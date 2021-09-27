@@ -17,6 +17,17 @@ dependencies {
     implementation "io.ktor:ktor-server-netty:$ktor_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
     implementation "io.ktor:ktor-serialization:$ktor_version"
+    implementation group: 'org.ktorm', name: 'ktorm-core', version: '3.4.1'
+    implementation "org.ktorm:ktorm-core:$ktorm_version"
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
+
+    // Koin for Kotlin apps
+    compile "io.insert-koin:koin-ktor:$koin_version"
+    compile "io.insert-koin:koin-core:$koin_version"
+    // Testing
+    testCompile "io.insert-koin:koin-test:$koin_version"
+    // Needed JUnit version
+    testCompile "io.insert-koin:koin-test-junit4:$koin_version"
 
     testImplementation "io.ktor:ktor-server-test-host:$ktor_version"
     testImplementation "org.jetbrains.kotlin:kotlin-test"
