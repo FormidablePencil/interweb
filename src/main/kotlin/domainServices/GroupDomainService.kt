@@ -6,20 +6,19 @@ import models.GroupComments
 import repositories.GroupRepository
 
 class GroupDomainService(
-    private val categoriesOfGroupRepository: CategoriesOfGroupRepository,
     private val groupRepository: GroupRepository,
     private val groupManager: GroupManager,
-    private val groupCommentsRepository: GroupCommentsRepository,
 ) {
 
     //region Get
 
-    fun GetGroupById(id: Int): Group {
-        return groupRepository.GetGroupById(id)
+    fun GetGroupById(groupId: Int): Group {
+        var group = groupRepository.GetGroupById(groupId)
+        return group
     }
 
-    fun GetGroupComments(groupId: Int): List<GroupComments> {
-        return groupCommentsRepository.GetCommentsByGroupId(groupId)
+    fun GetGroupByAuthorsCategory(groupIds: List<Int>, category: List<String>): Group {
+        return groupRepository.FilterGroupByCategories(groupIds, category)
     }
 
     fun GetSubGroups(subGroupsIds: List<Int>): List<Group> {

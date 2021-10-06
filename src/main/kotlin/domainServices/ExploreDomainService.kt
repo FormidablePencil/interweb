@@ -3,10 +3,9 @@ package domainServices
 import repositories.AuthorRepository
 import repositories.GroupRepository
 
-class SearchDomainService(
+class ExploreDomainService(
     private var authorRepository: AuthorRepository,
     private var groupRepository: GroupRepository,
-    private var groupCategoriesRepository: CategoriesOfGroupRepository
 ) {
 
     fun Search(search: String) {
@@ -17,7 +16,7 @@ class SearchDomainService(
     }
 
     fun SearchAuthors(username: String) {
-        authorRepository.GetByUsername(username)
+        authorRepository.CreateAuthor(username)
     }
 
     fun SearchGroupsByTitle(title: String) {

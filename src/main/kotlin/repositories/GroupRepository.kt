@@ -18,8 +18,8 @@ class GroupRepository : IGroupingRepository {
 
     }
 
-    fun GetGroupByAuthorsCategory(authorId: Int, category: Int) {
-
+    fun FilterGroupByCategories(groupIds: List<Int>, category: List<String>): Group {
+        return Group
     }
 
     fun GetGroupByAuthorsTags(authorId: Int, tag: String): List<Group> {

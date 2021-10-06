@@ -1,24 +1,19 @@
 package routes
 
-import domainServices.AuthorDomainService
+import domainServices.AuthorsPortfolioDomainService
 import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.response.*
 import io.ktor.routing.*
-import jdk.internal.vm.compiler.word.LocationIdentity.any
-import models.customerStorage
 import org.koin.ktor.ext.inject
-import repositories.AuthorRepository
 
 fun Application.registerAuthorRoutes() {
-    val authorDomainService by inject<AuthorDomainService>()
+    val authorDomainService by inject<AuthorsPortfolioDomainService>()
 
     routing {
         signInRouting(authorDomainService)
     }
 }
 
-fun Route.signInRouting(authorDomainService: AuthorDomainService) {
+fun Route.signInRouting(authorDomainService: AuthorsPortfolioDomainService) {
     route("/signIn") {
         get {
             var id = 0;
