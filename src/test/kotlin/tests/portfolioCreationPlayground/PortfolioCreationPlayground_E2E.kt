@@ -1,4 +1,4 @@
-package PortfolioCreationPlayground
+package tests.portfolioCreationPlayground
 
 import domainServices.PortfolioCreationPlaygroundDomainService
 import models.AuthorsPortfolio.AddNewComponentRequest

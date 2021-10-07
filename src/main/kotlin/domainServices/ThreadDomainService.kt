@@ -33,7 +33,7 @@ class ThreadDomainService(
 
     //region Create
 
-    fun CreateThread() {
+    fun CreateThread(authorId: Int) {
 
     }
 
