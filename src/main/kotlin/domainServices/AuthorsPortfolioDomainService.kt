@@ -16,6 +16,11 @@ class AuthorsPortfolioDomainService(
         authorsPortfolioManager.GetLayout(layoutId)
     }
 
+    fun GetAuthorsLayouts() {
+        authorsPortfolioManager.GetAuthorsLayouts()
+    }
+
+
     fun GetAuthor(userId: Int): Author? {
         return authorManager.GetAuthor(userId)
     };

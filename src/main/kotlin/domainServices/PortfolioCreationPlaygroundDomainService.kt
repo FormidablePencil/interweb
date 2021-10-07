@@ -8,8 +8,8 @@ class PortfolioCreationPlaygroundDomainService(
     private var authorsPortfolioManager: AuthorsPortfolioManager,
     private var portfolioComponentRepository : PortfolioComponentRepository,
 ) {
-    fun GetLayouts() {
-        authorsPortfolioManager.GetLayouts()
+    fun GetAuthorsLayouts() {
+        authorsPortfolioManager.GetAuthorsLayouts()
     }
 
     fun GetLayout(layoutId: Int) {

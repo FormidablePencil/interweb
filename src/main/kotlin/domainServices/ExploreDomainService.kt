@@ -1,17 +1,17 @@
 package domainServices
 
 import repositories.AuthorRepository
-import repositories.GroupRepository
+import repositories.ThreadRepository
 
 class ExploreDomainService(
     private var authorRepository: AuthorRepository,
-    private var groupRepository: GroupRepository,
+    private var threadRepository: ThreadRepository,
 ) {
 
     fun Search(search: String) {
         SearchAuthors(search)
-        SearchGroupsByTitle(search)
-        SearchGroupsByTags(search)
+        SearchThreadsByTitle(search)
+        SearchThreadsByTags(search)
         // return the most relevant by precedence
     }
 
@@ -19,12 +19,12 @@ class ExploreDomainService(
         authorRepository.CreateAuthor(username)
     }
 
-    fun SearchGroupsByTitle(title: String) {
+    fun SearchThreadsByTitle(title: String) {
 
     }
 
-    fun SearchGroupsByTags(tag: String) {
-        groupRepository.GetGroupsByTag(tag)
+    fun SearchThreadsByTags(tag: String) {
+        threadRepository.GetThreadsByTag(tag)
     }
 
 }

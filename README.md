@@ -1,3 +1,7 @@
+# Done
+- PortfolioCreationPlayground test/blueprint has been done and now ready for implementation for the most part
+- 
+
 
 // TODO: Submodules (dev-ops) but first... why TP.Core.Web, the mediary between Core and TP.WebApi? - Because
 TP.Functions needed most of the same logic as TP.WebApi

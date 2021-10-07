@@ -7,7 +7,14 @@ class PortfolioCreationPlayground_E2E(
     private val portfolioCreationPlaygroundDomainService: PortfolioCreationPlaygroundDomainService,
 ) {
     fun GetLayout() {
+        //region setup
 
+        // create layout with components
+        val layoutId = 1
+
+        //endregion
+
+        portfolioCreationPlaygroundDomainService.GetLayout(layoutId)
     }
 
     fun EditPortfolio_workflow() {

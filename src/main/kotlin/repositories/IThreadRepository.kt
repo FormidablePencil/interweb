@@ -1,5 +1,5 @@
 package repositories
 
-interface IGroupingRepository {
+interface IThreadingRepository {
 
 }

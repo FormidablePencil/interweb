@@ -1,7 +1,7 @@
 package managers
 
 class AuthorsPortfolioManager {
-    fun GetLayouts() {
+    fun GetAuthorsLayouts() {
     }
 
     fun GetLayout(layoutId: Int) {

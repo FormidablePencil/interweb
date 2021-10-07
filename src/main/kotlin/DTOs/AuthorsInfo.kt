@@ -1,7 +1,7 @@
 package DTOs
 
 import models.Author
-import models.Group
+import models.Thread
 
-//data class AuthorsInfo(var author: Author, var groupings: List<Group>, var categories: Array<Categories>)
-data class AuthorsInfo(var author: Author, var groupings: List<Group>)
+//data class AuthorsInfo(var author: Author, var threadings: List<Thread>, var categories: Array<Categories>)
+data class AuthorsInfo(var author: Author, var threadings: List<Thread>)
