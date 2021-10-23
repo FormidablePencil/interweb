@@ -1,4 +1,4 @@
-package DTOs
+package dto
 
 import models.Author
 import models.Thread

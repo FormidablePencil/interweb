@@ -7,7 +7,7 @@ class ThreadRepository : IThreadingRepository {
     //region Get
 
     fun GetThreadById(id: Int): Thread {
-        return Thread
+        return Thread()
     }
 
     fun GetThreads(threadsIds: List<Int>): List<Thread> {
@@ -19,7 +19,7 @@ class ThreadRepository : IThreadingRepository {
     }
 
     fun FilterThreadByCategories(threadIds: List<Int>, category: List<String>): Thread {
-        return Thread
+        return Thread()
     }
 
     fun GetThreadByAuthorsTags(authorId: Int, tag: String): List<Thread> {

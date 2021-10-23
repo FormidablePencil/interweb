@@ -13,17 +13,15 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     override fun CreateAuthor(username: String): Int {
         val author = Author{ username }
         val response = database.author.add(author)
-        println(response)
-        println("Success")
         return response
     }
 
-    override fun Get(username: String): Author? {
+    override fun GetByUsername(username: String): Author? {
         val author = database.author.find { it.username eq username }
         return author
     }
 
-    override fun Get(authorId: Int): Author? {
+    override fun GetById(authorId: Int): Author? {
         val author = database.author.find { it.id eq authorId }
         return author
     }

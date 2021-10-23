@@ -1,17 +1,15 @@
 package domainServices
 
-import DTOs.AuthorsPortfolioLayout
-import DTOs.LayoutComponent
-import managers.AuthorManager
+import dto.AuthorsPortfolioLayout
+import dto.LayoutComponent
 import managers.AuthorsPortfolioManager
 import models.Author
-import models.AuthorsPortfolio.AddNewComponentRequest
 import repositories.AuthorRepository
-import repositories.AuthorViewerRepository
+import repositories.IAuthorRepository
 
 
 class AuthorsPortfolioDomainService(
-    private var authorManager: AuthorManager,
+    private val authorRepository: IAuthorRepository,
     private val authorsPortfolioManager: AuthorsPortfolioManager,
 ) {
     fun GetLayout(authorId: Int, layoutId: Int): AuthorsPortfolioLayout {
@@ -26,11 +24,11 @@ class AuthorsPortfolioDomainService(
         return listOf<Int>(32, 43)
     }
 
-    fun GetAuthor(userId: Int): Author? {
-        return authorManager.GetAuthor(userId)
+    fun GetAuthorById(userId: Int): Author? {
+        return authorRepository.GetById(userId)
     };
 
-    fun GetAuthor(username: String): Author? {
-        return authorManager.GetAuthor(username)
+    fun GetAuthorByUsername(username: String): Author? {
+        return authorRepository.GetByUsername(username)
     };
 }

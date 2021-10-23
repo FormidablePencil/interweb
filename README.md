@@ -16,7 +16,7 @@ TP.Functions needed most of the same logic as TP.WebApi
 Repositories -
     db querying
 
-DTOs
+dto
 
 Models
 

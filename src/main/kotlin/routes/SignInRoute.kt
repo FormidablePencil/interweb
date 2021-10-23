@@ -17,7 +17,7 @@ fun Route.signInRouting(authorDomainService: AuthorsPortfolioDomainService) {
     route("/signIn") {
         get {
             var id = 0;
-            authorDomainService.GetAuthor(id)
+            authorDomainService.GetAuthorById(id)
             // GetSettings
             // GetNewNotification
         }

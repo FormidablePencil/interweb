@@ -1,7 +1,7 @@
 package tests.thread
 
-import DTO.signup.SignupResWF
-import DTO.thread.CreateThreadReqWF
+import dto.signup.SignupResWF
+import dto.thread.CreateThreadReqWF
 import domainServices.ExploreDomainService
 import domainServices.ThreadDomainService
 import tests.signup.Signup_E2E
@@ -14,7 +14,7 @@ class CreateThread_E2E(
 
     fun CreateThread_workflow(createThreadRequest: CreateThreadReqWF = CreateThreadReqWF()) {
         // surround code with a transaction scope
-        val signupResWF: SignupResWF = signupE2E.Signup_workflow()
+        val signupResWF: SignupResWF = signupE2E.Signup_flow()
 
         threadDomainService.CreateThread(signupResWF.authorId)
 

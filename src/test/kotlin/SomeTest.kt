@@ -1,10 +1,7 @@
 import configurations.DIHelper
 import org.junit.Rule
 import org.junit.Test
-import org.koin.core.scope.get
-import org.koin.dsl.module
 import org.koin.test.KoinTest
-import repositories.AuthorRepository
 import repositories.IAuthorRepository
 
 import org.koin.test.KoinTestRule
@@ -21,6 +18,9 @@ class SomeOtherTest : KoinTest {
     @Test
     fun testDbConnection() {
 //        AuthorRepository().CreateAuthor("dfd")
-        authorRepository.CreateAuthor("New user");
+        var result = authorRepository.CreateAuthor("New user");
+
+        println("first $result")
+        println("second")
     }
 }

@@ -1,6 +1,6 @@
 package tests.explore
 
-import DTO.signup.SignupResWF
+import dto.signup.SignupResWF
 import domainServices.AuthorsPortfolioDomainService
 import domainServices.ExploreDomainService
 import domainServices.ThreadDomainService
@@ -18,7 +18,7 @@ class Explore_E2E(
 ) {
     fun VisitAuthorsPortfolio_userflow() {
         //region setup
-        val signupResWF: SignupResWF = signupE2E.Signup_workflow()
+        val signupResWF: SignupResWF = signupE2E.Signup_flow()
         threadDomainService.CreateThread(signupResWF.authorId)
         //endregion
 

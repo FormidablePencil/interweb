@@ -1,22 +1,27 @@
-package tests.signup
+package tests.login
 
-import dto.signup.SignupReqWF
 import dto.signup.SignupResWF
 import domainServices.SignupDomainService
+import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import repositories.IAuthorRepository
+import tests.signup.Signup_E2E
+import tests.token.Token_E2E
 
-class Signup_E2E : KoinTest {
-    val signupDomainService by inject<SignupDomainService>()
+class Login_E2E : KoinTest {
     val authorRepository by inject<IAuthorRepository>()
+    val signupDomainService by inject<SignupDomainService>()
+    val signup_E2E by inject<Signup_E2E>()
+    val token_E2E by inject<Token_E2E>()
 
 //    @get:Rule
 //    val koinTestRule = KoinTestRule.create {
-//        modules(DIHelper.GetModule(environment.config))
+//        modules(DIHelper.CoreModule)
 //    }
 
-    fun Signup_flow(signupReqWF: SignupReqWF = SignupReqWF()): SignupResWF {
+    @Test
+    fun Login_test() {
         val email = "someEmail" // randomly generate
         val username = "username" // randomly generate
         val password = "password" // randomly generate
@@ -24,6 +29,13 @@ class Signup_E2E : KoinTest {
         // wrap tranScope
         val authorId = signupDomainService.Signup(email, username, password)
 
-        return SignupResWF(authorId, email, username)
+        var signupResult: SignupResWF = signup_E2E.Signup_flow();
+
+        var loginResult = Login_flow()
+
+    }
+
+    fun Login_flow() {
+        token_E2E.Authenticate()
     }
 }

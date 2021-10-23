@@ -3,6 +3,6 @@ package managers
 import models.Author
 
 interface IAuthorManager {
-    fun GetAuthor(username: String): Author?
-    fun GetAuthor(userId: Int): Author?
+    fun GetAuthorByUsername(username: String): Author?
+    fun GetAuthorById(userId: Int): Author?
 }

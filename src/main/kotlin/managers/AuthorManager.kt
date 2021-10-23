@@ -10,16 +10,16 @@ class AuthorManager(
     private val authorViewerRepository: AuthorViewerRepository,
 ) : OwnerOrViewManager(token), IAuthorManager {
 
-    override fun GetAuthor(username: String): Author? {
+    override fun GetAuthorByUsername(username: String): Author? {
         return if (requesterUsername == username)
-            authorRepository.Get(username)
+            authorRepository.GetByUsername(username)
         else
             authorViewerRepository.Get(username)
     }
 
-    override fun GetAuthor(userId: Int): Author? {
+    override fun GetAuthorById(userId: Int): Author? {
         return if (requesterId == userId)
-            authorRepository.Get(userId)
+            authorRepository.GetById(userId)
         else
             authorViewerRepository.Get(userId)
     };

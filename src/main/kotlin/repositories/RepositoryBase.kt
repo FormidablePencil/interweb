@@ -12,7 +12,7 @@ open class RepositoryBase {
     init {
         val prop = Properties()
         prop.load(FileInputStream("local.datasource.properties"))
-        database = Database.connect(prop.getProperty("password"), user = prop.getProperty("username"), password = prop.getProperty("jdbcUrl"))
+        database = Database.connect(prop.getProperty("jdbcUrl"), user = prop.getProperty("username"), password = prop.getProperty("password"))
         println("${prop.getProperty("password")} ${prop.getProperty("username")} ${prop.getProperty("jdbcUrl")}")
     }
 

@@ -18,7 +18,7 @@ class ExploreDomainService(
     }
 
     fun SearchAuthors(username: String): Author {
-        val author = authorRepository.Get(username)
+        val author = authorRepository.GetByUsername(username)
         if (author != null)
             return author
         else throw Exception("failed to find author...")
