@@ -17,10 +17,5 @@ class SomeOtherTest : KoinTest {
 
     @Test
     fun testDbConnection() {
-//        AuthorRepository().CreateAuthor("dfd")
-        var result = authorRepository.CreateAuthor("New user");
-
-        println("first $result")
-        println("second")
     }
 }

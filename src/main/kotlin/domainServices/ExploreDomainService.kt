@@ -17,8 +17,8 @@ class ExploreDomainService(
         // return the most relevant by precedence
     }
 
-    fun SearchAuthors(username: String): Author {
-        val author = authorRepository.GetByUsername(username)
+    fun SearchAuthors(email: String): Author {
+        val author = authorRepository.getByEmail(email)
         if (author != null)
             return author
         else throw Exception("failed to find author...")

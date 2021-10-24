@@ -25,10 +25,10 @@ class AuthorsPortfolioDomainService(
     }
 
     fun GetAuthorById(userId: Int): Author? {
-        return authorRepository.GetById(userId)
+        return authorRepository.getById(userId)
     };
 
-    fun GetAuthorByUsername(username: String): Author? {
-        return authorRepository.GetByUsername(username)
+    fun GetAuthorByEmail(email: String): Author? {
+        return authorRepository.getByEmail(email)
     };
 }

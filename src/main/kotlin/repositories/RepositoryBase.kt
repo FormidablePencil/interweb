@@ -9,6 +9,7 @@ import java.util.*
 
 open class RepositoryBase {
     val database: Database
+
     init {
         val prop = Properties()
         prop.load(FileInputStream("local.datasource.properties"))

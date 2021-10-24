@@ -4,19 +4,22 @@ import dto.signup.SignupResWF
 import dto.thread.CreateThreadReqWF
 import domainServices.ExploreDomainService
 import domainServices.ThreadDomainService
-import tests.signup.Signup_E2E
+import dto.author.CreateAuthorRequest
+import dto.signup.SignupResult
+import tests.signup.SignupE2E
 
 class CreateThread_E2E(
     private val threadDomainService: ThreadDomainService,
     private val exploreDomainService: ExploreDomainService,
-    private val signupE2E: Signup_E2E,
+    private val signupE2E: SignupE2E,
 ) {
 
     fun CreateThread_workflow(createThreadRequest: CreateThreadReqWF = CreateThreadReqWF()) {
         // surround code with a transaction scope
-        val signupResWF: SignupResWF = signupE2E.Signup_flow()
+        var createAuthorRequest = CreateAuthorRequest("", "", "", "", "")
+        val signupResult: SignupResult = signupE2E.Signup_flow(createAuthorRequest)
 
-        threadDomainService.CreateThread(signupResWF.authorId)
+        threadDomainService.CreateThread(signupResult.authorId)
 
         // validate that it was created through another user
 
