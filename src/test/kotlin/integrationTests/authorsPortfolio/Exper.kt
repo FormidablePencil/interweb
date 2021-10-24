@@ -1,4 +1,4 @@
-package tests.authorsPortfolio
+package integrationTests.authorsPortfolio
 
 import org.junit.Test
 import org.koin.test.KoinTest

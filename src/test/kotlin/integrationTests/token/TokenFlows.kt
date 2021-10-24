@@ -1,23 +1,17 @@
-package tests.token
+package integrationTests.token
 
-import DITestHelper
-import configurations.DIHelper
 import dto.author.CreateAuthorRequest
-import org.junit.Assert
-import org.junit.Rule
-import org.junit.Test
+import io.kotlintest.shouldNotBe
 import org.koin.test.KoinTest
-import org.koin.test.KoinTestRule
-import org.koin.test.inject
-import tests.login.LoginE2E
+import integrationTests.login.LoginFlows
 
-class TokenE2E(): KoinTest {
-    val login_E2E by inject<LoginE2E>()
+// directories
+// integration tests.
+// unit tests (mock generators).
+// shared - flows for integration tests, di
 
-    @get:Rule
-    val koinTestRule = KoinTestRule.create {
-        modules(DIHelper.CoreModule, DITestHelper.CoreModule)
-    }
+class TokenFlows : KoinTest {
+    val loginFlows = LoginFlows()
 
     // Tests
     // refresh token fails if expired
@@ -33,8 +27,8 @@ class TokenE2E(): KoinTest {
     // The server tries to decrypt the token with the corresponding data, UserId and encrypted password in their case
     // and if success then give access to restricted requested resources.
 
-    @Test
-    fun loginTokens() {
+
+    fun loginTokens_flow() {
         var createAuthorRequest = CreateAuthorRequest(
             "Formidable@78",
             "someEmail@gmail.com",
@@ -43,9 +37,9 @@ class TokenE2E(): KoinTest {
             "PurpleBlue@54",
         )
 
-        var result = login_E2E.signupAndLogin_flow(createAuthorRequest)
+        var result = loginFlows.signupAndLogin(createAuthorRequest)
 
-        Assert.assertTrue(result.refreshToken.isNotEmpty())
+        result.refreshToken.length shouldNotBe 0
         // expiration date greater than something and less than another thing
         // attempt to access data with tempered token and attempt to access another users resources
     }
@@ -61,7 +55,7 @@ class TokenE2E(): KoinTest {
             "lastname",
             "PurpleBlue@54",
         )
-        var result = login_E2E.signupAndLogin_flow(createAuthorRequest)
+        var result = loginFlows.signupAndLogin(createAuthorRequest)
         // send credentials generate refresh token with 1 second expiration time
         // delay runtime and validate refresh token
         //endregion

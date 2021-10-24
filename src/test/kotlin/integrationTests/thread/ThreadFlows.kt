@@ -1,10 +1,10 @@
-package tests.thread
+package integrationTests.thread
 
-import tests.thread.CreateThread_E2E
+import org.koin.test.KoinTest
+import org.koin.test.inject
 
-class Thread_E2E(
-    val createThreadE2E: CreateThread_E2E,
-) {
+class ThreadFlows : KoinTest {
+    private val createThreadFlows by inject<CreateThreadFlows>()
 
     fun NavigateToGetRelatedThread_workflow() {
         //region setup

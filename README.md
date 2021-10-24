@@ -34,13 +34,13 @@ DomainServices -
 Managers -
     Extracted out logic for multiple DomainServices. (rather than needing to DI large DomainService classes).
 
-# Automated tests
+# Automated integrationTests
 
-e2e, checkpoints and unit tests
+e2e, checkpoints and unit integrationTests
 
-These tests will lie in their respective projects
+These integrationTests will lie in their respective projects
 
-## IW.UtilLib4Tests will exist for utilities and tests to consume
+## IW.UtilLib4Tests will exist for utilities and integrationTests to consume
 Shortcuts -
     Parts of code skipped for producing changes in db for testing purposes by mocking dependencies.
 
@@ -49,11 +49,11 @@ GenericFakeData
 DependencyInjectionHelper
     Inject mocks from mockFactories, mocked log repositories and perhaps classes from other projects.
 
-TODO: TP way was having a startup for every lib which worked since tests were their own project. IW however,
-I need to understand where the startup of the tests is.
+TODO: TP way was having a startup for every lib which worked since integrationTests were their own project. IW however,
+I need to understand where the startup of the integrationTests is.
 
 
-[comment]: <> (The tests will mimic the codebase structure)
+[comment]: <> (The integrationTests will mimic the codebase structure)
 
 [comment]: <> (## Projects and structure)
 

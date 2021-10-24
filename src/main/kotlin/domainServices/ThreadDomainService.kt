@@ -12,20 +12,20 @@ class ThreadDomainService(
 
     //region Get
 
-    fun GetThreadById(threadId: Int): Thread {
+    fun getThreadById(threadId: Int): Thread {
         var thread = threadRepository.GetThreadById(threadId)
         return thread
     }
 
-    fun GetThreadByAuthorsCategory(threadIds: List<Int>, category: List<String>): Thread {
+    fun getThreadByAuthorsCategory(threadIds: List<Int>, category: List<String>): Thread {
         return threadRepository.FilterThreadByCategories(threadIds, category)
     }
 
-    fun GetSubThreads(subThreadsIds: List<Int>): List<Thread> {
+    fun getSubThreads(subThreadsIds: List<Int>): List<Thread> {
         return threadRepository.GetThreads(subThreadsIds)
     }
 
-    fun GetRelatedThreads(relatedThreadsIds: List<Int>): List<Thread> {
+    fun getRelatedThreads(relatedThreadsIds: List<Int>): List<Thread> {
         return threadRepository.GetThreads(relatedThreadsIds)
     }
 
@@ -33,7 +33,7 @@ class ThreadDomainService(
 
     //region Create
 
-    fun CreateThread(authorId: Int) {
+    fun createThread(authorId: Int) {
 
     }
 

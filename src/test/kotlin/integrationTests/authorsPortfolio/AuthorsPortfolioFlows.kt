@@ -1,15 +1,14 @@
-package tests.authorsPortfolio
+package integrationTests.authorsPortfolio
 
-import dto.signup.SignupResWF
 import domainServices.AuthorsPortfolioDomainService
 import domainServices.SignupDomainService
+import domainServices.TokenDomainService
+import integrationTests.login.LoginFlows
 import org.junit.Test
-import tests.signup.SignupE2E
+import integrationTests.signup.SignupFlows
+import org.koin.test.inject
 
-class AuthorsPortfolio_E2E(
-    private val authorsPortfolioDomainService: AuthorsPortfolioDomainService,
-    private val signupDomainService: SignupDomainService,
-    private val signupE2E: SignupE2E,
+class AuthorsPortfolioFlows(
 ) {
     fun GetLayouts() {
         //region setup

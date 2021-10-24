@@ -1,12 +1,15 @@
-package tests.portfolioCreationPlayground
+package integrationTests.portfolioCreationPlayground
 
 import domainServices.PortfolioCreationPlaygroundDomainService
+import domainServices.TokenDomainService
 import models.AuthorsPortfolio.AddNewComponentRequest
+import org.koin.test.KoinTest
+import org.koin.test.inject
 
-class PortfolioCreationPlayground_E2E(
-    private val portfolioCreationPlaygroundDomainService: PortfolioCreationPlaygroundDomainService,
-) {
-    fun GetLayout() {
+class PortfolioCreationPlaygroundFlows: KoinTest {
+    private val portfolioCreationPlaygroundDomainService by inject<PortfolioCreationPlaygroundDomainService>()
+
+    fun getLayout() {
         //region setup
 
         // create layout with components
@@ -17,11 +20,11 @@ class PortfolioCreationPlayground_E2E(
         portfolioCreationPlaygroundDomainService.GetLayout(layoutId)
     }
 
-    fun EditPortfolio_workflow() {
+    fun editPortfolio() {
         //region setup
         // authors have foreign key of componentLibrary.Id -> libraryName id -> component.libraryId
         // a component will have a column that tells you to what "library" it belongs to
-        AddNewComponent_workflow()
+        addNewComponent()
         //endregion
 
         //region action
@@ -31,7 +34,7 @@ class PortfolioCreationPlayground_E2E(
     }
 
     // do you want to update the db for component one at a time or all at once?? one at a time for users to get back to where they left off
-    fun AddNewComponent_workflow(): Int {
+    fun addNewComponent(): Int {
         //region param (thought)
         // They choose to design for what Layout, e.g. Default, Web dev, photographer, ect.
         var portfolioLayoutId = 2
@@ -59,7 +62,7 @@ class PortfolioCreationPlayground_E2E(
     }
 
     // done in portfolio page drag mode
-    fun UpdateArrangmentOfComponent_workflow() {
+    fun updateArrangmentOfComponent() {
         //region setup and thought
         var componentArrangment = listOf<Int>(1, 12, 43, 13)
         var layoutId = 1
@@ -79,9 +82,9 @@ class PortfolioCreationPlayground_E2E(
     }
 
     // when user saves in component canvas page, updateComponent is triggered
-    fun UpdateComponent_workflow() {
+    fun updateComponent() {
         //region setup
-        var componentId = AddNewComponent_workflow();
+        var componentId = addNewComponent();
         //endregion
 
         //region actions
@@ -92,7 +95,7 @@ class PortfolioCreationPlayground_E2E(
     // prompt if user is sure that they want to delete
     fun DeleteComponent_workflow() {
         //region setup
-        var componentId = AddNewComponent_workflow();
+        var componentId = addNewComponent();
         //endregion
 
         //region actions
