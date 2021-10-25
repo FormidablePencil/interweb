@@ -1,7 +1,8 @@
 package routes
 
+import domainServices.LoginDomainService
 import domainServices.TokenDomainService
-import dto.token.AuthenticateResponse
+import dto.token.AuthenticateRequest
 import dto.login.Login
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -23,24 +24,16 @@ fun Application.registerLoginRoutes() {
 }
 
 fun Route.loginRoute() {
-    val tokenDomainService: TokenDomainService by inject()
+    val loginDomainService: LoginDomainService by inject()
     val authorRepository: IAuthorRepository by inject()
 
-    // unit test routes/controller?
     post("/login") {
-
-        //region authentication
-        val principal = call.principal<JWTPrincipal>()
-        val username = principal!!.payload.getClaim("username").asString()
-        val expiresAt = principal.expiresAt?.time?.minus(System.currentTimeMillis())
-        call.respondText("Hello, $username! Token is expired at $expiresAt ms.")
-        //endregion
-
         try {
             val user = call.receive<Login>()
             // return access token (expires in 15 minutes) and a refresh token (expires in 30days)
-            var token = tokenDomainService.login(AuthenticateResponse(user.username, user.password))
+            var token = loginDomainService.login(user.username, user.password)
             call.respond(token)
+//        call.respond(hashMapOf("token" to token))
         } catch (ex: ConstraintViolationException) {
             call.respond(HttpStatusCode.BadRequest, FailedRequestValidationResponse(ex))
         }

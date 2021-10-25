@@ -1,6 +1,8 @@
 package managers
 
+import dto.token.TokensResult
+
 interface ITokenManager {
-    fun authenticate(email: String, password: String)
-    fun getNewAccessToken(refreshToken: String)
+    fun refreshAccessToken(refreshToken: String): Pair<String, String>
+    fun generateTokens(authorId: Int, username: String): TokensResult
 }

@@ -1,22 +1,10 @@
 package domainServices
 
-import dto.token.AuthenticateResponse
-import dto.token.LoginResult
 import managers.ITokenManager
 
 class TokenDomainService(
     private val tokenManager: ITokenManager
 ) {
-
-    fun login(request: AuthenticateResponse): LoginResult {
-        var authorId = 1
-        var refreshToken = ""
-        var accessToken = ""
-
-        tokenManager.authenticate(request.username, request.password)
-
-        return LoginResult(authorId, refreshToken, accessToken)
-    }
 
     fun generateToken() {
     }
@@ -24,6 +12,7 @@ class TokenDomainService(
     fun generateRefreshToken() {
     }
 
-    fun refreshAccessToken() {
+    fun refreshAccessToken(refreshToken: String): Pair<String, String> {
+        return tokenManager.refreshAccessToken(refreshToken)
     }
 }

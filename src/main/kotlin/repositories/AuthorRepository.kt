@@ -14,24 +14,12 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     val Database.author get() = this.sequenceOf(Authors)
     val Database.password get() = this.sequenceOf(Passwords)
 
-    override fun validateCredentials(email: String, password: String): Author? {
-        var result = database.author.find() { it.email eq email }
-        return result
-    }
-
     override fun createAuthor(request: CreateAuthorRequest): Int {
-        var passwordId = database.insertAndGenerateKey(Passwords) {
-            set(it.password, request.encryptedPassword)
-        }
-
-        if (passwordId !is Int)
-            throw Exception("Server error. Saving password failed")
-
         var authorId = database.insertAndGenerateKey(Authors) {
             set(it.username, request.username)
             set(it.firstname, request.firstname)
             set(it.lastname, request.lastname)
-            set(it.passwordId, passwordId)
+            set(it.passwordId, request.passwordId)
             set(it.email, request.email)
         }
 
@@ -42,8 +30,6 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
 
         return authorId
     }
-
-//    override fun DeleteAuthor()
 
     override fun getByEmail(email: String): Author? {
         val author = database.author.find { it.email eq email }

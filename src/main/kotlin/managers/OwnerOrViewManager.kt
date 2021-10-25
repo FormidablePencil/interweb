@@ -1,6 +1,6 @@
 package managers
 
-// a class inherited by every manager for saving username
+// a class inherited by every manager for saving email
 open class OwnerOrViewManager : IUserStaticManager {
     val requesterUsername: String = ""
     var requesterId: Int = 0

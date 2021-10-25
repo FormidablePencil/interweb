@@ -1,12 +1,16 @@
 package repositories
 
-import dto.token.AuthenticateResponse
+import models.Authors
+import org.ktorm.database.Database
+import org.ktorm.entity.sequenceOf
 
-class TokenRepository: RepositoryBase() {
-//    val Database.author get() = this.sequenceOf(Authors)
+class TokenRepository : RepositoryBase(), ITokenRepository {
+    private val Database.author get() = this.sequenceOf(Authors)
 
-    fun Authenticate(request: AuthenticateResponse) {
-       // check to see if there's a token in db created for that user and matches
-//        database.author
+    override fun insertTokens(
+        refreshToken: HashMap<String, String>,
+        accessToken: HashMap<String, String>
+    ): Int {
+        return 0
     }
 }

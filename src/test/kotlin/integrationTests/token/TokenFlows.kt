@@ -28,7 +28,7 @@ class TokenFlows : KoinTest {
     // and if success then give access to restricted requested resources.
 
 
-    fun loginTokens_flow() {
+    fun login() {
         var createAuthorRequest = CreateAuthorRequest(
             "Formidable@78",
             "someEmail@gmail.com",

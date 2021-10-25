@@ -9,6 +9,7 @@ import dto.signup.SignupResult
 import integrationTests.signup.SignupFlows
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import shared.KoinFunSpec
 
 class CreateThreadFlows: KoinTest {
     private val threadDomainService by inject<ThreadDomainService>()

@@ -4,7 +4,6 @@ import dto.author.CreateAuthorRequest
 import models.Author
 
 interface IAuthorRepository {
-    fun validateCredentials(email: String, password: String): Author?
     fun createAuthor(request: CreateAuthorRequest): Int
     fun getByEmail(email: String): Author?
     fun getById(authorId: Int): Author?

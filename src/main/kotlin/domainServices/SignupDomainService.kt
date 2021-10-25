@@ -13,11 +13,11 @@ class SignupDomainService(
         // save encrypted password, create author column and generate jwt tokens
         // return jwt tokens and authorId
 
-        request.encryptedPassword = request.password;
+        request.encryptedPassword = "";
 
         var createAuthorResult = authorRepository.createAuthor(request)
 
-//        tokenManager.authenticate(email, username)
+//        tokenManager.authenticate(email, email)
 
 //        var result = authorRepository.GetByUsername()
         val authorId = 1
