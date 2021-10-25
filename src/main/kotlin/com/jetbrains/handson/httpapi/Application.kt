@@ -2,10 +2,12 @@ package com.jetbrains.handson.httpapi
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.typesafe.config.ConfigFactory
 import configurations.DIHelper
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
+import io.ktor.config.*
 import io.ktor.features.*
 import io.ktor.serialization.*
 import org.koin.core.context.startKoin
@@ -17,7 +19,9 @@ import routes.registerOrderRoutes
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module(testing: Boolean = false) {
-    val port = environment.config.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
+
+    val applicationConfig = HoconApplicationConfig(ConfigFactory.load("application.conf"))
+    val port = applicationConfig.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
 
     startKoin {
         // declare modules
@@ -41,10 +45,11 @@ fun Application.module(testing: Boolean = false) {
 //    for (row in database.from(Employees).select()) {
 //        println(row[Employees.name])
 //    }
-    val secret = environment.config.property("jwt.secret").getString()
-    val issuer = environment.config.property("jwt.issuer").getString()
-    val audience = environment.config.property("jwt.audience").getString()
-    val myRealm = environment.config.property("jwt.realm").getString()
+
+    val secret = applicationConfig.property("jwt.secret").getString()
+    val issuer = applicationConfig.property("jwt.issuer").getString()
+    val audience = applicationConfig.property("jwt.audience").getString()
+    val myRealm = applicationConfig.property("jwt.realm").getString()
     install(Authentication) {
         jwt("auth-jwt") {
             realm = myRealm

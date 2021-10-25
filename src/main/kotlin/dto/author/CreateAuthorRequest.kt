@@ -5,7 +5,7 @@ data class CreateAuthorRequest(
     val email: String,
     val firstname: String,
     val lastname: String,
-    val passwordId: Int,
+    val password: String,
 ) {
     var encryptedPassword: String? = null
 }

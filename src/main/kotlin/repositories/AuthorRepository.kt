@@ -19,7 +19,6 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
             set(it.username, request.username)
             set(it.firstname, request.firstname)
             set(it.lastname, request.lastname)
-            set(it.passwordId, request.passwordId)
             set(it.email, request.email)
         }
 

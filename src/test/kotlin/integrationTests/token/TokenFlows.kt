@@ -1,7 +1,6 @@
 package integrationTests.token
 
 import dto.author.CreateAuthorRequest
-import io.kotlintest.shouldNotBe
 import org.koin.test.KoinTest
 import integrationTests.login.LoginFlows
 
@@ -34,12 +33,12 @@ class TokenFlows : KoinTest {
             "someEmail@gmail.com",
             "firstname",
             "lastname",
-            "PurpleBlue@54",
+            "password"
         )
 
         var result = loginFlows.signupAndLogin(createAuthorRequest)
 
-        result.refreshToken.length shouldNotBe 0
+//        result.tokens.refreshToken.length shouldNotBe 0
         // expiration date greater than something and less than another thing
         // attempt to access data with tempered token and attempt to access another users resources
     }
@@ -53,7 +52,7 @@ class TokenFlows : KoinTest {
             "someEmail@gmail.com",
             "firstname",
             "lastname",
-            "PurpleBlue@54",
+            "password"
         )
         var result = loginFlows.signupAndLogin(createAuthorRequest)
         // send credentials generate refresh token with 1 second expiration time
