@@ -1,3 +1,5 @@
 package dto.signup
 
-data class SignupResult(val authorId: Int)
+import dto.token.TokensResult
+
+data class SignupResult(val authorId: Int, val tokens: TokensResult)

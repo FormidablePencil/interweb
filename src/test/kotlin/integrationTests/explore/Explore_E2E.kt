@@ -20,7 +20,7 @@ class Explore_E2E(
     fun VisitAuthorsPortfolio_userflow() {
         //region setup
         var result = CreateAuthorRequest("", "", "", "", "")
-        val signupResult: SignupResult = signupE2E.Signup_flow(result)
+        val signupResult: SignupResult = signupE2E.signup(result)
         threadDomainService.createThread(signupResult.authorId)
         //endregion
 

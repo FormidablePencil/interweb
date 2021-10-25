@@ -1,12 +1,9 @@
 package routes
 
 import domainServices.LoginDomainService
-import domainServices.TokenDomainService
-import dto.token.AuthenticateRequest
 import dto.login.Login
 import io.ktor.application.*
 import io.ktor.auth.*
-import io.ktor.auth.jwt.*
 import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*

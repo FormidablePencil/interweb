@@ -38,7 +38,7 @@ class TokenFlows : KoinTest {
 
         var result = loginFlows.signupAndLogin(createAuthorRequest)
 
-//        result.tokens.refreshToken.length shouldNotBe 0
+//        result.tokens.RefreshToken.length shouldNotBe 0
         // expiration date greater than something and less than another thing
         // attempt to access data with tempered token and attempt to access another users resources
     }

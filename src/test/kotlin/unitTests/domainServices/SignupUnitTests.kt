@@ -23,7 +23,7 @@ class SignupUnitTests : KoinBehaviorSpec() {
                 // dependency inject the mocked data on the fly using koin's scope
                 //endregion
 
-                signupDomainService.Signup(genCreateAuthorRequest())
+                signupDomainService.signup(genCreateAuthorRequest())
 
                 //region assertions
                 // test that dependencies have been called and the data provided was correct
@@ -34,7 +34,7 @@ class SignupUnitTests : KoinBehaviorSpec() {
         Given("incorrectly format email") {
             Then("throw incorrectlyFormattedEmail exception") {
                 var exception = shouldThrow<Exception> {
-                    signupDomainService.Signup(genCreateAuthorRequest(email = "email"))
+                    signupDomainService.signup(genCreateAuthorRequest(email = "email"))
                 }
                 // replace messages with enums
                 exception.message shouldBe "incorrectly formatted email"
@@ -44,7 +44,7 @@ class SignupUnitTests : KoinBehaviorSpec() {
         Given("weak password") {
             Then("throw weakPassword exception") {
                 var exception = shouldThrow<Exception> {
-                    signupDomainService.Signup(genCreateAuthorRequest(password = "password"))
+                    signupDomainService.signup(genCreateAuthorRequest(password = "password"))
                 }
                 // replace messages with enums
                 exception.message shouldBe "weak password"

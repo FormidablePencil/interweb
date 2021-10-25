@@ -1,3 +1,9 @@
+# Testing
+There are
+- Unit tests
+- Integration tests (try not to access domainServices directly but through user flows)
+- user flows
+
 # Done
 - PortfolioCreationPlayground test/blueprint has been done and now ready for implementation for the most part
 - 

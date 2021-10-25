@@ -13,7 +13,7 @@ class LoginFlows : KoinTest {
 
     fun signupAndLogin(request: CreateAuthorRequest): LoginResult {
         // signup and login
-        signupFlows.Signup_flow(request)
+        signupFlows.signup(request)
         var result = loginDomainService.login(request.username, "")
 
         return result

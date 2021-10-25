@@ -6,6 +6,4 @@ data class CreateAuthorRequest(
     val firstname: String,
     val lastname: String,
     val password: String,
-) {
-    var encryptedPassword: String? = null
-}
+)

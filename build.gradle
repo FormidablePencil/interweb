@@ -23,17 +23,20 @@ dependencies {
     implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
 
     // Koin for Kotlin apps
-    compile "io.insert-koin:koin-ktor:$koin_version"
-    compile "io.insert-koin:koin-core:$koin_version"
-    // Testing
-    testCompile "io.insert-koin:koin-test:$koin_version"
-    // Needed JUnit version
-    testCompile "io.insert-koin:koin-test-junit4:$koin_version"
+    // Koin for Ktor
+    implementation "io.insert-koin:koin-ktor:$koin_version"
+// Koin core features
+    implementation "io.insert-koin:koin-core:$koin_version"
+// Koin for JUnit 5
+    testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
+
+
+    // current jbcrypt_version is 0.4
+    compile group: 'org.mindrot', name: 'jbcrypt', version: 0.4
 
     testImplementation "io.ktor:ktor-server-test-host:$ktor_version"
-//    testImplementation "org.jetbrains.kotlin:kotlin-test"
-    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.3.2'
-
+//    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5:1.5.31'
+    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
 
     implementation "io.ktor:ktor-auth:$ktor_version"
     implementation "io.ktor:ktor-auth-jwt:$ktor_version"

@@ -8,7 +8,7 @@ import repositories.IAuthorRepository
 import repositories.ITokenRepository
 import java.util.*
 
-enum class Tokens { AccessToken, refreshToken }
+enum class Tokens { AccessToken, RefreshToken }
 
 class TokenManager(
     private val config: IConfig,
@@ -21,7 +21,9 @@ class TokenManager(
         // validate refresh token
         validateRefreshToken(refreshToken)
 
-        return Pair<String, String>("new AccessToken", "new refreshToken")
+//        val result = generateToken()
+
+        return Pair<String, String>("new AccessToken", "new RefreshToken")
     }
 
     private fun validateRefreshToken(refreshToken: String) {
@@ -30,11 +32,11 @@ class TokenManager(
     }
 
     override fun generateTokens(authorId: Int, username: String): TokensResult {
-        var refreshToken = generateToken(authorId, username, Tokens.refreshToken)
-        var accessToken = generateToken(authorId, username, Tokens.AccessToken)
+        val refreshToken = generateToken(authorId, username, Tokens.RefreshToken)
+        val accessToken = generateToken(authorId, username, Tokens.AccessToken)
 
-        // save both of them in the db
-        tokenRepository.insertTokens(refreshToken, accessToken)
+        // save both of them in the db under authorId
+        tokenRepository.insertTokens(refreshToken, accessToken, authorId)
 
         return TokensResult(refreshToken, accessToken)
     }

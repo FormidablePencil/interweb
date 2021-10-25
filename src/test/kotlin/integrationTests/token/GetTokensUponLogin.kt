@@ -1,18 +1,28 @@
 package integrationTests.token
 
 import com.jetbrains.handson.httpapi.module
+import domainServices.SignupDomainService
+import integrationTests.signup.SignupFlows
+import io.kotlintest.matchers.numerics.shouldBeGreaterThan
+import io.kotlintest.matchers.numerics.shouldNotBeGreaterThan
 import io.kotlintest.shouldBe
-import io.kotlintest.specs.BehaviorSpec
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import org.koin.test.inject
+import shared.KoinBehaviorSpec
 
 // mock dependencies
 // test runner
 // group tests (integration and unit tests)
 // transactions
 
-class GetTokensUponLogin : BehaviorSpec() {
-    private fun loginRequest(email: String, password: String, assertion: (status: HttpStatusCode?) -> Unit) {
+class GetTokensUponLogin : KoinBehaviorSpec() {
+    private val signupFlows = SignupFlows()
+
+    private fun loginRequest(
+        email: String, password: String,
+        assertion: (status: HttpStatusCode?, content: String?) -> Unit
+    ) {
         withTestApplication({ module(testing = true) }) {
             with(handleRequest(HttpMethod.Post, "/login") {
                 addHeader(HttpHeaders.ContentType, ContentType.Application.FormUrlEncoded.toString())
@@ -23,23 +33,32 @@ class GetTokensUponLogin : BehaviorSpec() {
                     ).formUrlEncode()
                 )
             }) {
-                assertion(response.status())
+                assertion(response.status(), response.content)
             }
         }
     }
 
     init {
         // first create an account via domainServices
+        var result = signupFlows.signup()
 
         Given("valid credentials") {
             Then("user should get tokens") {
-                loginRequest("email", "Password") { status -> status shouldBe HttpStatusCode.OK }
+                loginRequest(result.username, result.password)
+                { status, content ->
+                    status shouldBe HttpStatusCode.OK
+                    content?.length?.shouldBeGreaterThan(0)
+                }
             }
         }
 
         Given("invalid credentials") {
             Then("user should get 400 error") {
-                loginRequest("email", "Password") { status -> status shouldBe HttpStatusCode.BadRequest }
+                loginRequest(result.username, "")
+                { status, content ->
+                    status shouldBe HttpStatusCode.BadRequest
+                    content?.length?.shouldNotBeGreaterThan(0)
+                }
             }
         }
 

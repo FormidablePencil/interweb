@@ -2,26 +2,33 @@ package domainServices
 
 import dto.author.CreateAuthorRequest
 import dto.signup.SignupResult
+import helper.DbHelper
+import helper.isStrongPassword
+import managers.IAuthorizationManager
 import managers.ITokenManager
 import repositories.IAuthorRepository
 
 class SignupDomainService(
-    val authorRepository: IAuthorRepository,
-    val tokenManager: ITokenManager
+    private val dbHelper: DbHelper,
+    private val authorizationManager: IAuthorizationManager,
+    private val authorRepository: IAuthorRepository,
+    private val tokenManager: ITokenManager,
 ) {
-    fun Signup(request: CreateAuthorRequest): SignupResult {
-        // save encrypted password, create author column and generate jwt tokens
-        // return jwt tokens and authorId
+    fun signup(request: CreateAuthorRequest): SignupResult {
+        // TODO: Unit tests all the steps before doing integration tests unless I have to
 
-        request.encryptedPassword = "";
+        dbHelper.database.useTransaction {
+            if (!isStrongPassword(request.password)) throw Exception("Not strong enough password")
+            checkNotNull(authorRepository.getByEmail(request.email)) { "email taken" }
+            checkNotNull(authorRepository.getByUsername(request.email)) { "username taken" }
 
-        var createAuthorResult = authorRepository.createAuthor(request)
+            val authorId = authorRepository.createAuthor(request)
+            val tokens = tokenManager.generateTokens(authorId, request.username)
+            authorizationManager.setNewPassword(request.password)
 
-//        tokenManager.authenticate(email, email)
+            //TODO: send message through 3rd party postMark welcoming new author
 
-//        var result = authorRepository.GetByUsername()
-        val authorId = 1
-
-        return SignupResult(authorId)
+            return SignupResult(authorId, tokens)
+        }
     }
 }

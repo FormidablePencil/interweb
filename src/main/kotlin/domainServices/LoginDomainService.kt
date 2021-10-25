@@ -1,16 +1,13 @@
 package domainServices
 
 import dto.token.LoginResult
-import dto.token.TokensResult
+import managers.IAuthorizationManager
 import managers.ITokenManager
-import repositories.AuthorizationRepository
-import repositories.IAuthorRepository
-import repositories.IAuthorizationRepository
-import java.util.HashMap
+import repositories.IPasswordRepository
 
 class LoginDomainService(
     private val tokenManager: ITokenManager,
-    private val authorizationRepository: IAuthorizationRepository,
+    private val authorizationManager: IAuthorizationManager,
 ) {
     // -----------
     // we need refresh access token working
@@ -39,7 +36,7 @@ class LoginDomainService(
         // validateCredentials and get author row if successful
         // get tokens
         // return author data and tokens back to client
-        var author = authorizationRepository.validateCredentials(email, password)
+        var author = authorizationManager.validateCredentials(email, password)
 
         var tokensResult = tokenManager.generateTokens(author.id, author.username)
 

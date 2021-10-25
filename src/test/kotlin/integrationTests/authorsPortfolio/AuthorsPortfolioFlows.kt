@@ -31,7 +31,7 @@ class AuthorsPortfolioFlows(
     //region experimentation
     @Test
     fun Exper() {
-//            signupDomainService.Signup("myEmail@gmail.com", "Illustrious-Elk-Love", "password")
+//            signupDomainService.signup("myEmail@gmail.com", "Illustrious-Elk-Love", "password")
 //            authorsPortfolioDomainService.GetAuthorByEmail("Illustrious-Elk-Love")
     }
     //endregion

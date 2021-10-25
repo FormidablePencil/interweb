@@ -9,4 +9,5 @@ interface IAuthorRepository {
     fun getById(authorId: Int): Author?
     fun resetPasswordByEmail(email: String, oldPassword: String)
     fun resetPasswordByUsername(username: String, oldPassword: String)
+    fun getByUsername(username: String): Author?
 }

@@ -31,13 +31,15 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     }
 
     override fun getByEmail(email: String): Author? {
-        val author = database.author.find { it.email eq email }
-        return author
+        return database.author.find { it.email eq email }
+    }
+
+    override fun getByUsername(username: String): Author? {
+        return database.author.find { it.username eq username }
     }
 
     override fun getById(authorId: Int): Author? {
-        val author = database.author.find { it.id eq authorId }
-        return author
+        return database.author.find { it.id eq authorId }
     }
 
     override fun resetPasswordByEmail(email: String, oldPassword: String) {
