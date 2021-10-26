@@ -4,9 +4,7 @@ import dto.AuthorsPortfolioLayout
 import dto.LayoutComponent
 import managers.AuthorsPortfolioManager
 import models.Author
-import repositories.AuthorRepository
 import repositories.IAuthorRepository
-
 
 class AuthorsPortfolioDomainService(
     private val authorRepository: IAuthorRepository,

@@ -15,6 +15,7 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     val Database.password get() = this.sequenceOf(Passwords)
 
     override fun createAuthor(request: CreateAuthorRequest): Int {
+
         var authorId = database.insertAndGenerateKey(Authors) {
             set(it.username, request.username)
             set(it.firstname, request.firstname)

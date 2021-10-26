@@ -39,29 +39,34 @@ class GetTokensUponLogin : KoinBehaviorSpec() {
     }
 
     init {
-        // first create an account via domainServices
-        var result = signupFlows.signup()
+        // create a wrapper to catch cleanup exceptions
+        try {
+            // first create an account via domainServices
+            val result = signupFlows.signup()
 
-        Given("valid credentials") {
-            Then("user should get tokens") {
-                loginRequest(result.username, result.password)
-                { status, content ->
-                    status shouldBe HttpStatusCode.OK
-                    content?.length?.shouldBeGreaterThan(0)
+            Given("valid credentials") {
+                Then("user should get tokens") {
+                    loginRequest(result.username, result.password)
+                    { status, content ->
+                        status shouldBe HttpStatusCode.OK
+                        content?.length?.shouldBeGreaterThan(0)
+                    }
                 }
             }
-        }
 
-        Given("invalid credentials") {
-            Then("user should get 400 error") {
-                loginRequest(result.username, "")
-                { status, content ->
-                    status shouldBe HttpStatusCode.BadRequest
-                    content?.length?.shouldNotBeGreaterThan(0)
+            Given("invalid credentials") {
+                Then("user should get 400 error") {
+                    loginRequest(result.username, "")
+                    { status, content ->
+                        status shouldBe HttpStatusCode.BadRequest
+                        content?.length?.shouldNotBeGreaterThan(0)
+                    }
                 }
             }
-        }
 
-        // after we are done with test, cleanup with transaction not completing
+        } catch (ex: Exception) {
+            if (ex.message == "cleanup")
+            else throw Exception(ex)
+        }
     }
 }

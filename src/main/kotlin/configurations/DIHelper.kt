@@ -5,7 +5,6 @@ import domainServices.AuthorsPortfolioDomainService
 import domainServices.LoginDomainService
 import domainServices.SignupDomainService
 import domainServices.TokenDomainService
-import helper.DbHelper
 import helper.PassEncrypt
 import io.ktor.config.*
 import managers.*
@@ -17,15 +16,15 @@ import java.util.*
 object DIHelper {
     val CoreModule = module {
         // domain services
-        single { SignupDomainService(get(), get(), get(), get()) }
+        single { SignupDomainService(get(), get(), get()) }
         single { AuthorsPortfolioDomainService(get(), get()) }
         single { TokenDomainService(get()) }
         single { LoginDomainService(get(), get()) }
 
         // managers
         single { AuthorsPortfolioManager() }
-        single<ITokenManager> { TokenManager(get(), get(), get()) }
-        single<IAuthorizationManager> { AuthorizationManager(get(), get()) }
+        single<ITokenManager> { TokenManager(get(), get()) }
+        single<IAuthorizationManager> { AuthorizationManager(get(), get(), get()) }
 
         // repositories
         single<IAuthorRepository> { AuthorRepository() }
@@ -35,12 +34,12 @@ object DIHelper {
         // env configurations
         val dbConnection = Properties()
         dbConnection.load(FileInputStream("local.datasource.properties"))
-        val applicationConfig = HoconApplicationConfig(ConfigFactory.load("application.conf"))
 
-        single<IConfig> { Config(applicationConfig, dbConnection) }
-        single { DbHelper() }
+        val appConfig: ApplicationConfig = HoconApplicationConfig(ConfigFactory.load("application.conf"))
+
+        single<IAppEnv> { AppEnv(appConfig, dbConnection) }
 
         // other
-        single { PassEncrypt(get()) }
+        single { PassEncrypt() }
     }
 }

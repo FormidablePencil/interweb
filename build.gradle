@@ -29,7 +29,7 @@ dependencies {
     implementation "io.insert-koin:koin-core:$koin_version"
 // Koin for JUnit 5
     testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
-
+    testImplementation "io.mockk:mockk:1.12.0"
 
     // current jbcrypt_version is 0.4
     compile group: 'org.mindrot', name: 'jbcrypt', version: 0.4

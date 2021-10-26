@@ -1,11 +1,8 @@
 package helper
 
-import configurations.IConfig
 import org.mindrot.jbcrypt.BCrypt
 
-class PassEncrypt(
-    private val config: IConfig
-) {
+class PassEncrypt() {
     fun encryptPassword(password: String): String {
         return BCrypt.hashpw(password, BCrypt.gensalt())
     }

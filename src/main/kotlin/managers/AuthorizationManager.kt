@@ -1,8 +1,9 @@
 package managers
 
-import configurations.IConfig
+import configurations.IAppEnv
 import helper.PassEncrypt
 import models.Author
+import org.koin.core.component.inject
 import org.mindrot.jbcrypt.BCrypt
 import repositories.IAuthorRepository
 import repositories.IPasswordRepository
@@ -10,9 +11,10 @@ import repositories.IPasswordRepository
 class AuthorizationManager(
     private val authorRepository: IAuthorRepository,
     private val passwordRepository: IPasswordRepository,
-    private val config: IConfig,
     private val passEncrypt: PassEncrypt,
 ) : IAuthorizationManager {
+    private val appEnv: IAppEnv by inject()
+
     override fun validateCredentials(email: String, password: String): Author {
         val author: Author? = authorRepository.getByEmail(email)
         if (author?.id == null)
