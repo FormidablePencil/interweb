@@ -2,41 +2,28 @@ package integrationTests.signup
 
 import domainServices.SignupDomainService
 import dto.author.CreateAuthorRequest
-import dto.signup.SignupFlowResultWF
 import dto.signup.SignupResult
-import helper.DbHelper
-import org.koin.test.KoinTest
+import io.kotlintest.matchers.numerics.shouldBeGreaterThan
+import io.kotlintest.shouldNotBe
 import org.koin.test.inject
+import shared.KoinBehaviorSpec
 
-class SignupFlows : KoinTest {
+class SignupFlows : KoinBehaviorSpec() {
     private val signupDomainService: SignupDomainService by inject()
-    private val dbHelper: DbHelper by inject()
+    private val createAuthorRequest = CreateAuthorRequest(
+        "username", "email", "firstname",
+        "lastname", "password"
+    )
 
-    fun signup(request: CreateAuthorRequest, cleanup: Boolean = false): SignupResult {
-        dbHelper.database.useTransaction {
+    fun signup(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): SignupResult {
+        return cleanup(cleanup) {
             val result = signupDomainService.signup(request)
 
-//        return SignupResWF(signupResponse.authorId)
+            result.authorId shouldNotBe null
+//            result.tokens.refreshToken.size shouldBeGreaterThan 0
+//            result.tokens.accessToken.size shouldBeGreaterThan 0
 
-            if (cleanup) throw Exception("cleanup")
-        }
-        return signupDomainService.signup(request)
-    }
-
-    fun signup(cleanup: Boolean = false): SignupFlowResultWF {
-        val createAuthorRequest = CreateAuthorRequest(
-            "username", "email", "firstname",
-            "lastname", "password"
-        )
-        dbHelper.database.useTransaction {
-            val signupResult = signupDomainService.signup(createAuthorRequest)
-
-            if (cleanup) throw Exception("cleanup")
-
-            return SignupFlowResultWF(
-                createAuthorRequest.username, createAuthorRequest.email,
-                createAuthorRequest.password, signupResult.authorId
-            )
-        }
+            return@cleanup result
+        }.value
     }
 }

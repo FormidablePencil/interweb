@@ -1,7 +1,6 @@
 package integrationTests.portfolioCreationPlayground
 
 import domainServices.PortfolioCreationPlaygroundDomainService
-import domainServices.TokenDomainService
 import models.AuthorsPortfolio.AddNewComponentRequest
 import org.koin.test.KoinTest
 import org.koin.test.inject

@@ -1,11 +1,11 @@
 package unitTests.domainServices
 
-//import domainServices.TokenDomainService
+//import domainServices.AuthorizationService
 //import org.koin.test.inject
 //import shared.KoinBehaviorSpec
 //
 //class TokenUnitTests : KoinBehaviorSpec() {
-//    private val tokenDomainService by inject<TokenDomainService>()
+//    private val tokenDomainService by inject<AuthorizationService>()
 //
 //    init {
 //        Given("valid data") {

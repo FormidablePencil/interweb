@@ -1,15 +1,16 @@
-package integrationTests.token
+package integrationTests.authorization
 
 import dto.author.CreateAuthorRequest
 import org.koin.test.KoinTest
 import integrationTests.login.LoginFlows
+import shared.KoinBehaviorSpec
 
 // directories
 // integration tests.
 // unit tests (mock generators).
 // shared - flows for integration tests, di
 
-class TokenFlows : KoinTest {
+class AuthorizationFlows : KoinBehaviorSpec() {
     val loginFlows = LoginFlows()
 
     // Tests
@@ -28,15 +29,7 @@ class TokenFlows : KoinTest {
 
 
     fun login() {
-        var createAuthorRequest = CreateAuthorRequest(
-            "Formidable@78",
-            "someEmail@gmail.com",
-            "firstname",
-            "lastname",
-            "password"
-        )
-
-        var result = loginFlows.signupAndLogin(createAuthorRequest)
+        var result = loginFlows.signupAndLogin()
 
 //        result.tokens.RefreshToken.length shouldNotBe 0
         // expiration date greater than something and less than another thing
@@ -47,14 +40,8 @@ class TokenFlows : KoinTest {
         // we can make http calls and dependency inject mocked version of dependencies to test the controllers
 
         //region setup
-        var createAuthorRequest = CreateAuthorRequest(
-            "Formidable@78",
-            "someEmail@gmail.com",
-            "firstname",
-            "lastname",
-            "password"
-        )
-        var result = loginFlows.signupAndLogin(createAuthorRequest)
+
+        var result = loginFlows.signupAndLogin()
         // send credentials generate refresh token with 1 second expiration time
         // delay runtime and validate refresh token
         //endregion

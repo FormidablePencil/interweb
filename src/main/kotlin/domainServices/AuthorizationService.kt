@@ -2,7 +2,7 @@ package domainServices
 
 import managers.ITokenManager
 
-class TokenDomainService(
+class AuthorizationService(
     private val tokenManager: ITokenManager
 ) {
 

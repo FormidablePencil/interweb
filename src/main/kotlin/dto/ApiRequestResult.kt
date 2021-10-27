@@ -1,28 +1,25 @@
 package dto
 
-abstract class ApiRequestResult<Value, ErrorCode> : BaseApiRequestResult<ErrorCode>() {
-    var value: Value? = null
-
-    fun success(value: Value) {
-        this.value = value
-        success = true
-    }
+open class ApiRequestResult<T : Enum<T>> : BaseApiRequestResultExtFun<T> {
+    override var error: Enum<T>? = null
+    override var message: String? = null
+    override var success: Boolean? = null
 }
 
-open class BaseApiRequestResult<ErrorCode> {
-    var message: String? = null
-    var success = false
+interface BaseApiRequestResultExtFun<T: Enum<T>> {
+    var error: Enum<T>?
+    var message: String?
+    var success: Boolean?
+}
 
-    fun errorCode(message: String) {
-        this.message = message
-        success = false
-    }
+fun <C, T : Enum<T>> BaseApiRequestResultExtFun<T>.failed(error: Enum<T>, msg: String?): C {
+    this.error = error
+    this.message = msg
+    this.success = false
+    return this as C
+}
 
-    fun errorCode(errorCode: ErrorCode, message: String) {
-        this.message = message
-    }
-
-    fun success() {
-        success = true
-    }
+fun <C, T : Enum<T>> BaseApiRequestResultExtFun<T>.succeeded(): C {
+    this.success = true
+    return this as C
 }

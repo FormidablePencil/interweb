@@ -1,20 +1,17 @@
-package integrationTests.token
+package integrationTests.authorization
 
 import com.jetbrains.handson.httpapi.module
-import domainServices.SignupDomainService
+import dto.author.CreateAuthorRequest
 import integrationTests.signup.SignupFlows
 import io.kotlintest.matchers.numerics.shouldBeGreaterThan
 import io.kotlintest.matchers.numerics.shouldNotBeGreaterThan
 import io.kotlintest.shouldBe
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.koin.test.inject
 import shared.KoinBehaviorSpec
 
-// mock dependencies
 // test runner
 // group tests (integration and unit tests)
-// transactions
 
 class GetTokensUponLogin : KoinBehaviorSpec() {
     private val signupFlows = SignupFlows()
@@ -42,11 +39,16 @@ class GetTokensUponLogin : KoinBehaviorSpec() {
         // create a wrapper to catch cleanup exceptions
         try {
             // first create an account via domainServices
+            val createAuthorRequest = CreateAuthorRequest(
+                "username", "email", "firstname",
+                "lastname", "password"
+            )
+
             val result = signupFlows.signup()
 
             Given("valid credentials") {
                 Then("user should get tokens") {
-                    loginRequest(result.username, result.password)
+                    loginRequest(createAuthorRequest.username, createAuthorRequest.password)
                     { status, content ->
                         status shouldBe HttpStatusCode.OK
                         content?.length?.shouldBeGreaterThan(0)
@@ -56,7 +58,7 @@ class GetTokensUponLogin : KoinBehaviorSpec() {
 
             Given("invalid credentials") {
                 Then("user should get 400 error") {
-                    loginRequest(result.username, "")
+                    loginRequest(createAuthorRequest.username, "")
                     { status, content ->
                         status shouldBe HttpStatusCode.BadRequest
                         content?.length?.shouldNotBeGreaterThan(0)

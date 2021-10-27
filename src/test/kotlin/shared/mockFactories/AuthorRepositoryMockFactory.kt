@@ -1,14 +1,10 @@
 package shared.mockFactories
 
-import dto.author.CreateAuthorRequest
-import helper.DbHelper
 import io.mockk.every
 import io.mockk.mockk
-import managers.AuthorizationManager
 import managers.IAuthorizationManager
 import managers.ITokenManager
 import models.Author
-import repositories.AuthorRepository
 import repositories.IAuthorRepository
 
 fun authorRepositoryMK(): IAuthorRepository {
@@ -20,12 +16,6 @@ fun authorRepositoryMK(): IAuthorRepository {
     every { mock.getByEmail(any()) } returns fakeAuthor
     every { mock.getByUsername(any()) } returns fakeAuthor
     every { mock.createAuthor(any()) } returns 2133
-    return mock
-}
-
-fun dbHelperMK(): DbHelper {
-    val mock = mockk<DbHelper>()
-
     return mock
 }
 

@@ -7,7 +7,6 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import shared.mockFactories.authorRepositoryMK
 import shared.mockFactories.authorizationManagerMK
-import shared.mockFactories.dbHelperMK
 import shared.mockFactories.tokenManagerMK
 
 class DITestHelper {
@@ -20,7 +19,6 @@ class DITestHelper {
 
         val UnitTestModule = module {
             single { authorRepositoryMK() }
-            single { dbHelperMK() }
             single { authorizationManagerMK() }
             single { tokenManagerMK() }
 

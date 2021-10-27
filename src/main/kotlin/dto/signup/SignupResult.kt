@@ -1,5 +1,15 @@
 package dto.signup
 
-import dto.token.TokensResult
+import dto.*
 
-data class SignupResult(val authorId: Int, val tokens: TokensResult)
+class SignupResult(val authorId: Int) : ApiRequestResult<SignupResultError>() {
+}
+
+enum class SignupResultError {
+    ServerError
+}
+
+//fun testExc() {
+//    var w: SignupResult = SignupResult(231).succeeded()
+//    var r: SignupResult = SignupResult(987).failed(SignupResultError.ServerError, "ErrorMessage")
+//}

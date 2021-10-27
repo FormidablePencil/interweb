@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory
 import domainServices.AuthorsPortfolioDomainService
 import domainServices.LoginDomainService
 import domainServices.SignupDomainService
-import domainServices.TokenDomainService
+import domainServices.AuthorizationService
 import helper.PassEncrypt
 import io.ktor.config.*
 import managers.*
@@ -18,7 +18,7 @@ object DIHelper {
         // domain services
         single { SignupDomainService(get(), get(), get()) }
         single { AuthorsPortfolioDomainService(get(), get()) }
-        single { TokenDomainService(get()) }
+        single { AuthorizationService(get()) }
         single { LoginDomainService(get(), get()) }
 
         // managers
@@ -40,6 +40,7 @@ object DIHelper {
         single<IAppEnv> { AppEnv(appConfig, dbConnection) }
 
         // other
-        single { PassEncrypt() }
+        single { PassEncrypt() } // helper
+        single<IConnectionToDb> { ConnectionToDb() } //database access
     }
 }

@@ -11,10 +11,17 @@ class LoginFlows : KoinTest {
     private val loginDomainService by inject<LoginDomainService>()
     private val signupFlows = SignupFlows()
 
-    fun signupAndLogin(request: CreateAuthorRequest): LoginResult {
+    fun signupAndLogin(): LoginResult {
         // signup and login
-        signupFlows.signup(request)
-        var result = loginDomainService.login(request.username, "")
+        val createAuthorRequest = CreateAuthorRequest(
+            "Formidable@78",
+            "someEmail@gmail.com",
+            "firstname",
+            "lastname",
+            "password"
+        )
+        val signupResult = signupFlows.signup()
+        val result = loginDomainService.login(createAuthorRequest.username, createAuthorRequest.password)
 
         return result
     }

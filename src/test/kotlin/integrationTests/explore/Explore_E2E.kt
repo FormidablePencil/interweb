@@ -14,19 +14,23 @@ class Explore_E2E(
     private val threadDomainService: ThreadDomainService,
     private val exploreDomainService: ExploreDomainService,
     private val authorsPortfolioDomainService: AuthorsPortfolioDomainService,
-    private val signupE2E: SignupFlows,
+    private val signupFlows: SignupFlows,
     val createThreadE2E: CreateThreadFlows
 ) {
     fun VisitAuthorsPortfolio_userflow() {
         //region setup
-        var result = CreateAuthorRequest("", "", "", "", "")
-        val signupResult: SignupResult = signupE2E.signup(result)
+        val createAuthorRequest = CreateAuthorRequest(
+            "username", "email", "firstname",
+            "lastname", "password"
+        )
+
+        val signupResult = signupFlows.signup(createAuthorRequest)
         threadDomainService.createThread(signupResult.authorId)
         //endregion
 
         //region actions
         // Search author
-        val author: Author = exploreDomainService.SearchAuthors(result.email)
+        val author: Author = exploreDomainService.SearchAuthors(createAuthorRequest.email)
         // click author which gets author's layouts
         val authorsLayouts = authorsPortfolioDomainService.GetAuthorsLayouts(author.id)
         val layoutChoseToView = authorsLayouts.first()

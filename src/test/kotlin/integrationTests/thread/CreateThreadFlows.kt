@@ -18,8 +18,7 @@ class CreateThreadFlows: KoinTest {
 
     fun CreateThread(createThreadRequest: CreateThreadReqWF = CreateThreadReqWF()) {
         // surround code with a transaction scope
-        var createAuthorRequest = CreateAuthorRequest("", "", "", "", "")
-        val signupResult: SignupResult = signupFlows.signup(createAuthorRequest)
+        val signupResult = signupFlows.signup()
 
         threadDomainService.createThread(signupResult.authorId)
 

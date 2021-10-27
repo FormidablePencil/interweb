@@ -1,23 +1,49 @@
 package unitTests.domainServices
 
+import arrow.core.success
 import domainServices.SignupDomainService
+import dto.*
 import dto.author.CreateAuthorRequest
+import dto.signup.SignupResult
+import dto.signup.SignupResultError
+import dto.signup.testExc
 import dto.token.TokensResult
+import io.kotlintest.matchers.numerics.shouldBeGreaterThan
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
-import io.kotlintest.specs.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
 import managers.IAuthorizationManager
 import managers.ITokenManager
 import models.Author
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import repositories.IAuthorRepository
-import shared.DITestHelper
+import shared.KoinBehaviorSpec
 
-class SignupUT : BehaviorSpec(), KoinTest {
+class SignupUT : KoinBehaviorSpec(), KoinTest {
     private lateinit var signupDomainService: SignupDomainService
+    private lateinit var authorizationManager: IAuthorizationManager
+    private lateinit var tokenManager: ITokenManager
+    private lateinit var authorRepository: IAuthorRepository
+    private val authorId = 1
+    private val passwordId = 2
+    private val fakeAuthor = Author {
+        val id = 3;
+        val email = "email"
+    }
+
+    private fun initMockDependencies() {
+        tokenManager = mockk()
+        every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
+
+        authorizationManager = mockk()
+        every { authorizationManager.setNewPassword(any()) } returns passwordId
+
+        authorRepository = mockk()
+        every { authorRepository.getByEmail(any()) } returns null
+        every { authorRepository.getByUsername(any()) } returns null
+        every { authorRepository.createAuthor(any()) } returns authorId
+    }
 
     private fun genCreateAuthorRequest(
         username: String = "YourNeighborhoodSpider",
@@ -28,47 +54,26 @@ class SignupUT : BehaviorSpec(), KoinTest {
     }
 
     init {
-        // override mocks in here
+        testExc()
+
+        initMockDependencies()
+
         Given("valid credentials") {
-            val tokenManager = mockk<ITokenManager>()
-            every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
-            val authorizationManager = mockk<IAuthorizationManager>()
-            every { authorizationManager.setNewPassword(any()) } returns 123542
-            DITestHelper.overrideAndStart(module { single { tokenManager }; single { authorizationManager } })
-            val authorRepository = mockk<IAuthorRepository>()
-            val fakeAuthor = Author {
-                val id = 1
-                val email = "email"
-            }
-            every { authorRepository.getByEmail(any()) } returns fakeAuthor
-            every { authorRepository.getByUsername(any()) } returns fakeAuthor
-            every { authorRepository.createAuthor(any()) } returns 2133
+            signupDomainService = SignupDomainService(authorizationManager, authorRepository, tokenManager)
 
             Then("return tokens and authorId") {
 
-                signupDomainService = SignupDomainService(authorizationManager, authorRepository, tokenManager)
                 val result = signupDomainService.signup(genCreateAuthorRequest())
 
                 //region assertions
-                // test that dependencies have been called and the data provided was correct
+//                result.authorId shouldBe authorId
+//                result.tokens.refreshToken.size shouldBeGreaterThan 0
+//                result.tokens.accessToken.size shouldBeGreaterThan 0
                 //endregion
             }
         }
 
         Given("incorrectly format email") {
-            val tokenManager = mockk<ITokenManager>()
-            every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
-            val authorizationManager = mockk<IAuthorizationManager>()
-            every { authorizationManager.setNewPassword(any()) } returns 123542
-            val authorRepository = mockk<IAuthorRepository>()
-            val fakeAuthor = Author {
-                val id = 1
-                val email = "email"
-            }
-            every { authorRepository.getByEmail(any()) } returns fakeAuthor
-            every { authorRepository.getByUsername(any()) } returns fakeAuthor
-            every { authorRepository.createAuthor(any()) } returns 2133
-
             Then("throw incorrectlyFormattedEmail exception") {
                 val exception = shouldThrow<Exception> {
                     signupDomainService.signup(genCreateAuthorRequest(email = "email"))
@@ -79,12 +84,6 @@ class SignupUT : BehaviorSpec(), KoinTest {
         }
 
         Given("weak password") {
-            val tokenManager = mockk<ITokenManager>()
-            every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
-            val authorizationManager = mockk<IAuthorizationManager>()
-            every { authorizationManager.setNewPassword(any()) } returns 123542
-            DITestHelper.overrideAndStart(module { single { tokenManager }; single { authorizationManager } })
-
             Then("throw weakPassword exception") {
                 val exception = shouldThrow<Exception> {
                     signupDomainService.signup(genCreateAuthorRequest(password = "password"))
@@ -95,12 +94,6 @@ class SignupUT : BehaviorSpec(), KoinTest {
         }
 
         Given("taken email") {
-            val tokenManager = mockk<ITokenManager>()
-            every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
-            val authorizationManager = mockk<IAuthorizationManager>()
-            every { authorizationManager.setNewPassword(any()) } returns 123542
-            DITestHelper.overrideAndStart(module { single { tokenManager }; single { authorizationManager } })
-
             Then("throw exception") {
                 val exception = shouldThrow<Exception> {
 //                    signupDomainService.signup(genCreateAuthorRequest(password = "password"))
@@ -111,12 +104,6 @@ class SignupUT : BehaviorSpec(), KoinTest {
         }
 
         Given("taken username") {
-            val tokenManager = mockk<ITokenManager>()
-            every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
-            val authorizationManager = mockk<IAuthorizationManager>()
-            every { authorizationManager.setNewPassword(any()) } returns 123542
-            DITestHelper.overrideAndStart(module { single { tokenManager }; single { authorizationManager } })
-
             Then("throw exception") {
                 val exception = shouldThrow<Exception> {
 //                    signupDomainService.signup(genCreateAuthorRequest(password = "password"))
@@ -126,6 +113,4 @@ class SignupUT : BehaviorSpec(), KoinTest {
             }
         }
     }
-
-
 }

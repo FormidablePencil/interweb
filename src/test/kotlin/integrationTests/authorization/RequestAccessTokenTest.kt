@@ -1,12 +1,12 @@
-package integrationTests.token
+package integrationTests.authorization
 
-import domainServices.TokenDomainService
+import domainServices.AuthorizationService
 import io.kotlintest.matchers.numerics.shouldBeGreaterThan
 import org.koin.test.inject
 import shared.KoinBehaviorSpec
 
 class RequestAccessTokenTest : KoinBehaviorSpec() {
-    private val tokenDomainService: TokenDomainService by inject()
+    private val tokenDomainService: AuthorizationService by inject()
 
     init {
         Given("a valid refresh token") {
