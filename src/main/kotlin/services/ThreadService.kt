@@ -1,11 +1,10 @@
-package domainServices
+package services
 
 import managers.ThreadManager
 import models.thread.Thread
-import models.thread.ThreadComments
 import repositories.ThreadRepository
 
-class ThreadDomainService(
+class ThreadService(
     private val threadRepository: ThreadRepository,
     private val threadManager: ThreadManager,
 ) {

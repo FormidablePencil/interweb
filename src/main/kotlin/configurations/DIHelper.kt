@@ -3,10 +3,9 @@ package configurations
 import com.typesafe.config.ConfigFactory
 import configurations.interfaces.IAppEnv
 import configurations.interfaces.IConnectionToDb
-import domainServices.AuthorsPortfolioDomainService
-import domainServices.LoginDomainService
-import domainServices.SignupDomainService
-import domainServices.AuthorizationService
+import services.AuthorsPortfolioService
+import services.SignupService
+import services.AuthorizationService
 import helper.PassEncrypt
 import io.ktor.config.*
 import managers.*
@@ -23,15 +22,14 @@ import java.util.*
 object DIHelper {
     val CoreModule = module {
         // domain services
-        single { SignupDomainService(get(), get(), get()) }
-        single { AuthorsPortfolioDomainService(get(), get()) }
-        single { AuthorizationService(get()) }
-        single { LoginDomainService(get(), get()) }
+        single { SignupService(get(), get(), get()) }
+        single { AuthorsPortfolioService(get(), get()) }
+        single { AuthorizationService(get(), get(), get()) }
 
         // managers
         single { AuthorsPortfolioManager() }
-        single<ITokenManager> { TokenManager(get(), get()) }
-        single<IAuthorizationManager> { AuthorizationManager(get(), get(), get()) }
+        single<ITokenManager> { TokenManager(get()) }
+        single<IAuthorizationManager> { AuthorizationManager(get(), get(), get(), get(), get()) }
 
         // repositories
         single<IAuthorRepository> { AuthorRepository() }

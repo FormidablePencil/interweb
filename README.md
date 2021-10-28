@@ -1,11 +1,11 @@
 # Testing
 There are
 - Unit tests
-- Integration tests (try not to access domainServices directly but through user flows)
+- Integration tests (try not to access services directly but through user flows)
 - user flows
 
 ### Structure of unit tests example
-- domainServices
+- services
     - managers
       - tokenManager - name mimicking file
         - GenerateTokens.kt name mimicking class method

@@ -25,6 +25,7 @@ dependencies {
     implementation "io.insert-koin:koin-ktor:$koin_version"
 // Koin core features
     implementation "io.insert-koin:koin-core:$koin_version"
+    implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
 // Koin for JUnit 5
     testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
     testImplementation "io.mockk:mockk:1.12.0"

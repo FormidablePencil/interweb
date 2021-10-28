@@ -1,6 +1,6 @@
 package integrationTests.authorization.flows
 
-import domainServices.LoginDomainService
+import services.AuthorizationService
 import dtos.author.CreateAuthorRequest
 import dtos.authorization.LoginResult
 import integrationTests.signup.flows.SignupFlow
@@ -8,7 +8,7 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 
 class LoginFlow : KoinTest {
-    private val loginDomainService by inject<LoginDomainService>()
+    private val authorizationDomainService by inject<AuthorizationService>()
     private val signupFlows = SignupFlow()
 
     fun signupAndLogin(): LoginResult {
@@ -21,7 +21,7 @@ class LoginFlow : KoinTest {
             "password"
         )
         val signupResult = signupFlows.signup()
-        val result = loginDomainService.login(createAuthorRequest.username, createAuthorRequest.password)
+        val result = authorizationDomainService.login(createAuthorRequest.username, createAuthorRequest.password)
 
         return result
     }

@@ -16,7 +16,7 @@ interface Token : Entity<Token> {
     val author: Author
 }
 
-object Tokens : Table<Token>("token") {
+object Tokens : Table<Token>("tokens") {
     val id = int("id").primaryKey().bindTo { it.id }
     val refreshToken = varchar("refresh_token").bindTo { it.refreshToken }
     val accessToken = varchar("access_token").bindTo { it.accessToken }

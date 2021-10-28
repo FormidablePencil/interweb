@@ -1,6 +1,6 @@
 package routes
 
-import domainServices.LoginDomainService
+import services.AuthorizationService
 import dtos.login.LoginRequest
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -21,14 +21,14 @@ fun Application.registerLoginRoutes() {
 }
 
 fun Route.loginRoute() {
-    val loginDomainService: LoginDomainService by inject()
+    val authorizationDomainService: AuthorizationService by inject()
     val authorRepository: IAuthorRepository by inject()
 
     post("/login") {
         try {
             val user = call.receive<LoginRequest>()
             // return access token (expires in 15 minutes) and a refresh token (expires in 30days)
-            var token = loginDomainService.login(user.username, user.password)
+            var token = authorizationDomainService.login(user.username, user.password)
             call.respond(token)
 //        call.respond(hashMapOf("token" to token))
         } catch (ex: ConstraintViolationException) {

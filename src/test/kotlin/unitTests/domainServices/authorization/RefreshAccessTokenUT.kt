@@ -1,5 +1,6 @@
 package unitTests.domainServices.authorization
 
+
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -17,7 +18,7 @@ class RefreshAccessToken : BehaviorSpec({
 
     Given("valid refresh token") {
         Then("return access token") {
-            val (accessToken, refreshToken) = tokenManager.refreshAccessToken("invalidToken")
+            val (accessToken, refreshToken) = tokenManager.refreshAccessToken("invalidToken", 2)
 
             // region assertion
             accessToken.length shouldBeGreaterThan 0
@@ -29,7 +30,7 @@ class RefreshAccessToken : BehaviorSpec({
     Given("invalid refresh token") {
         Then("throw custom exception") {
             val exception = shouldThrow<Exception> {
-                tokenManager.refreshAccessToken("invalidToken")
+                tokenManager.refreshAccessToken("invalidToken", 2)
             }
             exception.message shouldBe "invalid refresh token"
         }

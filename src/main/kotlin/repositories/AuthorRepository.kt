@@ -1,9 +1,9 @@
 package repositories
 
 import dtos.author.CreateAuthorRequest
+import models.authorization.Passwords
 import models.profile.Author
 import models.profile.Authors
-import models.authorization.Passwords
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insertAndGenerateKey

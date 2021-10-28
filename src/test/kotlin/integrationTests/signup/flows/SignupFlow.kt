@@ -1,6 +1,6 @@
 package integrationTests.signup.flows
 
-import domainServices.SignupDomainService
+import services.SignupService
 import dtos.author.CreateAuthorRequest
 import dtos.signup.SignupResult
 import io.kotest.matchers.shouldNotBe
@@ -9,7 +9,7 @@ import shared.BehaviorSpecIT
 import shared.cleanup
 
 class SignupFlow : BehaviorSpecIT() {
-    private val signupDomainService: SignupDomainService by inject()
+    private val signupDomainService: SignupService by inject()
     private val createAuthorRequest = CreateAuthorRequest(
         "CherryCas6as", "6saberryyTest1235@gmail.com", "Alex",
         "Martini", "Formidable!56"

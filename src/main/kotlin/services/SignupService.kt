@@ -1,11 +1,11 @@
-package domainServices
+package services
 
 import configurations.interfaces.IConnectionToDb
 import dtos.author.CreateAuthorRequest
-import dtos.failed
+import helper.failed
 import dtos.signup.SignupResult
 import dtos.signup.SignupResultError
-import dtos.succeeded
+import helper.succeeded
 import helper.isEmailFormatted
 import helper.isStrongPassword
 import managers.interfaces.IAuthorizationManager
@@ -14,7 +14,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import repositories.interfaces.IAuthorRepository
 
-class SignupDomainService(
+class SignupService(
     private val authorizationManager: IAuthorizationManager,
     private val authorRepository: IAuthorRepository,
     private val tokenManager: ITokenManager,
@@ -35,8 +35,8 @@ class SignupDomainService(
 
         connectionToDb.database.useTransaction {
             val authorId = authorRepository.createAuthor(request)
-            val tokens = tokenManager.generateTokens(authorId, request.username)
-            authorizationManager.setNewPassword(request.password)
+            val tokens = tokenManager.genTokensOnSignup(authorId)
+            authorizationManager.setNewPasswordForSignup(request.password)
 
             //TODO: send message through 3rd party postMark welcoming the new author
 

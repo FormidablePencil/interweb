@@ -1,6 +1,6 @@
 package unitTests.domainServices.signup
 
-import domainServices.SignupDomainService
+import services.SignupService
 import dtos.author.CreateAuthorRequest
 import dtos.authorization.TokensResult
 import io.kotest.assertions.throwables.shouldThrow
@@ -14,7 +14,7 @@ import repositories.interfaces.IAuthorRepository
 import shared.BehaviorSpecUT
 
 class SignupUT : BehaviorSpecUT({
-    lateinit var signupDomainService: SignupDomainService
+    lateinit var signupDomainService: SignupService
     var authorizationManager: IAuthorizationManager = mockk()
     var tokenManager: ITokenManager = mockk()
     var authorRepository: IAuthorRepository = mockk()
@@ -25,9 +25,9 @@ class SignupUT : BehaviorSpecUT({
         val email = "email"
     }
 
-    every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
+    every { tokenManager.generateTokens(any()) } returns TokensResult("", "")
 
-    every { authorizationManager.setNewPassword(any()) } returns passwordId
+    every { authorizationManager.setNewPasswordForSignup(any()) } returns passwordId
 
     every { authorRepository.getByEmail(any()) } returns null
     every { authorRepository.getByUsername(any()) } returns null
@@ -43,7 +43,7 @@ class SignupUT : BehaviorSpecUT({
     }
 
     Given("valid credentials") {
-        signupDomainService = SignupDomainService(authorizationManager, authorRepository, tokenManager)
+        signupDomainService = SignupService(authorizationManager, authorRepository, tokenManager)
 
         Then("return tokens and authorId") {
 

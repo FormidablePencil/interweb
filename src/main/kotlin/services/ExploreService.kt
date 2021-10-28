@@ -1,11 +1,11 @@
-package domainServices
+package services
 
 import models.profile.Author
 import models.thread.Thread
 import repositories.AuthorRepository
 import repositories.ThreadRepository
 
-class ExploreDomainService(
+class ExploreService(
     private var authorRepository: AuthorRepository,
     private var threadRepository: ThreadRepository,
 ) {

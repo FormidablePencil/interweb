@@ -1,6 +1,6 @@
 package unitTests.domainServices.login
 
-import domainServices.LoginDomainService
+import services.AuthorizationService
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -8,12 +8,14 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import managers.interfaces.IAuthorizationManager
 import managers.interfaces.ITokenManager
+import repositories.interfaces.ITokenRepository
 
 class LoginUT : BehaviorSpec({
     val tokenManager: ITokenManager = mockk()
     val authorizationManager: IAuthorizationManager = mockk()
+    val tokenRepository: ITokenRepository = mockk()
 
-    val loginDomainService = LoginDomainService(tokenManager, authorizationManager)
+    val loginDomainService = AuthorizationService(tokenManager, tokenRepository, authorizationManager)
 
     // mock all the dependencies
     // verify that the correct data in the dependencies has been inputted

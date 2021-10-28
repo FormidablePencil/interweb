@@ -1,8 +1,8 @@
-package domainServices
+package services
 
 import repositories.AppSettingsRepository
 
-class AccountSettingsDomainService(
+class AccountSettingsService(
     private val appSettingsRepository: AppSettingsRepository
 ) {
     fun GetSettings(authorId: Int) {

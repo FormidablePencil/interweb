@@ -2,71 +2,74 @@ package managers
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import dtos.authorization.TokensResult
 import configurations.interfaces.IAppEnv
 import configurations.interfaces.IConnectionToDb
-import dtos.succeeded
+import dtos.authorization.TokensResult
+import dtos.authorization.TokensResultError
+import helper.failed
+import helper.succeeded
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
-import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.ITokenRepository
 import java.util.*
 
-enum class Tokens { AccessToken, RefreshToken }
+enum class KindOfTokens { AccessToken, RefreshToken }
 
 class TokenManager(
-    private val authorRepository: IAuthorRepository,
     private val tokenRepository: ITokenRepository,
 ) : ITokenManager {
     private val appEnv: IAppEnv by inject()
     private val connectionToDb: IConnectionToDb by inject()
 
-    override fun refreshAccessToken(refreshToken: String): Pair<String, String> {
-        TODO()
-        // validate refresh token
-        validateRefreshToken(refreshToken)
-
-//        val result = generateToken()
-
-        return Pair<String, String>("new AccessToken", "new RefreshToken")
+    override fun genTokensOnSignup(authorId: Int): Pair<String?, String?> {
+        val tokenResult = generateTokens(authorId)
+        return Pair(tokenResult.refreshToken, tokenResult.accessToken)
     }
 
-    private fun validateRefreshToken(refreshToken: String) {
-        TODO()
-        // get refresh token from db and compare the two. Don't try
+    override fun genTokensOnResetPassword(authorId: Int): TokensResult {
+        return generateTokens(authorId)
     }
 
-    override fun generateTokens(authorId: Int, username: String): TokensResult {
-        val refreshToken = generateToken(authorId, username, Tokens.RefreshToken)
-        val accessToken = generateToken(authorId, username, Tokens.AccessToken)
+    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResult {
+        return if (!isRefreshTokenValid(refreshToken, authorId))
+            TokensResult().failed(TokensResultError.InvalidRefreshToken, "Invalid refresh token")
+        else generateTokens(authorId)
+    }
+
+    private fun generateTokens(authorId: Int): TokensResult {
+        val refreshToken = generateToken(authorId, KindOfTokens.RefreshToken)
+        val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 
         connectionToDb.database.useTransaction {
-            tokenRepository.deleteOldTokens(username, authorId)
+            tokenRepository.deleteOldTokens(authorId)
             tokenRepository.insertTokens(refreshToken, accessToken, authorId)
         }
 
         return TokensResult(refreshToken, accessToken).succeeded()
     }
 
-    private fun generateToken(authorId: Int, username: String, kindOfToken: Tokens): HashMap<String, String> {
+    private fun isRefreshTokenValid(refreshToken: String, authorId: Int): Boolean {
+        val tokensDb = tokenRepository.getTokensByAuthorId(authorId)
+        return tokensDb?.refreshToken == refreshToken
+    }
+
+    private fun generateToken(authorId: Int, kindOfToken: KindOfTokens): String {
         val secret = appEnv.appConfig.property("jwt.secret").getString()
         val issuer = appEnv.appConfig.property("jwt.issuer").getString()
         val audience = appEnv.appConfig.property("jwt.audience").getString()
         val myRealm = appEnv.appConfig.property("jwt.realm").getString()
 
         val expire = when (kindOfToken) {
-            Tokens.RefreshToken -> 10000
-            Tokens.AccessToken -> 1200
+            KindOfTokens.RefreshToken -> 10000
+            KindOfTokens.AccessToken -> 1200
         }
 
-        val token = JWT.create()
+        return JWT.create()
             .withAudience(audience)
             .withIssuer(issuer)
             .withClaim("authorId", authorId)
-            .withClaim("username", username)
             .withExpiresAt(Date(System.currentTimeMillis() + expire))
             .sign(Algorithm.HMAC256(secret))
-
-        return hashMapOf("token" to token)
+//        return hashMapOf("token" to token)
     }
 }

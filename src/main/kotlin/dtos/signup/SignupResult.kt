@@ -1,6 +1,6 @@
 package dtos.signup
 
-import dtos.*
+import dtos.DtoResult
 
 data class SignupResult(var authorId: Int? = null) : DtoResult<SignupResultError>()
 

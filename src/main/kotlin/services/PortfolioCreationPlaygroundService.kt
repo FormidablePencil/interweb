@@ -1,10 +1,10 @@
-package domainServices
+package services
 
 import managers.AuthorsPortfolioManager
 import dtos.portfolio.AddNewComponentRequest
 import repositories.PortfolioComponentRepository
 
-class PortfolioCreationPlaygroundDomainService(
+class PortfolioCreationPlaygroundService(
     private var authorsPortfolioManager: AuthorsPortfolioManager,
     private var portfolioComponentRepository : PortfolioComponentRepository,
 ) {

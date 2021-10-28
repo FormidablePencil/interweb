@@ -1,12 +1,12 @@
 package integrationTests.portfolioCreationPlayground.flows
 
-import domainServices.PortfolioCreationPlaygroundDomainService
+import services.PortfolioCreationPlaygroundService
 import dtos.portfolio.AddNewComponentRequest
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
 class PortfolioCreationPlaygroundFlow: KoinTest {
-    private val portfolioCreationPlaygroundDomainService by inject<PortfolioCreationPlaygroundDomainService>()
+    private val portfolioCreationPlaygroundDomainService by inject<PortfolioCreationPlaygroundService>()
 
     fun getLayout() {
         //region setup

@@ -1,17 +1,17 @@
 package integrationTests.explore.flows
 
-import domainServices.AuthorsPortfolioDomainService
-import domainServices.ExploreDomainService
-import domainServices.ThreadDomainService
+import services.AuthorsPortfolioService
+import services.ExploreService
+import services.ThreadService
 import dtos.author.CreateAuthorRequest
 import integrationTests.signup.flows.SignupFlow
 import models.profile.Author
 import org.junit.Assert
 
 class ExploreFlow(
-    private val threadDomainService: ThreadDomainService,
-    private val exploreDomainService: ExploreDomainService,
-    private val authorsPortfolioDomainService: AuthorsPortfolioDomainService,
+    private val threadDomainService: ThreadService,
+    private val exploreDomainService: ExploreService,
+    private val authorsPortfolioDomainService: AuthorsPortfolioService,
     private val signupFlows: SignupFlow,
 ) {
     fun VisitAuthorsPortfolio_userflow() {

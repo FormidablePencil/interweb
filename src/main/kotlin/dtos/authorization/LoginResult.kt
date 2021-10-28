@@ -1,3 +1,9 @@
 package dtos.authorization
 
-data class LoginResult(val authorId: Int, val tokens: TokensResult)
+import dtos.DtoResult
+
+data class LoginResult(val authorId: Int? = null, val tokens: TokensResult? = null) : DtoResult<LoginResultError>()
+
+enum class LoginResultError {
+    InvalidEmail, InvalidPassword
+}

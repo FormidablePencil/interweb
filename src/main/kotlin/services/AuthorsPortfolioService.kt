@@ -1,4 +1,4 @@
-package domainServices
+package services
 
 import dtos.portfolio.GetLayoutResult
 import models.portfolio.LayoutComponent
@@ -6,7 +6,7 @@ import managers.AuthorsPortfolioManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
 
-class AuthorsPortfolioDomainService(
+class AuthorsPortfolioService(
     private val authorRepository: IAuthorRepository,
     private val authorsPortfolioManager: AuthorsPortfolioManager,
 ) {
