@@ -1,11 +1,11 @@
-package integrationTests.portfolioCreationPlayground
+package integrationTests.portfolioCreationPlayground.flows
 
 import domainServices.PortfolioCreationPlaygroundDomainService
 import models.AuthorsPortfolio.AddNewComponentRequest
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class PortfolioCreationPlaygroundFlows: KoinTest {
+class PortfolioCreationPlaygroundFlow: KoinTest {
     private val portfolioCreationPlaygroundDomainService by inject<PortfolioCreationPlaygroundDomainService>()
 
     fun getLayout() {

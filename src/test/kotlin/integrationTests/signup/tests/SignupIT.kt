@@ -1,11 +1,12 @@
-package integrationTests.signup
+package integrationTests.signup.tests
 
+import integrationTests.signup.flows.SignupFlow
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
-import shared.KoinBehaviorSpec
+import shared.BehaviorSpecIT
 
-class SignupIT : KoinBehaviorSpec() {
-    private val signupFlows: SignupFlows by inject()
+class SignupIT : BehaviorSpecIT() {
+    private val signupFlows: SignupFlow by inject()
 
     init {
         Given("valid credentials") {

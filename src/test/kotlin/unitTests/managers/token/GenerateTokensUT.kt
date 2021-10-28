@@ -1,4 +1,4 @@
-package unitTests.managers.tokenManger
+package unitTests.managers.token
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -7,7 +7,7 @@ import io.mockk.mockk
 import managers.TokenManager
 import repositories.IAuthorRepository
 import repositories.ITokenRepository
-import shared.UtBehaviorSpec
+import shared.BehaviorSpecUT
 
 class MyTests : FunSpec({
     test("String length should return the length of the string") {
@@ -16,7 +16,7 @@ class MyTests : FunSpec({
     }
 })
 
-class GenerateTokensUT : UtBehaviorSpec({
+class GenerateTokensUT : BehaviorSpecUT({
     var authorRepository: IAuthorRepository = mockk()
     var tokenRepository: ITokenRepository = mockk()
     val authorId = 321

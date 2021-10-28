@@ -1,15 +1,15 @@
-package integrationTests.login
+package integrationTests.authorization.flows
 
 import domainServices.LoginDomainService
 import dto.author.CreateAuthorRequest
 import dto.token.LoginResult
-import integrationTests.signup.SignupFlows
+import integrationTests.signup.flows.SignupFlow
 import org.koin.test.KoinTest
 import org.koin.test.inject
 
-class LoginFlows : KoinTest {
+class LoginFlow : KoinTest {
     private val loginDomainService by inject<LoginDomainService>()
-    private val signupFlows = SignupFlows()
+    private val signupFlows = SignupFlow()
 
     fun signupAndLogin(): LoginResult {
         // signup and login

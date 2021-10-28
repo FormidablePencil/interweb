@@ -1,8 +1,8 @@
-package integrationTests.authorsPortfolio
+package integrationTests.authorsPortfolio.flows
 
 import org.junit.Test
 
-class AuthorsPortfolioFlows(
+class AuthorsPortfolioFlow(
 ) {
     fun GetLayouts() {
         //region setup

@@ -1,14 +1,14 @@
-package integrationTests.signup
+package integrationTests.signup.flows
 
 import domainServices.SignupDomainService
 import dto.author.CreateAuthorRequest
 import dto.signup.SignupResult
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
-import shared.KoinBehaviorSpec
+import shared.BehaviorSpecIT
 import shared.cleanup
 
-class SignupFlows : KoinBehaviorSpec() {
+class SignupFlow : BehaviorSpecIT() {
     private val signupDomainService: SignupDomainService by inject()
     private val createAuthorRequest = CreateAuthorRequest(
         "CherryCas6as", "6saberryyTest1235@gmail.com", "Alex",

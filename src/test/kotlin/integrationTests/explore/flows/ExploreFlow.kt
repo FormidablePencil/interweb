@@ -1,21 +1,18 @@
-package integrationTests.explore
+package integrationTests.explore.flows
 
 import domainServices.AuthorsPortfolioDomainService
 import domainServices.ExploreDomainService
 import domainServices.ThreadDomainService
 import dto.author.CreateAuthorRequest
-import dto.signup.SignupResult
+import integrationTests.signup.flows.SignupFlow
 import models.Author
 import org.junit.Assert
-import integrationTests.signup.SignupFlows
-import integrationTests.thread.CreateThreadFlows
 
-class Explore_E2E(
+class ExploreFlow(
     private val threadDomainService: ThreadDomainService,
     private val exploreDomainService: ExploreDomainService,
     private val authorsPortfolioDomainService: AuthorsPortfolioDomainService,
-    private val signupFlows: SignupFlows,
-    val createThreadE2E: CreateThreadFlows
+    private val signupFlows: SignupFlow,
 ) {
     fun VisitAuthorsPortfolio_userflow() {
         //region setup
@@ -47,7 +44,6 @@ class Explore_E2E(
 
     fun VisitThread_userflow() {
         //region setup
-        val threadId = createThreadE2E.CreateThread()
         //endregion
 
         var threads = exploreDomainService.SearchThreadsByTitle("Theology")

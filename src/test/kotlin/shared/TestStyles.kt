@@ -1,8 +1,8 @@
 package shared
 
+import configurations.DIHelper
 import configurations.IConnectionToDb
 import io.kotest.core.spec.style.BehaviorSpec
-import io.kotest.core.spec.style.FunSpec
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.test.KoinTest
@@ -11,37 +11,41 @@ data class CleanupResult<T>(val value: T)
 
 interface ICleanupTest {
     val connectionToDb: IConnectionToDb
-
 }
 
 fun <T> ICleanupTest.cleanup(cleanup: Boolean, code: () -> T): CleanupResult<T> {
     if (cleanup)
         connectionToDb.database.useTransaction {
-            var result = code()
+            val result = code()
             connectionToDb.database.transactionManager.currentTransaction?.rollback()
             return CleanupResult(result);
         }
     else {
-        var result = code()
+        val result = code()
         return CleanupResult(result);
     }
 }
 
-open class KoinBehaviorSpec() : BehaviorSpec(), KoinTest, ICleanupTest {
+open class BehaviorSpecFlowsForIntegrationTests(body: BehaviorSpecFlowsForIntegrationTests.() -> Unit = {}) : BehaviorSpec(), KoinTest, ICleanupTest {
     override val connectionToDb: IConnectionToDb by inject()
-}
 
-open class UtBehaviorSpec(body: BehaviorSpec.() -> Unit = {}) : BehaviorSpec(), KoinTest {
     init {
-        startUt()
+        startKoin {
+            modules(DIHelper.CoreModule, DITestHelper.FlowModule)
+        }
         body()
     }
 }
 
+open class BehaviorSpecIT(body: BehaviorSpecFlowsForIntegrationTests.() -> Unit = {}) : BehaviorSpecFlowsForIntegrationTests(body)
 
-
-fun startUt() {
-    startKoin {
-        modules(DITestHelper.UnitTestModule)
+// There a few places where there are dependency inject not through constructor but directly in class. This is
+// where you'll have to use koin to dependency inject mocked version. Otherwise, use BehaviorSpec instead
+open class BehaviorSpecUT(body: BehaviorSpec.() -> Unit = {}) : BehaviorSpec(), KoinTest {
+    init {
+        startKoin {
+            modules(DITestHelper.UnitTestModule)
+        }
+        body()
     }
 }
