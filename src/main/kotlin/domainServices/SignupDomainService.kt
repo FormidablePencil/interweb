@@ -1,10 +1,11 @@
 package domainServices
 
 import configurations.IConnectionToDb
-import dto.ApiRequestResult
 import dto.author.CreateAuthorRequest
+import dto.failed
 import dto.signup.SignupResult
 import dto.signup.SignupResultError
+import dto.succeeded
 import helper.isEmailFormatted
 import helper.isStrongPassword
 import managers.IAuthorizationManager
@@ -21,26 +22,25 @@ class SignupDomainService(
     private val connectionToDb: IConnectionToDb by inject();
 
     fun signup(request: CreateAuthorRequest): SignupResult {
-//        var signupResult = SignupResult()
+        if (!isStrongPassword(request.password))
+            return SignupResult().failed(SignupResultError.WeakPassword, "Weak password.")
+        if (!isEmailFormatted(request.email))
+            return SignupResult().failed(
+                SignupResultError.InvalidEmailFormat, "Email provided is not formatted as such."
+            )
+        if (authorRepository.getByEmail(request.email) != null)
+            return SignupResult().failed(SignupResultError.ServerError, "Email taken.")
+        if (authorRepository.getByUsername(request.username) != null)
+            return SignupResult().failed(SignupResultError.ServerError, "Username taken.")
 
         connectionToDb.database.useTransaction {
-            if (!isStrongPassword(request.password)) throw Exception("Not strong enough password")
-            if (!isEmailFormatted(request.email)) throw Exception("Not an email provided")
-
-
-
-//            if (authorRepository.getByEmail(request.email) != null)
-//                return result2.authorId
-            check(authorRepository.getByUsername(request.username) != null) { "username taken" }
-
             val authorId = authorRepository.createAuthor(request)
             val tokens = tokenManager.generateTokens(authorId, request.username)
             authorizationManager.setNewPassword(request.password)
 
             //TODO: send message through 3rd party postMark welcoming the new author
 
-            return SignupResult(authorId)
-//            return SignupResult(authorId, tokens)
+            return SignupResult(authorId).succeeded()
         }
     }
 }

@@ -6,4 +6,5 @@ interface ITokenRepository {
         accessToken: HashMap<String, String>,
         authorId: Int
     ): Int
+    fun deleteOldTokens(username: String, authorId: Int)
 }

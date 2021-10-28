@@ -7,12 +7,13 @@ import io.kotlintest.matchers.numerics.shouldBeGreaterThan
 import io.kotlintest.shouldNotBe
 import org.koin.test.inject
 import shared.KoinBehaviorSpec
+import shared.cleanup
 
 class SignupFlows : KoinBehaviorSpec() {
     private val signupDomainService: SignupDomainService by inject()
     private val createAuthorRequest = CreateAuthorRequest(
-        "username", "email", "firstname",
-        "lastname", "password"
+        "CherryCas6as", "6saberryyTest1235@gmail.com", "Alex",
+        "Martini", "Formidable!56"
     )
 
     fun signup(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): SignupResult {

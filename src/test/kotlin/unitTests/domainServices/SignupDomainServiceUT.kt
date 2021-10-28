@@ -6,7 +6,6 @@ import dto.*
 import dto.author.CreateAuthorRequest
 import dto.signup.SignupResult
 import dto.signup.SignupResultError
-import dto.signup.testExc
 import dto.token.TokensResult
 import io.kotlintest.matchers.numerics.shouldBeGreaterThan
 import io.kotlintest.shouldBe
@@ -20,26 +19,23 @@ import org.koin.test.KoinTest
 import repositories.IAuthorRepository
 import shared.KoinBehaviorSpec
 
-class SignupUT : KoinBehaviorSpec(), KoinTest {
-    private lateinit var signupDomainService: SignupDomainService
-    private lateinit var authorizationManager: IAuthorizationManager
-    private lateinit var tokenManager: ITokenManager
-    private lateinit var authorRepository: IAuthorRepository
-    private val authorId = 1
-    private val passwordId = 2
-    private val fakeAuthor = Author {
+class SignupUT : KoinBehaviorSpec() {
+    lateinit var signupDomainService: SignupDomainService
+    var authorizationManager: IAuthorizationManager = mockk()
+    var tokenManager: ITokenManager = mockk()
+    var authorRepository: IAuthorRepository = mockk()
+    val authorId = 1
+    val passwordId = 2
+    val fakeAuthor = Author {
         val id = 3;
         val email = "email"
     }
 
-    private fun initMockDependencies() {
-        tokenManager = mockk()
+    init {
         every { tokenManager.generateTokens(any(), any()) } returns TokensResult(HashMap(1), HashMap(1))
 
-        authorizationManager = mockk()
         every { authorizationManager.setNewPassword(any()) } returns passwordId
 
-        authorRepository = mockk()
         every { authorRepository.getByEmail(any()) } returns null
         every { authorRepository.getByUsername(any()) } returns null
         every { authorRepository.createAuthor(any()) } returns authorId
@@ -54,10 +50,6 @@ class SignupUT : KoinBehaviorSpec(), KoinTest {
     }
 
     init {
-        testExc()
-
-        initMockDependencies()
-
         Given("valid credentials") {
             signupDomainService = SignupDomainService(authorizationManager, authorRepository, tokenManager)
 

@@ -25,7 +25,10 @@ class Explore_E2E(
         )
 
         val signupResult = signupFlows.signup(createAuthorRequest)
-        threadDomainService.createThread(signupResult.authorId)
+       if (signupResult?.authorId == null)
+           return
+
+        threadDomainService.createThread(signupResult.authorId!!)
         //endregion
 
         //region actions

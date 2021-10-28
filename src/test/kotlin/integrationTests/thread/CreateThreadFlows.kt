@@ -20,7 +20,7 @@ class CreateThreadFlows: KoinTest {
         // surround code with a transaction scope
         val signupResult = signupFlows.signup()
 
-        threadDomainService.createThread(signupResult.authorId)
+//        threadDomainService.createThread(signupResult.authorId)
 
         // validate that it was created through another user
 

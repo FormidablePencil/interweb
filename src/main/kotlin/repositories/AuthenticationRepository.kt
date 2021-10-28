@@ -14,4 +14,9 @@ class TokenRepository : RepositoryBase(), ITokenRepository {
     ): Int {
         throw NotImplementedError()
     }
+
+    override fun deleteOldTokens(username: String, authorId: Int) {
+        // Not too familiar with tokens so we should first create them before we delete
+        TODO()
+    }
 }

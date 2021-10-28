@@ -1,6 +1,5 @@
 package shared
 
-import configurations.DIHelper
 import configurations.IConnectionToDb
 import io.kotlintest.specs.*
 import org.koin.core.component.inject
@@ -9,56 +8,32 @@ import org.koin.test.KoinTest
 
 data class CleanupResult<T>(val value: T)
 
-open class KoinBehaviorSpec : BehaviorSpec(), KoinTest {
-    private val connectionToDb: IConnectionToDb by inject()
+interface ICleanupTest {
+    val connectionToDb: IConnectionToDb
 
-    fun <T> cleanup(cleanup: Boolean, code: () -> T): CleanupResult<T> {
-        if (cleanup)
-            connectionToDb.database.useTransaction {
-                var result = code()
-                connectionToDb.database.transactionManager.currentTransaction?.rollback()
-                return CleanupResult(result);
-            }
-        else {
+}
+
+fun <T> ICleanupTest.cleanup(cleanup: Boolean, code: () -> T): CleanupResult<T> {
+    if (cleanup)
+        connectionToDb.database.useTransaction {
             var result = code()
+            connectionToDb.database.transactionManager.currentTransaction?.rollback()
             return CleanupResult(result);
         }
-    }
-
-    init {
-        startKoin {
-            modules(DIHelper.CoreModule, DITestHelper.CoreModule)
-        }
+    else {
+        var result = code()
+        return CleanupResult(result);
     }
 }
+
+open class KoinBehaviorSpec : BehaviorSpec(), KoinTest, ICleanupTest {
+    override val connectionToDb: IConnectionToDb by inject()
+}
+
+open class UtBehaviorSpec : BehaviorSpec(), KoinTest { init { startUt() } }
 
 fun startUt() {
     startKoin {
         modules(DITestHelper.UnitTestModule)
     }
-}
-
-open class UtFeatureSpec : FeatureSpec(), KoinTest { init {
-    startUt()
-}
-}
-
-open class UtBehaviorSpec : BehaviorSpec(), KoinTest { init {
-    startUt()
-}
-}
-
-open class UtFreeSpec : FreeSpec(), KoinTest { init {
-    startUt()
-}
-}
-
-open class UtDescribeSpec : DescribeSpec(), KoinTest { init {
-    startUt()
-}
-}
-
-open class UtExpectSpec : ExpectSpec(), KoinTest { init {
-    startUt()
-}
 }
