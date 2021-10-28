@@ -1,7 +1,6 @@
 package integrationTests.signup
 
-import io.kotlintest.matchers.numerics.shouldBeGreaterThan
-import io.kotlintest.shouldNotBe
+import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
 import shared.KoinBehaviorSpec
 

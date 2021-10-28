@@ -1,7 +1,8 @@
 package shared
 
 import configurations.IConnectionToDb
-import io.kotlintest.specs.*
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.core.spec.style.FunSpec
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin
 import org.koin.test.KoinTest
@@ -26,11 +27,18 @@ fun <T> ICleanupTest.cleanup(cleanup: Boolean, code: () -> T): CleanupResult<T> 
     }
 }
 
-open class KoinBehaviorSpec : BehaviorSpec(), KoinTest, ICleanupTest {
+open class KoinBehaviorSpec() : BehaviorSpec(), KoinTest, ICleanupTest {
     override val connectionToDb: IConnectionToDb by inject()
 }
 
-open class UtBehaviorSpec : BehaviorSpec(), KoinTest { init { startUt() } }
+open class UtBehaviorSpec(body: BehaviorSpec.() -> Unit = {}) : BehaviorSpec(), KoinTest {
+    init {
+        startUt()
+        body()
+    }
+}
+
+
 
 fun startUt() {
     startKoin {

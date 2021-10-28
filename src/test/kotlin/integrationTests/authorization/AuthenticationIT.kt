@@ -1,17 +1,59 @@
 package integrationTests.authorization
 
 import com.jetbrains.handson.httpapi.module
+import configurations.DIHelper
 import dto.author.CreateAuthorRequest
 import integrationTests.signup.SignupFlows
-import io.kotlintest.matchers.numerics.shouldBeGreaterThan
-import io.kotlintest.matchers.numerics.shouldNotBeGreaterThan
-import io.kotlintest.shouldBe
+import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.ints.shouldNotBeGreaterThan
+import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.ktor.server.testing.*
+import org.koin.core.context.startKoin
+import org.koin.test.inject
+import shared.DITestHelper
 import shared.KoinBehaviorSpec
+import shared.cleanup
 
-// test runner
-// group tests (integration and unit tests)
+class AuthenticationIT : KoinBehaviorSpec() {
+    private val signupFlows: SignupFlows by inject()
+
+    init {
+        startKoin {
+            modules(DIHelper.CoreModule, DITestHelper.CoreModule)
+        }
+    }
+
+    init {
+        cleanup(true) {
+            Given("created an account") {
+                val result = signupFlows.signup()
+
+                And("login") {
+                    // all the assertions happen in the flows
+                    // AuthorizationFlows.login()
+
+                }
+
+                And("refresh tokens") {
+                    // AuthorizationFlows.refresh()
+
+                    Then("login with new tokens given") {
+                        // AuthorizationFlow.login()
+
+                    }
+                }
+
+                And("reset password") {
+                    Then("login with new tokens given") {
+                        // AuthorizationFlows.login()
+
+                    }
+                }
+            }
+        }
+    }
+}
 
 class GetTokensUponLogin : KoinBehaviorSpec() {
     private val signupFlows = SignupFlows()

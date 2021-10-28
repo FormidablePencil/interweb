@@ -1,21 +1,15 @@
 package unitTests.domainServices
 
-import arrow.core.success
 import domainServices.SignupDomainService
-import dto.*
 import dto.author.CreateAuthorRequest
-import dto.signup.SignupResult
-import dto.signup.SignupResultError
 import dto.token.TokensResult
-import io.kotlintest.matchers.numerics.shouldBeGreaterThan
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import managers.IAuthorizationManager
 import managers.ITokenManager
 import models.Author
-import org.koin.test.KoinTest
 import repositories.IAuthorRepository
 import shared.KoinBehaviorSpec
 

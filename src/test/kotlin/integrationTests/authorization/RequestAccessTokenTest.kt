@@ -1,7 +1,7 @@
 package integrationTests.authorization
 
 import domainServices.AuthorizationService
-import io.kotlintest.matchers.numerics.shouldBeGreaterThan
+import io.kotest.matchers.ints.shouldBeGreaterThan
 import org.koin.test.inject
 import shared.KoinBehaviorSpec
 

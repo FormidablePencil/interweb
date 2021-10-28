@@ -3,8 +3,7 @@ package integrationTests.signup
 import domainServices.SignupDomainService
 import dto.author.CreateAuthorRequest
 import dto.signup.SignupResult
-import io.kotlintest.matchers.numerics.shouldBeGreaterThan
-import io.kotlintest.shouldNotBe
+import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
 import shared.KoinBehaviorSpec
 import shared.cleanup
