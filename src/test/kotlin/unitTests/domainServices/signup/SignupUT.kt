@@ -1,21 +1,18 @@
 package unitTests.domainServices.signup
 
-import services.SignupService
 import dtos.author.CreateAuthorRequest
-import dtos.authorization.TokensResult
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import managers.interfaces.IAuthorizationManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
+import services.AuthorizationService
 import shared.BehaviorSpecUT
 
 class SignupUT : BehaviorSpecUT({
-    lateinit var signupDomainService: SignupService
-    var authorizationManager: IAuthorizationManager = mockk()
+    lateinit var authorizationService: AuthorizationService
     var tokenManager: ITokenManager = mockk()
     var authorRepository: IAuthorRepository = mockk()
     val authorId = 1
@@ -25,9 +22,9 @@ class SignupUT : BehaviorSpecUT({
         val email = "email"
     }
 
-    every { tokenManager.generateTokens(any()) } returns TokensResult("", "")
+//    every { authorizationService.generateTokens(any()) } returns TokensResult("", "")
 
-    every { authorizationManager.setNewPasswordForSignup(any()) } returns passwordId
+    every { authorizationService.setNewPasswordForSignup(any()) } returns passwordId
 
     every { authorRepository.getByEmail(any()) } returns null
     every { authorRepository.getByUsername(any()) } returns null
@@ -43,11 +40,11 @@ class SignupUT : BehaviorSpecUT({
     }
 
     Given("valid credentials") {
-        signupDomainService = SignupService(authorizationManager, authorRepository, tokenManager)
+        authorizationService = AuthorizationService(authorRepository, tokenManager)
 
         Then("return tokens and authorId") {
 
-            val result = signupDomainService.signup(genCreateAuthorRequest())
+            val result = authorizationService.signup(genCreateAuthorRequest())
 
             //region assertions
 //                result.authorId shouldBe authorId
@@ -60,7 +57,7 @@ class SignupUT : BehaviorSpecUT({
     Given("incorrectly format email") {
         Then("throw incorrectlyFormattedEmail exception") {
             val exception = shouldThrow<Exception> {
-                signupDomainService.signup(genCreateAuthorRequest(email = "email"))
+                authorizationService.signup(genCreateAuthorRequest(email = "email"))
             }
             // replace messages with enums
             exception.message shouldBe "Not an email provided"
@@ -70,7 +67,7 @@ class SignupUT : BehaviorSpecUT({
     Given("weak password") {
         Then("throw weakPassword exception") {
             val exception = shouldThrow<Exception> {
-                signupDomainService.signup(genCreateAuthorRequest(password = "password"))
+                authorizationService.signup(genCreateAuthorRequest(password = "password"))
             }
             // replace messages with enums
             exception.message shouldBe "weak password"

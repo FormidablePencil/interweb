@@ -9,3 +9,7 @@ fun isEmailFormatted(email: String): Boolean {
     val emailFormattedRegex = """[^@ \t\r\n]+@[^@ \t\r\n]+\.[^@ \t\r\n]+""".toRegex()
     return emailFormattedRegex.matches(email)
 }
+
+fun maskEmail(email: String): String {
+    return email.replace("(^[^@]{3}|(?!^)\\G)[^@]", "$1*")
+}

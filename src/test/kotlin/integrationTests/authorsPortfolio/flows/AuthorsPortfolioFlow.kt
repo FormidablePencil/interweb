@@ -26,7 +26,7 @@ class AuthorsPortfolioFlow(
     @Test
     fun Exper() {
 //            signupDomainService.signup("myEmail@gmail.com", "Illustrious-Elk-Love", "password")
-//            authorsPortfolioDomainService.GetAuthorByEmail("Illustrious-Elk-Love")
+//            authorsPortfolioDomainService.getAuthorByEmail("Illustrious-Elk-Love")
     }
     //endregion
 }
