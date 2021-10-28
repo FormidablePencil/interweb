@@ -1,9 +1,8 @@
 package domainServices
 
-import dto.token.LoginResult
-import managers.IAuthorizationManager
-import managers.ITokenManager
-import repositories.IPasswordRepository
+import dtos.authorization.LoginResult
+import managers.interfaces.IAuthorizationManager
+import managers.interfaces.ITokenManager
 
 class LoginDomainService(
     private val tokenManager: ITokenManager,

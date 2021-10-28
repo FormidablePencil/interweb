@@ -1,8 +1,9 @@
 package repositories
 
-import models.Author
+import models.profile.Author
 import org.ktorm.dsl.eq
 import org.ktorm.entity.find
+import repositories.interfaces.IAuthorViewerRepository
 
 class AuthorViewerRepository : AuthorRepository(), IAuthorViewerRepository {
     override fun Get(username: String): Author? {

@@ -1,7 +1,7 @@
 package domainServices
 
 import managers.AuthorsPortfolioManager
-import models.AuthorsPortfolio.AddNewComponentRequest
+import dtos.portfolio.AddNewComponentRequest
 import repositories.PortfolioComponentRepository
 
 class PortfolioCreationPlaygroundDomainService(

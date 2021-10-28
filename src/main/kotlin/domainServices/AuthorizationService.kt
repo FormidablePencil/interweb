@@ -1,6 +1,6 @@
 package domainServices
 
-import managers.ITokenManager
+import managers.interfaces.ITokenManager
 
 class AuthorizationService(
     private val tokenManager: ITokenManager

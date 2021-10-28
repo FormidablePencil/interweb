@@ -1,7 +1,7 @@
 package shared
 
 import configurations.DIHelper
-import configurations.IConnectionToDb
+import configurations.interfaces.IConnectionToDb
 import io.kotest.core.spec.style.BehaviorSpec
 import org.koin.core.component.inject
 import org.koin.core.context.startKoin

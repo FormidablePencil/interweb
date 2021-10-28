@@ -1,18 +1,18 @@
 package domainServices
 
-import configurations.IConnectionToDb
-import dto.author.CreateAuthorRequest
-import dto.failed
-import dto.signup.SignupResult
-import dto.signup.SignupResultError
-import dto.succeeded
+import configurations.interfaces.IConnectionToDb
+import dtos.author.CreateAuthorRequest
+import dtos.failed
+import dtos.signup.SignupResult
+import dtos.signup.SignupResultError
+import dtos.succeeded
 import helper.isEmailFormatted
 import helper.isStrongPassword
-import managers.IAuthorizationManager
-import managers.ITokenManager
+import managers.interfaces.IAuthorizationManager
+import managers.interfaces.ITokenManager
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import repositories.IAuthorRepository
+import repositories.interfaces.IAuthorRepository
 
 class SignupDomainService(
     private val authorizationManager: IAuthorizationManager,

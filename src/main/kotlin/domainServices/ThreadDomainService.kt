@@ -1,8 +1,8 @@
 package domainServices
 
 import managers.ThreadManager
-import models.Thread
-import models.ThreadComments
+import models.thread.Thread
+import models.thread.ThreadComments
 import repositories.ThreadRepository
 
 class ThreadDomainService(

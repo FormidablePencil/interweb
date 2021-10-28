@@ -1,3 +1,0 @@
-package managers
-
-interface IUserStaticManager

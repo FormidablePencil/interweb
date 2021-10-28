@@ -1,8 +1,8 @@
 package integrationTests.authorization.flows
 
 import domainServices.LoginDomainService
-import dto.author.CreateAuthorRequest
-import dto.token.LoginResult
+import dtos.author.CreateAuthorRequest
+import dtos.authorization.LoginResult
 import integrationTests.signup.flows.SignupFlow
 import org.koin.test.KoinTest
 import org.koin.test.inject

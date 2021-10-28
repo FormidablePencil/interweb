@@ -1,8 +1,8 @@
 package shared.mockFactories
 
 import com.typesafe.config.ConfigFactory
-import configurations.IAppEnv
-import configurations.IConnectionToDb
+import configurations.interfaces.IAppEnv
+import configurations.interfaces.IConnectionToDb
 import io.ktor.config.*
 import io.mockk.every
 import io.mockk.mockk

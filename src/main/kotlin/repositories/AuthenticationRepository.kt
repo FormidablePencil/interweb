@@ -1,8 +1,9 @@
 package repositories
 
-import models.Authors
+import models.profile.Authors
 import org.ktorm.database.Database
 import org.ktorm.entity.sequenceOf
+import repositories.interfaces.ITokenRepository
 
 class TokenRepository : RepositoryBase(), ITokenRepository {
     private val Database.author get() = this.sequenceOf(Authors)

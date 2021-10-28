@@ -1,14 +1,15 @@
 package repositories
 
-import dto.author.CreateAuthorRequest
-import models.Author
-import models.Authors
-import models.auth.Passwords
+import dtos.author.CreateAuthorRequest
+import models.profile.Author
+import models.profile.Authors
+import models.authorization.Passwords
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insertAndGenerateKey
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
+import repositories.interfaces.IAuthorRepository
 
 open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     val Database.author get() = this.sequenceOf(Authors)

@@ -1,7 +1,7 @@
 package domainServices
 
-import models.Author
-import models.Thread
+import models.profile.Author
+import models.thread.Thread
 import repositories.AuthorRepository
 import repositories.ThreadRepository
 

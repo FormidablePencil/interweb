@@ -3,9 +3,9 @@ package integrationTests.explore.flows
 import domainServices.AuthorsPortfolioDomainService
 import domainServices.ExploreDomainService
 import domainServices.ThreadDomainService
-import dto.author.CreateAuthorRequest
+import dtos.author.CreateAuthorRequest
 import integrationTests.signup.flows.SignupFlow
-import models.Author
+import models.profile.Author
 import org.junit.Assert
 
 class ExploreFlow(

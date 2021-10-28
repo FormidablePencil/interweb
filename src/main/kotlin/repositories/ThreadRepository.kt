@@ -1,6 +1,7 @@
 package repositories
 
-import models.Thread
+import models.thread.Thread
+import repositories.interfaces.IThreadingRepository
 
 class ThreadRepository : IThreadingRepository {
 

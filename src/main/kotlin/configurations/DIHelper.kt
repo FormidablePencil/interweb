@@ -1,6 +1,8 @@
 package configurations
 
 import com.typesafe.config.ConfigFactory
+import configurations.interfaces.IAppEnv
+import configurations.interfaces.IConnectionToDb
 import domainServices.AuthorsPortfolioDomainService
 import domainServices.LoginDomainService
 import domainServices.SignupDomainService
@@ -8,8 +10,13 @@ import domainServices.AuthorizationService
 import helper.PassEncrypt
 import io.ktor.config.*
 import managers.*
+import managers.interfaces.IAuthorizationManager
+import managers.interfaces.ITokenManager
 import org.koin.dsl.module
 import repositories.*
+import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.IPasswordRepository
+import repositories.interfaces.ITokenRepository
 import java.io.FileInputStream
 import java.util.*
 

@@ -1,12 +1,13 @@
 package managers
 
-import configurations.IAppEnv
+import configurations.interfaces.IAppEnv
 import helper.PassEncrypt
-import models.Author
+import managers.interfaces.IAuthorizationManager
+import models.profile.Author
 import org.koin.core.component.inject
 import org.mindrot.jbcrypt.BCrypt
-import repositories.IAuthorRepository
-import repositories.IPasswordRepository
+import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.IPasswordRepository
 
 class AuthorizationManager(
     private val authorRepository: IAuthorRepository,

@@ -1,13 +1,14 @@
 package repositories
 
-import models.Authors
-import models.auth.Password
-import models.auth.Passwords
+import models.profile.Authors
+import models.authorization.Password
+import models.authorization.Passwords
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insertAndGenerateKey
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
+import repositories.interfaces.IPasswordRepository
 
 class PasswordRepository : RepositoryBase(), IPasswordRepository {
     override val Database.author get() = this.sequenceOf(Authors)

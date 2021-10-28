@@ -1,16 +1,16 @@
 package unitTests.domainServices.signup
 
 import domainServices.SignupDomainService
-import dto.author.CreateAuthorRequest
-import dto.token.TokensResult
+import dtos.author.CreateAuthorRequest
+import dtos.authorization.TokensResult
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import managers.IAuthorizationManager
-import managers.ITokenManager
-import models.Author
-import repositories.IAuthorRepository
+import managers.interfaces.IAuthorizationManager
+import managers.interfaces.ITokenManager
+import models.profile.Author
+import repositories.interfaces.IAuthorRepository
 import shared.BehaviorSpecUT
 
 class SignupUT : BehaviorSpecUT({

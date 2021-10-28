@@ -6,8 +6,8 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
-import managers.IAuthorizationManager
-import managers.ITokenManager
+import managers.interfaces.IAuthorizationManager
+import managers.interfaces.ITokenManager
 
 class LoginUT : BehaviorSpec({
     val tokenManager: ITokenManager = mockk()

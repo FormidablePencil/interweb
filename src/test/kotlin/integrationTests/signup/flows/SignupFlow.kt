@@ -1,8 +1,8 @@
 package integrationTests.signup.flows
 
 import domainServices.SignupDomainService
-import dto.author.CreateAuthorRequest
-import dto.signup.SignupResult
+import dtos.author.CreateAuthorRequest
+import dtos.signup.SignupResult
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
 import shared.BehaviorSpecIT

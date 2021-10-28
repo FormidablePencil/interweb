@@ -3,7 +3,7 @@ package integrationTests.authorization.tests
 import com.jetbrains.handson.httpapi.module
 import configurations.DIHelper
 import domainServices.AuthorizationService
-import dto.author.CreateAuthorRequest
+import dtos.author.CreateAuthorRequest
 import integrationTests.signup.flows.SignupFlow
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldNotBeGreaterThan

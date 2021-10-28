@@ -1,20 +1,20 @@
 package domainServices
 
-import dto.AuthorsPortfolioLayout
-import dto.LayoutComponent
+import dtos.portfolio.GetLayoutResult
+import models.portfolio.LayoutComponent
 import managers.AuthorsPortfolioManager
-import models.Author
-import repositories.IAuthorRepository
+import models.profile.Author
+import repositories.interfaces.IAuthorRepository
 
 class AuthorsPortfolioDomainService(
     private val authorRepository: IAuthorRepository,
     private val authorsPortfolioManager: AuthorsPortfolioManager,
 ) {
-    fun GetLayout(authorId: Int, layoutId: Int): AuthorsPortfolioLayout {
+    fun GetLayout(authorId: Int, layoutId: Int): GetLayoutResult {
         authorsPortfolioManager.GetLayout(layoutId)
         val listOfComponents = listOf(LayoutComponent(1))
         val componentArrangement = listOf(1, 2)
-        return AuthorsPortfolioLayout(listOfComponents, componentArrangement)
+        return GetLayoutResult(listOfComponents, componentArrangement)
     }
 
     fun GetAuthorsLayouts(authorId: Int): List<Int> {

@@ -1,5 +1,6 @@
 package configurations
 
+import configurations.interfaces.IAppEnv
 import io.ktor.config.*
 import java.util.*
 

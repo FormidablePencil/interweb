@@ -5,8 +5,8 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import managers.TokenManager
-import repositories.IAuthorRepository
-import repositories.ITokenRepository
+import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.ITokenRepository
 import shared.BehaviorSpecUT
 
 class MyTests : FunSpec({

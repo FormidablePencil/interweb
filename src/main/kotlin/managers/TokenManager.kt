@@ -2,14 +2,14 @@ package managers
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import dto.token.TokensResult
-import configurations.IAppEnv
-import configurations.IConnectionToDb
-import dto.succeeded
-import io.ktor.util.*
+import dtos.authorization.TokensResult
+import configurations.interfaces.IAppEnv
+import configurations.interfaces.IConnectionToDb
+import dtos.succeeded
+import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
-import repositories.IAuthorRepository
-import repositories.ITokenRepository
+import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.ITokenRepository
 import java.util.*
 
 enum class Tokens { AccessToken, RefreshToken }

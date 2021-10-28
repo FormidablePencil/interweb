@@ -6,8 +6,8 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import managers.TokenManager
-import repositories.IAuthorRepository
-import repositories.ITokenRepository
+import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.ITokenRepository
 
 class RefreshAccessToken : BehaviorSpec({
     val authorRepository: IAuthorRepository = mockk()

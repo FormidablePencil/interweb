@@ -1,6 +1,7 @@
 package managers
 
-import models.Author
+import managers.interfaces.IAuthorManager
+import models.profile.Author
 import repositories.AuthorRepository
 import repositories.AuthorViewerRepository
 
