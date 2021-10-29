@@ -7,13 +7,13 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import managers.interfaces.ITokenManager
-import repositories.interfaces.ITokenRepository
+import repositories.interfaces.IRefreshTokenRepository
 
 class LoginUT : BehaviorSpec({
     val tokenManager: ITokenManager = mockk()
-    val tokenRepository: ITokenRepository = mockk()
+    val refreshTokenRepository: IRefreshTokenRepository = mockk()
 
-    val loginDomainService = AuthorizationService(tokenManager, tokenRepository)
+    val loginDomainService = AuthorizationService(tokenManager, refreshTokenRepository)
 
     // mock all the dependencies
     // verify that the correct data in the dependencies has been inputted

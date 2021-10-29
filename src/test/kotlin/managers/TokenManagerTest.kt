@@ -5,25 +5,23 @@ import com.auth0.jwt.algorithms.Algorithm
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.mockk.every
 import io.mockk.mockk
-import repositories.interfaces.ITokenRepository
+import repositories.interfaces.IRefreshTokenRepository
 import shared.BehaviorSpecUT
 import java.util.*
 
 // take a look at viewing code coverage
 
 class TokenManagerTest : BehaviorSpecUT({
-    var tokenRepository: ITokenRepository = mockk()
+    var refreshTokenRepository: IRefreshTokenRepository = mockk()
     val authorId = 321
 
-    every { tokenRepository.deleteOldTokens(authorId) } returns 1
-    every { tokenRepository.insertTokens(any(), any(), authorId) } returns 1
+    every { refreshTokenRepository.deleteOldToken(authorId) } returns 1
+    every { refreshTokenRepository.insertToken(any(), authorId) } returns 1
 
-    var tokenManager = TokenManager(tokenRepository)
+    var tokenManager = TokenManager(refreshTokenRepository)
 
     given("refreshAccessToken") {
-        // private method nested: validateRefreshToken
 
-        // check that the provided refresh token is being validated
         When("provided valid refreshToken and authorId") {
             val refreshToken = JWT.create()
                 .withAudience("audience")

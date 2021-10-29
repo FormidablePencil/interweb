@@ -2,7 +2,6 @@ package integrationTests.authorization.tests
 
 import com.jetbrains.handson.httpapi.module
 import configurations.DIHelper
-import services.AuthorizationService
 import dtos.author.CreateAuthorRequest
 import integrationTests.signup.flows.SignupFlow
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -13,7 +12,10 @@ import io.ktor.server.testing.*
 import org.koin.core.context.startKoin
 import org.koin.test.get
 import org.koin.test.inject
-import shared.*
+import services.AuthorizationService
+import shared.BehaviorSpecIT
+import shared.DITestHelper
+import shared.cleanup
 
 class TokensIT : BehaviorSpecIT({
     startKoin {
@@ -36,6 +38,13 @@ class TokensIT : BehaviorSpecIT({
             }
 
             And("refresh tokens") {
+                // each device will have their own unique refresh token by adding a UUID...
+                // refresh access-token -> updates the expiration only to the refresh-token that corresponds header.id with token.id
+                // and updates in db and returns it to client
+                // Since every device has a unique refresh-token, the devices will not have access anymore when both tokens expire
+                // and when refreshing access-token, all the other tokens are not updated, the refresh-token in db with id corresponding
+                // with the provided valid refresh-token id value which we put in the beginning for this purpose
+
                 // TokenFlow.refresh()
 
                 Then("login with new tokens given") {
@@ -46,6 +55,11 @@ class TokensIT : BehaviorSpecIT({
 
             And("reset password") {
                 Then("login with new tokens given") {
+                    // TokenFlow.login()
+
+                }
+
+                Then("login with old tokens given") {
                     // TokenFlow.login()
 
                 }
@@ -60,11 +74,11 @@ class RequestAccessTokenTest : BehaviorSpecIT() {
     init {
         Given("a valid refresh token") {
             Then("return new access token and refresh token") {
-                var (refreshToken, accessToken) = tokenDomainService.refreshAccessToken("refresh token")
+                var (refreshToken, accessToken) = tokenDomainService.refreshAccessToken("refresh token", 1)
 
                 // region assertions
-                refreshToken.length shouldBeGreaterThan 0
-                accessToken.length shouldBeGreaterThan 0
+                refreshToken?.length?.shouldBeGreaterThan(0)
+                accessToken?.length?.shouldBeGreaterThan(0)
                 // endregion
             }
         }

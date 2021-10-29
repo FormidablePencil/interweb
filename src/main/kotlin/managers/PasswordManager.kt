@@ -9,10 +9,10 @@ import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
 import org.mindrot.jbcrypt.BCrypt
 import repositories.interfaces.IPasswordRepository
-import repositories.interfaces.ITokenRepository
+import repositories.interfaces.IRefreshTokenRepository
 
 class PasswordManager(
-    private val tokenRepository: ITokenRepository,
+    private val refreshTokenRepository: IRefreshTokenRepository,
     private val passwordRepository: IPasswordRepository,
     private val tokenManager: ITokenManager,
 ) : IPasswordManager {
@@ -22,7 +22,7 @@ class PasswordManager(
         validatePassword(oldPassword, authorId)
 
         connectionToDb.database.useTransaction {
-            tokenRepository.deleteOldTokens(authorId)
+            refreshTokenRepository.deleteOldToken(authorId)
             passwordRepository.deletePassword(authorId)
             setNewPassword(newPassword)
             val tokens = tokenManager.genTokensOnResetPassword(authorId)

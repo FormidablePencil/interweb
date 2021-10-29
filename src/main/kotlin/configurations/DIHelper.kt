@@ -3,18 +3,23 @@ package configurations
 import com.typesafe.config.ConfigFactory
 import configurations.interfaces.IAppEnv
 import configurations.interfaces.IConnectionToDb
-import services.AuthorsPortfolioService
-import services.AuthorizationService
 import io.ktor.config.*
-import managers.*
+import managers.AuthorsPortfolioManager
+import managers.EmailManager
+import managers.PasswordManager
+import managers.TokenManager
+import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import org.koin.dsl.module
-import repositories.*
+import repositories.AuthorRepository
+import repositories.PasswordRepository
+import repositories.RefreshTokenRepository
 import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.IPasswordRepository
-import repositories.interfaces.ITokenRepository
-import services.EmailService
+import repositories.interfaces.IRefreshTokenRepository
+import services.AuthorizationService
+import services.AuthorsPortfolioService
 import java.io.FileInputStream
 import java.util.*
 
@@ -23,17 +28,17 @@ object DIHelper {
         // domain services
         single { AuthorsPortfolioService(get(), get()) }
         single { AuthorizationService(get(), get(), get(), get()) }
-        single { EmailService() }
 
         // managers
         single { AuthorsPortfolioManager() }
         single<ITokenManager> { TokenManager(get()) }
         single<IPasswordManager> { PasswordManager(get(), get(), get()) }
+        single<IEmailManager> { EmailManager() }
 
         // repositories
         single<IAuthorRepository> { AuthorRepository() }
         single<IPasswordRepository> { PasswordRepository() }
-        single<ITokenRepository> { TokenRepository() }
+        single<IRefreshTokenRepository> { RefreshTokenRepository() }
 
         // env configurations
         val dbConnection = Properties()

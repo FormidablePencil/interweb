@@ -60,7 +60,7 @@ fun Application.module(testing: Boolean = false) {
                 .withIssuer(issuer)
                 .build())
             validate { credential ->
-                if (credential.payload.getClaim("username").asString() != "") {
+                if (credential.payload.getClaim("authorId").asString() != "") {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

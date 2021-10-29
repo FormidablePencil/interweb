@@ -10,13 +10,13 @@ import helper.failed
 import helper.succeeded
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
-import repositories.interfaces.ITokenRepository
+import repositories.interfaces.IRefreshTokenRepository
 import java.util.*
 
 enum class KindOfTokens { AccessToken, RefreshToken }
 
 class TokenManager(
-    private val tokenRepository: ITokenRepository,
+    private val refreshTokenRepository: IRefreshTokenRepository,
 ) : ITokenManager {
     private val appEnv: IAppEnv by inject()
     private val connectionToDb: IConnectionToDb by inject()
@@ -41,15 +41,15 @@ class TokenManager(
         val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 
         connectionToDb.database.useTransaction {
-            tokenRepository.deleteOldTokens(authorId)
-            tokenRepository.insertTokens(refreshToken, accessToken, authorId)
+            refreshTokenRepository.deleteOldToken(authorId)
+            refreshTokenRepository.insertToken(refreshToken, authorId)
         }
 
         return TokensResult(refreshToken, accessToken).succeeded()
     }
 
     private fun isRefreshTokenValid(refreshToken: String, authorId: Int): Boolean {
-        val tokensDb = tokenRepository.getTokensByAuthorId(authorId)
+        val tokensDb = refreshTokenRepository.getTokenByAuthorId(authorId)
         return tokensDb?.refreshToken == refreshToken
     }
 

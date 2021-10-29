@@ -6,6 +6,7 @@ import dtos.authorization.*
 import dtos.signup.SignupResult
 import dtos.signup.SignupResultError
 import helper.*
+import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
@@ -16,7 +17,7 @@ import repositories.interfaces.IAuthorRepository
 class AuthorizationService(
     private val authorRepository: IAuthorRepository,
     private val tokenManager: ITokenManager,
-    private val emailService: EmailService,
+    private val emailManager: IEmailManager,
     private val passwordManager: IPasswordManager,
 ) : KoinComponent {
     private val connectionToDb: IConnectionToDb by inject();
@@ -72,7 +73,7 @@ class AuthorizationService(
         } else
             return RequestPasswordResetResult().failed(RequestPasswordResetResultError.NeitherUsernameNorEmailProvided)
 
-        emailService.sendCreatedAccount(author.id)
+        emailManager.sendCreatedAccount(author.id)
 
         val maskedEmail = maskEmail(author.email)
         return RequestPasswordResetResult(maskedEmail).succeeded()
@@ -92,7 +93,24 @@ class AuthorizationService(
         return passwordManager.resetPassword(oldPassword, newPassword, authorId)
     }
 }
+// Authorization features
+//  authorize restricted data with valid token from bearer
+//  login to get access token (and refresh token)
+//  reset password to get access token
+//  create account to get access token
 
-// tokens must be saved in db
-// tokens must be sent from the client via bearer
-// and validated everytime before giving access to data
+// Token
+//  tokens must be saved in db
+//  tokens must be sent from the client via bearer
+//  and validated everytime before giving access to data
+//  The refresh token should be stored to validate that the user has not reset their password and wiped all access from all devices
+
+// Models/tables
+//  tokens - authorization purposes
+//  author - resource association purposes
+//  password - authentication purposes
+//  password_reset_code
+
+// Why
+//  we need to restrict resources and modification privileges to everyone outside
+//  once this Authorization is built, we can have users use the app while new features are still being built

@@ -8,13 +8,13 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import managers.TokenManager
 import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.ITokenRepository
+import repositories.interfaces.IRefreshTokenRepository
 
 class RefreshAccessToken : BehaviorSpec({
     val authorRepository: IAuthorRepository = mockk()
-    val tokenRepository: ITokenRepository = mockk()
+    val refreshTokenRepository: IRefreshTokenRepository = mockk()
 
-    val tokenManager = TokenManager(authorRepository, tokenRepository)
+    val tokenManager = TokenManager(authorRepository, refreshTokenRepository)
 
     Given("valid refresh token") {
         Then("return access token") {

@@ -3,16 +3,19 @@ package services
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
+import managers.interfaces.IEmailManager
+import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.ITokenRepository
+import repositories.interfaces.IRefreshTokenRepository
 
 class AuthorizationServiceTest : BehaviorSpec({
     val authorRepository: IAuthorRepository = mockk()
     val tokenManager: ITokenManager = mockk()
-    val tokenRepository: ITokenRepository = mockk()
-    val emailService: EmailService = mockk()
+    val refreshTokenRepository: IRefreshTokenRepository = mockk()
+    val emailService: IEmailManager = mockk()
+    val passwordManager: IPasswordManager = mockk()
     val username = "username"
     val email = "email"
     val authorForUsername = Author { val id = 1 }
@@ -23,7 +26,7 @@ class AuthorizationServiceTest : BehaviorSpec({
     every { emailService.sendResetPassword(authorForUsername.id) }
 
     val authorizationService = AuthorizationService(
-        authorRepository, tokenManager, tokenRepository, emailService
+        authorRepository, tokenManager, emailService, passwordManager
     )
 
     given("login") { }
