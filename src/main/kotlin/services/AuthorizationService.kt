@@ -39,7 +39,7 @@ class AuthorizationService(
             val tokens = tokenManager.genTokensOnSignup(authorId)
             setNewPasswordForSignup(request.password)
 
-            //TODO: send message through 3rd party postMark welcoming the new author
+            //TODO: send message through 3rd party postMark welcoming the new author and validate email
 
             return SignupResult(authorId).succeeded()
         }
@@ -73,7 +73,7 @@ class AuthorizationService(
         } else
             return RequestPasswordResetResult().failed(RequestPasswordResetResultError.NeitherUsernameNorEmailProvided)
 
-        emailManager.sendCreatedAccount(author.id)
+        emailManager.sendValidateEmail(author.id)
 
         val maskedEmail = maskEmail(author.email)
         return RequestPasswordResetResult(maskedEmail).succeeded()

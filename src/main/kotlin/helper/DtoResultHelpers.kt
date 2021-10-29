@@ -1,6 +1,6 @@
 package helper
 
-import dtos.IDtoResult
+import dtos.DtoResult
 
 
 // region Generics
@@ -14,20 +14,20 @@ import dtos.IDtoResult
 // adding a response code would be nice and directly returning this object from the controller
 // maybe create another extension function that returns
 
-fun <C, T : Enum<T>> IDtoResult<T>.failed(error: Enum<T>, msg: String?): C {
+fun <C, T : Enum<T>> DtoResult<T>.failed(error: Enum<T>, msg: String?): C {
     this.error = error
     this.message = msg
     this.success = false
     return this as C
 }
 
-fun <T : Enum<T>, C> IDtoResult<T>.failed(error: Enum<T>): C {
+fun <T : Enum<T>, C> DtoResult<T>.failed(error: Enum<T>): C {
     this.error = error
     this.success = false
     return this as C
 }
 
-fun <C, T : Enum<T>> IDtoResult<T>.succeeded(): C {
+fun <C, T : Enum<T>> DtoResult<T>.succeeded(): C {
     this.success = true
     return this as C
 }

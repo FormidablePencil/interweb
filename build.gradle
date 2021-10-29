@@ -40,6 +40,7 @@ dependencies {
     testImplementation 'io.kotest:kotest-runner-junit5:5.0.0.M3'
     testImplementation 'io.kotest:kotest-assertions-core:5.0.0.M3'
     testImplementation 'io.kotest:kotest-property:5.0.0.M3'
+    testImplementation 'io.kotest:kotest-framework-datatest:5.0.0.M3'
 
     implementation "io.ktor:ktor-auth:$ktor_version"
     implementation "io.ktor:ktor-auth-jwt:$ktor_version"

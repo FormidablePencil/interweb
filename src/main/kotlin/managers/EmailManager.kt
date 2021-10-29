@@ -8,7 +8,7 @@ class EmailManager : IEmailManager {
 
     }
 
-    override fun sendCreatedAccount(userId: Int) {
+    override fun sendValidateEmail(userId: Int) {
 
     }
 }

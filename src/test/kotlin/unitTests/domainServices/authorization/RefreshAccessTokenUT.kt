@@ -7,22 +7,20 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import managers.TokenManager
-import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.IRefreshTokenRepository
 
 class RefreshAccessToken : BehaviorSpec({
-    val authorRepository: IAuthorRepository = mockk()
     val refreshTokenRepository: IRefreshTokenRepository = mockk()
 
-    val tokenManager = TokenManager(authorRepository, refreshTokenRepository)
+    val tokenManager = TokenManager(refreshTokenRepository)
 
     Given("valid refresh token") {
         Then("return access token") {
             val (accessToken, refreshToken) = tokenManager.refreshAccessToken("invalidToken", 2)
 
             // region assertion
-            accessToken.length shouldBeGreaterThan 0
-            refreshToken.length shouldBeGreaterThan 0
+            accessToken?.length?.shouldBeGreaterThan(0)
+            refreshToken?.length?.shouldBeGreaterThan(0)
             // endregion
         }
     }
