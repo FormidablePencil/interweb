@@ -12,6 +12,7 @@ import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
+import shared.DataTestName
 import shared.PythagTriple3
 
 fun isPythagTriple(a: Int, b: Int, c: Int): Boolean = a * a + b * b == c * c
@@ -50,24 +51,22 @@ class AuthorizationServiceTest : FunSpec({
     }
 
     context("test again 1") {
-//        PythagTriple3.names(false)
-        val r = PythagTriple3(3, 4, 5).setName("strong password", false).setName("email formatted", true)
-
-        withData<PythagTriple3>(
-            PythagTriple3(3, 4, 5).setName("Strong password", false), // incorrect email or password for instance
+        withData(
             PythagTriple3(6, 8, 10)
-                .setName("Strong password", true)
-                .setName("strong password", false)
-                .setName("email formatted", "Friest"),
-            PythagTriple3(8, 15, 17),
-            PythagTriple3(7, 24, 25)
+                .set("strong password", false)
+                .set("email formatted", false),
+            PythagTriple3(3, 4, 5)
+                .set("strong password", true)
+                .set("email formatted", false),
+            PythagTriple3(3, 4, 5)
+                .set("strong password", false)
+                .set("email formatted", true),
+            PythagTriple3(6, 8, 10)
+                .set("strong password", true)
+                .set("email formatted", true),
         ) { (a, b, c) ->
-
             isPythagTriple(a, b, c) shouldBe true
         }
-    }
-    test("test again") {
-        3 shouldBe 3
     }
 
 //    context("login 2") {
