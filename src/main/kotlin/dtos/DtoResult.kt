@@ -1,5 +1,7 @@
 package dtos
 
+import io.ktor.http.*
+
 //open class DtoResult<T : Enum<T>> : IDtoResult<T>() {
 ////    override var error: Enum<T>? = null
 ////    override var message: String? = null
@@ -7,6 +9,7 @@ package dtos
 //}
 
 open class DtoResult<T : Enum<T>> {
+    var statusCode: HttpStatusCode? = null
     var error: Enum<T>? = null
     var message: String? = null
     var success: Boolean? = null

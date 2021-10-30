@@ -9,7 +9,7 @@ import repositories.interfaces.IRefreshTokenRepository
 import shared.BehaviorSpecUT
 import java.util.*
 
-// take a look at viewing code coverage
+// take a look at viewing statusCode coverage
 
 class TokenManagerTest : BehaviorSpecUT({
     var refreshTokenRepository: IRefreshTokenRepository = mockk()

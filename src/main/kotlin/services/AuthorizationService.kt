@@ -5,7 +5,11 @@ import dtos.author.CreateAuthorRequest
 import dtos.authorization.*
 import dtos.signup.SignupResult
 import dtos.signup.SignupResultError
+import exceptions.GenericError
+import exceptions.ServerError
+import exceptions.ServerErrorException
 import helper.*
+import io.ktor.http.*
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
@@ -24,25 +28,31 @@ class AuthorizationService(
 
     fun signup(request: CreateAuthorRequest): SignupResult {
         if (!isStrongPassword(request.password))
-            return SignupResult().failed(SignupResultError.WeakPassword, "Weak password.")
+            return SignupResult().failed(SignupResultError.WeakPassword, HttpStatusCode.BadRequest)
         if (!isEmailFormatted(request.email))
-            return SignupResult().failed(
-                SignupResultError.InvalidEmailFormat, "Email provided is not formatted as such."
-            )
+            return SignupResult().failed(SignupResultError.InvalidEmailFormat, HttpStatusCode.BadRequest)
+
         if (authorRepository.getByEmail(request.email) != null)
-            return SignupResult().failed(SignupResultError.ServerError, "Email taken.")
+            return SignupResult().failed(SignupResultError.EmailTaken, HttpStatusCode.BadRequest)
         if (authorRepository.getByUsername(request.username) != null)
-            return SignupResult().failed(SignupResultError.ServerError, "Username taken.")
+            return SignupResult().failed(SignupResultError.UsernameTaken, HttpStatusCode.BadRequest)
 
-        connectionToDb.database.useTransaction {
-            val authorId = authorRepository.createAuthor(request)
-            val tokens = tokenManager.genTokensOnSignup(authorId)
-            setNewPasswordForSignup(request.password)
-
-            //TODO: send message through 3rd party postMark welcoming the new author and validate email
-
-            return SignupResult(authorId).succeeded()
+        try {
+            connectionToDb.database.useTransaction {
+                if (authorRepository.createAuthor(request) == 0) throw ServerErrorException(ServerError.FailedToCreateAuthor)
+                if (passwordManager.setNewPassword(request.password) == 0) throw ServerErrorException(ServerError.FailedToSetNewPassword)
+                emailManager.sendValidateEmail(request.email)
+                return SignupResult().succeeded(HttpStatusCode.Created)
+            }
+        } catch (ex: Exception) {
+            TODO("log the failed db insertions")
+            return SignupResult().failed(SignupResultError.ServerError, HttpStatusCode.InternalServerError)
         }
+
+    }
+
+    fun validateEmailSignupCode(code: String) {
+        TODO()
     }
 
     fun login(email: String, password: String): LoginResult {
@@ -73,21 +83,17 @@ class AuthorizationService(
         } else
             return RequestPasswordResetResult().failed(RequestPasswordResetResultError.NeitherUsernameNorEmailProvided)
 
-        emailManager.sendValidateEmail(author.id)
+        emailManager.sendValidateEmail(author.email)
 
         val maskedEmail = maskEmail(author.email)
         return RequestPasswordResetResult(maskedEmail).succeeded()
-    }
-
-    fun setNewPasswordForSignup(password: String): Int {
-        return passwordManager.setNewPassword(password)
     }
 
     fun resetPasswordByEmail(oldPassword: String, newPassword: String, emailCode: String): ResetPasswordResult {
 
         TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
 
-        // get authorId base off of emailCode - I wonder if the email code is a jwt token??? - It could work
+        // get authorId base off of emailCode - I wonder if the email statusCode is a jwt token??? - It could work
         val authorId = 1
 
         return passwordManager.resetPassword(oldPassword, newPassword, authorId)

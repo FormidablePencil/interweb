@@ -1,6 +1,7 @@
 package helper
 
 import dtos.DtoResult
+import io.ktor.http.*
 
 
 // region Generics
@@ -11,8 +12,16 @@ import dtos.DtoResult
 // endregion
 
 
-// adding a response code would be nice and directly returning this object from the controller
+// adding a response statusCode would be nice and directly returning this object from the controller
 // maybe create another extension function that returns
+
+fun <C, T : Enum<T>> DtoResult<T>.failed(error: Enum<T>, msg: String?, code: HttpStatusCode): C {
+    this.statusCode = code
+    this.error = error
+    this.message = msg
+    this.success = false
+    return this as C
+}
 
 fun <C, T : Enum<T>> DtoResult<T>.failed(error: Enum<T>, msg: String?): C {
     this.error = error
@@ -21,9 +30,22 @@ fun <C, T : Enum<T>> DtoResult<T>.failed(error: Enum<T>, msg: String?): C {
     return this as C
 }
 
+fun <T : Enum<T>, C> DtoResult<T>.failed(error: Enum<T>, code: HttpStatusCode): C {
+    this.statusCode = code
+    this.error = error
+    this.success = false
+    return this as C
+}
+
 fun <T : Enum<T>, C> DtoResult<T>.failed(error: Enum<T>): C {
     this.error = error
     this.success = false
+    return this as C
+}
+
+fun <C, T : Enum<T>> DtoResult<T>.succeeded(code: HttpStatusCode): C {
+    this.statusCode = code
+    this.success = true
     return this as C
 }
 

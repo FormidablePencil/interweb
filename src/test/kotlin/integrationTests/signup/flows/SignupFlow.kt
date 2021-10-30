@@ -2,7 +2,9 @@ package integrationTests.signup.flows
 
 import dtos.author.CreateAuthorRequest
 import dtos.signup.SignupResult
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.ktor.http.*
 import org.koin.test.inject
 import services.AuthorizationService
 import shared.BehaviorSpecIT
@@ -19,7 +21,7 @@ class SignupFlow : BehaviorSpecIT() {
         return cleanup(cleanup) {
             val result = authorizationService.signup(request)
 
-            result.authorId shouldNotBe null
+            result.message shouldBe HttpStatusCode.OK
 //            result.tokens.refreshToken.size shouldBeGreaterThan 0
 //            result.tokens.accessToken.size shouldBeGreaterThan 0
 

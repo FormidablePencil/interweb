@@ -6,6 +6,7 @@ import models.profile.Author
 import models.profile.Authors
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
+import org.ktorm.dsl.insert
 import org.ktorm.dsl.insertAndGenerateKey
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
@@ -16,19 +17,12 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     val Database.password get() = this.sequenceOf(Passwords)
 
     override fun createAuthor(request: CreateAuthorRequest): Int {
-        var authorId = database.insertAndGenerateKey(Authors) {
+        return database.insert(Authors) {
             set(it.username, request.username)
             set(it.firstname, request.firstname)
             set(it.lastname, request.lastname)
             set(it.email, request.email)
         }
-
-        if (authorId !is Int)
-            throw Exception("Server error. Saving author failed")
-
-        var result = database.author.find() { it.id eq authorId }
-
-        return authorId
     }
 
     override fun getByEmail(email: String): Author? {

@@ -25,7 +25,7 @@ class PasswordManager(
             refreshTokenRepository.deleteOldToken(authorId)
             passwordRepository.deletePassword(authorId)
             setNewPassword(newPassword)
-            val tokens = tokenManager.genTokensOnResetPassword(authorId)
+            val tokens = tokenManager.generateTokens(authorId)
             return ResetPasswordResult(tokens.accessToken, tokens.refreshToken).succeeded()
         }
     }

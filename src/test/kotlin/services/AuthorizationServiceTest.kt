@@ -1,24 +1,21 @@
 package services
 
 import dtos.author.CreateAuthorRequest
-import io.kotest.common.ExperimentalKotest
-import io.kotest.core.spec.style.FunSpec
-import io.kotest.datatest.withData
+import dtos.signup.SignupResultError
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.mockk
+import io.kotest.matchers.shouldNotBe
+import io.ktor.http.*
+import io.mockk.*
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
-import shared.DataTestName
-import shared.PythagTriple3
+import shared.BehaviorSpecUT
 
-fun isPythagTriple(a: Int, b: Int, c: Int): Boolean = a * a + b * b == c * c
-
-@OptIn(ExperimentalKotest::class)
-class AuthorizationServiceTest : FunSpec({
+class AuthorizationServiceTest : BehaviorSpecUT({
     val authorRepository: IAuthorRepository = mockk()
     val tokenManager: ITokenManager = mockk()
     val emailService: IEmailManager = mockk()
@@ -28,8 +25,8 @@ class AuthorizationServiceTest : FunSpec({
     val authorForUsername = Author { val id = 1 }
     val authorForEmail = Author { val id = 2 }
 
-    every { authorRepository.getByUsername(username) } returns authorForUsername
-    every { authorRepository.getByUsername(email) } returns authorForEmail
+    every { authorRepository.getByUsername(username) } returns null
+    every { authorRepository.getByEmail(email) } returns null
     every { emailService.sendResetPassword(authorForUsername.id) }
 
     val authorizationService = AuthorizationService(authorRepository, tokenManager, emailService, passwordManager)
@@ -50,141 +47,119 @@ class AuthorizationServiceTest : FunSpec({
         println("Goodbye from $it")
     }
 
-    context("test again 1") {
-        withData(
-            PythagTriple3(6, 8, 10)
-                .set("strong password", false)
-                .set("email formatted", false),
-            PythagTriple3(3, 4, 5)
-                .set("strong password", true)
-                .set("email formatted", false),
-            PythagTriple3(3, 4, 5)
-                .set("strong password", false)
-                .set("email formatted", true),
-            PythagTriple3(6, 8, 10)
-                .set("strong password", true)
-                .set("email formatted", true),
-        ) { (a, b, c) ->
-            isPythagTriple(a, b, c) shouldBe true
+    given("signup") {
+        And("valid credentials") {
+            Then("ok responses") {
+                val request = genCreateAuthorRequest()
+                every { authorRepository.createAuthor(request) }
+
+                val result = authorizationService.signup(genCreateAuthorRequest())
+                result.statusCode shouldBe HttpStatusCode.Created
+
+                verifySequence {
+                    authorRepository.createAuthor(request)
+                    passwordManager.setNewPassword(request.password)
+                    emailService.sendValidateEmail(email)
+                }
+            }
+        }
+
+        And("incorrectly format email") {
+            val result = authorizationService.signup(genCreateAuthorRequest(aEmail = "email"))
+
+            result.statusCode shouldBe HttpStatusCode.BadRequest
+            result.message shouldBe SignupResultError.getMsg(SignupResultError.EmailTaken)
+        }
+
+        And("weak password") {
+            val result = authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
+
+            result.statusCode shouldBe HttpStatusCode.BadRequest
+            result.message shouldBe SignupResultError.getMsg(SignupResultError.WeakPassword)
+        }
+
+        And("taken email") {
+            every { authorRepository.getByEmail(email) } returns authorForEmail
+
+            val result = authorizationService.signup(genCreateAuthorRequest())
+
+            result.statusCode shouldBe HttpStatusCode.BadRequest
+            result.message shouldBe SignupResultError.getMsg(SignupResultError.EmailTaken)
+        }
+
+        And("taken username") {
+            every { authorRepository.getByUsername(username) } returns authorForUsername
+
+            val result = authorizationService.signup(genCreateAuthorRequest())
+
+            result.statusCode shouldBe HttpStatusCode.BadRequest
+            result.message shouldBe SignupResultError.getMsg(SignupResultError.UsernameTaken)
+        }
+
+        Then("Failed To Create Author server error") {
+            TODO("should log the exception")
+            val request = genCreateAuthorRequest()
+            every { authorRepository.createAuthor(request) } returns 0
+
+            val result = authorizationService.signup(request)
+
+            result.statusCode shouldBe HttpStatusCode.BadRequest
+            result.message shouldBe SignupResultError.getMsg(SignupResultError.ServerError)
+        }
+
+        Then("Failed To Set New Password server error") {
+            TODO("should log the exception")
+            val request = genCreateAuthorRequest()
+            every { passwordManager.setNewPassword(request.password) } returns 0
+
+            val result = authorizationService.signup(request)
+
+            result.statusCode shouldBe HttpStatusCode.BadRequest
+            result.message shouldBe SignupResultError.getMsg(SignupResultError.ServerError)
         }
     }
 
-//    context("login 2") {
-//        test("variations") {
-//            withData(
-//                PythagTriple(3, 4, 5), // incorrect email or password for instance
-//                PythagTriple(6, 8, 10),
-//                PythagTriple(8, 15, 17),
-//                PythagTriple(7, 24, 25)
-//            ) { (a, b, c) ->
-//
-//                when (a) {
-//                    3, 8 -> { // if valid email or username for instance
-//                        println("one")
-//                        println("two")
-//                        isPythagTriple(a, b, c) shouldBe false
-//                    }
-//                    6 -> {
-//                        println("twenty five")
-//                        isPythagTriple(a, b, c) shouldBe true
-//                    }
-//                    else -> {
-//                        println("fifty nine")
-//                        isPythagTriple(a, b, c) shouldBe true
-//                    }
-//                }
-//            }
-//        }
-//    }
 
+    given("validateEmailSignupCode") {
 
-//    given("signup new user") {
-//        println("should print once because it should run only once")
-//
-//        Then("valid credentials") {
-//
-////                val result = authorizationService.signup(genCreateAuthorRequest())
-//
-//            4 shouldBe 4
-//            3 shouldBe 3
-//
-//            //region assertions
-////                result.authorId shouldBe authorId
-////                result.tokens.refreshToken.size shouldBeGreaterThan 0
-////                result.tokens.accessToken.size shouldBeGreaterThan 0
-//            //endregion
-//        }
-//
-//        And("incorrectly format email") {
-//            val exception = shouldThrow<Exception> {
-//                authorizationService.signup(genCreateAuthorRequest(aEmail = "email"))
-//            }
-//            // replace messages with enums
-//            exception.message shouldBe "Not an email provided"
-//        }
-//
-//        And("weak password") {
-//            val exception = shouldThrow<Exception> {
-//                authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
-//            }
-//            // replace messages with enums
-//            exception.message shouldBe "weak password"
-//        }
-//
-//        And("taken email") {
-//            val exception = shouldThrow<Exception> {
-//                authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
-//            }
-//            // replace messages with enums
-//            exception.message shouldBe "email taken"
-//        }
-//
-//        And("taken username") {
-//            val exception = shouldThrow<Exception> {
-//                authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
-//            }
-//            // replace messages with enums
-//            exception.message shouldBe "email taken"
-//        }
-//
-//    }
+    }
 
-//    given("login user") {
-//
-//        And("correct credentials") {
-//            val result = authorizationService.login("email", "password")
-//            result.authorId shouldNotBe null
-////                result.RefreshToken.length shouldNotBe 0
-////                result.accessToken.length shouldNotBe 0
-//        }
-//
-//        And("invalid email") {
-//            val exception = shouldThrow<Exception> {
-//                authorizationService.login("invalid", "correctPassword")
-//            }
-//            exception.message shouldBe "invalid email format"
-//        }
-//
-//        And("password provided is invalid") {
-//            var exception = shouldThrow<Exception> {
-//                authorizationService.login("correctEmail", "invalid")
-//            }
-//            exception.message shouldBe "invalid password format"
-//        }
-//
-//    }
+    given("login user") {
 
-//    given("refreshAccessToken") { }
-//
-//    given("requestPasswordReset") {
-//
-//        And("valid username and email") {
-//            val result = authorizationService.requestPasswordReset(username, email)
-//        }
-//
-//    }
-//
-//    given("setNewPasswordForSignup") { }
-//
-//    given("resetPasswordByEmail") { }
+        And("correct credentials") {
+            val result = authorizationService.login("email", "password")
+            result.authorId shouldNotBe null
+//                result.RefreshToken.length shouldNotBe 0
+//                result.accessToken.length shouldNotBe 0
+        }
+
+        And("invalid email") {
+            val exception = shouldThrow<Exception> {
+                authorizationService.login("invalid", "correctPassword")
+            }
+            exception.message shouldBe "invalid email format"
+        }
+
+        And("password provided is invalid") {
+            var exception = shouldThrow<Exception> {
+                authorizationService.login("correctEmail", "invalid")
+            }
+            exception.message shouldBe "invalid password format"
+        }
+
+    }
+
+    given("refreshAccessToken") { }
+
+    given("requestPasswordReset") {
+
+        And("valid username and email") {
+            val result = authorizationService.requestPasswordReset(username, email)
+        }
+
+    }
+
+    given("setNewPasswordForSignup") { }
+
+    given("resetPasswordByEmail") { }
 })

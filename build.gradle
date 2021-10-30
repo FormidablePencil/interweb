@@ -12,39 +12,37 @@ repositories {
 }
 
 dependencies {
+    // Ktor Api
     implementation "io.ktor:ktor-server-core:$ktor_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
     implementation "io.ktor:ktor-serialization:$ktor_version"
-    implementation group: 'org.ktorm', name: 'ktorm-core', version: '3.4.1'
-    implementation "org.ktorm:ktorm-core:$ktorm_version"
-    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
+    testImplementation "io.ktor:ktor-server-test-host:$ktor_version"
 
-    // Koin for Kotlin apps
-    // Koin for Ktor
+    // Ktorm Orm
+    implementation group: 'org.ktorm', name: 'ktorm-core', version: ktorm_version
+    implementation "org.ktorm:ktorm-core:$ktorm_version"
+    implementation group: 'mysql', name: 'mysql-connector-java', version: mysql_connector_version
+
+    // Koin DI
     implementation "io.insert-koin:koin-ktor:$koin_version"
-// Koin core features
     implementation "io.insert-koin:koin-core:$koin_version"
     implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
-// Koin for JUnit 5
     testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
-    testImplementation "io.mockk:mockk:1.12.0"
 
-    // current jbcrypt_version is 0.4
-    compile group: 'org.mindrot', name: 'jbcrypt', version: 0.4
+    compile group: 'org.mindrot', name: 'jbcrypt', version: jbcrypt_version //password encryption
+    implementation "org.valiktor:valiktor-core:$valiktor_version"
 
-    testImplementation "io.ktor:ktor-server-test-host:$ktor_version"
-//    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5:1.5.31'
-//    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
+    // Testing Frameworks
+    testImplementation "io.mockk:mockk:$mockk_version"
+    testImplementation "io.kotest:kotest-runner-junit5:$kotest_version"
+    testImplementation "io.kotest:kotest-assertions-core:$kotest_version"
+    testImplementation "io.kotest:kotest-property:$kotest_version"
+    testImplementation "io.kotest:kotest-framework-datatest:$kotest_version"
 
-    testImplementation 'io.kotest:kotest-runner-junit5:5.0.0.M3'
-    testImplementation 'io.kotest:kotest-assertions-core:5.0.0.M3'
-    testImplementation 'io.kotest:kotest-property:5.0.0.M3'
-    testImplementation 'io.kotest:kotest-framework-datatest:5.0.0.M3'
-
+    // Jwt auth
     implementation "io.ktor:ktor-auth:$ktor_version"
     implementation "io.ktor:ktor-auth-jwt:$ktor_version"
-    implementation 'org.valiktor:valiktor-core:0.12.0'
 }
 
 compileKotlin {

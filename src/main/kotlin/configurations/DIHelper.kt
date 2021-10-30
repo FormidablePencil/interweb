@@ -33,7 +33,7 @@ object DIHelper {
         single { AuthorsPortfolioManager() }
         single<ITokenManager> { TokenManager(get()) }
         single<IPasswordManager> { PasswordManager(get(), get(), get()) }
-        single<IEmailManager> { EmailManager() }
+        single<IEmailManager> { EmailManager(get()) }
 
         // repositories
         single<IAuthorRepository> { AuthorRepository() }

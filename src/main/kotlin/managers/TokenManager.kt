@@ -21,22 +21,13 @@ class TokenManager(
     private val appEnv: IAppEnv by inject()
     private val connectionToDb: IConnectionToDb by inject()
 
-    override fun genTokensOnSignup(authorId: Int): Pair<String?, String?> {
-        val tokenResult = generateTokens(authorId)
-        return Pair(tokenResult.refreshToken, tokenResult.accessToken)
-    }
-
-    override fun genTokensOnResetPassword(authorId: Int): TokensResult {
-        return generateTokens(authorId)
-    }
-
     override fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResult {
         return if (!isRefreshTokenValid(refreshToken, authorId))
             TokensResult().failed(TokensResultError.InvalidRefreshToken, "Invalid refresh token")
         else generateTokens(authorId)
     }
 
-    private fun generateTokens(authorId: Int): TokensResult {
+    override fun generateTokens(authorId: Int): TokensResult {
         val refreshToken = generateToken(authorId, KindOfTokens.RefreshToken)
         val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 

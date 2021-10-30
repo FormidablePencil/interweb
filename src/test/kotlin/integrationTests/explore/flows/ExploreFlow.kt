@@ -15,6 +15,8 @@ class ExploreFlow(
     private val signupFlows: SignupFlow,
 ) {
     fun VisitAuthorsPortfolio_userflow() {
+        TODO()
+
         //region setup
         val createAuthorRequest = CreateAuthorRequest(
             "username", "email", "firstname",
@@ -22,10 +24,9 @@ class ExploreFlow(
         )
 
         val signupResult = signupFlows.signup(createAuthorRequest)
-       if (signupResult?.authorId == null)
-           return
+//       if (signupResult?.authorId == null)
 
-        threadDomainService.createThread(signupResult.authorId!!)
+//        threadDomainService.createThread(signupResult.authorId!!)
         //endregion
 
         //region actions
@@ -43,6 +44,7 @@ class ExploreFlow(
     }
 
     fun VisitThread_userflow() {
+        TODO()
         //region setup
         //endregion
 

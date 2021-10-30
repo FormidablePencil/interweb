@@ -31,3 +31,22 @@ open class DataTestName <T> {
         return this as T
     }
 }
+
+//context("test again 1") {
+//    withData(
+//        PythagTriple3(6, 8, 10)
+//            .set("strong password", false)
+//            .set("email formatted", false),
+//        PythagTriple3(3, 4, 5)
+//            .set("strong password", true)
+//            .set("email formatted", false),
+//        PythagTriple3(3, 4, 5)
+//            .set("strong password", false)
+//            .set("email formatted", true),
+//        PythagTriple3(6, 8, 10)
+//            .set("strong password", true)
+//            .set("email formatted", true),
+//    ) { (a, b, c) ->
+//        isPythagTriple(a, b, c) shouldBe true
+//    }
+//}
