@@ -6,7 +6,7 @@ import exceptions.GenericError
 class SignupResult : DtoResult<SignupResultError>()
 
 enum class SignupResultError {
-    WeakPassword, InvalidEmailFormat, EmailTaken, UsernameTaken, ServerError;
+    WeakPassword, InvalidEmailFormat, EmailTaken, UsernameTaken;
 
     companion object {
         fun getMsg(enum: SignupResultError): String {
@@ -15,7 +15,6 @@ enum class SignupResultError {
                 InvalidEmailFormat -> "Email provided is not formatted as such."
                 EmailTaken -> "Email taken."
                 UsernameTaken -> "Username taken."
-                ServerError -> GenericError.getMsg(GenericError.ServerError)
             }
         }
     }

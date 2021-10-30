@@ -1,5 +1,7 @@
 package services
 
+import com.mysql.cj.log.Log
+import configurations.DIHelper
 import configurations.interfaces.IConnectionToDb
 import dtos.author.CreateAuthorRequest
 import dtos.authorization.*
@@ -14,9 +16,16 @@ import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
+import mu.KLogging
+import mu.KotlinLogging
+import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.logger.Logger
+import org.slf4j.LoggerFactory
 import repositories.interfaces.IAuthorRepository
+
+private val logger = KotlinLogging.logger {}
 
 class AuthorizationService(
     private val authorRepository: IAuthorRepository,
@@ -37,18 +46,15 @@ class AuthorizationService(
         if (authorRepository.getByUsername(request.username) != null)
             return SignupResult().failed(SignupResultError.UsernameTaken, HttpStatusCode.BadRequest)
 
-        try {
-            connectionToDb.database.useTransaction {
-                if (authorRepository.createAuthor(request) == 0) throw ServerErrorException(ServerError.FailedToCreateAuthor)
-                if (passwordManager.setNewPassword(request.password) == 0) throw ServerErrorException(ServerError.FailedToSetNewPassword)
-                emailManager.sendValidateEmail(request.email)
-                return SignupResult().succeeded(HttpStatusCode.Created)
-            }
-        } catch (ex: Exception) {
-            TODO("log the failed db insertions")
-            return SignupResult().failed(SignupResultError.ServerError, HttpStatusCode.InternalServerError)
-        }
+        connectionToDb.database.useTransaction {
+            if (authorRepository.createAuthor(request) == 0)
+                throw ServerErrorException(ServerError.FailedToCreateAuthor, this::class.java)
+            if (passwordManager.setNewPassword(request.password) == 0)
+                throw ServerErrorException(ServerError.FailedToSetNewPassword, this::class.java)
+            emailManager.sendValidateEmail(request.email)
 
+            return SignupResult().succeeded(HttpStatusCode.Created)
+        }
     }
 
     fun validateEmailSignupCode(code: String) {

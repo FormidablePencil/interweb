@@ -11,7 +11,10 @@ import managers.TokenManager
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
+import org.koin.core.logger.EmptyLogger
 import org.koin.dsl.module
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import repositories.AuthorRepository
 import repositories.PasswordRepository
 import repositories.RefreshTokenRepository

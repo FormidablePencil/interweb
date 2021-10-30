@@ -30,8 +30,10 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
     testImplementation "io.insert-koin:koin-test-junit4:$koin_version"
 
-    compile group: 'org.mindrot', name: 'jbcrypt', version: jbcrypt_version //password encryption
-    implementation "org.valiktor:valiktor-core:$valiktor_version"
+    // Other
+    compile group: 'org.mindrot', name: 'jbcrypt', version: jbcrypt_version // password encryption
+    implementation "org.valiktor:valiktor-core:$valiktor_version" // validator
+    implementation "io.github.microutils:kotlin-logging-jvm:$microutils_version" // Logging
 
     // Testing Frameworks
     testImplementation "io.mockk:mockk:$mockk_version"

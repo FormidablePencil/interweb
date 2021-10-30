@@ -1,23 +1,57 @@
 package exceptions
 
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+import org.slf4j.LoggerFactory
+
 class ServerErrorException : Exception {
-    constructor(errorEnum: ServerError) : super(ServerError.getMsg(errorEnum)) {
-        TODO("log to log service GenericError.getMsg(GenericError.WhatEverEnum)")
+    var errorCode: ServerError
+
+    constructor(error: ServerError, happenedWhere: Class<*>)
+            : super(ServerError.getLogMsg(error)) {
+        errorCode = error
+        logError((ServerError.getLogMsg(error)), happenedWhere)
     }
 
-    constructor(errorEnum: ServerError, cause: Exception) : super(ServerError.getMsg(errorEnum), cause) {
-        TODO("log to log service GenericError.getMsg(GenericError.WhatEverEnum)")
+    constructor(error: ServerError, cause: Exception, happenedWhere: Class<*>)
+            : super(ServerError.getLogMsg(error), cause) {
+        errorCode = error
+        logError((ServerError.getLogMsg(error)), happenedWhere)
     }
+
+    private fun logError(msg: String, happenedWhere: Class<*>) {
+        val logger = LoggerFactory.getLogger(happenedWhere)
+        logger.error(msg)
+    }
+}
+
+suspend fun ServerErrorException.httpRespond(call: ApplicationCall) {
+    call.respond(ServerError.getHttpCode(errorCode), ServerError.getHttpMsg(errorCode))
 }
 
 enum class ServerError {
     FailedToCreateAuthor, FailedToSetNewPassword;
 
     companion object {
-        fun getMsg(enum: ServerError): String {
+        fun getLogMsg(enum: ServerError): String {
             return when (enum) {
                 FailedToCreateAuthor -> "Failed to create author."
                 FailedToSetNewPassword -> "Failed to set new password."
+            }
+        }
+
+        fun getHttpCode(enum: ServerError): HttpStatusCode {
+            return when (enum) {
+                FailedToCreateAuthor,
+                FailedToSetNewPassword -> HttpStatusCode.InternalServerError
+            }
+        }
+
+        fun getHttpMsg(enum: ServerError): String {
+            return when (enum) {
+                FailedToCreateAuthor,
+                FailedToSetNewPassword -> GenericError.getMsg(GenericError.ServerError)
             }
         }
     }

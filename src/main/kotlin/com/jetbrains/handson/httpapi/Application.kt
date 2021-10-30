@@ -13,20 +13,23 @@ import io.ktor.serialization.*
 import org.koin.core.context.startKoin
 import routes.registerAuthorRoutes
 import routes.registerCustomerRoutes
-import routes.registerLoginRoutes
+import routes.registerAuthorizationRoutes
 import routes.registerOrderRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module(testing: Boolean = false) {
+    log.info("Hello from module!")
+
 
     val applicationConfig = HoconApplicationConfig(ConfigFactory.load("application.conf"))
     val port = applicationConfig.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
 
+//    log
     startKoin {
         // declare modules
         modules(
-            DIHelper.CoreModule
+            DIHelper.CoreModule,
         )
     }
 
@@ -75,5 +78,5 @@ fun Application.module(testing: Boolean = false) {
     registerCustomerRoutes()
     registerOrderRoutes()
     registerAuthorRoutes()
-    registerLoginRoutes()
+    registerAuthorizationRoutes()
 }
