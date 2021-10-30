@@ -55,25 +55,7 @@ class AuthorizationService(
         }
     }
 
-    fun verifyEmailCodeAndLogin(request: VerifyEmailCodeAndLoginByUsernameRequest): LoginResponse {
-        // have the user enter their new credentials on the page where the url has emailVerificationCode
-        // this is the only gateway of signing unit done it for the first time cause code validation will be done after valid credentials provided
-        val authorId = 1 // todo get authorId from token
-        var loginResult: TokensResponse
-        val verifyEmailResult = verifyEmailCode(request.code)
-
-        if (verifyEmailResult.success) {
-            when (verifyEmailResult.failedCode) {
-                VerifyEmailCodeResultFailed.InvalidEmailCode -> return LoginResponse()
-                VerifyEmailCodeResultFailed.DoesNotExistEmailCode ->
-                    throw ServerErrorException(ServerFailed.DoesNotExistEmailCode, this::class.java)
-            }
-        }
-
-        return login(LoginReq(credential = request.username, password = request.password, loginBy = LoginBy.Username))
-//        return loginResult
-    }
-
+    // region login either by username or email
     fun login(request: LoginByEmailRequest): LoginResponse {
         return login(LoginReq(credential = request.email, password = request.password, loginBy = LoginBy.Email))
     }
@@ -81,6 +63,31 @@ class AuthorizationService(
     fun login(request: LoginByUsernameRequest): LoginResponse {
         return login(LoginReq(credential = request.username, password = request.password, loginBy = LoginBy.Username))
     }
+    // endregion
+
+    // region login either by email or username after email verification
+    fun verifyEmailCodeAndLoginByEmail(request: VerifyEmailCodeThenLoginByEmailRequest): LoginResponse {
+        return verifyEmailCodeAndLogin(
+            VerifyEmailCodeThenLoginReq(
+                credential = request.email,
+                loginBy = LoginBy.Email,
+                password = request.password,
+                code = request.code
+            )
+        )
+    }
+
+    fun verifyEmailCodeAndLoginByUsername(request: VerifyEmailCodeThenLoginByUsernameRequest): LoginResponse {
+        return verifyEmailCodeAndLogin(
+            VerifyEmailCodeThenLoginReq(
+                credential = request.username,
+                loginBy = LoginBy.Username,
+                password = request.password,
+                code = request.code
+            )
+        )
+    }
+    // endregion
 
     fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
         return tokenManager.refreshAccessToken(refreshToken, authorId)
@@ -112,6 +119,25 @@ class AuthorizationService(
         val authorId = 1
 
         return passwordManager.resetPassword(oldPassword, newPassword, authorId)
+    }
+
+    private fun verifyEmailCodeAndLogin(request: VerifyEmailCodeThenLoginReq): LoginResponse {
+        // have the user enter their new credentials on the page where the url has emailVerificationCode
+        // this is the only gateway of signing unit done it for the first time cause code validation will be done after valid credentials provided
+        val authorId = 1 // todo get authorId from token
+        var loginResult: TokensResponse
+        val verifyEmailResult = verifyEmailCode(request.code)
+
+        if (verifyEmailResult.success) {
+            when (verifyEmailResult.failedCode) {
+                VerifyEmailCodeResultFailed.InvalidEmailCode -> return LoginResponse()
+                VerifyEmailCodeResultFailed.DoesNotExistEmailCode ->
+                    throw ServerErrorException(ServerFailed.DoesNotExistEmailCode, this::class.java)
+            }
+        }
+
+        return login(LoginReq(credential = request.credential, password = request.password, loginBy = request.loginBy))
+//        return loginResult
     }
 
     private fun login(request: LoginReq): LoginResponse {

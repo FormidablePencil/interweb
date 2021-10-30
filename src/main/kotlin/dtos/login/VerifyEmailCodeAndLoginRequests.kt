@@ -6,31 +6,31 @@ import org.valiktor.functions.isNotBlank
 import org.valiktor.validate
 
 @Serializable
-data class VerifyEmailCodeAndLoginByEmailRequest(
+data class VerifyEmailCodeThenLoginByEmailRequest(
     val email: String,
     val password: String,
     val code: String
 ) {
     init {
         validate(this) {
-            validate(VerifyEmailCodeAndLoginByEmailRequest::password).isNotBlank()
-            validate(VerifyEmailCodeAndLoginByEmailRequest::email).isNotBlank()
-            validate(VerifyEmailCodeAndLoginByEmailRequest::code).isNotBlank()
+            validate(VerifyEmailCodeThenLoginByEmailRequest::password).isNotBlank()
+            validate(VerifyEmailCodeThenLoginByEmailRequest::email).isNotBlank()
+            validate(VerifyEmailCodeThenLoginByEmailRequest::code).isNotBlank()
         }
     }
 }
 
 @Serializable
-data class VerifyEmailCodeAndLoginByUsernameRequest(
+data class VerifyEmailCodeThenLoginByUsernameRequest(
     val username: String,
     val password: String,
     val code: String
 ) {
     init {
         validate(this) {
-            validate(VerifyEmailCodeAndLoginByUsernameRequest::code).isNotBlank()
-            validate(VerifyEmailCodeAndLoginByUsernameRequest::password).hasSize(min = 3, max = 80)
-            validate(VerifyEmailCodeAndLoginByUsernameRequest::username).hasSize(min = 3, max = 80)
+            validate(VerifyEmailCodeThenLoginByUsernameRequest::code).isNotBlank()
+            validate(VerifyEmailCodeThenLoginByUsernameRequest::password).hasSize(min = 3, max = 80)
+            validate(VerifyEmailCodeThenLoginByUsernameRequest::username).hasSize(min = 3, max = 80)
         }
     }
 }
