@@ -11,14 +11,13 @@ import managers.TokenManager
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
-import org.koin.core.logger.EmptyLogger
 import org.koin.dsl.module
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import repositories.AuthorRepository
+import repositories.EmailVerifyCodeRepository
 import repositories.PasswordRepository
 import repositories.RefreshTokenRepository
 import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.IEmailVerifyCodeRepository
 import repositories.interfaces.IPasswordRepository
 import repositories.interfaces.IRefreshTokenRepository
 import services.AuthorizationService
@@ -30,13 +29,14 @@ object DIHelper {
     val CoreModule = module {
         // domain services
         single { AuthorsPortfolioService(get(), get()) }
-        single { AuthorizationService(get(), get(), get(), get()) }
+        single { AuthorizationService(get(), get(), get(), get(), get()) }
 
         // managers
         single { AuthorsPortfolioManager() }
         single<ITokenManager> { TokenManager(get()) }
         single<IPasswordManager> { PasswordManager(get(), get(), get()) }
-        single<IEmailManager> { EmailManager(get()) }
+        single<IEmailManager> { EmailManager(get(), get()) }
+        single<IEmailVerifyCodeRepository> { EmailVerifyCodeRepository() }
 
         // repositories
         single<IAuthorRepository> { AuthorRepository() }

@@ -21,7 +21,7 @@ class SignupUT : BehaviorSpecUT({
         val email = "email"
     }
 
-//    every { authorizationService.generateTokens(any()) } returns TokensResult("", "")
+//    every { authorizationService.generateTokens(any()) } returns TokensResponse("", "")
 
 //    every { authorizationService.setNewPasswordForSignup(any(), tokens) } returns passwordId
 

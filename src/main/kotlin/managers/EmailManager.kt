@@ -1,10 +1,15 @@
 package managers
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
 import managers.interfaces.IEmailManager
-import managers.interfaces.ITokenManager
+import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.IEmailVerifyCodeRepository
+import java.util.*
 
 class EmailManager(
-    private val tokenManager: ITokenManager
+    private val emailValidationCodeRepository: IEmailVerifyCodeRepository,
+    private val authorRepository: IAuthorRepository,
 ) : IEmailManager {
 
     override fun sendResetPassword(userId: Int) {
@@ -12,8 +17,17 @@ class EmailManager(
     }
 
     override fun sendValidateEmail(email: String) {
-        TODO()
-        val authorId = 0
-        val tokens = tokenManager.generateTokens(authorId)
+        val code = genEmailVerifyCode(email)
+        emailValidationCodeRepository.insert(code)
+    }
+
+    private fun genEmailVerifyCode(email: String): String {
+        val emailValidationSecret = "dfd"
+        val request = authorRepository.getByEmail(email)
+
+        return JWT.create()
+            .withClaim("authorId", request?.id)
+            .withExpiresAt(Date(System.currentTimeMillis() + 2000))
+            .sign(Algorithm.HMAC256(emailValidationSecret))
     }
 }

@@ -1,7 +1,7 @@
 package managers
 
 import configurations.interfaces.IConnectionToDb
-import dtos.authorization.ResetPasswordResult
+import dtos.authorization.ResetPasswordResponse
 import helper.PassEncrypt
 import helper.succeeded
 import managers.interfaces.IPasswordManager
@@ -18,7 +18,7 @@ class PasswordManager(
 ) : IPasswordManager {
     private val connectionToDb: IConnectionToDb by inject();
 
-    override fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResult {
+    override fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse {
         validatePassword(oldPassword, authorId)
 
         connectionToDb.database.useTransaction {
@@ -26,7 +26,7 @@ class PasswordManager(
             passwordRepository.deletePassword(authorId)
             setNewPassword(newPassword)
             val tokens = tokenManager.generateTokens(authorId)
-            return ResetPasswordResult(tokens.accessToken, tokens.refreshToken).succeeded()
+            return ResetPasswordResponse(tokens.accessToken, tokens.refreshToken).succeeded()
         }
     }
 

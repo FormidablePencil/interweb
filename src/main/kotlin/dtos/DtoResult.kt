@@ -1,28 +1,18 @@
 package dtos
 
-import io.ktor.http.*
-
-//open class DtoResult<T : Enum<T>> : IDtoResult<T>() {
-////    override var error: Enum<T>? = null
-////    override var message: String? = null
-////    override var success: Boolean? = null
-//}
-
-open class DtoResult<T : Enum<T>> {
-    var statusCode: HttpStatusCode? = null
-    var error: Enum<T>? = null
-    var message: String? = null
-    var success: Boolean? = null
+open class DtoResult<T> {
+    var failedCode: T? = null
+    var success: Boolean = false
 }
 
-//open class IDtoResult<T : Enum<T>> {
-//    var error: Enum<T>? = null
-//    var message: String? = null
-//    var success: Boolean? = null
-//}
+fun <T, C> DtoResult<T>.failed(error: T): C {
+    this.failedCode = error
+    this.success = false
+    return this as C
+}
 
-//interface IDtoResult<T : Enum<T>> {
-//    var error: Enum<T>?
-//    var message: String?
-//    var success: Boolean?
-//}
+
+fun <C, T : Enum<T>> DtoResult<T>.succeeded(): C {
+    this.success = true
+    return this as C
+}

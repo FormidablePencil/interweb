@@ -6,18 +6,18 @@ import io.ktor.response.*
 import org.slf4j.LoggerFactory
 
 class ServerErrorException : Exception {
-    var errorCode: ServerError
+    var errorCode: ServerFailed
 
-    constructor(error: ServerError, happenedWhere: Class<*>)
-            : super(ServerError.getLogMsg(error)) {
+    constructor(error: ServerFailed, happenedWhere: Class<*>)
+            : super(ServerFailed.getLogMsg(error)) {
         errorCode = error
-        logError((ServerError.getLogMsg(error)), happenedWhere)
+        logError((ServerFailed.getLogMsg(error)), happenedWhere)
     }
 
-    constructor(error: ServerError, cause: Exception, happenedWhere: Class<*>)
-            : super(ServerError.getLogMsg(error), cause) {
+    constructor(error: ServerFailed, cause: Exception, happenedWhere: Class<*>)
+            : super(ServerFailed.getLogMsg(error), cause) {
         errorCode = error
-        logError((ServerError.getLogMsg(error)), happenedWhere)
+        logError((ServerFailed.getLogMsg(error)), happenedWhere)
     }
 
     private fun logError(msg: String, happenedWhere: Class<*>) {
@@ -27,31 +27,30 @@ class ServerErrorException : Exception {
 }
 
 suspend fun ServerErrorException.httpRespond(call: ApplicationCall) {
-    call.respond(ServerError.getHttpCode(errorCode), ServerError.getHttpMsg(errorCode))
+    call.respond(ServerFailed.getHttpCode(errorCode), ServerFailed.getHttpMsg(errorCode))
 }
 
-enum class ServerError {
-    FailedToCreateAuthor, FailedToSetNewPassword;
+enum class ServerFailed {
+    FailedToCreateAuthor, FailedToSetNewPassword, DoesNotExistEmailCode;
 
     companion object {
-        fun getLogMsg(enum: ServerError): String {
+        fun getLogMsg(enum: ServerFailed): String {
             return when (enum) {
                 FailedToCreateAuthor -> "Failed to create author."
                 FailedToSetNewPassword -> "Failed to set new password."
+                DoesNotExistEmailCode -> "Email verification code was supposed to exist in our records"
             }
         }
 
-        fun getHttpCode(enum: ServerError): HttpStatusCode {
+        fun getHttpCode(enum: ServerFailed): HttpStatusCode {
             return when (enum) {
-                FailedToCreateAuthor,
-                FailedToSetNewPassword -> HttpStatusCode.InternalServerError
+                else -> HttpStatusCode.InternalServerError
             }
         }
 
-        fun getHttpMsg(enum: ServerError): String {
+        fun getHttpMsg(enum: ServerFailed): String {
             return when (enum) {
-                FailedToCreateAuthor,
-                FailedToSetNewPassword -> GenericError.getMsg(GenericError.ServerError)
+                else -> GenericError.getMsg(GenericError.ServerError)
             }
         }
     }

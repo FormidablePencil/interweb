@@ -38,7 +38,7 @@ class TokenManagerTest : BehaviorSpecUT({
                 // test a failed state
                 result.accessToken?.length?.shouldBeGreaterThan(1)
 
-//                TODO() // decode tokens and check that expiration, authorId and username is correct
+//                TODO() // decode tokens and check that expiration, authorId and email is correct
             }
         }
         When("provided tempered refreshToken but valid authorId") {

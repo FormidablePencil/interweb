@@ -4,8 +4,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import configurations.interfaces.IAppEnv
 import configurations.interfaces.IConnectionToDb
-import dtos.authorization.TokensResult
-import dtos.authorization.TokensResultError
+import dtos.authorization.TokensResponse
+import dtos.authorization.TokensResponseFailed
 import helper.failed
 import helper.succeeded
 import managers.interfaces.ITokenManager
@@ -21,13 +21,13 @@ class TokenManager(
     private val appEnv: IAppEnv by inject()
     private val connectionToDb: IConnectionToDb by inject()
 
-    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResult {
+    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
         return if (!isRefreshTokenValid(refreshToken, authorId))
-            TokensResult().failed(TokensResultError.InvalidRefreshToken, "Invalid refresh token")
+            TokensResponse().failed(TokensResponseFailed.InvalidRefreshToken, "Invalid refresh token")
         else generateTokens(authorId)
     }
 
-    override fun generateTokens(authorId: Int): TokensResult {
+    override fun generateTokens(authorId: Int): TokensResponse {
         val refreshToken = generateToken(authorId, KindOfTokens.RefreshToken)
         val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 
@@ -36,7 +36,7 @@ class TokenManager(
             refreshTokenRepository.insertToken(refreshToken, authorId)
         }
 
-        return TokensResult(refreshToken, accessToken).succeeded()
+        return TokensResponse(refreshToken, accessToken).succeeded()
     }
 
     private fun isRefreshTokenValid(refreshToken: String, authorId: Int): Boolean {

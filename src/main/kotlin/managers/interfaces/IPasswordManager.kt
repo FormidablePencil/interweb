@@ -1,10 +1,10 @@
 package managers.interfaces
 
-import dtos.authorization.ResetPasswordResult
+import dtos.authorization.ResetPasswordResponse
 import org.koin.core.component.KoinComponent
 
 interface IPasswordManager: KoinComponent {
-    fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResult
+    fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse
     fun validatePassword(password: String, authorId: Int): Boolean
     fun setNewPassword(password: String): Int
 }

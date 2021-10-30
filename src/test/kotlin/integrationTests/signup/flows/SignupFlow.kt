@@ -1,9 +1,8 @@
 package integrationTests.signup.flows
 
 import dtos.author.CreateAuthorRequest
-import dtos.signup.SignupResult
+import dtos.signup.SignupResponse
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.ktor.http.*
 import org.koin.test.inject
 import services.AuthorizationService
@@ -17,7 +16,7 @@ class SignupFlow : BehaviorSpecIT() {
         "Martini", "Formidable!56"
     )
 
-    fun signup(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): SignupResult {
+    fun signup(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): SignupResponse {
         return cleanup(cleanup) {
             val result = authorizationService.signup(request)
 

@@ -1,11 +1,11 @@
 package dtos.authorization
 
-import dtos.DtoResult
+import dtos.ApiResponse
 
-data class TokensResult(
+data class TokensResponse(
     val refreshToken: String? = null, val accessToken: String? = null
-) : DtoResult<TokensResultError>()
+) : ApiResponse<TokensResponseFailed>()
 
-enum class TokensResultError {
+enum class TokensResponseFailed {
     InvalidRefreshToken
 }

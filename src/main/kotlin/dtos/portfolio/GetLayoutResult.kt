@@ -1,11 +1,11 @@
 package dtos.portfolio
 
-import dtos.DtoResult
+import dtos.ApiResponse
 import models.portfolio.LayoutComponent
 
 data class GetLayoutResult(
     val layoutComponents: List<LayoutComponent>, val layoutArrangement: List<Int>
-) : DtoResult<GetLayoutResultError>()
+) : ApiResponse<GetLayoutResultError>()
 
 enum class GetLayoutResultError {
 

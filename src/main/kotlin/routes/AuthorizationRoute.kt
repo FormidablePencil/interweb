@@ -2,16 +2,12 @@ package routes
 
 import dtos.author.CreateAuthorRequest
 import services.AuthorizationService
-import dtos.login.LoginRequest
+import dtos.login.LoginByEmailRequest
 import io.ktor.application.*
 import io.ktor.auth.*
-import io.ktor.http.*
 import io.ktor.request.*
-import io.ktor.response.*
 import io.ktor.routing.*
 import org.koin.ktor.ext.inject
-import org.valiktor.ConstraintViolationException
-import repositories.interfaces.IAuthorRepository
 
 fun Application.registerAuthorizationRoutes() {
     routing {
@@ -30,15 +26,15 @@ fun Route.loginRoute() {
     }
 
     post("/login") {
-        val request = call.receive<LoginRequest>()
-        routeRespond(call) { authorizationService.login(request.username, request.password) }
+        val request = call.receive<LoginByEmailRequest>()
+        routeRespond(call) { authorizationService.login(request.email, request.password) }
     }
 
     post("/example") {
 //        try {
-//            val user = call.receive<LoginRequest>()
+//            val user = call.receive<LoginByEmailRequest>()
 //            // return access token (expires in 15 minutes) and a refresh token (expires in 30days)
-//            var token = authorizationService.login(user.username, user.password)
+//            var token = authorizationService.login(user.email, user.password)
 //            call.respond(token)
 ////        call.respond(hashMapOf("token" to token))
 //        } catch (ex: ConstraintViolationException) {

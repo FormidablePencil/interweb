@@ -1,9 +1,8 @@
 package services
 
 import dtos.author.CreateAuthorRequest
-import dtos.signup.SignupResultError
+import dtos.signup.SignupResponseFailed
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.http.*
@@ -29,7 +28,7 @@ class AuthorizationServiceTest : BehaviorSpecUT({
     every { authorRepository.getByEmail(email) } returns null
     every { emailService.sendResetPassword(authorForUsername.id) }
 
-    val authorizationService = AuthorizationService(authorRepository, tokenManager, emailService, passwordManager)
+    val authorizationService = AuthorizationService(authorRepository, tokenManager, emailService, passwordManager,)
 
     fun genCreateAuthorRequest(
         aUsername: String = username,
@@ -68,14 +67,14 @@ class AuthorizationServiceTest : BehaviorSpecUT({
             val result = authorizationService.signup(genCreateAuthorRequest(aEmail = "email"))
 
             result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResultError.getMsg(SignupResultError.EmailTaken)
+            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.EmailTaken)
         }
 
         And("weak password") {
             val result = authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
 
             result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResultError.getMsg(SignupResultError.WeakPassword)
+            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.WeakPassword)
         }
 
         And("taken email") {
@@ -84,16 +83,16 @@ class AuthorizationServiceTest : BehaviorSpecUT({
             val result = authorizationService.signup(genCreateAuthorRequest())
 
             result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResultError.getMsg(SignupResultError.EmailTaken)
+            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.EmailTaken)
         }
 
-        And("taken username") {
+        And("taken email") {
             every { authorRepository.getByUsername(username) } returns authorForUsername
 
             val result = authorizationService.signup(genCreateAuthorRequest())
 
             result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResultError.getMsg(SignupResultError.UsernameTaken)
+            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.UsernameTaken)
         }
 
         Then("Failed To Create Author server error") {
@@ -104,7 +103,7 @@ class AuthorizationServiceTest : BehaviorSpecUT({
             val result = authorizationService.signup(request)
 
             result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResultError.getMsg(SignupResultError.ServerError)
+            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.ServerError)
         }
 
         Then("Failed To Set New Password server error") {
@@ -115,7 +114,7 @@ class AuthorizationServiceTest : BehaviorSpecUT({
             val result = authorizationService.signup(request)
 
             result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResultError.getMsg(SignupResultError.ServerError)
+            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.ServerError)
         }
     }
 
@@ -153,7 +152,7 @@ class AuthorizationServiceTest : BehaviorSpecUT({
 
     given("requestPasswordReset") {
 
-        And("valid username and email") {
+        And("valid email and email") {
             val result = authorizationService.requestPasswordReset(username, email)
         }
 

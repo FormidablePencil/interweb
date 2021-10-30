@@ -1,14 +1,14 @@
 package services
 
-import com.mysql.cj.log.Log
-import configurations.DIHelper
 import configurations.interfaces.IConnectionToDb
 import dtos.author.CreateAuthorRequest
 import dtos.authorization.*
-import dtos.signup.SignupResult
-import dtos.signup.SignupResultError
-import exceptions.GenericError
-import exceptions.ServerError
+import dtos.failed
+import dtos.login.*
+import dtos.signup.SignupResponse
+import dtos.signup.SignupResponseFailed
+import dtos.succeeded
+import exceptions.ServerFailed
 import exceptions.ServerErrorException
 import helper.*
 import io.ktor.http.*
@@ -16,14 +16,11 @@ import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
-import mu.KLogging
 import mu.KotlinLogging
-import org.koin.core.Koin
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.core.logger.Logger
-import org.slf4j.LoggerFactory
 import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.IEmailVerifyCodeRepository
 
 private val logger = KotlinLogging.logger {}
 
@@ -32,70 +29,82 @@ class AuthorizationService(
     private val tokenManager: ITokenManager,
     private val emailManager: IEmailManager,
     private val passwordManager: IPasswordManager,
+    private val emailVerifyCodeRepository: IEmailVerifyCodeRepository,
 ) : KoinComponent {
     private val connectionToDb: IConnectionToDb by inject();
 
-    fun signup(request: CreateAuthorRequest): SignupResult {
+    fun signup(request: CreateAuthorRequest): SignupResponse {
         if (!isStrongPassword(request.password))
-            return SignupResult().failed(SignupResultError.WeakPassword, HttpStatusCode.BadRequest)
+            return SignupResponse().failed(SignupResponseFailed.WeakPassword)
         if (!isEmailFormatted(request.email))
-            return SignupResult().failed(SignupResultError.InvalidEmailFormat, HttpStatusCode.BadRequest)
+            return SignupResponse().failed(SignupResponseFailed.InvalidEmailFormat)
 
         if (authorRepository.getByEmail(request.email) != null)
-            return SignupResult().failed(SignupResultError.EmailTaken, HttpStatusCode.BadRequest)
+            return SignupResponse().failed(SignupResponseFailed.EmailTaken)
         if (authorRepository.getByUsername(request.username) != null)
-            return SignupResult().failed(SignupResultError.UsernameTaken, HttpStatusCode.BadRequest)
+            return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
 
         connectionToDb.database.useTransaction {
             if (authorRepository.createAuthor(request) == 0)
-                throw ServerErrorException(ServerError.FailedToCreateAuthor, this::class.java)
+                throw ServerErrorException(ServerFailed.FailedToCreateAuthor, this::class.java)
             if (passwordManager.setNewPassword(request.password) == 0)
-                throw ServerErrorException(ServerError.FailedToSetNewPassword, this::class.java)
+                throw ServerErrorException(ServerFailed.FailedToSetNewPassword, this::class.java)
             emailManager.sendValidateEmail(request.email)
 
-            return SignupResult().succeeded(HttpStatusCode.Created)
+            return SignupResponse().succeeded(HttpStatusCode.Created)
         }
     }
 
-    fun validateEmailSignupCode(code: String) {
-        TODO()
+    fun verifyEmailCodeAndLogin(request: VerifyEmailCodeAndLoginByUsernameRequest): LoginResponse {
+        // have the user enter their new credentials on the page where the url has emailVerificationCode
+        // this is the only gateway of signing unit done it for the first time cause code validation will be done after valid credentials provided
+        val authorId = 1 // todo get authorId from token
+        var loginResult: TokensResponse
+        val verifyEmailResult = verifyEmailCode(request.code)
+
+        if (verifyEmailResult.success) {
+            when (verifyEmailResult.failedCode) {
+                VerifyEmailCodeResultFailed.InvalidEmailCode -> return LoginResponse()
+                VerifyEmailCodeResultFailed.DoesNotExistEmailCode ->
+                    throw ServerErrorException(ServerFailed.DoesNotExistEmailCode, this::class.java)
+            }
+        }
+
+        return login(LoginReq(credential = request.username, password = request.password, loginBy = LoginBy.Username))
+//        return loginResult
     }
 
-    fun login(email: String, password: String): LoginResult {
-        val errorResponseMessage = "Invalid credentials"
-
-        val author: Author? = authorRepository.getByEmail(email)
-        if (author?.id == null)
-            return LoginResult().failed(LoginResultError.InvalidEmail, errorResponseMessage)
-
-        return if (passwordManager.validatePassword(password, author.id))
-            LoginResult(author.id).succeeded()
-        else LoginResult().failed(LoginResultError.InvalidPassword, errorResponseMessage)
+    fun login(request: LoginByEmailRequest): LoginResponse {
+        return login(LoginReq(credential = request.email, password = request.password, loginBy = LoginBy.Email))
     }
 
-    fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResult {
+    fun login(request: LoginByUsernameRequest): LoginResponse {
+        return login(LoginReq(credential = request.username, password = request.password, loginBy = LoginBy.Username))
+    }
+
+    fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
         return tokenManager.refreshAccessToken(refreshToken, authorId)
     }
 
-    fun requestPasswordReset(username: String?, email: String?): RequestPasswordResetResult {
+    fun requestPasswordReset(username: String?, email: String?): RequestPasswordResetResponse {
         val author: Author?
 
         if (!username.isNullOrEmpty()) {
             author = authorRepository.getByUsername(username)
-            if (author == null) return RequestPasswordResetResult().failed(RequestPasswordResetResultError.AccountNotFoundByGivenUsername)
+            if (author == null) return RequestPasswordResetResponse().failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenUsername)
         } else if (!email.isNullOrEmpty()) {
             author = authorRepository.getByEmail(email)
-            if (author == null) return RequestPasswordResetResult().failed(RequestPasswordResetResultError.AccountNotFoundByGivenEmail)
+            if (author == null) return RequestPasswordResetResponse().failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenEmail)
         } else
-            return RequestPasswordResetResult().failed(RequestPasswordResetResultError.NeitherUsernameNorEmailProvided)
+            return RequestPasswordResetResponse().failed(RequestPasswordResetResponseFailed.NeitherUsernameNorEmailProvided)
 
         emailManager.sendValidateEmail(author.email)
 
         val maskedEmail = maskEmail(author.email)
-        return RequestPasswordResetResult(maskedEmail).succeeded()
+        return RequestPasswordResetResponse(maskedEmail).succeeded()
     }
 
-    fun resetPasswordByEmail(oldPassword: String, newPassword: String, emailCode: String): ResetPasswordResult {
+    fun resetPasswordByEmail(oldPassword: String, newPassword: String, emailCode: String): ResetPasswordResponse {
 
         TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
 
@@ -103,6 +112,35 @@ class AuthorizationService(
         val authorId = 1
 
         return passwordManager.resetPassword(oldPassword, newPassword, authorId)
+    }
+
+    private fun login(request: LoginReq): LoginResponse {
+        // TODO check if first time email verification done
+        val author: Author? = authorRepository.getByUsername(request.username)
+        if (author?.id == null)
+            return LoginResponse().failed(LoginResponseFailed.InvalidUsername)
+        if (validatePassword(request.password, author.id))
+        val tokenResponse = tokenManager.generateTokens(author.id)
+        return LoginResponse(authorId = author)
+// TODO       return tokens
+    }
+
+    private fun validatePassword(password: String, authorId: Int): LoginResponse {
+        // route needs to respond with invalid credentials response
+        return if (passwordManager.validatePassword(password, authorId))
+            LoginResponse(authorId).succeeded()
+        else LoginResponse().failed(LoginResponseFailed.InvalidPassword)
+    }
+
+    private fun verifyEmailCode(code: String): VerifyEmailCodeResult {
+        val authorId = 2 // todo get authorId from token header
+
+        val codeDb = emailVerifyCodeRepository.get(authorId)
+            ?: return VerifyEmailCodeResult().failed(VerifyEmailCodeResultFailed.DoesNotExistEmailCode)
+
+        return if (codeDb == code)
+            VerifyEmailCodeResult().succeeded()
+        else VerifyEmailCodeResult().failed(VerifyEmailCodeResultFailed.InvalidEmailCode)
     }
 }
 // Authorization features
