@@ -27,7 +27,7 @@ class SignupUT : BehaviorSpecUT({
 
     every { authorRepository.getByEmail(any()) } returns null
     every { authorRepository.getByUsername(any()) } returns null
-    every { authorRepository.createAuthor(any()) } returns true
+    every { authorRepository.createAuthor(any()) } returns 123
 
 
 

@@ -1,12 +1,12 @@
 package dtos.authorization
 
-import dtos.ApiResponse
+import dtos.ApiDataResponse
 import dtos.IApiResponseEnum
 import io.ktor.http.*
 import responseData.PasswordResetResponseData
 
 // test a non instantiated object. Is this by reference or not?
-object RequestPasswordResetResponse : ApiResponse<PasswordResetResponseData, V>(V)
+object RequestPasswordResetResponse : ApiDataResponse<PasswordResetResponseData, V, RequestPasswordResetResponse>(V)
 
 internal typealias V = RequestPasswordResetResponseFailed
 
@@ -14,7 +14,7 @@ enum class RequestPasswordResetResponseFailed {
     AccountNotFoundByGivenEmail, AccountNotFoundByGivenUsername, NeitherUsernameNorEmailProvided;
 
     companion object : IApiResponseEnum<V> {
-        override fun message(code: V): String {
+        override fun getMsg(code: V): String {
             return when (code) {
                 AccountNotFoundByGivenEmail,
                 AccountNotFoundByGivenUsername,
@@ -22,7 +22,7 @@ enum class RequestPasswordResetResponseFailed {
             }
         }
 
-        override fun statusCode(code: V): HttpStatusCode {
+        override fun getStatusCode(code: V): HttpStatusCode {
             return when (code) {
                 AccountNotFoundByGivenEmail,
                 AccountNotFoundByGivenUsername,

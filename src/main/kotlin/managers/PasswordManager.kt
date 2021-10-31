@@ -6,6 +6,7 @@ import exceptions.ServerErrorException
 import exceptions.ServerFailed
 import helper.PassEncrypt
 import dtos.succeeded
+import io.ktor.http.*
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
@@ -28,7 +29,8 @@ class PasswordManager(
             passwordRepository.deletePassword(authorId)
             setNewPassword(newPassword)
             val tokens = tokenManager.generateTokens(authorId)
-            return ResetPasswordResponse(tokens.accessToken, tokens.refreshToken).succeeded()
+            return ResetPasswordResponse(tokens.accessToken, tokens.refreshToken)
+                .succeeded(HttpStatusCode.MultiStatus) // todo change implementation
         }
     }
 

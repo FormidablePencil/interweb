@@ -2,54 +2,72 @@ package dtos
 
 import io.ktor.http.*
 
-interface IApiResponseEnum<Code> {
-    fun message(code: Code): String
-    fun statusCode(code: Code): HttpStatusCode
+// region Explanation
+
+// endregion
+
+// region ApiResponse
+
+open class ApiResponse<Enum, ClassExtendedFrom>(
+    override val enum: IApiResponseEnum<Enum>
+) : BaseApiResponse<Enum, ClassExtendedFrom>(enum)
+
+fun <Enum, ClassExtendedFrom> ApiResponse<Enum, ClassExtendedFrom>.succeeded(
+    httpStatusCode: HttpStatusCode
+): ClassExtendedFrom {
+    this.successHttpStatusCode = httpStatusCode
+    return this as ClassExtendedFrom
 }
 
-open class ApiResponse<Data, Code>(val enum: IApiResponseEnum<Code>) {
+// endregion
+
+// region ApiDataResponse
+
+open class ApiDataResponse<Data, Enum, ClassExtendedFrom>(
+    override val enum: IApiResponseEnum<Enum>
+) :
+    BaseApiResponse<Enum, ClassExtendedFrom>(enum) {
     var data: Data? = null
-    var success: Boolean? = null
+}
+
+fun <Data, Enum, ClassExtendedFrom> ApiDataResponse<Data, Enum, ClassExtendedFrom>.succeeded(
+    httpStatusCode: HttpStatusCode,
+    data: Data
+): ClassExtendedFrom {
+    this.successHttpStatusCode = httpStatusCode
+    this.data = data
+    return this as ClassExtendedFrom
+}
+
+// endregion
+
+interface IApiResponseEnum<Enum> {
+    fun getMsg(code: Enum): String
+    fun getStatusCode(code: Enum): HttpStatusCode
+}
+
+abstract class BaseApiResponse<Enum, ClassExtendedFrom>(
+    open val enum: IApiResponseEnum<Enum>
+) {
     var successHttpStatusCode: HttpStatusCode? = null
 
-    var code: Code? = null
+    var code: Enum? = null
 
-    fun data(): Data {
-        return data!!
-    }
-
-    fun success(): Boolean {
-        return success != null
-    }
-
-    fun message(): String? {
-        return if (code == null) null
-        else enum.message(code!!)
+    fun message(): String {
+        return if (code == null) ""
+        else enum.getMsg(code!!)
     }
 
     fun statusCode(): HttpStatusCode? {
         return if (successHttpStatusCode !== null) successHttpStatusCode
         else if (code == null) null
-        else enum.statusCode(code!!)
+        else enum.getStatusCode(code!!)
     }
 }
 
-fun <C, Data, Code> ApiResponse<Data, Code>.succeeded(httpStatusCode: HttpStatusCode): C {
-    this.successHttpStatusCode = httpStatusCode
-    this.success = true
-    return this as C
-}
-
-fun <C, Data, Code> ApiResponse<Data, Code>.succeeded(httpStatusCode: HttpStatusCode, data: Data): C {
-    this.data = data
-    this.successHttpStatusCode = httpStatusCode
-    this.success = true
-    return this as C
-}
-
-fun <C, Data, Code> ApiResponse<Data, Code>.failed(code: Code): C {
+fun <Enum, ClassExtendedFrom> BaseApiResponse<Enum, ClassExtendedFrom>.failed(
+    code: Enum
+): ClassExtendedFrom {
     this.code = code
-    this.success = false
-    return this as C
+    return this as ClassExtendedFrom
 }
-

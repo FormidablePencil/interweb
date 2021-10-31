@@ -31,14 +31,13 @@ suspend fun ServerErrorException.httpRespond(call: ApplicationCall) {
 }
 
 enum class ServerFailed {
-    FailedToCreateAuthor, DoesNotExistEmailCode, FailedToRetrievePassword, AttemptedToAccessDataWhenNot;
+    FailedToCreateAuthor, DoesNotExistEmailCode, FailedToRetrievePassword;
 
 
     companion object {
         fun getLogMsg(enum: ServerFailed): String {
             return when (enum) {
                 FailedToCreateAuthor -> "Failed to create author."
-//                FailedToSetNewPassword -> "Failed to set new password."
                 DoesNotExistEmailCode -> "Email verification code was supposed to exist in our records."
                 FailedToRetrievePassword -> "Failed to retrieve password."
             }

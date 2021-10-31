@@ -1,11 +1,11 @@
 package dtos.authorization
 
-import dtos.ApiResponse
+import dtos.ApiDataResponse
 import dtos.IApiResponseEnum
 import dtos.token.responseData.TokenResponseData
 import io.ktor.http.*
 
-class LoginResponse : ApiResponse<TokenResponseData, E>(E)
+class LoginResponse : ApiDataResponse<TokenResponseData, E, LoginResponse>(E)
 
 internal typealias E = LoginResponseFailed
 
@@ -15,7 +15,7 @@ enum class LoginResponseFailed {
     InvalidPassword;
 
     companion object : IApiResponseEnum<E> {
-        override fun message(code: E): String {
+        override fun getMsg(code: E): String {
 
             return when (code) {
                 InvalidEmail,
@@ -24,7 +24,7 @@ enum class LoginResponseFailed {
             }
         }
 
-        override fun statusCode(code: E): HttpStatusCode {
+        override fun getStatusCode(code: E): HttpStatusCode {
             return when (code) {
                 InvalidEmail,
                 InvalidUsername,

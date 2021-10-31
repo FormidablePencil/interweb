@@ -4,7 +4,7 @@ import dtos.ApiResponse
 import dtos.IApiResponseEnum
 import io.ktor.http.*
 
-class VerifyEmailCodeResponse : ApiResponse<String, R>(R)
+class VerifyEmailCodeResponse : ApiResponse<R, VerifyEmailCodeResponse>(R)
 
 private typealias R = VerifyEmailCodeResponseFailed
 
@@ -12,7 +12,7 @@ enum class VerifyEmailCodeResponseFailed {
     DoesNotExistEmailCode, InvalidEmailCode;
 
     companion object : IApiResponseEnum<R> {
-        override fun message(code: R): String {
+        override fun getMsg(code: R): String {
             return when (code) {
                 DoesNotExistEmailCode,
                 InvalidEmailCode
@@ -20,7 +20,7 @@ enum class VerifyEmailCodeResponseFailed {
             }
         }
 
-        override fun statusCode(code: R): HttpStatusCode {
+        override fun getStatusCode(code: R): HttpStatusCode {
             return when (code) {
                 DoesNotExistEmailCode,
                 InvalidEmailCode

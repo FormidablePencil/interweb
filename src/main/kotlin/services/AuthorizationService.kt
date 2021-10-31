@@ -51,12 +51,14 @@ class AuthorizationService(
             return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
 
         connectionToDb.database.useTransaction {
-            if (!authorRepository.createAuthor(request)) // TODO replace ktorm with exposed and change return type to bool
+            val authorId = authorRepository.createAuthor(request) // TODO replace ktorm with exposed and change return type to bool
+            if (authorId !is Int)
                 throw ServerErrorException(ServerFailed.FailedToCreateAuthor, this::class.java)
             passwordManager.setNewPassword(request.password) // TODO we really need to swap ktorm for exposed asap
             emailManager.sendValidateEmail(request.email)
+            val tokens = tokenManager.generateTokens(authorId)
 
-            return SignupResponse().succeeded(HttpStatusCode.MultiStatus)
+            return SignupResponse().succeeded(HttpStatusCode.MultiStatus, tokens)
         }
     }
 
@@ -86,7 +88,8 @@ class AuthorizationService(
     }
 
     fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
-        return tokenManager.refreshAccessToken(refreshToken, authorId)
+        val tokenResponseData = tokenManager.refreshAccessToken(refreshToken, authorId)
+        return TokensResponse().succeeded(HttpStatusCode.OK, tokenResponseData)
     }
 
     fun requestPasswordReset(username: String?, email: String?): RequestPasswordResetResponse {
@@ -105,8 +108,7 @@ class AuthorizationService(
         emailManager.sendValidateEmail(author.email)
 
         val maskedEmail = maskEmail(author.email)
-        val r: RequestPasswordResetResponse =
-            RequestPasswordResetResponse.succeeded(HttpStatusCode.OK, PasswordResetResponseData(maskedEmail))
+        return RequestPasswordResetResponse.succeeded(HttpStatusCode.OK, PasswordResetResponseData(maskedEmail))
 
     }
 
@@ -114,7 +116,7 @@ class AuthorizationService(
 
         TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
 
-        // get authorId base off of emailCode - I wonder if the email statusCode is a jwt token??? - It could work
+        // get authorId base off of emailCode - I wonder if the email getStatusCode is a jwt token??? - It could work
         val authorId = 1
 
         return passwordManager.resetPassword(oldPassword, newPassword, authorId)

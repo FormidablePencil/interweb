@@ -1,11 +1,28 @@
 package dtos.authorization
 
-import dtos.ApiResponse
+import dtos.ApiDataResponse
+import dtos.IApiResponseEnum
+import dtos.token.responseData.TokenResponseData
+import io.ktor.http.*
 
-data class TokensResponse(
-    val refreshToken: String? = null, val accessToken: String? = null
-) : ApiResponse<TokensResponseFailed>()
+class TokensResponse : ApiDataResponse<TokenResponseData, G, TokensResponse>(G)
+
+internal typealias G = TokensResponseFailed
 
 enum class TokensResponseFailed {
-    InvalidRefreshToken
+    InvalidRefreshToken;
+
+    companion object : IApiResponseEnum<G> {
+        override fun getMsg(code: G): String {
+            return when (code) {
+                InvalidRefreshToken -> "Invalid refresh token."
+            }
+        }
+
+        override fun getStatusCode(code: G): HttpStatusCode {
+            return when (code) {
+                InvalidRefreshToken -> HttpStatusCode.BadRequest
+            }
+        }
+    }
 }

@@ -74,11 +74,13 @@ class RequestAccessTokenTest : BehaviorSpecIT() {
     init {
         Given("a valid refresh token") {
             Then("return new access token and refresh token") {
-                var (refreshToken, accessToken) = tokenDomainService.refreshAccessToken("refresh token", 1)
+//                var (refreshToken, accessToken)
+                val result = tokenDomainService.refreshAccessToken("refresh token", 1)
 
                 // region assertions
-                refreshToken?.length?.shouldBeGreaterThan(0)
-                accessToken?.length?.shouldBeGreaterThan(0)
+                val data = result.data ?: throw Exception("test failed")
+                data.refreshToken.length shouldBeGreaterThan 0
+                data.accessToken.length shouldBeGreaterThan 0
                 // endregion
             }
         }

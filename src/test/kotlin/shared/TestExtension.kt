@@ -1,17 +1,17 @@
 package shared
 
-import io.kotest.datatest.WithDataTestName
-
-data class PythagTriple(val a: Int, val b: Int, val c: Int) : WithDataTestName {
-    override fun dataTestName() = "$a, $b, $c"
-}
-
-
-data class PythagTriple3(val a: Int, val b: Int, val c: Int) : ExtendDataTest<PythagTriple3>(), WithDataTestName {
-//    operator fun component1(): Int {
+//import io.kotest.datatest.WithDataTestName
 //
-//    }
-}
+//data class PythagTriple(val a: Int, val b: Int, val c: Int) : WithDataTestName {
+//    override fun dataTestName() = "$a, $b, $c"
+//}
+//
+//
+//data class PythagTriple3(val a: Int, val b: Int, val c: Int) : ExtendDataTest<PythagTriple3>(), WithDataTestName {
+////    operator fun component1(): Int {
+////
+////    }
+//}
 
 abstract class ExtendDataTest<T>: DataTestName<T>() {
    override var testName: String = ""

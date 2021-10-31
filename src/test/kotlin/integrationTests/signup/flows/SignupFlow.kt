@@ -20,7 +20,7 @@ class SignupFlow : BehaviorSpecIT() {
         return cleanup(cleanup) {
             val result = authorizationService.signup(request)
 
-            result.message shouldBe HttpStatusCode.OK
+            result.message() shouldBe HttpStatusCode.OK
 //            result.tokens.refreshToken.size shouldBeGreaterThan 0
 //            result.tokens.accessToken.size shouldBeGreaterThan 0
 
