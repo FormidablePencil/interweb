@@ -19,7 +19,7 @@ class ExploreService(
 
     fun SearchAuthors(email: String): Author {
         val author = authorRepository.getByEmail(email)
-        if (author != null)
+        if (author is Author)
             return author
         else throw Exception("failed to find author...")
     }

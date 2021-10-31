@@ -15,7 +15,7 @@ import io.ktor.http.*
 // adding a response statusCode would be nice and directly returning this object from the controller
 // maybe create another extension function that returns
 
-fun <C, T : Enum<T>> ApiResponse<T>.failed(error: Enum<T>, msg: String?, code: HttpStatusCode): C {
+fun <C, E> ApiResponse<E>.failed(error: E, msg: String?, code: HttpStatusCode): C {
     this.statusCode = code
     this.error = error
     this.message = msg
@@ -23,33 +23,33 @@ fun <C, T : Enum<T>> ApiResponse<T>.failed(error: Enum<T>, msg: String?, code: H
     return this as C
 }
 
-fun <C, T : Enum<T>> ApiResponse<T>.failed(error: Enum<T>, msg: String?): C {
+fun <C, E> ApiResponse<E>.failed(error: E, msg: String?): C {
     this.error = error
     this.message = msg
     this.success = false
     return this as C
 }
 
-fun <T : Enum<T>, C> ApiResponse<T>.failed(error: Enum<T>, code: HttpStatusCode): C {
+fun <C, E> ApiResponse<E>.failed(error: E, code: HttpStatusCode): C {
     this.statusCode = code
     this.error = error
     this.success = false
     return this as C
 }
 
-fun <T : Enum<T>, C> ApiResponse<T>.failed(error: Enum<T>): C {
+fun <C, E> ApiResponse<E>.failed(error: E): C {
     this.error = error
     this.success = false
     return this as C
 }
 
-fun <C, T : Enum<T>> ApiResponse<T>.succeeded(code: HttpStatusCode): C {
+fun <C, E> ApiResponse<E>.succeeded(code: HttpStatusCode): C {
     this.statusCode = code
     this.success = true
     return this as C
 }
 
-fun <C, T : Enum<T>> ApiResponse<T>.succeeded(): C {
+fun <C, E> ApiResponse<E>.succeeded(): C {
     this.success = true
     return this as C
 }

@@ -1,8 +1,8 @@
 package dtos.authorization
 
-import dtos.DtoResult
+import dtos.ApiResponse
 
-class VerifyEmailCodeResult : DtoResult<VerifyEmailCodeResultFailed>() {
+class VerifyEmailCodeResponse : ApiResponse<VerifyEmailCodeResultFailed>() {
 }
 
 enum class VerifyEmailCodeResultFailed {
@@ -11,7 +11,7 @@ enum class VerifyEmailCodeResultFailed {
     companion object {
         fun getMsg(enum: VerifyEmailCodeResultFailed): String {
             return when (enum) {
-                DoesNotExistEmailCode -> "User has not requested a email verification code."
+                DoesNotExistEmailCode,
                 InvalidEmailCode -> "Invalid email code"
             }
         }
