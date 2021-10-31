@@ -2,27 +2,54 @@ package dtos
 
 import io.ktor.http.*
 
-//open class ApiResponse<T : Enum<T>> : IDtoResult<T>() {
-////    override var error: Enum<T>? = null
-////    override var message: String? = null
-////    override var success: Boolean? = null
-//}
-
-open class ApiResponse<T> {
-    var statusCode: HttpStatusCode? = null
-    var error: T? = null
-    var message: String? = null
-    var success: Boolean? = null
+interface IApiResponseEnum<Code> {
+    fun message(code: Code): String
+    fun statusCode(code: Code): HttpStatusCode
 }
 
-//open class IDtoResult<T : Enum<T>> {
-//    var error: Enum<T>? = null
-//    var message: String? = null
-//    var success: Boolean? = null
-//}
+open class ApiResponse<Data, Code>(val enum: IApiResponseEnum<Code>) {
+    var data: Data? = null
+    var success: Boolean? = null
+    var successHttpStatusCode: HttpStatusCode? = null
 
-//interface IDtoResult<T : Enum<T>> {
-//    var error: Enum<T>?
-//    var message: String?
-//    var success: Boolean?
-//}
+    var code: Code? = null
+
+    fun data(): Data {
+        return data!!
+    }
+
+    fun success(): Boolean {
+        return success != null
+    }
+
+    fun message(): String? {
+        return if (code == null) null
+        else enum.message(code!!)
+    }
+
+    fun statusCode(): HttpStatusCode? {
+        return if (successHttpStatusCode !== null) successHttpStatusCode
+        else if (code == null) null
+        else enum.statusCode(code!!)
+    }
+}
+
+fun <C, Data, Code> ApiResponse<Data, Code>.succeeded(httpStatusCode: HttpStatusCode): C {
+    this.successHttpStatusCode = httpStatusCode
+    this.success = true
+    return this as C
+}
+
+fun <C, Data, Code> ApiResponse<Data, Code>.succeeded(httpStatusCode: HttpStatusCode, data: Data): C {
+    this.data = data
+    this.successHttpStatusCode = httpStatusCode
+    this.success = true
+    return this as C
+}
+
+fun <C, Data, Code> ApiResponse<Data, Code>.failed(code: Code): C {
+    this.code = code
+    this.success = false
+    return this as C
+}
+

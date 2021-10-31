@@ -19,10 +19,10 @@ class PasswordRepository : RepositoryBase(), IPasswordRepository {
         return database.password.find() { it.authorId eq authorId }
     }
 
-    override fun insertPassword(passwordHash: String): Int? {
+    override fun insertPassword(passwordHash: String): Int {
         return database.insertAndGenerateKey(Passwords) {
             set(it.password, passwordHash)
-        } as Int?
+        } as Int
     }
 
     override fun deletePassword(authorId: Int): Int {

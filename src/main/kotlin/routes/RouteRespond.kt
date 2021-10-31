@@ -1,5 +1,7 @@
 package routes
 
+import dtos.ApiResponse
+import dtos.IApiResponseEnum
 import exceptions.GenericError
 import exceptions.ServerErrorException
 import exceptions.httpRespond
@@ -8,9 +10,10 @@ import io.ktor.http.*
 import io.ktor.response.*
 
 // TODO test the success response, ServerErrorException response and Exception response
-suspend fun routeRespond(call: ApplicationCall, code: () -> Any) {
+suspend fun <Data, FailedCode> routeRespond(call: ApplicationCall, code: () -> ApiResponse<Data, FailedCode>) {
     try {
-        call.respond(code()) // TODO this might return too much information or non at all
+        val result = code()
+        call.respond(result.statusCode()!!, result.message()!!)
     } catch (ex: ServerErrorException) {
         ex.httpRespond(call)
     } catch (ex: Exception) {

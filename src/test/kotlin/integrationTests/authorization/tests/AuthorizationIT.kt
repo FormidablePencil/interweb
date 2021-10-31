@@ -129,7 +129,7 @@ class GetTokensUponLogin : BehaviorSpecIT() {
             }
 
             Given("invalid credentials") {
-                Then("user should get 400 error") {
+                Then("user should get 400 code") {
                     loginRequest(createAuthorRequest.username, "")
                     { status, content ->
                         status shouldBe HttpStatusCode.BadRequest

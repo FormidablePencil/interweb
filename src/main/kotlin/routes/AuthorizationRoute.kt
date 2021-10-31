@@ -3,6 +3,7 @@ package routes
 import dtos.author.CreateAuthorRequest
 import services.AuthorizationService
 import dtos.login.LoginByEmailRequest
+import dtos.login.LoginByUsernameRequest
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.request.*
@@ -25,9 +26,14 @@ fun Route.loginRoute() {
         routeRespond(call) { authorizationService.signup(request) }
     }
 
-    post("/login") {
+    post("/login:username") {
+        val request = call.receive<LoginByUsernameRequest>()
+        routeRespond(call) { authorizationService.login(request) }
+    }
+
+    post("/login:email") {
         val request = call.receive<LoginByEmailRequest>()
-        routeRespond(call) { authorizationService.login(request.email, request.password) }
+        routeRespond(call) { authorizationService.login(request) }
     }
 
     post("/example") {

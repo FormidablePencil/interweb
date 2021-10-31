@@ -12,6 +12,6 @@ fun FailedRequestValidationResponse(ex: ConstraintViolationException): String {
         else "$f, $concatenatedMessage".also { concatenatedMessage = it }
     }
 
-    if (concatenatedMessage.isNullOrEmpty()) throw Exception("Server error")
+    if (concatenatedMessage.isNullOrEmpty()) throw Exception("Server code")
    else return concatenatedMessage as String
 }

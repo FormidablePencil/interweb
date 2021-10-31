@@ -6,8 +6,7 @@ import configurations.interfaces.IAppEnv
 import configurations.interfaces.IConnectionToDb
 import dtos.authorization.TokensResponse
 import dtos.authorization.TokensResponseFailed
-import helper.failed
-import helper.succeeded
+import dtos.token.responseData.TokenResponseData
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
 import repositories.interfaces.IRefreshTokenRepository
@@ -21,13 +20,13 @@ class TokenManager(
     private val appEnv: IAppEnv by inject()
     private val connectionToDb: IConnectionToDb by inject()
 
-    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
+    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokenResponseData {
         return if (!isRefreshTokenValid(refreshToken, authorId))
             TokensResponse().failed(TokensResponseFailed.InvalidRefreshToken, "Invalid refresh token")
         else generateTokens(authorId)
     }
 
-    override fun generateTokens(authorId: Int): TokensResponse {
+    override fun generateTokens(authorId: Int): TokenResponseData {
         val refreshToken = generateToken(authorId, KindOfTokens.RefreshToken)
         val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 
@@ -36,7 +35,7 @@ class TokenManager(
             refreshTokenRepository.insertToken(refreshToken, authorId)
         }
 
-        return TokensResponse(refreshToken, accessToken).succeeded()
+        return TokenResponseData(refreshToken, accessToken)
     }
 
     private fun isRefreshTokenValid(refreshToken: String, authorId: Int): Boolean {

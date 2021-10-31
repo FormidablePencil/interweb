@@ -5,7 +5,7 @@ import dtos.authorization.ResetPasswordResponse
 import exceptions.ServerErrorException
 import exceptions.ServerFailed
 import helper.PassEncrypt
-import helper.succeeded
+import dtos.succeeded
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
@@ -44,7 +44,7 @@ class PasswordManager(
         val passwordId = passwordRepository.insertPassword(encryptPassword)
 
         if (passwordId !is Int)
-            throw Exception("Server error. Saving password failed")
+            throw Exception("Server code. Saving password failed")
 
         return passwordId
     }

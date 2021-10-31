@@ -1,151 +1,135 @@
 package services
 
 import dtos.author.CreateAuthorRequest
+import dtos.login.LoginByEmailRequest
 import dtos.signup.SignupResponseFailed
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.ktor.http.*
-import io.mockk.*
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.verifySequence
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
+import repositories.interfaces.IEmailVerifyCodeRepository
 import shared.BehaviorSpecUT
 
 class AuthorizationServiceTest : BehaviorSpecUT({
     val authorRepository: IAuthorRepository = mockk()
     val tokenManager: ITokenManager = mockk()
-    val emailService: IEmailManager = mockk()
+    val emailManager: IEmailManager = mockk()
     val passwordManager: IPasswordManager = mockk()
+    val emailVerifyCodeRepository: IEmailVerifyCodeRepository = mockk()
+
     val username = "YourNeighborhoodSpider"
     val email = "testemail12345@gmail.com"
+    val password = "Formidable!76"
     val authorForUsername = Author { val id = 1 }
     val authorForEmail = Author { val id = 2 }
 
     every { authorRepository.getByUsername(username) } returns null
     every { authorRepository.getByEmail(email) } returns null
-    every { emailService.sendResetPassword(authorForUsername.id) }
+    justRun { emailManager.sendValidateEmail(email) }
+    every { passwordManager.setNewPassword(password) } returns 32
 
-    val authorizationService = AuthorizationService(authorRepository, tokenManager, emailService, passwordManager,)
-
-    fun genCreateAuthorRequest(
-        aUsername: String = username,
-        aEmail: String = email,
-        aPassword: String = "Formidable!76"
-    ): CreateAuthorRequest {
-        return CreateAuthorRequest(aUsername, aEmail, "Billy", "Bob", aPassword)
-    }
-
-    beforeEach {
-        println("Hello from $it")
-    }
-
-    afterEach {
-        println("Goodbye from $it")
-    }
+    val authorizationService =
+        AuthorizationService(authorRepository, tokenManager, emailManager, passwordManager, emailVerifyCodeRepository)
 
     given("signup") {
-        And("valid credentials") {
-            Then("ok responses") {
+        fun genCreateAuthorRequest(
+            aUsername: String = username, aEmail: String = email, aPassword: String = password,
+        ): CreateAuthorRequest {
+            return CreateAuthorRequest(aUsername, aEmail, "Billy", "Bob", aPassword)
+        }
+        and("valid credentials") {
+            then("respond with Created") {
                 val request = genCreateAuthorRequest()
-                every { authorRepository.createAuthor(request) }
+                every { authorRepository.createAuthor(request) } returns true // TODO replace ktorm with exposed and change return type to bool
 
                 val result = authorizationService.signup(genCreateAuthorRequest())
-                result.statusCode shouldBe HttpStatusCode.Created
 
                 verifySequence {
+                    authorRepository.getByEmail(request.email)
+                    authorRepository.getByUsername(username)
                     authorRepository.createAuthor(request)
                     passwordManager.setNewPassword(request.password)
-                    emailService.sendValidateEmail(email)
+                    emailManager.sendValidateEmail(email)
                 }
+
+                result.statusCode() shouldBe HttpStatusCode.Created
             }
         }
 
-        And("incorrectly format email") {
-            val result = authorizationService.signup(genCreateAuthorRequest(aEmail = "email"))
-
-            result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.EmailTaken)
-        }
-
-        And("weak password") {
+        and("weak password") {
             val result = authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
 
-            result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.WeakPassword)
+            result.statusCode() shouldBe HttpStatusCode.BadRequest
+            result.message() shouldBe SignupResponseFailed.message(SignupResponseFailed.WeakPassword)
         }
 
-        And("taken email") {
+        and("incorrectly format email") {
+            val result = authorizationService.signup(genCreateAuthorRequest(aEmail = "email"))
+
+            result.statusCode() shouldBe HttpStatusCode.BadRequest
+            result.message() shouldBe SignupResponseFailed.message(SignupResponseFailed.InvalidEmailFormat)
+        }
+
+        and("taken email") {
             every { authorRepository.getByEmail(email) } returns authorForEmail
 
             val result = authorizationService.signup(genCreateAuthorRequest())
 
-            result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.EmailTaken)
+            result.statusCode() shouldBe HttpStatusCode.BadRequest
+            result.message() shouldBe SignupResponseFailed.message(SignupResponseFailed.EmailTaken)
         }
 
-        And("taken email") {
+        and("taken email") {
             every { authorRepository.getByUsername(username) } returns authorForUsername
 
             val result = authorizationService.signup(genCreateAuthorRequest())
 
-            result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.UsernameTaken)
+            result.statusCode() shouldBe HttpStatusCode.BadRequest
+            result.message() shouldBe SignupResponseFailed.message(SignupResponseFailed.UsernameTaken)
         }
 
-        Then("Failed To Create Author server error") {
-            TODO("should log the exception")
-            val request = genCreateAuthorRequest()
-            every { authorRepository.createAuthor(request) } returns 0
-
-            val result = authorizationService.signup(request)
-
-            result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.ServerError)
-        }
-
-        Then("Failed To Set New Password server error") {
-            TODO("should log the exception")
-            val request = genCreateAuthorRequest()
-            every { passwordManager.setNewPassword(request.password) } returns 0
-
-            val result = authorizationService.signup(request)
-
-            result.statusCode shouldBe HttpStatusCode.BadRequest
-            result.message shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.ServerError)
-        }
     }
-
 
     given("validateEmailSignupCode") {
 
     }
 
-    given("login user") {
+    given("login") {
 
-        And("correct credentials") {
-            val result = authorizationService.login("email", "password")
-            result.authorId shouldNotBe null
-//                result.RefreshToken.length shouldNotBe 0
-//                result.accessToken.length shouldNotBe 0
-        }
+        and("login through email") {
+            then("return tokens") {
+                val result = authorizationService.login(LoginByEmailRequest(email = email, password = password))
 
-        And("invalid email") {
-            val exception = shouldThrow<Exception> {
-                authorizationService.login("invalid", "correctPassword")
+                result.data().accessToken.length.shouldBeGreaterThan(0)
+                result.data().refreshToken.length.shouldBeGreaterThan(0)
             }
-            exception.message shouldBe "invalid email format"
         }
 
-        And("password provided is invalid") {
-            var exception = shouldThrow<Exception> {
-                authorizationService.login("correctEmail", "invalid")
+        and("invalid email") {
+            then("return 400") {
+                val res = authorizationService.login(LoginByEmailRequest(email = email, password = password))
+                res.message() shouldBe "invalid email format"
             }
-            exception.message shouldBe "invalid password format"
         }
 
+        And("invalid password") {
+            then("return 400") {
+                val res = authorizationService.login(LoginByEmailRequest(email = email, password = password))
+                res.message() shouldBe "invalid password format"
+            }
+        }
+
+        And("invalid username") {
+
+        }
     }
 
     given("refreshAccessToken") { }

@@ -3,12 +3,14 @@ package services
 import configurations.interfaces.IConnectionToDb
 import dtos.author.CreateAuthorRequest
 import dtos.authorization.*
+import dtos.failed
 import dtos.login.LoginBy
 import dtos.login.LoginByEmailRequest
 import dtos.login.LoginByUsernameRequest
 import dtos.login.LoginRequest
 import dtos.signup.SignupResponse
 import dtos.signup.SignupResponseFailed
+import dtos.succeeded
 import exceptions.ServerErrorException
 import exceptions.ServerFailed
 import helper.*
@@ -22,6 +24,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.IEmailVerifyCodeRepository
+import responseData.PasswordResetResponseData
 
 private val logger = KotlinLogging.logger {}
 
@@ -40,19 +43,20 @@ class AuthorizationService(
         if (!isEmailFormatted(request.email))
             return SignupResponse().failed(SignupResponseFailed.InvalidEmailFormat)
 
+        val f: SignupResponse = SignupResponse().failed(SignupResponseFailed.InvalidEmailFormat)
+
         if (authorRepository.getByEmail(request.email) is Author)
             return SignupResponse().failed(SignupResponseFailed.EmailTaken)
         if (authorRepository.getByUsername(request.username) is Author)
             return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
 
         connectionToDb.database.useTransaction {
-            if (authorRepository.createAuthor(request) == 0)
+            if (!authorRepository.createAuthor(request)) // TODO replace ktorm with exposed and change return type to bool
                 throw ServerErrorException(ServerFailed.FailedToCreateAuthor, this::class.java)
-            if (passwordManager.setNewPassword(request.password) == 0)
-                throw ServerErrorException(ServerFailed.FailedToSetNewPassword, this::class.java)
+            passwordManager.setNewPassword(request.password) // TODO we really need to swap ktorm for exposed asap
             emailManager.sendValidateEmail(request.email)
 
-            return SignupResponse().succeeded(HttpStatusCode.Created)
+            return SignupResponse().succeeded(HttpStatusCode.MultiStatus)
         }
     }
 
@@ -74,11 +78,11 @@ class AuthorizationService(
         val authorId = 2 // todo get authorId from token header
 
         val codeDb = emailVerifyCodeRepository.get(authorId)
-            ?: return VerifyEmailCodeResponse().failed(VerifyEmailCodeResultFailed.DoesNotExistEmailCode)
+            ?: return VerifyEmailCodeResponse().failed(VerifyEmailCodeResponseFailed.DoesNotExistEmailCode)
 
         return if (codeDb == request.code)
-            VerifyEmailCodeResponse().succeeded()
-        else VerifyEmailCodeResponse().failed(VerifyEmailCodeResultFailed.InvalidEmailCode)
+            VerifyEmailCodeResponse().succeeded(HttpStatusCode.OK)
+        else VerifyEmailCodeResponse().failed(VerifyEmailCodeResponseFailed.InvalidEmailCode)
     }
 
     fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
@@ -91,17 +95,19 @@ class AuthorizationService(
         // todo refactor to use a where. logic does it well
         if (!username.isNullOrEmpty()) {
             author = authorRepository.getByUsername(username)
-            if (author !is Author) return RequestPasswordResetResponse().failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenUsername)
+            if (author !is Author) return RequestPasswordResetResponse.failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenUsername)
         } else if (!email.isNullOrEmpty()) {
             author = authorRepository.getByEmail(email)
-            if (author !is Author) return RequestPasswordResetResponse().failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenEmail)
+            if (author !is Author) return RequestPasswordResetResponse.failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenEmail)
         } else
-            return RequestPasswordResetResponse().failed(RequestPasswordResetResponseFailed.NeitherUsernameNorEmailProvided)
+            return RequestPasswordResetResponse.failed(RequestPasswordResetResponseFailed.NeitherUsernameNorEmailProvided)
 
         emailManager.sendValidateEmail(author.email)
 
         val maskedEmail = maskEmail(author.email)
-        return RequestPasswordResetResponse(maskedEmail).succeeded()
+        val r: RequestPasswordResetResponse =
+            RequestPasswordResetResponse.succeeded(HttpStatusCode.OK, PasswordResetResponseData(maskedEmail))
+
     }
 
     fun resetPasswordByEmail(oldPassword: String, newPassword: String, emailCode: String): ResetPasswordResponse {
@@ -126,7 +132,7 @@ class AuthorizationService(
             return LoginResponse().failed(LoginResponseFailed.InvalidPassword)
 
         val tokenResponse = tokenManager.generateTokens(author.id)
-        return LoginResponse(tokenResponse)
+        return LoginResponse().succeeded(HttpStatusCode.OK, tokenResponse)
     }
 
     private fun validatePassword(password: String, authorId: Int): Boolean {

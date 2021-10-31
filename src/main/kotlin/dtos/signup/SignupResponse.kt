@@ -1,16 +1,23 @@
 package dtos.signup
 
 import dtos.ApiResponse
+import dtos.IApiResponseEnum
+import dtos.token.responseData.TokenResponseData
 import io.ktor.http.*
 
-class SignupResponse : ApiResponse<SignupResponseFailed>()
+class SignupResponse : ApiResponse<TokenResponseData, E>(E)
+
+internal typealias E = SignupResponseFailed
 
 enum class SignupResponseFailed {
-    WeakPassword, InvalidEmailFormat, EmailTaken, UsernameTaken;
+    WeakPassword,
+    InvalidEmailFormat,
+    EmailTaken,
+    UsernameTaken;
 
-    companion object {
-        fun getMsg(enum: SignupResponseFailed): String {
-            return when (enum) {
+    companion object : IApiResponseEnum<E> {
+        override fun message(code: E): String {
+            return when (code) {
                 WeakPassword -> "Not a strong enough password."
                 InvalidEmailFormat -> "Email provided is not formatted as such."
                 EmailTaken -> "Email taken."
@@ -18,8 +25,8 @@ enum class SignupResponseFailed {
             }
         }
 
-        fun getHttpCode(enum: SignupResponseFailed): HttpStatusCode {
-            return when (enum) {
+        override fun statusCode(code: E): HttpStatusCode {
+            return when (code) {
                 WeakPassword,
                 InvalidEmailFormat,
                 EmailTaken,
@@ -28,9 +35,3 @@ enum class SignupResponseFailed {
         }
     }
 }
-
-
-// also combine message, status code and serialize response with one method if possible
-//fun SignupResponseError.getMessage(enum: SignupResponseError): String {
-//
-//}
