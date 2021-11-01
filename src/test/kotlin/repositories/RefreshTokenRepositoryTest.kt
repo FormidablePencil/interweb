@@ -3,7 +3,7 @@ package repositories
 import io.kotest.matchers.shouldBe
 import org.koin.test.get
 import repositories.interfaces.IRefreshTokenRepository
-import shared.BehaviorSpecUtRepo
+import shared.testUtils.BehaviorSpecUtRepo
 
 class RefreshTokenRepositoryTest : BehaviorSpecUtRepo({
     val refreshTokenRepository: IRefreshTokenRepository = get()

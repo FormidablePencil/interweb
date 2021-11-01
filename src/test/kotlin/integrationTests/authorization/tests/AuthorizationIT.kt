@@ -13,9 +13,9 @@ import org.koin.core.context.startKoin
 import org.koin.test.get
 import org.koin.test.inject
 import services.AuthorizationService
-import shared.BehaviorSpecIT
+import shared.testUtils.BehaviorSpecIT
 import shared.DITestHelper
-import shared.rollbackGiven
+import shared.testUtils.rollbackGiven
 
 class TokensIT : BehaviorSpecIT({
     startKoin {
@@ -108,7 +108,7 @@ class GetTokensUponLogin : BehaviorSpecIT() {
     }
 
     init {
-        // create a wrapper to catch cleanup exceptions
+        // create a wrapper to catch rollback exceptions
         try {
             // first create an account via domainServices
             val createAuthorRequest = CreateAuthorRequest(
@@ -139,7 +139,7 @@ class GetTokensUponLogin : BehaviorSpecIT() {
             }
 
         } catch (ex: Exception) {
-            if (ex.message == "cleanup")
+            if (ex.message == "rollback")
             else throw Exception(ex)
         }
     }

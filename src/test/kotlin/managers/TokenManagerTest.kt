@@ -6,7 +6,7 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.mockk.every
 import io.mockk.mockk
 import repositories.interfaces.IRefreshTokenRepository
-import shared.BehaviorSpecUT
+import shared.testUtils.BehaviorSpecUT
 import java.util.*
 
 // take a look at viewing getStatusCode coverage

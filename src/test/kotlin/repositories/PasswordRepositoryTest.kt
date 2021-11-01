@@ -5,9 +5,9 @@ import io.kotest.matchers.shouldNotBe
 import org.koin.test.get
 import org.mindrot.jbcrypt.BCrypt
 import repositories.interfaces.IPasswordRepository
-import shared.BehaviorSpecUtRepo
+import shared.testUtils.BehaviorSpecUtRepo
 import shared.persistentId
-import shared.rollbackGiven
+import shared.testUtils.rollbackGiven
 
 class PasswordRepositoryTest : BehaviorSpecUtRepo({
     val passwordRepository: IPasswordRepository = get()
@@ -28,5 +28,6 @@ class PasswordRepositoryTest : BehaviorSpecUtRepo({
         then("deletePassword()") {
             passwordRepository.deletePassword(authorId) shouldBe true
         }
+
     }
 })

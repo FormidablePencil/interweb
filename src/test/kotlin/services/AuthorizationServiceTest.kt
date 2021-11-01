@@ -15,7 +15,7 @@ import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.IEmailVerifyCodeRepository
-import shared.BehaviorSpecUT
+import shared.testUtils.BehaviorSpecUT
 
 class AuthorizationServiceTest : BehaviorSpecUT({
     val authorRepository: IAuthorRepository = mockk()

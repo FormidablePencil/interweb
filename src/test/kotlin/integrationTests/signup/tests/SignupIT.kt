@@ -1,9 +1,8 @@
 package integrationTests.signup.tests
 
 import integrationTests.signup.flows.SignupFlow
-import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
-import shared.BehaviorSpecIT
+import shared.testUtils.BehaviorSpecIT
 
 class SignupIT : BehaviorSpecIT() {
     private val signupFlows: SignupFlow by inject()

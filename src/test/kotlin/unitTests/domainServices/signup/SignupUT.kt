@@ -6,7 +6,7 @@ import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
 import services.AuthorizationService
-import shared.BehaviorSpecUT
+import shared.testUtils.BehaviorSpecUT
 
 class SignupUT : BehaviorSpecUT({
     lateinit var authorizationService: AuthorizationService

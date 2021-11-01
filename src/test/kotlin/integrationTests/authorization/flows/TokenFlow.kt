@@ -1,6 +1,6 @@
 package integrationTests.authorization.flows
 
-import shared.BehaviorSpecIT
+import shared.testUtils.BehaviorSpecIT
 
 // directories
 // integration tests.

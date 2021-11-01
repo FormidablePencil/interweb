@@ -4,8 +4,8 @@ import dtos.author.CreateAuthorRequest
 import io.kotest.matchers.shouldBe
 import org.koin.test.get
 import repositories.interfaces.IAuthorRepository
-import shared.BehaviorSpecUtRepo
-import shared.rollbackGiven
+import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.rollbackGiven
 
 class AuthorRepositoryTest : BehaviorSpecUtRepo({
     val authorRepository: IAuthorRepository = get()
@@ -36,5 +36,19 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
         then("getById()") {
             authorRepository.getById(authorId) ?: throw Exception("test failed")
         }
+    }
+
+
+    given("insertPassword() with already existing author id") {
+        val request = CreateAuthorRequest(
+            username = "existing username",
+            email = "existing email",
+            firstname = "existing",
+            lastname = "existing",
+            password = "existing",
+        )
+
+
+
     }
 })
