@@ -15,7 +15,7 @@ import org.koin.test.inject
 import services.AuthorizationService
 import shared.BehaviorSpecIT
 import shared.DITestHelper
-import shared.cleanup
+import shared.rollbackGiven
 
 class TokensIT : BehaviorSpecIT({
     startKoin {
@@ -27,42 +27,40 @@ class TokensIT : BehaviorSpecIT({
     val signupFlows: SignupFlow = get()
 
 
-    cleanup(true) {
-        Given("created an account") {
-            val result = signupFlows.signup()
+    rollbackGiven("created an account") {
+        val result = signupFlows.signup()
 
-            And("login") {
-                // all the assertions happen in the flows
+        And("login") {
+            // all the assertions happen in the flows
+            // TokenFlow.login()
+
+        }
+
+        And("refresh tokens") {
+            // each device will have their own unique refresh token by adding a UUID...
+            // refresh access-token -> updates the expiration only to the refresh-token that corresponds header.id with token.id
+            // and updates in db and returns it to client
+            // Since every device has a unique refresh-token, the devices will not have access anymore when both tokens expire
+            // and when refreshing access-token, all the other tokens are not updated, the refresh-token in db with id corresponding
+            // with the provided valid refresh-token id value which we put in the beginning for this purpose
+
+            // TokenFlow.refresh()
+
+            Then("login with new tokens given") {
+                // TokenFlow.login()
+
+            }
+        }
+
+        And("reset password") {
+            Then("login with new tokens given") {
                 // TokenFlow.login()
 
             }
 
-            And("refresh tokens") {
-                // each device will have their own unique refresh token by adding a UUID...
-                // refresh access-token -> updates the expiration only to the refresh-token that corresponds header.id with token.id
-                // and updates in db and returns it to client
-                // Since every device has a unique refresh-token, the devices will not have access anymore when both tokens expire
-                // and when refreshing access-token, all the other tokens are not updated, the refresh-token in db with id corresponding
-                // with the provided valid refresh-token id value which we put in the beginning for this purpose
+            Then("login with old tokens given") {
+                // TokenFlow.login()
 
-                // TokenFlow.refresh()
-
-                Then("login with new tokens given") {
-                    // TokenFlow.login()
-
-                }
-            }
-
-            And("reset password") {
-                Then("login with new tokens given") {
-                    // TokenFlow.login()
-
-                }
-
-                Then("login with old tokens given") {
-                    // TokenFlow.login()
-
-                }
             }
         }
     }

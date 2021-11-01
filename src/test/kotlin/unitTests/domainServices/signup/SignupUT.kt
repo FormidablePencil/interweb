@@ -1,7 +1,5 @@
 package unitTests.domainServices.signup
 
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import managers.interfaces.ITokenManager
@@ -27,7 +25,7 @@ class SignupUT : BehaviorSpecUT({
 
     every { authorRepository.getByEmail(any()) } returns null
     every { authorRepository.getByUsername(any()) } returns null
-    every { authorRepository.createAuthor(any()) } returns 123
+    every { authorRepository.insertAuthor(any()) } returns 123
 
 
 

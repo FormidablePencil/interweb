@@ -16,7 +16,7 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     val Database.author get() = this.sequenceOf(Authors)
     val Database.password get() = this.sequenceOf(Passwords)
 
-    override fun createAuthor(request: CreateAuthorRequest): Int? {
+    override fun insertAuthor(request: CreateAuthorRequest): Int? {
         return database.insertAndGenerateKey(Authors) {
             set(it.username, request.username)
             set(it.firstname, request.firstname)
@@ -35,13 +35,5 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
 
     override fun getById(authorId: Int): Author? {
         return database.author.find { it.id eq authorId }
-    }
-
-    override fun resetPasswordByEmail(email: String, oldPassword: String) {
-        throw NotImplementedError()
-    }
-
-    override fun resetPasswordByUsername(username: String, oldPassword: String) {
-        throw NotImplementedError()
     }
 }

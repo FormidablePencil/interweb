@@ -1,23 +1,28 @@
 package shared
 
+import com.mysql.cj.x.protobuf.MysqlxResultset
 import configurations.DIHelper
 import configurations.interfaces.IConnectionToDb
 import io.kotest.core.spec.style.BehaviorSpec
-import org.koin.core.component.inject
+import io.kotest.core.spec.style.scopes.BehaviorSpecGivenContainerContext
 import org.koin.core.context.startKoin
 import org.koin.test.KoinTest
+import org.koin.test.get
 
 data class CleanupResult<T>(val value: T)
 
 interface ICleanupTest {
-    val connectionToDb: IConnectionToDb
+    val connectionToDb: IConnectionToDb?
 }
 
-fun <T> ICleanupTest.cleanup(cleanup: Boolean, code: () -> T): CleanupResult<T> {
+/** Rollback transaction wrapper for repository unit tests which call the database and integration tests. One limitation
+ *  is you cannot test inserting duplicate data because of how db transactions work. */
+suspend fun <T> ICleanupTest.cleanupGiven(cleanup: Boolean = true, code: suspend () -> T): CleanupResult<T> {
+    connectionToDb ?: throw Exception("cleanup fun failed")
     if (cleanup)
-        connectionToDb.database.useTransaction {
+        connectionToDb!!.database.useTransaction {
             val result = code()
-            connectionToDb.database.transactionManager.currentTransaction?.rollback()
+            connectionToDb!!.database.transactionManager.currentTransaction?.rollback()
             return CleanupResult(result);
         }
     else {
@@ -26,21 +31,44 @@ fun <T> ICleanupTest.cleanup(cleanup: Boolean, code: () -> T): CleanupResult<T> 
     }
 }
 
-open class BehaviorSpecFlowsForIntegrationTests(body: BehaviorSpecFlowsForIntegrationTests.() -> Unit = {}) : BehaviorSpec(), KoinTest, ICleanupTest {
-    override val connectionToDb: IConnectionToDb by inject()
+/** Rollback transaction wrapper for integration testing. */
+fun <T> ICleanupTest.cleanup(cleanup: Boolean = true, code: () -> T): CleanupResult<T> {
+    connectionToDb ?: throw Exception("cleanup fun failed")
+    if (cleanup)
+        connectionToDb!!.database.useTransaction {
+            val result = code()
+            connectionToDb!!.database.transactionManager.currentTransaction?.rollback()
+            return CleanupResult(result);
+        }
+    else {
+        val result = code()
+        return CleanupResult(result);
+    }
+}
+
+/** For integration test to extend Koin, Kotest.BehaviorSpec, and extension functions. */
+open class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, ICleanupTest {
+    final override var connectionToDb: IConnectionToDb? = null
 
     init {
         startKoin {
             modules(DIHelper.CoreModule, DITestHelper.FlowModule)
         }
+        connectionToDb = get()
         body()
     }
 }
 
-open class BehaviorSpecIT(body: BehaviorSpecFlowsForIntegrationTests.() -> Unit = {}) : BehaviorSpecFlowsForIntegrationTests(body)
+typealias BehaviorSpecUtRepo = BehaviorSpecIT
 
-// There a few places where there are dependency inject not through constructor but directly in class. This is
-// where you'll have to use koin to dependency inject mocked version. Otherwise, use BehaviorSpec instead
+fun BehaviorSpecIT.rollbackGiven(name: String, codeHere: suspend BehaviorSpecGivenContainerContext.() -> Unit) {
+    given(name) {
+        cleanupGiven {
+            codeHere()
+        }
+    }
+}
+
 open class BehaviorSpecUT(body: BehaviorSpec.() -> Unit = {}) : BehaviorSpec(), KoinTest {
     init {
         startKoin {
@@ -49,3 +77,4 @@ open class BehaviorSpecUT(body: BehaviorSpec.() -> Unit = {}) : BehaviorSpec(), 
         body()
     }
 }
+

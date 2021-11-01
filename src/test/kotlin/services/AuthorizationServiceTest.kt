@@ -33,7 +33,7 @@ class AuthorizationServiceTest : BehaviorSpecUT({
     every { authorRepository.getByUsername(username) } returns null
     every { authorRepository.getByEmail(email) } returns null
     justRun { emailManager.sendValidateEmail(email) }
-    every { passwordManager.setNewPassword(password) } returns 32
+    every { passwordManager.setNewPassword(password, authorId = authorForUsername.id) } returns true
 
     val authorizationService =
         AuthorizationService(authorRepository, tokenManager, emailManager, passwordManager, emailVerifyCodeRepository)
@@ -47,15 +47,15 @@ class AuthorizationServiceTest : BehaviorSpecUT({
         When("provided with valid credentials") {
             then("return tokens") {
                 val request = genCreateAuthorRequest()
-                every { authorRepository.createAuthor(request) } returns 123 // TODO replace ktorm with exposed and change return type to bool
+                every { authorRepository.insertAuthor(request) } returns 123 // TODO replace ktorm with exposed and change return type to bool
 
                 val result = authorizationService.signup(genCreateAuthorRequest())
 
                 verifySequence {
                     authorRepository.getByEmail(request.email)
                     authorRepository.getByUsername(username)
-                    authorRepository.createAuthor(request)
-                    passwordManager.setNewPassword(request.password)
+                    authorRepository.insertAuthor(request)
+                    passwordManager.setNewPassword(request.password, authorForUsername.id)
                     emailManager.sendValidateEmail(email)
                 }
 

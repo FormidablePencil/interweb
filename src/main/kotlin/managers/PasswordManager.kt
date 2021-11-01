@@ -3,7 +3,6 @@ package managers
 import configurations.interfaces.IConnectionToDb
 import dtos.authorization.ResetPasswordResponse
 import exceptions.ServerErrorException
-import helper.PassEncrypt
 import dtos.succeeded
 import io.ktor.http.*
 import managers.interfaces.IPasswordManager
@@ -26,7 +25,8 @@ class PasswordManager(
         connectionToDb.database.useTransaction {
             refreshTokenRepository.deleteOldToken(authorId)
             passwordRepository.deletePassword(authorId)
-            setNewPassword(newPassword)
+            if (setNewPassword(newPassword, authorId))
+                throw ServerErrorException("Server code. Saving password failed", this::class.java)
             val tokens = tokenManager.generateTokens(authorId)
             return ResetPasswordResponse(tokens.accessToken, tokens.refreshToken)
                 .succeeded(HttpStatusCode.MultiStatus) // todo change implementation
@@ -40,13 +40,8 @@ class PasswordManager(
         return BCrypt.checkpw(password, passwordRecord.password)
     }
 
-    override fun setNewPassword(password: String): Int {
-        val encryptPassword = PassEncrypt().encryptPassword(password)
-        val passwordId = passwordRepository.insertPassword(encryptPassword)
-
-        if (passwordId !is Int)
-            throw Exception("Server code. Saving password failed")
-
-        return passwordId
+    override fun setNewPassword(password: String, authorId: Int): Boolean {
+        val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
+        return passwordRepository.insertPassword(passwordHash, authorId)
     }
 }
