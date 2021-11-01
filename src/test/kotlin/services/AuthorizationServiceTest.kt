@@ -44,8 +44,8 @@ class AuthorizationServiceTest : BehaviorSpecUT({
         ): CreateAuthorRequest {
             return CreateAuthorRequest(aUsername, aEmail, "Billy", "Bob", aPassword)
         }
-        and("valid credentials") {
-            then("respond with Created") {
+        When("provided with valid credentials") {
+            then("return tokens") {
                 val request = genCreateAuthorRequest()
                 every { authorRepository.createAuthor(request) } returns 123 // TODO replace ktorm with exposed and change return type to bool
 
@@ -63,7 +63,7 @@ class AuthorizationServiceTest : BehaviorSpecUT({
             }
         }
 
-        and("weak password") {
+        When("provided with weak password") {
             val result = authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
 
             result.statusCode() shouldBe HttpStatusCode.BadRequest

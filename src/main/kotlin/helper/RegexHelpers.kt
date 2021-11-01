@@ -11,5 +11,6 @@ fun isEmailFormatted(email: String): Boolean {
 }
 
 fun maskEmail(email: String): String {
-    return email.replace("(^[^@]{3}|(?!^)\\G)[^@]", "$1*")
+    val maskEmailRegex = """(?<=.)[^@](?=[^@]*?@)|(?:(?<=@.)|(?!^)\\G(?=[^@]*$)).(?=.*[^@]\\.)""".toRegex()
+    return email.replace(maskEmailRegex, "*")
 }

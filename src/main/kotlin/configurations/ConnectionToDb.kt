@@ -12,6 +12,6 @@ class ConnectionToDb : KoinComponent, IConnectionToDb {
     override val database: Database = Database.connect(
         appEnv.dbConnection.getProperty("jdbcUrl"),
         user = appEnv.dbConnection.getProperty("username"),
-        password = appEnv.dbConnection.getProperty("password")
+        password = appEnv.dbConnection.getProperty("password"),
     )
 }

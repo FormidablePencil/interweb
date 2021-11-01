@@ -43,17 +43,14 @@ class AuthorizationService(
         if (!isEmailFormatted(request.email))
             return SignupResponse().failed(SignupResponseFailed.InvalidEmailFormat)
 
-        val f: SignupResponse = SignupResponse().failed(SignupResponseFailed.InvalidEmailFormat)
-
         if (authorRepository.getByEmail(request.email) is Author)
             return SignupResponse().failed(SignupResponseFailed.EmailTaken)
         if (authorRepository.getByUsername(request.username) is Author)
             return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
 
         connectionToDb.database.useTransaction {
-            val authorId = authorRepository.createAuthor(request) // TODO replace ktorm with exposed and change return type to bool
-            if (authorId !is Int)
-                throw ServerErrorException(ServerFailed.FailedToCreateAuthor, this::class.java)
+            val authorId = authorRepository.createAuthor(request)
+            authorId?: throw ServerErrorException(ServerFailed.FailedToCreateAuthor, this::class.java)
             passwordManager.setNewPassword(request.password) // TODO we really need to swap ktorm for exposed asap
             emailManager.sendValidateEmail(request.email)
             val tokens = tokenManager.generateTokens(authorId)
