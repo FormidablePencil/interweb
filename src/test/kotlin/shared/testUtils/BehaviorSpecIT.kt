@@ -23,29 +23,18 @@ open class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec()
     }
 }
 
-/** Rollback after test has run. */
-fun BehaviorSpecIT.rollbackGiven(name: String, code: suspend BehaviorSpecGivenContainerContext.() -> Unit) {
-    given(name) {
-        rollbackSuspend {
-            code()
-        }
-    }
-}
-
 /** If database was wiped the insertion will succeed therefore run the insertion again to test that it failed. */
-fun BehaviorSpecIT.testDupGiven(name: String, code: suspend BehaviorSpecGivenContainerContext.() -> Unit) {
-    given(name) {
-        shouldThrow<Exception> {
-            try {
-                code()
-            } catch (ex: Exception) {
-                throw Exception(ex)
-            }
-            try {
-                code()
-            } catch (ex: Exception) {
-                throw Exception(ex)
-            }
+suspend fun BehaviorSpecIT.testDuplicate(code: suspend () -> Unit) {
+    shouldThrow<Exception> {
+        try {
+            code()
+        } catch (ex: Exception) {
+            throw Exception(ex)
+        }
+        try {
+            code()
+        } catch (ex: Exception) {
+            throw Exception(ex)
         }
     }
 }

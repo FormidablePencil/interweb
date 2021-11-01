@@ -8,8 +8,8 @@ interface IRollback {
 }
 
 /** Rollback transaction wrapper for integration testing. */
-fun <T> IRollback.rollback(cleanup: Boolean = true, code: () -> T): T {
-    connectionToDb ?: throw Exception("rollback fun failed")
+fun <T> IRollback.rollbackDeprecated(cleanup: Boolean = true, code: () -> T): T {
+    connectionToDb ?: throw Exception("rollbackDeprecated fun failed")
     if (cleanup)
         connectionToDb!!.database.useTransaction {
             val result = code()
@@ -23,8 +23,8 @@ fun <T> IRollback.rollback(cleanup: Boolean = true, code: () -> T): T {
 
 /** Rollback transaction wrapper for repository unit tests which call the database and integration tests. One limitation
  *  is you cannot test inserting duplicate data because of how db transactions work. */
-suspend fun <T> IRollback.rollbackSuspend(cleanup: Boolean = true, code: suspend () -> T): T {
-    connectionToDb ?: throw Exception("rollback fun failed")
+suspend fun <T> IRollback.rollback(cleanup: Boolean = true, code: suspend () -> T): T {
+    connectionToDb ?: throw Exception("rollbackDeprecated fun failed")
     if (cleanup)
         connectionToDb!!.database.useTransaction {
             val result = code()

@@ -7,7 +7,7 @@ import io.ktor.http.*
 import org.koin.test.inject
 import services.AuthorizationService
 import shared.testUtils.BehaviorSpecIT
-import shared.testUtils.rollback
+import shared.testUtils.rollbackDeprecated
 
 class SignupFlow : BehaviorSpecIT() {
     private val authorizationService: AuthorizationService by inject()
@@ -17,14 +17,14 @@ class SignupFlow : BehaviorSpecIT() {
     )
 
     fun signup(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): SignupResponse {
-        return rollback(cleanup) {
+        return rollbackDeprecated(cleanup) {
             val result = authorizationService.signup(request)
 
             result.message() shouldBe HttpStatusCode.OK
 //            result.tokens.refreshToken.size shouldBeGreaterThan 0
 //            result.tokens.accessToken.size shouldBeGreaterThan 0
 
-            return@rollback result
-        }.value
+            return@rollbackDeprecated result
+        }
     }
 }
