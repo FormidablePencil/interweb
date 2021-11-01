@@ -8,7 +8,6 @@ import io.kotest.matchers.shouldBe
 @ExperimentalKotest
 class RegexHelpersKtTest : BehaviorSpec({
     given("isStrongPassword()") {
-
         When("weak password") {
             val weakPasswords = listOf(
                 "for", "formidable", "Formidable", "fo3", "formidable234",

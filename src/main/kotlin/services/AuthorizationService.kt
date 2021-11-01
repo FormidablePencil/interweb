@@ -12,7 +12,6 @@ import dtos.signup.SignupResponse
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
 import exceptions.ServerErrorException
-import exceptions.ServerFailed
 import helper.*
 import io.ktor.http.*
 import managers.interfaces.IEmailManager
@@ -50,7 +49,7 @@ class AuthorizationService(
 
         connectionToDb.database.useTransaction {
             val authorId = authorRepository.createAuthor(request)
-            authorId?: throw ServerErrorException(ServerFailed.FailedToCreateAuthor, this::class.java)
+            authorId?: throw ServerErrorException("Failed to create author", this::class.java)
             passwordManager.setNewPassword(request.password) // TODO we really need to swap ktorm for exposed asap
             emailManager.sendValidateEmail(request.email)
             val tokens = tokenManager.generateTokens(authorId)

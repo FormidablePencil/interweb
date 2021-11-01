@@ -3,7 +3,6 @@ package managers
 import configurations.interfaces.IConnectionToDb
 import dtos.authorization.ResetPasswordResponse
 import exceptions.ServerErrorException
-import exceptions.ServerFailed
 import helper.PassEncrypt
 import dtos.succeeded
 import io.ktor.http.*
@@ -36,7 +35,7 @@ class PasswordManager(
 
     override fun validatePassword(password: String, authorId: Int): Boolean {
         val passwordRecord = passwordRepository.getPassword(authorId)
-            ?: throw ServerErrorException(ServerFailed.FailedToRetrievePassword, this::class.java)
+            ?: throw ServerErrorException("Failed to retrieve password", this::class.java)
 
         return BCrypt.checkpw(password, passwordRecord.password)
     }

@@ -2,8 +2,6 @@ package routes
 
 import dtos.ApiDataResponse
 import exceptions.GenericError
-import exceptions.ServerErrorException
-import exceptions.httpRespond
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
@@ -16,11 +14,8 @@ suspend fun <Data, Enum, ClassExtendedFrom> routeRespond(
     try {
         val result = code()
         call.respond(result.statusCode()!!, result.message()!!)
-    } catch (ex: ServerErrorException) {
-        // todo log the exception
-        ex.httpRespond(call)
     } catch (ex: Exception) {
-        // todo log the exception
+        // todo log the exception if it isn't already being logged
         call.respond(HttpStatusCode.InternalServerError, GenericError.ServerError)
     }
 }
