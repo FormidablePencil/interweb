@@ -13,15 +13,15 @@ import repositories.interfaces.IRefreshTokenRepository
 class RefreshTokenRepository : RepositoryBase(), IRefreshTokenRepository {
     private val Database.token get() = this.sequenceOf(Tokens)
 
-    override fun insertToken(refreshToken: String, authorId: Int): Int {
+    override fun insertToken(refreshToken: String, authorId: Int): Boolean {
         return database.insert(Tokens) {
             set(it.refreshToken, refreshToken)
             set(it.authorId, authorId)
-        }
+        } != 0
     }
 
-    override fun deleteOldToken(authorId: Int): Int {
-        return database.delete(Tokens) { it.authorId eq authorId }
+    override fun deleteOldToken(authorId: Int): Boolean {
+        return database.delete(Tokens) { it.authorId eq authorId } != 0
     }
 
     override fun getTokenByAuthorId(authorId: Int): Token? {

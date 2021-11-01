@@ -15,8 +15,8 @@ class TokenManagerTest : BehaviorSpecUT({
     var refreshTokenRepository: IRefreshTokenRepository = mockk()
     val authorId = 321
 
-    every { refreshTokenRepository.deleteOldToken(authorId) } returns 1
-    every { refreshTokenRepository.insertToken(any(), authorId) } returns 1
+    every { refreshTokenRepository.deleteOldToken(authorId) } returns true
+    every { refreshTokenRepository.insertToken(any(), authorId) } returns true
 
     var tokenManager = TokenManager(refreshTokenRepository)
 

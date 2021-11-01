@@ -7,4 +7,7 @@ const val persistentId = 34
 //  when an error occurs concerning no author by id when running repo unit tests, write a suggestion
 //  to execute the program. - I could get to know python along the way.
 
+// TODO("Make password foreign key unique. InsertPassword() again should fail but doesn't.
+//  We could test off of one that already exists in database.")
+
 // todo - persist database for recovery purposes

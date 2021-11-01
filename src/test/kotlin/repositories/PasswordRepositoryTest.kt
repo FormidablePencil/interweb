@@ -18,10 +18,6 @@ class PasswordRepositoryTest : BehaviorSpecUtRepo({
     rollbackGiven("insertPassword()") {
         passwordRepository.insertPassword(passwordHash, authorId) shouldBe true
 
-        then("insertPassword() again, should fail") {
-            TODO()
-        }
-
         then("getPassword()") {
             val getPasswordRes = passwordRepository.getPassword(authorId)
                 ?: throw Exception("test failed")
