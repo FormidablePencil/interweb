@@ -1,4 +1,8 @@
 package shared.testUtils
 
-/** Integration testing class BehaviorSpecIT has all we need for unit testing repositories. */
-typealias BehaviorSpecUtRepo = BehaviorSpecIT
+/** Unit testing repositories class. */
+open class BehaviorSpecUtRepo(body: BehaviorSpecUtRepo.() -> Unit = {}): BehaviorSpecIT(), SqlColConstraint {
+    init {
+        body()
+    }
+}

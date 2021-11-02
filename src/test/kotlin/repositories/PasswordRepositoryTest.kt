@@ -8,6 +8,7 @@ import repositories.interfaces.IPasswordRepository
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.persistentId
 import shared.testUtils.rollback
+import shared.testUtils.whenUniqueConstraintDeprecated
 
 class PasswordRepositoryTest : BehaviorSpecUtRepo({
     val passwordRepository: IPasswordRepository = get()
@@ -29,6 +30,12 @@ class PasswordRepositoryTest : BehaviorSpecUtRepo({
             then("deletePassword()") {
                 passwordRepository.deletePassword(authorId) shouldBe true
             }
+        }
+    }
+
+    given("constraints") {
+        whenUniqueConstraintDeprecated("author_id") {
+            passwordRepository.insertPassword(passwordHash, 2) shouldBe true
         }
     }
 })
