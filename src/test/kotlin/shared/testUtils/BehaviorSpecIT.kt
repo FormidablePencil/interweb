@@ -9,6 +9,10 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 import shared.DITestHelper
 
+interface DoHaveDbConnection {
+    val connectionToDb: IConnectionToDb
+}
+
 /** For integration tests to extend Koin, Kotest.BehaviorSpec, and extension functions. */
 open class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoHaveDbConnection {
     override lateinit var connectionToDb: IConnectionToDb
@@ -38,5 +42,3 @@ suspend fun BehaviorSpecIT.whenUniqueConstraintDeprecated(constraintOn: String, 
         }
     }
 }
-
-

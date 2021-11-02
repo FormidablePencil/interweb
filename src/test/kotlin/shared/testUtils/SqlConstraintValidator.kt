@@ -1,6 +1,5 @@
 package shared.testUtils
 
-import configurations.interfaces.IConnectionToDb
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.scopes.BehaviorSpecGivenContainerContext
 
@@ -8,11 +7,8 @@ enum class SqlConstraint {
     SizeLimit, Unique, NotNull;
 }
 
-interface DoHaveDbConnection {
-    val connectionToDb: IConnectionToDb
-}
-
 /** To validate sql constraints. */
+// todo - write a test for this
 interface SqlColConstraint : DoHaveDbConnection {
     suspend fun BehaviorSpecGivenContainerContext.whenConstraint(
         constraint: SqlConstraint,

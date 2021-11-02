@@ -1,6 +1,5 @@
 package shared.testUtils
 
-
 /** Rollback transaction wrapper for integration testing. */
 fun <T> DoHaveDbConnection.rollbackDeprecated(cleanup: Boolean = true, code: () -> T): T {
     if (cleanup)
