@@ -45,21 +45,19 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
     }
 
     given("constraints") {
-//        whenConstraint(SqlConstraint.Unique, "username", 20) { x ->
-//            authorRepository.insertAuthor(genReq(username = x, email = "someEmail"))
-//        }
-//
-//        // do success and fail
-//        whenConstraint(SqlConstraint.Unique, "email", 20) { x ->
-//            authorRepository.insertAuthor(genReq(email = x, username = "someUsername"))
-//        }
-//
-//        // do success and fail
-//        whenConstraint(SqlConstraint.SizeLimit, "email VarChar(20)", 100) { x ->
-//            authorRepository.insertAuthor(genReq(email = x))
-//        }
+        whenConstraint(SqlConstraint.Unique, "username", null) {
+            authorRepository.insertAuthor(genReq(username = "username", email = "someEmail"))
+        } // todo - create validation with valikator
 
-        whenConstraint(SqlConstraint.SizeLimit, "username VarChar(15)", 10) { x ->
+        whenConstraint(SqlConstraint.Unique, "email", null) {
+            authorRepository.insertAuthor(genReq(email = "email", username = "someUsername"))
+        }
+
+        whenConstraint(SqlConstraint.MaxSize, "email", 100) { x ->
+            authorRepository.insertAuthor(genReq(email = x))
+        }
+
+        whenConstraint(SqlConstraint.MaxSize, "username", 15) { x ->
             authorRepository.insertAuthor(genReq(username = x))
         }
 
