@@ -1,4 +1,4 @@
-import com.jetbrains.handson.httpapi.module
+import com.idealIntent.module
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.junit.Test

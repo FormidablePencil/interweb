@@ -1,4 +1,4 @@
-package com.jetbrains.handson.httpapi
+package com.idealIntent
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm

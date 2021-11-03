@@ -4,8 +4,9 @@ plugins {
     id 'application'
 }
 
-group 'com.jetbrains.handson'
-version '1.0-SNAPSHOT'
+group 'com.idealIntent'
+version '0.0-SNAPSHOT'
+
 
 repositories {
     mavenCentral()
@@ -60,5 +61,5 @@ test {
 }
 
 application {
-    mainClassName = 'com.jetbrains.handson.httpapi.ApplicationKt'
+    mainClassName = 'com.idealIntent.ApplicationKt'
 }

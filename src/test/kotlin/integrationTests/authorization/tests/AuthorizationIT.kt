@@ -1,6 +1,6 @@
 package integrationTests.authorization.tests
 
-import com.jetbrains.handson.httpapi.module
+import com.idealIntent.module
 import configurations.DIHelper
 import dtos.author.CreateAuthorRequest
 import integrationTests.signup.flows.SignupFlow
