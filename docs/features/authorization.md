@@ -1,4 +1,4 @@
-## Authorization features
+# Authorization features
 
 - authorize restricted data with valid token from bearer
 - login to get access token (and refresh token)

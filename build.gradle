@@ -12,19 +12,23 @@ repositories {
 }
 
 dependencies {
-    // Ktor Api
+    // Ktor - api
     implementation "io.ktor:ktor-server-core:$ktor_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
     implementation "io.ktor:ktor-serialization:$ktor_version"
     testImplementation "io.ktor:ktor-server-test-host:$ktor_version"
 
-    // Ktorm Orm
+    // Kor auth = jwt
+    implementation "io.ktor:ktor-auth:$ktor_version"
+    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
+
+    // Ktorm - orm
     implementation group: 'org.ktorm', name: 'ktorm-core', version: ktorm_version
     implementation "org.ktorm:ktorm-core:$ktorm_version"
     implementation group: 'mysql', name: 'mysql-connector-java', version: mysql_connector_version
 
-    // Koin DI
+    // Koin - DI
     implementation "io.insert-koin:koin-ktor:$koin_version"
     implementation "io.insert-koin:koin-core:$koin_version"
     implementation 'org.junit.jupiter:junit-jupiter:5.7.0'
@@ -41,10 +45,6 @@ dependencies {
     testImplementation "io.kotest:kotest-assertions-core:$kotest_version"
     testImplementation "io.kotest:kotest-property:$kotest_version"
     testImplementation "io.kotest:kotest-framework-datatest:$kotest_version"
-
-    // Jwt auth
-    implementation "io.ktor:ktor-auth:$ktor_version"
-    implementation "io.ktor:ktor-auth-jwt:$ktor_version"
 }
 
 compileKotlin {

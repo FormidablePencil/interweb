@@ -1,4 +1,4 @@
-### The Vision
+# The Vision
 
 For people to do what they love to do and having only that to be a requirement to sustain themselves. This project is an
 attempt to make this a reality. The theory this project is based on is doing what you love manifests the likeness of
@@ -21,6 +21,7 @@ tailored for this use case then those people will reach out to you.
 
 #### Finding/matching people
 
+[Jump to authorization feature](features/authorization.md)
 - Different Author-Spaces you could create and organize for.
     - People visiting your profile could select what Author-Space to visit.
 - Take tinder as an example of matching algorithms.
