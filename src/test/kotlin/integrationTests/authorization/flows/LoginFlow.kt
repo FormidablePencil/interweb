@@ -1,12 +1,12 @@
 package integrationTests.authorization.flows
 
 import services.AuthorizationService
-import dtos.author.CreateAuthorRequest
 import dtos.authorization.LoginResponse
-import dtos.login.LoginByEmailRequest
 import integrationTests.signup.flows.SignupFlow
 import org.koin.test.KoinTest
 import org.koin.test.inject
+import serialized.CreateAuthorRequest
+import serialized.LoginByEmailRequest
 
 class LoginFlow : KoinTest {
     private val authorizationDomainService by inject<AuthorizationService>()

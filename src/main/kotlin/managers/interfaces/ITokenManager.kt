@@ -1,10 +1,9 @@
 package managers.interfaces
 
-import dtos.authorization.TokensResponse
-import dtos.token.responseData.TokenResponseData
+import dtos.token.responseData.ITokenResponseData
 import org.koin.core.component.KoinComponent
 
 interface ITokenManager : KoinComponent {
-    fun generateTokens(authorId: Int): TokenResponseData
-    fun refreshAccessToken(refreshToken: String, authorId: Int): TokenResponseData
+    fun generateTokens(authorId: Int): ITokenResponseData
+    fun refreshAccessToken(refreshToken: String, authorId: Int): ITokenResponseData
 }

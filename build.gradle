@@ -5,14 +5,17 @@ plugins {
 }
 
 group 'com.idealIntent'
-version '0.0-SNAPSHOT'
+version '1.0-SNAPSHOT'
 
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
+    compile "com.idealIntent:IW-data:1.0-SNAPSHOT"
+
     // Ktor - api
     implementation "io.ktor:ktor-server-core:$ktor_version"
     implementation "io.ktor:ktor-server-netty:$ktor_version"

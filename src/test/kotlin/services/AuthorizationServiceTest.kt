@@ -1,7 +1,5 @@
 package services
 
-import dtos.author.CreateAuthorRequest
-import dtos.login.LoginByEmailRequest
 import dtos.signup.SignupResponseFailed
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
@@ -15,6 +13,8 @@ import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.IEmailVerifyCodeRepository
+import serialized.CreateAuthorRequest
+import serialized.LoginByEmailRequest
 import shared.testUtils.BehaviorSpecUT
 
 class AuthorizationServiceTest : BehaviorSpecUT({

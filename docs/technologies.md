@@ -1,4 +1,4 @@
-# Technologies we are using
+# Technologies utilizing
 
 ### Ktor
 

@@ -75,7 +75,7 @@ class ApiResponseKtTest : BehaviorSpec({
             result.statusCode() shouldBe statusCode
             result.message().shouldBeEmpty()
 
-            val data = result.data?: throw Exception("test failed")
+            val data = result.data ?: throw Exception("test failed")
             data.sample shouldBe sample.sample
             data.example shouldBe sample.example
         }

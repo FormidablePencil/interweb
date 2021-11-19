@@ -12,7 +12,7 @@ tailored for this use case then those people will reach out to you.
 #### The intentions of an author on this platform to create and maintain their profile would be:
 
 - Find friends, find like-minded or those with similar interests.
-- Business ventures. Find those who with a Space(Author-Spaces) that's impressive to you and vise-verse, create and
+- Business ventures. Find those who with a Subject(Author-Spaces) that's impressive to you and vise-verse, create and
   organize your content that will appeal to those you are interested in.
 - Organize your content if you're a content creator like a youtuber or blog writer. - Platform might replace books some
   day.

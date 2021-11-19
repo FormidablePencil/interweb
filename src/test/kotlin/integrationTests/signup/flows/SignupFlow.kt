@@ -1,10 +1,10 @@
 package integrationTests.signup.flows
 
-import dtos.author.CreateAuthorRequest
 import dtos.signup.SignupResponse
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import org.koin.test.inject
+import serialized.CreateAuthorRequest
 import services.AuthorizationService
 import shared.testUtils.BehaviorSpecIT
 import shared.testUtils.rollbackDeprecated

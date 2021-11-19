@@ -2,7 +2,6 @@ package integrationTests.authorization.tests
 
 import com.idealIntent.module
 import configurations.DIHelper
-import dtos.author.CreateAuthorRequest
 import integrationTests.signup.flows.SignupFlow
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldNotBeGreaterThan
@@ -12,6 +11,7 @@ import io.ktor.server.testing.*
 import org.koin.core.context.startKoin
 import org.koin.test.get
 import org.koin.test.inject
+import serialized.CreateAuthorRequest
 import services.AuthorizationService
 import shared.testUtils.BehaviorSpecIT
 import shared.DITestHelper

@@ -1,7 +1,7 @@
 package repositories.interfaces
 
-import dtos.author.CreateAuthorRequest
 import models.profile.Author
+import serialized.CreateAuthorRequest
 
 interface IAuthorRepository {
     fun insertAuthor(request: CreateAuthorRequest): Int?

@@ -1,9 +1,9 @@
 package repositories
 
-import dtos.author.CreateAuthorRequest
 import io.kotest.matchers.shouldBe
 import org.koin.test.get
 import repositories.interfaces.IAuthorRepository
+import serialized.CreateAuthorRequest
 import shared.testUtils.*
 
 class AuthorRepositoryTest : BehaviorSpecUtRepo({

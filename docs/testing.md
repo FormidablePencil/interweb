@@ -17,7 +17,8 @@ There are unit tests, integration tests and user flows.
 #### Why validate sql column constraints in repository unit testing?
 - To keep http requests body validating in sync with sql column constraints. If column constraints changes then the request-body-validation will have to change, and if req-body-valid is not validating that the data matches the same constraints as in the db col then the test should fail given that there is one to make sure these two things are in sync.
 
-## Structures
+## Backend code structures
+
 ### Structure of unit tests  <!-- {docsify-ignore} -->
 - services
     - managers
@@ -30,3 +31,12 @@ There are unit tests, integration tests and user flows.
         - file name ends with Flows.kt
     - IntegrationTests(dir)
         - file name ends with IT.kt
+
+
+## Frontend code structure
+
+- Networking integration tests
+    - No mocking networking itself since there should be a very little amount of code in them.
+- Unit testing UI
+- Unit testing functionality code (like helpers and various other logic)
+- E2E testing & flows

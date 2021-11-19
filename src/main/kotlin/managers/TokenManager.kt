@@ -7,11 +7,12 @@ import configurations.interfaces.IConnectionToDb
 import dtos.authorization.TokensResponse
 import dtos.authorization.TokensResponseFailed
 import dtos.succeeded
-import dtos.token.responseData.TokenResponseData
+import dtos.token.responseData.ITokenResponseData
 import io.ktor.http.*
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
 import repositories.interfaces.IRefreshTokenRepository
+import serialized.TokenResponseData
 import java.util.*
 
 enum class KindOfTokens { AccessToken, RefreshToken }

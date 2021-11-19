@@ -12,8 +12,8 @@ import io.ktor.features.*
 import io.ktor.serialization.*
 import org.koin.core.context.startKoin
 import routes.registerAuthorRoutes
-import routes.registerCustomerRoutes
 import routes.registerAuthorizationRoutes
+import routes.registerCustomerRoutes
 import routes.registerOrderRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
@@ -58,10 +58,11 @@ fun Application.module(testing: Boolean = false) {
             realm = myRealm
             verifier(
                 JWT
-                .require(Algorithm.HMAC256(secret))
-                .withAudience(audience)
-                .withIssuer(issuer)
-                .build())
+                    .require(Algorithm.HMAC256(secret))
+                    .withAudience(audience)
+                    .withIssuer(issuer)
+                    .build()
+            )
             validate { credential ->
                 if (credential.payload.getClaim("authorId").asString() != "") {
                     JWTPrincipal(credential.payload)

@@ -3,10 +3,10 @@ package integrationTests.explore.flows
 import services.AuthorsPortfolioService
 import services.ExploreService
 import services.ThreadService
-import dtos.author.CreateAuthorRequest
 import integrationTests.signup.flows.SignupFlow
 import models.profile.Author
 import org.junit.Assert
+import serialized.CreateAuthorRequest
 
 class ExploreFlow(
     private val threadDomainService: ThreadService,

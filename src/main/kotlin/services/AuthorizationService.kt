@@ -1,12 +1,9 @@
 package services
 
 import configurations.interfaces.IConnectionToDb
-import dtos.author.CreateAuthorRequest
 import dtos.authorization.*
 import dtos.failed
 import dtos.login.LoginBy
-import dtos.login.LoginByEmailRequest
-import dtos.login.LoginByUsernameRequest
 import dtos.login.LoginRequest
 import dtos.signup.SignupResponse
 import dtos.signup.SignupResponseFailed
@@ -23,6 +20,9 @@ import org.koin.core.component.inject
 import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.IEmailVerifyCodeRepository
 import responseData.PasswordResetResponseData
+import serialized.CreateAuthorRequest
+import serialized.LoginByEmailRequest
+import serialized.LoginByUsernameRequest
 
 //private val logger = KotlinLogging.logger {}
 

@@ -1,40 +1,54 @@
 package routes
 
-import dtos.author.CreateAuthorRequest
-import services.AuthorizationService
-import dtos.login.LoginByEmailRequest
-import dtos.login.LoginByUsernameRequest
+import dtos.login.ILoginByUsernameRequest
 import io.ktor.application.*
-import io.ktor.auth.*
 import io.ktor.request.*
 import io.ktor.routing.*
+import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
+import serialized.CreateAuthorRequest
+import serialized.LoginByUsernameRequest
+import services.AuthorizationService
 
 fun Application.registerAuthorizationRoutes() {
     routing {
-        authenticate("auth-jwt") {
-            loginRoute()
-        }
+//        authenticate("auth-jwt") {
+        loginRoute()
+//        }
     }
 }
+
+
+
+//@Serializable
+//data class LoginByUsernameRequest2(val username: String, val password: String) {
+//    init {
+//        validate(this) {
+//            validate(LoginByUsernameRequest2::username).isNotBlank()
+//            validate(LoginByUsernameRequest2::password).hasSize(min = 3, max = 80)
+//        }
+//    }
+//}
 
 fun Route.loginRoute() {
     val authorizationService: AuthorizationService by inject()
 
     post("/signup") {
         val request = call.receive<CreateAuthorRequest>()
+        println(request)
         routeRespond(call) { authorizationService.signup(request) }
     }
 
-    post("/login:username") {
+    post("/login") {
         val request = call.receive<LoginByUsernameRequest>()
+        println(request)
         routeRespond(call) { authorizationService.login(request) }
     }
 
-    post("/login:email") {
-        val request = call.receive<LoginByEmailRequest>()
-        routeRespond(call) { authorizationService.login(request) }
-    }
+//    post("/login:email") {
+//        val request = call.receive<LoginByEmailRequest>()
+//        routeRespond(call) { authorizationService.login(request) }
+//    }
 
     post("/example") {
 //        try {
