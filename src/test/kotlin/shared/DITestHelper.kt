@@ -2,7 +2,6 @@ package shared
 
 import integrationTests.auth.flows.LoginFlow
 import integrationTests.authorization.flows.LoginFlowDeprecated
-import integrationTests.authorization.flows.TokenFlow
 import integrationTests.auth.flows.SignupFlow
 import org.koin.dsl.module
 import shared.mockFactories.appEnvMK
@@ -12,7 +11,6 @@ object DITestHelper {
     val FlowModule = module {
         single { LoginFlowDeprecated() }
         single { SignupFlow() }
-        single { TokenFlow() }
         single { LoginFlow() }
     }
 

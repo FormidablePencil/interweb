@@ -14,7 +14,7 @@ import shared.testUtils.rollback
 class SignupFlow : BehaviorSpecFlow() {
     private val authorizationService: AuthorizationService by inject()
     private val createAuthorRequest = CreateAuthorRequest(
-        "6saberryyTest1235@gmail.com", "CherryCas6as", "Alex", "Formidable!56", "Martini"
+        "6saberryyTest1235@gmail.com1", "CherryCas6as", "Alex", "Formidable!56", "Martini1"
     )
 
     suspend fun signup(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): SignupResponse {

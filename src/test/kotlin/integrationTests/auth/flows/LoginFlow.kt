@@ -19,7 +19,7 @@ class LoginFlow : BehaviorSpecFlow() {
     private val signupFlow: SignupFlow by inject()
 
     private val createAuthorRequest = CreateAuthorRequest(
-        "6saberryyTest1235@gmail.com", "CherryCas6as", "Alex", "Formidable!56", "Martini"
+        "6saberryyTest1235@gmail.com2", "CherryCas6as", "Alex", "Formidable!56", "Martinii"
     )
     private val loginByUsernameRequest = LoginByUsernameRequest(
         username = createAuthorRequest.username,

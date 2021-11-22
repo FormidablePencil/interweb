@@ -25,7 +25,6 @@ fun Application.module(testing: Boolean = false) {
     val port = applicationConfig.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
 
     startKoin {
-        // declare modules
         modules(
             DIHelper.CoreModule,
         )

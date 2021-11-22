@@ -11,8 +11,9 @@ import org.opentest4j.AssertionFailedError
 import serialized.CreateAuthorRequest
 import serialized.LoginByUsernameRequest
 import shared.testUtils.BehaviorSpecIT
+import kotlin.test.assertEquals
 
-class RouteTestingExample : BehaviorSpecIT({
+class ApiRequestIT : BehaviorSpecIT({
     val signupFlow: SignupFlow by inject()
     val loginFlow: LoginFlow by inject()
 
@@ -31,18 +32,15 @@ class RouteTestingExample : BehaviorSpecIT({
         stopKoin()
 
         withTestApplication({ module(testing = true) }) {
-            val f = handleRequest(HttpMethod.Get, "/order/2020-04-06-01") {
+            val res = handleRequest(HttpMethod.Get, "/order/2020-04-06-01") {
                 addHeader(HttpHeaders.Authorization, "Bearer ${tokens.accessToken}")
-
-//                assertEquals(
-//                    """{"number":"2020-04-06-01","contents":[{"item":"Ham Sandwich","amount":2,"price":5.5},{"item":"Water","amount":1,"price":1.5},{"item":"Beer","amount":3,"price":2.3},{"item":"Cheesecake","amount":1,"price":3.75}]}""",
-//                response.content
-//                )
-//                assertEquals(HttpStatusCode.OK, response.status())
             }
-            println(f.response.status())
-            println(f.response.content)
-            println(f)
+            assertEquals(
+                """{"number":"2020-04-06-01","contents":[{"item":"Ham Sandwich","amount":2,"price":5.5},{"item":"Water","amount":1,"price":1.5},{"item":"Beer","amount":3,"price":2.3},{"item":"Cheesecake","amount":1,"price":3.75}]}""",
+                res.response.content
+            )
+            println(res.response.status())
+            println(res.response.content)
         }
     }
 })

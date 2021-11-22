@@ -6,8 +6,8 @@ import configurations.interfaces.IAppEnv
 import configurations.interfaces.IConnectionToDb
 import dtos.authorization.TokensResponse
 import dtos.authorization.TokensResponseFailed
+import dtos.failed
 import dtos.succeeded
-import dtos.token.responseData.ITokenResponseData
 import io.ktor.http.*
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
@@ -23,12 +23,12 @@ class TokenManager(
     private val appEnv: IAppEnv by inject()
     private val connectionToDb: IConnectionToDb by inject()
 
-    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokenResponseData {
-        return TokenResponseData("", "")
-//        return if (!isRefreshTokenValid(refreshToken, authorId))
-//            TokensResponse().failed(TokensResponseFailed.InvalidRefreshToken)
-//        else
-//            TokensResponse().succeeded(HttpStatusCode.MultiStatus, generateTokens(authorId))
+    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
+        return if (isRefreshTokenValid(refreshToken, authorId)) {
+            val newTokens = generateTokens(authorId)
+            TokensResponse().succeeded(HttpStatusCode.Created, newTokens)
+        } else
+            TokensResponse().failed(TokensResponseFailed.InvalidRefreshToken)
     }
 
     override fun generateTokens(authorId: Int): TokenResponseData {
@@ -52,7 +52,7 @@ class TokenManager(
         val secret = appEnv.appConfig.property("jwt.secret").getString()
         val issuer = appEnv.appConfig.property("jwt.issuer").getString()
         val audience = appEnv.appConfig.property("jwt.audience").getString()
-        val myRealm = appEnv.appConfig.property("jwt.realm").getString()
+        val myRealm = appEnv.appConfig.property("jwt.realm").getString() // todo - what is this?
 
         val expire = when (kindOfToken) {
             KindOfTokens.RefreshToken -> 10000
@@ -65,6 +65,5 @@ class TokenManager(
             .withClaim("authorId", authorId)
             .withExpiresAt(Date(System.currentTimeMillis() + expire))
             .sign(Algorithm.HMAC256(secret))
-//        return hashMapOf("token" to token)
     }
 }

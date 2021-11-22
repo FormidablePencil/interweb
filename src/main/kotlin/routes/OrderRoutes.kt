@@ -9,11 +9,11 @@ import models.orderStorage
 
 fun Application.registerOrderRoutes() {
     routing {
-//        authenticate("auth-jwt") {
+        authenticate("auth-jwt") {
             listOrdersRoute()
             getOrderRoute()
             totalizeOrderRoute()
-//        }
+        }
     }
 }
 

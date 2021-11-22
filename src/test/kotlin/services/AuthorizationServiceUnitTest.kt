@@ -2,7 +2,9 @@ package services
 
 import dtos.authorization.LoginResponse
 import dtos.authorization.LoginResponseFailed
+import dtos.authorization.TokensResponse
 import dtos.signup.SignupResponseFailed
+import dtos.token.responseData.ITokenResponseData
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.mockk.*
@@ -18,7 +20,7 @@ import serialized.LoginByUsernameRequest
 import serialized.TokenResponseData
 import shared.testUtils.BehaviorSpecUT
 
-class AuthorizationServiceTest : BehaviorSpecUT({
+class AuthorizationServiceUnitTest : BehaviorSpecUT({
     val authorRepository: IAuthorRepository = mockk()
     val tokenManager: ITokenManager = mockk()
     val emailManager: IEmailManager = mockk()
@@ -33,6 +35,11 @@ class AuthorizationServiceTest : BehaviorSpecUT({
 
     val authorizationService =
         AuthorizationService(authorRepository, tokenManager, emailManager, passwordManager, emailVerifyCodeRepository)
+
+    fun validateTokens(data: ITokenResponseData) {
+        data.refreshToken shouldBe tokenResponseData.refreshToken
+        data.accessToken shouldBe tokenResponseData.accessToken
+    }
 
     beforeEach {
         clearAllMocks()
@@ -103,8 +110,7 @@ class AuthorizationServiceTest : BehaviorSpecUT({
             }
 
             result.statusCode() shouldBe HttpStatusCode.Created
-            result.data!!.refreshToken shouldBe tokenResponseData.refreshToken
-            result.data!!.accessToken shouldBe tokenResponseData.accessToken
+            validateTokens(result.data!!)
         }
     }
 
@@ -128,7 +134,6 @@ class AuthorizationServiceTest : BehaviorSpecUT({
                 result.message() shouldBe LoginResponseFailed.getMsg(LoginResponseFailed.InvalidEmail)
                 result.statusCode() shouldBe HttpStatusCode.BadRequest
             }
-
             then("when attempting to login by email") {
                 every { authorRepository.getByEmail(requestByEmail.email) } returns null
 
@@ -164,14 +169,25 @@ class AuthorizationServiceTest : BehaviorSpecUT({
         }
     }
 
-    xgiven("refreshAccessToken") { }
+    given("refreshAccessToken") {
+        then("provided valid refresh token") {
+            val tokenResponse = TokensResponse()
+            every { tokenManager.refreshAccessToken(tokenResponseData.refreshToken, authorId) } returns tokenResponse
+
+            val res = authorizationService.refreshAccessToken(tokenResponseData.refreshToken, authorId)
+
+            res shouldBe tokenResponse
+            verify(exactly = 1) { tokenManager.refreshAccessToken(tokenResponseData.refreshToken, authorId) }
+        }
+    }
 
     xgiven("requestPasswordReset") {
-
         then("valid email and email") {
-            val result = authorizationService.requestPasswordReset(username, email)
-        }
+            val res = authorizationService.requestPasswordReset(username, email)
 
+
+//            res.statusCode()
+        }
     }
 
     xgiven("setNewPasswordForSignup") { }

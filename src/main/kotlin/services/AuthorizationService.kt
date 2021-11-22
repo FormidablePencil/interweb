@@ -83,8 +83,7 @@ class AuthorizationService(
     }
 
     fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
-        val tokenResponseData = tokenManager.refreshAccessToken(refreshToken, authorId)
-        return TokensResponse().succeeded(HttpStatusCode.OK, tokenResponseData)
+        return tokenManager.refreshAccessToken(refreshToken, authorId)
     }
 
     fun requestPasswordReset(username: String?, email: String?): RequestPasswordResetResponse {

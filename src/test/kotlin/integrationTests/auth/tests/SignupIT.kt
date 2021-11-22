@@ -11,7 +11,7 @@ class SignupIT : BehaviorSpecIT({
     Given("valid credentials") {
         Then("return tokens and author id") {
             rollback {
-                val result = signupFlows.signup()
+                signupFlows.signup()
             }
         }
     }
