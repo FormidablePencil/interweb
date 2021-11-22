@@ -21,33 +21,15 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 fun Application.module(testing: Boolean = false) {
     log.info("Hello from module!")
 
-
     val applicationConfig = HoconApplicationConfig(ConfigFactory.load("application.conf"))
     val port = applicationConfig.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
 
-//    log
     startKoin {
         // declare modules
         modules(
             DIHelper.CoreModule,
         )
     }
-
-
-//    val database = Database.connect("", user = "", password = "")
-
-//    database.insert(Employees) {
-//        set(it.name, "jerry")
-//        set(it.job, "trainee")
-//        set(it.managerId, 1)
-//        set(it.hireDate, LocalDate.now())
-//        set(it.salary, 50)
-//        set(it.departmentId, 1)
-//    }
-//
-//    for (row in database.from(Employees).select()) {
-//        println(row[Employees.name])
-//    }
 
     val secret = applicationConfig.property("jwt.secret").getString()
     val issuer = applicationConfig.property("jwt.issuer").getString()

@@ -1,6 +1,7 @@
 package routes
 
 import io.ktor.application.*
+import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.routing.*
@@ -8,9 +9,11 @@ import models.orderStorage
 
 fun Application.registerOrderRoutes() {
     routing {
-        listOrdersRoute()
-        getOrderRoute()
-        totalizeOrderRoute()
+//        authenticate("auth-jwt") {
+            listOrdersRoute()
+            getOrderRoute()
+            totalizeOrderRoute()
+//        }
     }
 }
 

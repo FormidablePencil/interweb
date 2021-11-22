@@ -6,6 +6,7 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import org.koin.test.inject
+import org.opentest4j.AssertionFailedError
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -37,8 +38,8 @@ class LoginFlow : BehaviorSpecFlow() {
         data.accessToken.length.shouldBeGreaterThan(0)
     }
 
-    suspend fun login(): LoginResponse {
-        return loginByUsername()
+    suspend fun login(request: LoginByUsernameRequest): LoginResponse {
+        return loginByUsername(request)
     }
 
     suspend fun loginByUsername(
@@ -46,7 +47,13 @@ class LoginFlow : BehaviorSpecFlow() {
         cleanup: Boolean = false
     ): LoginResponse {
         return rollback(cleanup) {
-            signupFlow.signup(createAuthorRequest)
+            // attempt to log in first before creating an account
+            try {
+                val loginResult = authorizationService.login(request)
+                validateLoginResponse(loginResult)
+            } catch (ex: AssertionFailedError) {
+                signupFlow.signup(createAuthorRequest)
+            }
 
             val result = authorizationService.login(request)
 
@@ -60,7 +67,13 @@ class LoginFlow : BehaviorSpecFlow() {
         cleanup: Boolean = false
     ): LoginResponse {
         return rollback(cleanup) {
-            signupFlow.signup(createAuthorRequest)
+            try {
+                // attempt to log in first before creating an account
+                val loginResult = authorizationService.login(request)
+                validateLoginResponse(loginResult)
+            } catch (ex: AssertionFailedError) {
+                signupFlow.signup(createAuthorRequest)
+            }
 
             val result = authorizationService.login(request)
 

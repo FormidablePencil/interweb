@@ -1,11 +1,8 @@
 package routes
 
-import dtos.login.ILoginByUsernameRequest
 import io.ktor.application.*
-import io.ktor.auth.*
 import io.ktor.request.*
 import io.ktor.routing.*
-import kotlinx.serialization.Serializable
 import org.koin.ktor.ext.inject
 import serialized.CreateAuthorRequest
 import serialized.LoginByUsernameRequest
@@ -18,7 +15,6 @@ fun Application.registerAuthorizationRoutes() {
 //        }
     }
 }
-
 
 
 //@Serializable
