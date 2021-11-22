@@ -1,7 +1,10 @@
 package integrationTests.auth.flows
 
 import dtos.authorization.LoginResponse
+import exceptions.ServerErrorException
 import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.shouldBe
+import io.ktor.http.*
 import org.koin.test.inject
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
@@ -27,7 +30,9 @@ class LoginFlow : BehaviorSpecFlow() {
     )
 
     private fun validateLoginResponse(result: LoginResponse) {
-        val data = result.data ?: throw Exception()
+        result.statusCode() shouldBe HttpStatusCode.OK
+        val data = result.data
+            ?: throw ServerErrorException("Nothing returned after successful login", this::class.java)
         data.refreshToken.length.shouldBeGreaterThan(0)
         data.accessToken.length.shouldBeGreaterThan(0)
     }

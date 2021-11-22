@@ -1,5 +1,6 @@
 package shared
 
+import integrationTests.auth.flows.LoginFlow
 import integrationTests.authorization.flows.LoginFlowDeprecated
 import integrationTests.authorization.flows.TokenFlow
 import integrationTests.auth.flows.SignupFlow
@@ -12,6 +13,7 @@ object DITestHelper {
         single { LoginFlowDeprecated() }
         single { SignupFlow() }
         single { TokenFlow() }
+        single { LoginFlow() }
     }
 
     // There are dependencies that are injected not through the constructors therefore we can use koin to handle them
