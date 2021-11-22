@@ -40,3 +40,15 @@ There are unit tests, integration tests and user flows.
 - Unit testing UI
 - Unit testing functionality code (like helpers and various other logic)
 - E2E testing & flows
+
+## Frontend testing
+
+- E2E testing with playwright
+- snapshots with enzyme
+- unit testing pure logic with jest
+- unit testing the state of a component with enzyme
+
+### Playwright vs Jest
+
+The difference between these them is that Jest is for unit testing with a lot of functionality mocked 
+including http networking whereas PlayWright is for E2E which queries the database through http call to the server.

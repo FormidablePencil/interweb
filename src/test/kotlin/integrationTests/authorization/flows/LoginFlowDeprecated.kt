@@ -2,17 +2,17 @@ package integrationTests.authorization.flows
 
 import services.AuthorizationService
 import dtos.authorization.LoginResponse
-import integrationTests.signup.flows.SignupFlow
+import integrationTests.auth.flows.SignupFlow
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 
-class LoginFlow : KoinTest {
+class LoginFlowDeprecated : KoinTest {
     private val authorizationDomainService by inject<AuthorizationService>()
     private val signupFlows = SignupFlow()
 
-    fun signupAndLogin(): LoginResponse {
+    suspend fun signupAndLogin(): LoginResponse {
         // signup and login
         val createAuthorRequest = CreateAuthorRequest(
             "Formidable@78",

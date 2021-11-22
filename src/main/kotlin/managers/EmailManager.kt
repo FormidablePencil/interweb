@@ -16,10 +16,10 @@ class EmailManager(
         TODO()
     }
 
-    override fun sendValidateEmail(email: String) {
-        val code = genEmailVerifyCode(email)
-        emailValidationCodeRepository.insert(code)
-        TODO("create top level logic for it")
+    override fun welcomeNewAuthor(email: String) {
+//        val code = genEmailVerifyCode(email)
+//        emailValidationCodeRepository.insert(code)
+        // TODO("create top level logic for it")
     }
 
     private fun genEmailVerifyCode(email: String): String {

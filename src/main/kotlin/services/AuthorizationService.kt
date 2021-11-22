@@ -9,7 +9,9 @@ import dtos.signup.SignupResponse
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
 import exceptions.ServerErrorException
-import helper.*
+import helper.isEmailFormatted
+import helper.isStrongPassword
+import helper.maskEmail
 import io.ktor.http.*
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
@@ -49,11 +51,11 @@ class AuthorizationService(
         connectionToDb.database.useTransaction {
             val authorId = authorRepository.insertAuthor(request)
             authorId ?: throw ServerErrorException("Failed to create author", this::class.java)
-            passwordManager.setNewPassword(request.password, authorId) // TODO we really need to swap ktorm for exposed asap
-            emailManager.sendValidateEmail(request.email)
+            passwordManager.setNewPassword(request.password, authorId)
+            emailManager.welcomeNewAuthor(request.email)
             val tokens = tokenManager.generateTokens(authorId)
 
-            return SignupResponse().succeeded(HttpStatusCode.MultiStatus, tokens)
+            return SignupResponse().succeeded(HttpStatusCode.Created, tokens)
         }
     }
 
@@ -98,7 +100,7 @@ class AuthorizationService(
         } else
             return RequestPasswordResetResponse.failed(RequestPasswordResetResponseFailed.NeitherUsernameNorEmailProvided)
 
-        emailManager.sendValidateEmail(author.email)
+        emailManager.welcomeNewAuthor(author.email)
 
         val maskedEmail = maskEmail(author.email)
         return RequestPasswordResetResponse.succeeded(HttpStatusCode.OK, PasswordResetResponseData(maskedEmail))
@@ -123,7 +125,7 @@ class AuthorizationService(
                 ?: return LoginResponse().failed(LoginResponseFailed.InvalidUsername)
         }
 
-        if (passwordManager.validatePassword(request.password, author.id))
+        if (!passwordManager.validatePassword(request.password, author.id))
             return LoginResponse().failed(LoginResponseFailed.InvalidPassword)
 
         val tokenResponse = tokenManager.generateTokens(author.id)

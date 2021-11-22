@@ -2,7 +2,7 @@ package integrationTests.authorization.tests
 
 import com.idealIntent.module
 import configurations.DIHelper
-import integrationTests.signup.flows.SignupFlow
+import integrationTests.auth.flows.SignupFlow
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.ints.shouldNotBeGreaterThan
 import io.kotest.matchers.shouldBe
@@ -117,9 +117,9 @@ class GetTokensUponLogin : BehaviorSpecIT() {
                 "lastname", "password"
             )
 
-            val result = signupFlows.signup()
 
             Given("valid credentials") {
+                val result = signupFlows.signup()
                 Then("user should get tokens") {
                     loginRequest(createAuthorRequest.username, createAuthorRequest.password)
                     { status, content ->

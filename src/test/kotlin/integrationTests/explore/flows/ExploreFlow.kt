@@ -3,7 +3,7 @@ package integrationTests.explore.flows
 import services.AuthorsPortfolioService
 import services.ExploreService
 import services.ThreadService
-import integrationTests.signup.flows.SignupFlow
+import integrationTests.auth.flows.SignupFlow
 import models.profile.Author
 import org.junit.Assert
 import serialized.CreateAuthorRequest
@@ -14,7 +14,7 @@ class ExploreFlow(
     private val authorsPortfolioDomainService: AuthorsPortfolioService,
     private val signupFlows: SignupFlow,
 ) {
-    fun VisitAuthorsPortfolio_userflow() {
+    suspend fun VisitAuthorsPortfolio_userflow() {
         TODO()
 
         //region setup

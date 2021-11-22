@@ -26,6 +26,14 @@ open class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec()
     }
 }
 
+open class BehaviorSpecFlow(body: BehaviorSpecFlow.() -> Unit = {}) : KoinTest, DoHaveDbConnection {
+    override lateinit var connectionToDb: IConnectionToDb
+
+    init {
+        body()
+    }
+}
+
 suspend fun BehaviorSpecIT.whenUniqueConstraintDeprecated(constraintOn: String, code: suspend () -> Unit) {
     Given(constraintOn) {
         shouldThrow<Exception> {

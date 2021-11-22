@@ -1,4 +1,4 @@
-# Technologies utilizing
+## Backend technologies
 
 ### Ktor
 
@@ -47,3 +47,29 @@ Mock library for testing.
 https://kotest.io/
 
 Feature rich testing framework.
+
+## Frontend Web technologies
+
+### Playwright
+
+https://playwright.dev/
+
+End-to-end testing purposes. Nice thing about it is that it works for safari too.
+
+### Jest
+
+https://jestjs.io/
+
+Unit testing purposes.
+
+### Redux
+
+https://react-redux.js.org/
+
+state management.
+
+### Tailwind
+
+https://tailwindcss.com/
+
+A utility-first CSS framework.

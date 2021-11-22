@@ -1,5 +1,7 @@
 # Backend todos
 
+- password reset then reset tokens (just delete them from the db)
+
 ### Authentication
 
 - auth with credentials (login)

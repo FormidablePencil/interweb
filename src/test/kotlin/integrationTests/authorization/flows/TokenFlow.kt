@@ -8,7 +8,7 @@ import shared.testUtils.BehaviorSpecIT
 // shared - flows for integration tests, di
 
 class TokenFlow : BehaviorSpecIT() {
-    val loginFlow = LoginFlow()
+    val loginFlow = LoginFlowDeprecated()
 
     // Tests
     // refresh token fails if expired
@@ -25,7 +25,7 @@ class TokenFlow : BehaviorSpecIT() {
     // and if success then give access to restricted requested resources.
 
 
-    fun login() {
+    suspend fun login() {
         var result = loginFlow.signupAndLogin()
 
 //        result.tokens.RefreshToken.length shouldNotBe 0
@@ -33,7 +33,7 @@ class TokenFlow : BehaviorSpecIT() {
         // attempt to access data with tempered token and attempt to access another users resources
     }
 
-    fun expiredRefreshToken() {
+    suspend fun expiredRefreshToken() {
         // we can make http calls and dependency inject mocked version of dependencies to test the controllers
 
         //region setup
@@ -53,7 +53,7 @@ class TokenFlow : BehaviorSpecIT() {
 
 // convert to working format
 //class LoginTests : KoinFunSpec() {
-//    private val loginFlow by inject<LoginFlow>()
+//    private val loginFlow by inject<LoginFlowDeprecated>()
 //
 //    init {
 //        // about the tokens, verification of correction should be done by unit tests and mocks
