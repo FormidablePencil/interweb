@@ -22,6 +22,7 @@ class ApiRequestIT : BehaviorSpecIT({
             "someEmail@gmail.com123Hello", "Billy", "Bob", "Unforgettable!123", "EatIt"
         )
 
+        // first signup/login to get the tokens
         val result = try {
             loginFlow.login(LoginByUsernameRequest(createAuthorRequest.username, createAuthorRequest.password))
         } catch (ex: AssertionFailedError) {

@@ -21,7 +21,7 @@ class PasswordRepository : RepositoryBase(), IPasswordRepository {
     }
 
     override fun getPassword(authorId: Int): Password? {
-        return database.password.find() { it.authorId eq authorId }
+        return database.password.find { it.authorId eq authorId }
     }
 
     override fun deletePassword(authorId: Int): Boolean {

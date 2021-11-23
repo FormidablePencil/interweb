@@ -1,11 +1,18 @@
 package integrationTests.authorization.tests
 
+import com.auth0.jwt.JWT
+import dtos.authorization.TokensResponseFailed
 import dtos.token.responseData.ITokenResponseData
 import integrationTests.auth.flows.LoginFlow
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.shouldBe
+import io.ktor.http.*
 import org.koin.test.get
 import org.koin.test.inject
+import org.opentest4j.AssertionFailedError
+import serialized.CreateAuthorRequest
+import serialized.LoginByUsernameRequest
 import services.AuthorizationService
 import shared.testUtils.BehaviorSpecIT
 import shared.testUtils.rollback
@@ -40,23 +47,36 @@ class TokenIT : BehaviorSpecIT({
         }
     }
 
-    given("refresh tokens") {
-        then("with valid refresh token") {
-            // each device will have their own unique refresh token by adding a UUID...
-            // refresh access-token -> updates the expiration only to the refresh-token that corresponds header.id with token.id
-            // and updates in db and returns it to client
-            // Since every device has a unique refresh-token, the devices will not have access anymore when both tokens expire
-            // and when refreshing access-token, all the other tokens are not updated, the refresh-token in db with id corresponding
-            // with the provided valid refresh-token id value which we put in the beginning for this purpose
+    given("an initial refresh token") {
+        When("requested for new tokens") {
+            Then("initial refresh token should be denied and the new token should be accepted the next request for new tokens") {
+                val signupRequest = CreateAuthorRequest(
+                    "someEmail@gmail.com123Hello", "Billy", "Bob", "Unforgettable!123", "EatIt"
+                )
 
-            // todo
-            // first signup, then access restricted data with tokens given
-            // then request refresh tokens and try to access restricted data with old tokens and new tokens given
+                // first signup/login to get the initial tokens
+                // request new refresh tokens which should make initial tokens not valid anymore
+                val result = try {
+                    loginFlow.login(LoginByUsernameRequest(signupRequest.username, signupRequest.password))
+                } catch (ex: AssertionFailedError) {
+                    signupFlow.signup(signupRequest)
+                }
 
-            rollback {
-                val res = authorizationService.refreshAccessToken("refresh token", 1)
+                val initialAccessToken = result.data!!.accessToken
 
-                validateThatTokensReturned(res.data!!)
+                val authorId = JWT().decodeJwt(initialAccessToken).getClaim("authorId").asInt()
+
+                val refreshTokenResponse = authorizationService.refreshAccessToken(initialAccessToken, authorId)
+                val newAccessToken = refreshTokenResponse.data!!.accessToken
+
+                val attemptWithInitialTokenAgain = authorizationService.refreshAccessToken(initialAccessToken, authorId)
+
+                attemptWithInitialTokenAgain.statusCode() shouldBe HttpStatusCode.BadRequest
+                attemptWithInitialTokenAgain.message() shouldBe TokensResponseFailed.getMsg(TokensResponseFailed.InvalidRefreshToken)
+
+                val attemptWithNewToken = authorizationService.refreshAccessToken(newAccessToken, authorId)
+
+                attemptWithNewToken.statusCode() shouldBe HttpStatusCode.Created
             }
         }
     }
