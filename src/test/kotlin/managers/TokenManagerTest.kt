@@ -5,29 +5,31 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.typesafe.config.ConfigFactory
 import dtos.authorization.TokensResponseFailed
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.config.*
 import io.ktor.http.*
-import io.mockk.clearMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verifySequence
+import io.mockk.*
 import models.authorization.Token
 import repositories.interfaces.IRefreshTokenRepository
 import serialized.TokenResponseData
-import shared.testUtils.BehaviorSpecUT
+import shared.mockFactories.appEnvMK
+import shared.mockFactories.connectionToDbMK
 
-class TokenManagerTest : BehaviorSpecUT({
+class TokenManagerTest : BehaviorSpec({
     val refreshTokenRepository: IRefreshTokenRepository = mockk()
     val tokenDb: Token = mockk()
     val authorId = 321
     val tokens = TokenResponseData("access token", "refresh token")
 
-    val tokenManager = TokenManager(refreshTokenRepository)
+    val tokenManager = spyk(TokenManager(refreshTokenRepository))
 
     beforeEach {
         clearMocks(refreshTokenRepository, tokenDb)
+
+        every { tokenManager getProperty "connectionToDb" } returns connectionToDbMK()
+        every { tokenManager getProperty "appEnv" } returns appEnvMK()
 
         every { refreshTokenRepository.deleteOldToken(authorId) } returns true
         every { refreshTokenRepository.insertToken(any(), authorId) } returns true

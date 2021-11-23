@@ -13,6 +13,9 @@ import helper.isEmailFormatted
 import helper.isStrongPassword
 import helper.maskEmail
 import io.ktor.http.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
@@ -26,7 +29,16 @@ import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
 
-//private val logger = KotlinLogging.logger {}
+
+fun main() {
+    // how do I make this code run in parallel
+    runBlocking {
+        delay(2000L)
+            print(1)
+    }
+    print(2)
+
+}
 
 class AuthorizationService(
     private val authorRepository: IAuthorRepository,
@@ -35,7 +47,7 @@ class AuthorizationService(
     private val passwordManager: IPasswordManager,
     private val emailVerifyCodeRepository: IEmailVerifyCodeRepository,
 ) : KoinComponent {
-    private val connectionToDb: IConnectionToDb by inject();
+    private val connectionToDb: IConnectionToDb by inject()
 
     fun signup(request: CreateAuthorRequest): SignupResponse {
         if (!isStrongPassword(request.password))

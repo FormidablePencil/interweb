@@ -4,7 +4,9 @@ import io.kotest.matchers.shouldBe
 import org.koin.test.get
 import repositories.interfaces.IAuthorRepository
 import serialized.CreateAuthorRequest
-import shared.testUtils.*
+import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.SqlConstraint
+import shared.testUtils.rollback
 
 class AuthorRepositoryTest : BehaviorSpecUtRepo({
     val authorRepository: IAuthorRepository = get()
@@ -15,7 +17,9 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
         firstname: String = "firstname",
         lastname: String = "lastname",
         password: String = "password"
-    ) = CreateAuthorRequest(username, email, firstname, lastname, password)
+    ) = CreateAuthorRequest(
+        username = username, email = email, firstname = firstname, lastname = lastname, password = password
+    )
 
     given("insertAuthor()") {
         rollback {

@@ -1,4 +1,4 @@
-package integrationTests.authorization.tests
+package integrationTests.auth.tests
 
 import com.auth0.jwt.JWT
 import dtos.authorization.TokensResponseFailed
@@ -8,6 +8,7 @@ import integrationTests.auth.flows.SignupFlow
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
+import kotlinx.coroutines.delay
 import org.koin.test.get
 import org.koin.test.inject
 import org.opentest4j.AssertionFailedError
@@ -54,27 +55,31 @@ class TokenIT : BehaviorSpecIT({
                     "someEmail@gmail.com123Hello", "Billy", "Bob", "Unforgettable!123", "EatIt"
                 )
 
-                // first signup/login to get the initial tokens
-                // request new refresh tokens which should make initial tokens not valid anymore
+                // firstly, signup/login to get the initial tokens
+                // then request new refresh tokens. The initial tokens should now be invalid and replaced with the new
                 val result = try {
                     loginFlow.login(LoginByUsernameRequest(signupRequest.username, signupRequest.password))
                 } catch (ex: AssertionFailedError) {
                     signupFlow.signup(signupRequest)
                 }
 
-                val initialAccessToken = result.data!!.accessToken
+                delay(1000L) // jwt token generator for some reason needs a delay or else it'll generate same as previous one
 
-                val authorId = JWT().decodeJwt(initialAccessToken).getClaim("authorId").asInt()
+                val InvalidRefreshToken = result.data!!.refreshToken
 
-                val refreshTokenResponse = authorizationService.refreshAccessToken(initialAccessToken, authorId)
-                val newAccessToken = refreshTokenResponse.data!!.accessToken
+                val authorId = JWT().decodeJwt(InvalidRefreshToken).getClaim("authorId").asInt()
 
-                val attemptWithInitialTokenAgain = authorizationService.refreshAccessToken(initialAccessToken, authorId)
+                val refreshTokenResponse = authorizationService.refreshAccessToken(InvalidRefreshToken, authorId)
+                refreshTokenResponse.statusCode() shouldBe HttpStatusCode.Created
+                val newRefreshToken = refreshTokenResponse.data!!.refreshToken
+
+                val attemptWithInitialTokenAgain =
+                    authorizationService.refreshAccessToken(InvalidRefreshToken, authorId)
 
                 attemptWithInitialTokenAgain.statusCode() shouldBe HttpStatusCode.BadRequest
                 attemptWithInitialTokenAgain.message() shouldBe TokensResponseFailed.getMsg(TokensResponseFailed.InvalidRefreshToken)
 
-                val attemptWithNewToken = authorizationService.refreshAccessToken(newAccessToken, authorId)
+                val attemptWithNewToken = authorizationService.refreshAccessToken(newRefreshToken, authorId)
 
                 attemptWithNewToken.statusCode() shouldBe HttpStatusCode.Created
             }
@@ -84,20 +89,26 @@ class TokenIT : BehaviorSpecIT({
     given("reset password") {
         then("with valid password provided") {
             // todo
-            // first signup, then access restricted data with tokens given
-            // then reset password and try to access restricted data with old tokens and new tokens given
+            // firstly signup/login to get new tokens
+
+            // attempt to access a restricted resource with given tokens
+
+            // then reset password which should delete all tokens
+
+            // and try again to access a restricted resource
+
         }
     }
 
-    given("requested sign out in all devices") {
+    given("requested sign out of all devices") {
         then("with valid password provided") {
+            // todo
+            // save as reset password except there's no password reset
 
         }
     }
 
-    xgiven("sign out specific device") {
-        then("with valid password provided") {
-            // todo - create a sign from specified devices
-        }
-    }
+    // todo
+    // reset password
+    // sign out of all devices (show all devices that are signed in)
 })

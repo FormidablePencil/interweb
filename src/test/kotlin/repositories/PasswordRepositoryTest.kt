@@ -16,7 +16,8 @@ class PasswordRepositoryTest : BehaviorSpecUtRepo({
     val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
     val authorId = persistentId
 
-    given("insertPassword()") {
+    // todo - how are we going to go about testing repositories?
+    xgiven("insertPassword()") {
         rollback {
             passwordRepository.insertPassword(passwordHash, authorId) shouldBe true
 

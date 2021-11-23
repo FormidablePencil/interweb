@@ -8,6 +8,7 @@ import dtos.authorization.TokensResponse
 import dtos.authorization.TokensResponseFailed
 import dtos.failed
 import dtos.succeeded
+import dtos.token.responseData.ITokenResponseData
 import io.ktor.http.*
 import managers.interfaces.ITokenManager
 import org.koin.core.component.inject
@@ -40,12 +41,11 @@ class TokenManager(
             refreshTokenRepository.insertToken(refreshToken, authorId)
         }
 
-        return TokenResponseData(refreshToken, accessToken)
+        return TokenResponseData(refreshToken = refreshToken, accessToken = accessToken)
     }
 
     private fun isRefreshTokenValid(refreshToken: String, authorId: Int): Boolean {
-        val tokensDb = refreshTokenRepository.getTokenByAuthorId(authorId)
-        return tokensDb?.refreshToken == refreshToken
+        return refreshTokenRepository.getTokenByAuthorId(authorId)?.refreshToken == refreshToken
     }
 
     private fun generateToken(authorId: Int, kindOfToken: KindOfTokens): String {

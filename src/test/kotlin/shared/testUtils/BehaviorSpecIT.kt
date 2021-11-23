@@ -5,6 +5,7 @@ import configurations.interfaces.IConnectionToDb
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 import shared.DITestHelper
@@ -14,13 +15,24 @@ interface DoHaveDbConnection {
 }
 
 /** For integration tests to extend Koin, Kotest.BehaviorSpec, and extension functions. */
-open class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoHaveDbConnection {
+abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoHaveDbConnection {
     override lateinit var connectionToDb: IConnectionToDb
 
     init {
-        startKoin {
-            modules(DIHelper.CoreModule, DITestHelper.FlowModule)
+        try {
+            startKoin {
+                modules(DIHelper.CoreModule, DITestHelper.FlowModule)
+            }
+        } catch (ex: Exception) {
         }
+
+        afterEach {
+            stopKoin()
+            startKoin {
+                modules(DIHelper.CoreModule, DITestHelper.FlowModule)
+            }
+        }
+
         connectionToDb = get()
         body()
     }

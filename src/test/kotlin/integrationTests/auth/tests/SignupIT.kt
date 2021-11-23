@@ -6,12 +6,12 @@ import shared.testUtils.BehaviorSpecIT
 import shared.testUtils.rollback
 
 class SignupIT : BehaviorSpecIT({
-    val signupFlows: SignupFlow by inject()
+    val signupFlow: SignupFlow by inject()
 
     Given("valid credentials") {
         Then("return tokens and author id") {
             rollback {
-                signupFlows.signup()
+                signupFlow.signup()
             }
         }
     }

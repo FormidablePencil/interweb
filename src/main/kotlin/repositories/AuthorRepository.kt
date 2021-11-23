@@ -6,6 +6,7 @@ import models.profile.Authors
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insertAndGenerateKey
+// todo - replace findLast with find and run the tests
 import org.ktorm.entity.find
 import org.ktorm.entity.findLast
 import org.ktorm.entity.sequenceOf

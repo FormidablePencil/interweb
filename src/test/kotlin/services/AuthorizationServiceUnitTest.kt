@@ -5,6 +5,7 @@ import dtos.authorization.LoginResponseFailed
 import dtos.authorization.TokensResponse
 import dtos.signup.SignupResponseFailed
 import dtos.token.responseData.ITokenResponseData
+import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.mockk.*
@@ -18,9 +19,9 @@ import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
 import serialized.TokenResponseData
-import shared.testUtils.BehaviorSpecUT
+import shared.mockFactories.connectionToDbMK
 
-class AuthorizationServiceUnitTest : BehaviorSpecUT({
+class AuthorizationServiceUnitTest : BehaviorSpec({
     val authorRepository: IAuthorRepository = mockk()
     val tokenManager: ITokenManager = mockk()
     val emailManager: IEmailManager = mockk()
@@ -33,8 +34,15 @@ class AuthorizationServiceUnitTest : BehaviorSpecUT({
     val authorId = 3
     val tokenResponseData = TokenResponseData("access token", "refresh token")
 
-    val authorizationService =
-        AuthorizationService(authorRepository, tokenManager, emailManager, passwordManager, emailVerifyCodeRepository)
+    val authorizationService = spyk(
+        AuthorizationService(
+            authorRepository,
+            tokenManager,
+            emailManager,
+            passwordManager,
+            emailVerifyCodeRepository
+        )
+    )
 
     fun validateTokens(data: ITokenResponseData) {
         data.refreshToken shouldBe tokenResponseData.refreshToken
@@ -44,6 +52,7 @@ class AuthorizationServiceUnitTest : BehaviorSpecUT({
     beforeEach {
         clearAllMocks()
 
+        every { authorizationService getProperty "connectionToDb" } returns connectionToDbMK()
         every { author.id } returns authorId
     }
 
