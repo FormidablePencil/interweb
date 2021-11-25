@@ -5,6 +5,7 @@ import dtos.authorization.*
 import dtos.failed
 import dtos.login.LoginBy
 import dtos.login.LoginRequest
+import dtos.responseData.PasswordResetResponseData
 import dtos.signup.SignupResponse
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
@@ -24,7 +25,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import repositories.interfaces.IAuthorRepository
 import repositories.interfaces.IEmailVerifyCodeRepository
-import responseData.PasswordResetResponseData
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -33,11 +33,12 @@ import serialized.LoginByUsernameRequest
 fun main() {
     // how do I make this code run in parallel
     runBlocking {
-        delay(2000L)
+        launch {
+            delay(2000L)
             print(1)
+        }
+        print(2)
     }
-    print(2)
-
 }
 
 class AuthorizationService(
@@ -57,14 +58,14 @@ class AuthorizationService(
 
         if (authorRepository.getByEmail(request.email) is Author)
             return SignupResponse().failed(SignupResponseFailed.EmailTaken)
-        if (authorRepository.getByUsername(request.username) is Author)
+        if (authorRepository.getIdByUsername(request.username) is Author)
             return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
 
         connectionToDb.database.useTransaction {
             val authorId = authorRepository.insertAuthor(request)
             authorId ?: throw ServerErrorException("Failed to create author", this::class.java)
             passwordManager.setNewPassword(request.password, authorId)
-            emailManager.welcomeNewAuthor(request.email)
+            emailManager.welcomeNewAuthor(authorId)
             val tokens = tokenManager.generateTokens(authorId)
 
             return SignupResponse().succeeded(HttpStatusCode.Created, tokens)
@@ -98,41 +99,40 @@ class AuthorizationService(
         return tokenManager.refreshAccessToken(refreshToken, authorId)
     }
 
-    fun requestPasswordReset(username: String?, email: String?): RequestPasswordResetResponse {
-        val author: Author?
-
-        // todo refactor to use a where. logic does it well
-        if (!username.isNullOrEmpty()) {
-            author = authorRepository.getByUsername(username)
-            if (author !is Author) return RequestPasswordResetResponse.failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenUsername)
-        } else if (!email.isNullOrEmpty()) {
-            author = authorRepository.getByEmail(email)
-            if (author !is Author) return RequestPasswordResetResponse.failed(RequestPasswordResetResponseFailed.AccountNotFoundByGivenEmail)
-        } else
-            return RequestPasswordResetResponse.failed(RequestPasswordResetResponseFailed.NeitherUsernameNorEmailProvided)
-
-        emailManager.welcomeNewAuthor(author.email)
-
-        val maskedEmail = maskEmail(author.email)
-        return RequestPasswordResetResponse.succeeded(HttpStatusCode.OK, PasswordResetResponseData(maskedEmail))
+    // todo - reset password with current password
+    fun resetPassword(currentPassword: String, newPassword: String) {
 
     }
 
-    fun resetPasswordByEmail(oldPassword: String, newPassword: String, emailCode: String): ResetPasswordResponse {
+    fun requestPasswordResetThroughVerifiedEmail(authorId: Int): RequestPasswordResetResponse = runBlocking {
+        val email = authorRepository.getById(authorId)?.email
+            ?: throw ServerErrorException("author must exist but doesn't.", this::class.java)
+
+        launch {
+            emailManager.sendResetPasswordLink(authorId)
+        }
+        return@runBlocking RequestPasswordResetResponse().succeeded(
+            HttpStatusCode.OK,
+            PasswordResetResponseData(maskEmail(email))
+        )
+    }
+
+    // todo - reset password through verified simpleEmail
+    fun resetPasswordWithEmailCode(newPassword: String, emailCode: String): ResetPasswordResponse {
 
         TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
 
-        // get authorId base off of emailCode - I wonder if the email getStatusCode is a jwt token??? - It could work
+        // get authorId base off of emailCode - I wonder if the simpleEmail getStatusCode is a jwt token??? - It could work
         val authorId = 1
 
-        return passwordManager.resetPassword(oldPassword, newPassword, authorId)
+//        return passwordManager.resetPassword(oldPassword, newPassword, authorId)
     }
 
     private fun login(request: LoginRequest): LoginResponse {
         val author = when (request.loginBy) {
             LoginBy.Email -> authorRepository.getByEmail(request.credential)
                 ?: return LoginResponse().failed(LoginResponseFailed.InvalidEmail)
-            LoginBy.Username -> authorRepository.getByUsername(request.credential)
+            LoginBy.Username -> authorRepository.getIdByUsername(request.credential)
                 ?: return LoginResponse().failed(LoginResponseFailed.InvalidUsername)
         }
 

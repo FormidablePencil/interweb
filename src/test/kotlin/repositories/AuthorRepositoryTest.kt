@@ -13,7 +13,7 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
 
     fun genReq(
         username: String = "username",
-        email: String = "email",
+        email: String = "simpleEmail",
         firstname: String = "firstname",
         lastname: String = "lastname",
         password: String = "password"
@@ -38,8 +38,8 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
                 authorGotByEmail.lastname shouldBe request.lastname
             }
 
-            then("getByUsername()") {
-                authorRepository.getByUsername(request.username) ?: throw Exception("test failed")
+            then("getIdByUsername()") {
+                authorRepository.getIdByUsername(request.username) ?: throw Exception("test failed")
             }
 
             then("getById()") {
@@ -53,11 +53,11 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
             authorRepository.insertAuthor(genReq(username = "username", email = "someEmail"))
         } // todo - create validation with valikator
 
-        whenConstraint(SqlConstraint.Unique, "email", null) {
-            authorRepository.insertAuthor(genReq(email = "email", username = "someUsername"))
+        whenConstraint(SqlConstraint.Unique, "simpleEmail", null) {
+            authorRepository.insertAuthor(genReq(email = "simpleEmail", username = "someUsername"))
         }
 
-        whenConstraint(SqlConstraint.MaxSize, "email", 100) { x ->
+        whenConstraint(SqlConstraint.MaxSize, "simpleEmail", 100) { x ->
             authorRepository.insertAuthor(genReq(email = x))
         }
 

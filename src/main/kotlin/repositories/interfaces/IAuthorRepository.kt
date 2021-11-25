@@ -7,5 +7,5 @@ interface IAuthorRepository {
     fun insertAuthor(request: CreateAuthorRequest): Int?
     fun getByEmail(email: String): Author?
     fun getById(authorId: Int): Author?
-    fun getByUsername(username: String): Author?
+    fun getIdByUsername(username: String): Author?
 }

@@ -2,7 +2,7 @@ package managers
 
 import managers.interfaces.IUserStaticManager
 
-// a class inherited by every manager for saving email
+// a class inherited by every manager for saving simpleEmail
 open class OwnerOrViewManager : IUserStaticManager {
     val requesterUsername: String = ""
     var requesterId: Int = 0

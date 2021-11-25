@@ -42,7 +42,7 @@ fun Route.loginRoute() {
         routeRespond(call) { authorizationService.login(request) }
     }
 
-//    post("/login:email") {
+//    post("/login:simpleEmail") {
 //        val request = call.receive<LoginByEmailRequest>()
 //        routeRespond(call) { authorizationService.login(request) }
 //    }
@@ -51,7 +51,7 @@ fun Route.loginRoute() {
 //        try {
 //            val user = call.receive<LoginByEmailRequest>()
 //            // return access token (expires in 15 minutes) and a refresh token (expires in 30days)
-//            var token = authorizationService.login(user.email, user.password)
+//            var token = authorizationService.login(user.simpleEmail, user.password)
 //            call.respond(token)
 ////        call.respond(hashMapOf("token" to token))
 //        } catch (ex: ConstraintViolationException) {

@@ -19,7 +19,7 @@ class ExploreFlow(
 
         //region setup
         val createAuthorRequest = CreateAuthorRequest(
-            "username", "email", "firstname",
+            "username", "simpleEmail", "firstname",
             "lastname", "password"
         )
 

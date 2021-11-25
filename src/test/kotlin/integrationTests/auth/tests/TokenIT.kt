@@ -100,7 +100,7 @@ class TokenIT : BehaviorSpecIT({
         }
     }
 
-    given("requested sign out of all devices") {
+    given("sign out of all devices") {
         then("with valid password provided") {
             // todo
             // save as reset password except there's no password reset

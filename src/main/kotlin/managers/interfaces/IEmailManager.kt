@@ -1,6 +1,7 @@
 package managers.interfaces
 
 interface IEmailManager {
-    fun sendResetPassword(userId: Int)
-    fun welcomeNewAuthor(email: String)
+    fun welcomeNewAuthor(authorId: Int)
+    suspend fun sendResetPasswordLink(authorId: Int)
+    fun sendValidateEmail(authorId: Int)
 }

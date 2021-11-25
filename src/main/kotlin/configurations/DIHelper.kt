@@ -11,6 +11,7 @@ import managers.TokenManager
 import managers.interfaces.IEmailManager
 import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
+import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import repositories.AuthorRepository
 import repositories.EmailVerifyCodeRepository
@@ -52,6 +53,7 @@ object DIHelper {
         single<IAppEnv> { AppEnv(appConfig, dbConnection) }
 
         // other
-        single<IConnectionToDb> { ConnectionToDb() } //database access
+        single<IConnectionToDb> { ConnectionToDb() } // database access
+        single { SimpleEmail() } // e-mailer
     }
 }

@@ -12,6 +12,10 @@
 
 Unit test each piece, create feature flows and test validation with the sql constraint test helpers.
 
+###### Integration tests
+
+- SendingEmailIT?
+
 ### Documentation
 
 I want to cover everything we use because these things will be use repetitively

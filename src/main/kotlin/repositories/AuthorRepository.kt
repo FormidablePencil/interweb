@@ -6,9 +6,7 @@ import models.profile.Authors
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insertAndGenerateKey
-// todo - replace findLast with find and run the tests
 import org.ktorm.entity.find
-import org.ktorm.entity.findLast
 import org.ktorm.entity.sequenceOf
 import repositories.interfaces.IAuthorRepository
 import serialized.CreateAuthorRequest
@@ -27,14 +25,14 @@ open class AuthorRepository : RepositoryBase(), IAuthorRepository {
     }
 
     override fun getByEmail(email: String): Author? {
-        return database.author.findLast { it.email eq email }
+        return database.author.find { it.email eq email }
     }
 
-    override fun getByUsername(username: String): Author? {
-        return database.author.findLast { it.username eq username }
+    override fun getIdByUsername(username: String): Author? {
+        return database.author.find { it.username eq username }
     }
 
     override fun getById(authorId: Int): Author? {
-        return database.author.findLast { it.id eq authorId }
+        return database.author.find { it.id eq authorId }
     }
 }

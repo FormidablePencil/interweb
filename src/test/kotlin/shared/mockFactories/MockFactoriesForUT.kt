@@ -6,6 +6,7 @@ import configurations.interfaces.IConnectionToDb
 import io.ktor.config.*
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 
 fun connectionToDbMK(): IConnectionToDb {
     val mock = mockk<IConnectionToDb>(relaxed = true)
@@ -23,7 +24,9 @@ fun connectionToDbMK(): IConnectionToDb {
 fun appEnvMK(): IAppEnv {
     val mock = mockk<IAppEnv>()
 
-    every { mock.appConfig } returns HoconApplicationConfig(ConfigFactory.load("application.conf"))
+    val configs = HoconApplicationConfig(ConfigFactory.load())
+
+    every { mock.appConfig } returns configs
 
     return mock
 }
