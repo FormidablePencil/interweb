@@ -14,11 +14,11 @@ import managers.interfaces.ITokenManager
 import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import repositories.AuthorRepository
-import repositories.EmailVerifyCodeRepository
+import repositories.EmailRepository
 import repositories.PasswordRepository
 import repositories.RefreshTokenRepository
 import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailVerifyCodeRepository
+import repositories.interfaces.IEmailRepository
 import repositories.interfaces.IPasswordRepository
 import repositories.interfaces.IRefreshTokenRepository
 import services.AuthorizationService
@@ -37,7 +37,7 @@ object DIHelper {
         single<ITokenManager> { TokenManager(get()) }
         single<IPasswordManager> { PasswordManager(get(), get(), get()) }
         single<IEmailManager> { EmailManager(get(), get()) }
-        single<IEmailVerifyCodeRepository> { EmailVerifyCodeRepository() }
+        single<IEmailRepository> { EmailRepository() }
 
         // repositories
         single<IAuthorRepository> { AuthorRepository() }

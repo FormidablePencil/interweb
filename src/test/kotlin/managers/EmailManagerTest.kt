@@ -11,7 +11,7 @@ import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailVerifyCodeRepository
+import repositories.interfaces.IEmailRepository
 import staticData.EmailMessages
 import staticData.IEmailMsgStructure
 
@@ -30,7 +30,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
     )
 
     init {
-        val emailVerifyCodeRepository: IEmailVerifyCodeRepository = mockk(relaxed = true)
+        val emailRepository: IEmailRepository = mockk(relaxed = true)
         val authorRepository: IAuthorRepository = mockk()
         val authorId = 0
         val author: Author = mockk()
@@ -62,7 +62,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
             every { author.id } returns authorId
             every { authorRepository.getById(authorId) } returns author
 
-            emailManager = spyk(EmailManager(emailVerifyCodeRepository, authorRepository), recordPrivateCalls = true)
+            emailManager = spyk(EmailManager(emailRepository, authorRepository), recordPrivateCalls = true)
 
             verifyInstantiation()
         }
@@ -86,8 +86,8 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
 
                 verifyOrder {
                     authorRepository.getById(authorId)
-                    appEnv.getConfig("jwt.secret")
-                    emailVerifyCodeRepository.insert(any())
+                    appEnv.getConfig("jwt.emailSecret")
+                    emailRepository.insertResetPasswordCode(any(), authorId)
                     sendEmailVerificationOrder(passwordResetMsg)
                 }
             }
@@ -108,7 +108,16 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
 
         given("sendValidateEmail") {
             then("send validation code to email") {
+                val verifyEmailMsg = EmailMessages.ValidateEmailMsg(username = author.username)
 
+                emailManager.sendValidateEmail(authorId)
+
+                verifyOrder {
+                    authorRepository.getById(authorId)
+                    appEnv.getConfig("jwt.emailSecret")
+                    emailRepository.insertEmailVerificationCode(any(), authorId)
+                    sendEmailVerificationOrder(verifyEmailMsg)
+                }
             }
         }
     }

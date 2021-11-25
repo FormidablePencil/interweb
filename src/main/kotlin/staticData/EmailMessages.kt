@@ -15,4 +15,9 @@ class EmailMessages {
         override fun subject() = "Reset password $username"
         override fun message() = "You have requested a password reset."
     }
+
+    class ValidateEmailMsg(val username: String) : IEmailMsgStructure {
+        override fun subject() = "Validate your email address for '$username'"
+        override fun message() = "Validate your email address"
+    }
 }

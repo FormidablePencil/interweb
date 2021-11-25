@@ -24,7 +24,7 @@ import models.profile.Author
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailVerifyCodeRepository
+import repositories.interfaces.IEmailRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -46,7 +46,7 @@ class AuthorizationService(
     private val tokenManager: ITokenManager,
     private val emailManager: IEmailManager,
     private val passwordManager: IPasswordManager,
-    private val emailVerifyCodeRepository: IEmailVerifyCodeRepository,
+    private val emailVerifyCodeRepository: IEmailRepository,
 ) : KoinComponent {
     private val connectionToDb: IConnectionToDb by inject()
 

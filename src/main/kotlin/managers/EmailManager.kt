@@ -10,12 +10,12 @@ import org.apache.commons.mail.SimpleEmail
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailVerifyCodeRepository
+import repositories.interfaces.IEmailRepository
 import staticData.EmailMessages
 import java.util.*
 
 class EmailManager(
-    private val emailVerifyCodeRepository: IEmailVerifyCodeRepository,
+    private val emailRepository: IEmailRepository,
     private val authorRepository: IAuthorRepository,
 ) : IEmailManager, KoinComponent {
     private val appEnv: IAppEnv = get()
@@ -51,8 +51,8 @@ class EmailManager(
         val passwordResetMsg = EmailMessages.PasswordResetMsg(username = author.username)
 
         // region todo - could run async
-        val code = generateEmailVerificationToken(authorId)
-        emailVerifyCodeRepository.insert(code)
+        val code = generateCode(authorId)
+        emailRepository.insertResetPasswordCode(code, authorId)
         // endregion
 
         eMailer.setFrom(emailConfig("from"))
@@ -63,11 +63,24 @@ class EmailManager(
     }
 
     override fun sendValidateEmail(authorId: Int) {
+        val author = authorRepository.getById(authorId)
+            ?: throw ServerErrorException("Resource not found", this::class.java)
+        val passwordResetMsg = EmailMessages.ValidateEmailMsg(username = author.username)
 
+        // region todo - could run async
+        val code = generateCode(authorId)
+        emailRepository.insertEmailVerificationCode(code, authorId)
+        // endregion
+
+        eMailer.setFrom(emailConfig("from"))
+        eMailer.subject = passwordResetMsg.subject()
+        eMailer.setMsg(passwordResetMsg.message())
+        eMailer.addTo(author.email)
+        eMailer.send()
     }
 
-    private fun generateEmailVerificationToken(authorId: Int): String {
-        val emailValidationSecret = appEnv.getConfig("jwt.secret")
+    private fun generateCode(authorId: Int): String {
+        val emailValidationSecret = appEnv.getConfig("jwt.emailSecret")
         return JWT.create()
             .withClaim("authorId", authorId)
             .withExpiresAt(Date(System.currentTimeMillis() + 2000))

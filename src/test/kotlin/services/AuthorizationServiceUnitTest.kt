@@ -15,7 +15,7 @@ import managers.interfaces.IPasswordManager
 import managers.interfaces.ITokenManager
 import models.profile.Author
 import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailVerifyCodeRepository
+import repositories.interfaces.IEmailRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -27,7 +27,7 @@ class AuthorizationServiceUnitTest : BehaviorSpec({
     val tokenManager: ITokenManager = mockk()
     val emailManager: IEmailManager = mockk()
     val passwordManager: IPasswordManager = mockk()
-    val emailVerifyCodeRepository: IEmailVerifyCodeRepository = mockk()
+    val emailVerifyCodeRepository: IEmailRepository = mockk()
     val author: Author = mockk()
     val username = "YourNeighborhoodSpider"
     val email = "testemail12345@gmail.com"
