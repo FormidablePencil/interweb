@@ -16,7 +16,7 @@ import managers.PasswordManager
 import managers.TokenManager
 import models.profile.Author
 import repositories.AuthorRepository
-import repositories.EmailRepository
+import repositories.EmailVerificationCodeRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -28,7 +28,7 @@ class AuthorizationServiceTest : BehaviorSpec({
     val tokenManager: TokenManager = mockk()
     val emailManager: EmailManager = mockk()
     val passwordManager: PasswordManager = mockk()
-    val emailVerifyCodeRepository: EmailRepository = mockk()
+    val emailVerifyCodeRepository: EmailVerificationCodeRepository = mockk()
     val author: Author = mockk()
     val username = "YourNeighborhoodSpider"
     val email = "testemail12345@gmail.com"
@@ -39,10 +39,10 @@ class AuthorizationServiceTest : BehaviorSpec({
 
     val authorizationService = spyk(
         AuthorizationService(
-            authorRepository,
             tokenManager,
             emailManager,
             passwordManager,
+            authorRepository,
             emailVerifyCodeRepository,
         )
     )

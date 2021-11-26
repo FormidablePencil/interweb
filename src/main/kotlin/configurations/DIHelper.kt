@@ -9,7 +9,7 @@ import managers.TokenManager
 import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import repositories.AuthorRepository
-import repositories.EmailRepository
+import repositories.EmailVerificationCodeRepository
 import repositories.PasswordRepository
 import repositories.RefreshTokenRepository
 import services.AuthorizationService
@@ -27,8 +27,8 @@ object DIHelper {
         single { AuthorsPortfolioManager() }
         single { TokenManager(get()) }
         single { PasswordManager(get(), get(), get()) }
-        single { EmailManager(get(), get()) }
-        single { EmailRepository() }
+        single { EmailManager(get(), get(), get()) }
+        single { EmailVerificationCodeRepository() }
 
         // repositories
         single { AuthorRepository() }

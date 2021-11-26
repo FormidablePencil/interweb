@@ -11,7 +11,8 @@ import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import repositories.AuthorRepository
-import repositories.EmailRepository
+import repositories.EmailVerificationCodeRepository
+import repositories.password.ResetPasswordCodeRepository
 import shared.appEnvMockHelper
 import staticData.EmailMessages
 import staticData.IEmailMsgStructure
@@ -30,7 +31,8 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
     )
 
     init {
-        val emailRepository: EmailRepository = mockk(relaxed = true)
+        val emailRepository: EmailVerificationCodeRepository = mockk(relaxed = true)
+        val resetPasswordCodeRepository: ResetPasswordCodeRepository = mockk(relaxed = true)
         val authorRepository: AuthorRepository = mockk()
         val authorId = 0
         val author: Author = mockk()
@@ -59,7 +61,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
             every { author.id } returns authorId
             every { authorRepository.getById(authorId) } returns author
 
-            emailManager = spyk(EmailManager(emailRepository, authorRepository), recordPrivateCalls = true)
+            emailManager = spyk(EmailManager(emailRepository, resetPasswordCodeRepository, authorRepository), recordPrivateCalls = true)
 
             verifyInstantiation()
         }
@@ -75,7 +77,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
             eMailer.addTo(email)
         }
 
-        xgiven("sendResetPasswordLink") {
+        given("sendResetPasswordLink") {
             then("just send reset password link to email on file") {
                 val passwordResetMsg = EmailMessages.PasswordResetMsg(username = author.username)
 
@@ -87,7 +89,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
                 }
                 coVerify {
                     appEnv.getConfig("jwt.emailSecret")
-                    emailRepository.insertResetPasswordCode(any(), authorId)
+                    resetPasswordCodeRepository.insert(any(), authorId)
                 }
             }
         }
@@ -117,7 +119,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
                 }
                 coVerify {
                     appEnv.getConfig("jwt.emailSecret")
-                    emailRepository.insertEmailVerificationCode(any(), authorId)
+                    emailRepository.insert(any(), authorId)
                 }
             }
         }

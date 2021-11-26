@@ -24,7 +24,7 @@ import models.profile.Author
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import repositories.AuthorRepository
-import repositories.EmailRepository
+import repositories.EmailVerificationCodeRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -40,11 +40,11 @@ fun main() {
 }
 
 class AuthorizationService(
-    private val authorRepository: AuthorRepository,
     private val tokenManager: TokenManager,
     private val emailManager: EmailManager,
     private val passwordManager: PasswordManager,
-    private val emailVerifyCodeRepository: EmailRepository,
+    private val authorRepository: AuthorRepository,
+    private val emailRepository: EmailVerificationCodeRepository,
 ) : KoinComponent {
     val appEnv: AppEnv by inject()
 
@@ -105,7 +105,7 @@ class AuthorizationService(
     fun verifyEmail(request: VerifyEmailCodeRequest): VerifyEmailCodeResponse {
         val authorId = 2 // todo get authorId from token header
 
-        val codeDb = emailVerifyCodeRepository.get(authorId)
+        val codeDb = emailRepository.getCode(authorId)
             ?: return VerifyEmailCodeResponse().failed(VerifyEmailCodeResponseFailed.DoesNotExistEmailCode)
 
         return if (codeDb == request.code)

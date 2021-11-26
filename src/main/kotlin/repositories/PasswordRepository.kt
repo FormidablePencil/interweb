@@ -26,4 +26,8 @@ class PasswordRepository : RepositoryBase() {
     fun deletePassword(authorId: Int): Boolean {
         return database.delete(Passwords) { it.authorId eq authorId } != 0
     }
+
+    fun insertResetPasswordCode(code: String, authorId: Int) {
+        TODO("Not yet implemented")
+    }
 }

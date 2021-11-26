@@ -11,12 +11,14 @@ import org.apache.commons.mail.SimpleEmail
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import repositories.AuthorRepository
-import repositories.EmailRepository
+import repositories.EmailVerificationCodeRepository
+import repositories.password.ResetPasswordCodeRepository
 import staticData.EmailMessages
 import java.util.*
 
 class EmailManager(
-    private val emailRepository: EmailRepository,
+    private val emailVerificationCodeRepository: EmailVerificationCodeRepository,
+    private val resetPasswordCodeRepository: ResetPasswordCodeRepository,
     private val authorRepository: AuthorRepository,
 ) : KoinComponent {
     private val appEnv: AppEnv = get()
@@ -53,7 +55,7 @@ class EmailManager(
 
         launch {
             val code = generateCode(authorId)
-            emailRepository.insertResetPasswordCode(code, authorId)
+            resetPasswordCodeRepository.insert(code, authorId)
         }
 
         eMailer.setFrom(emailConfig("from"))
@@ -70,7 +72,7 @@ class EmailManager(
 
         launch {
             val code = generateCode(authorId)
-            emailRepository.insertEmailVerificationCode(code, authorId)
+            emailVerificationCodeRepository.insert(code, authorId)
         }
 
         eMailer.setFrom(emailConfig("from"))
