@@ -4,10 +4,10 @@ import dtos.portfolio.GetLayoutResult
 import models.portfolio.LayoutComponent
 import managers.AuthorsPortfolioManager
 import models.profile.Author
-import repositories.interfaces.IAuthorRepository
+import repositories.AuthorRepository
 
 class AuthorsPortfolioService(
-    private val authorRepository: IAuthorRepository,
+    private val authorRepository: AuthorRepository,
     private val authorsPortfolioManager: AuthorsPortfolioManager,
 ) {
     fun GetLayout(authorId: Int, layoutId: Int): GetLayoutResult {

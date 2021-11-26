@@ -2,24 +2,23 @@ package managers
 
 import configurations.interfaces.IConnectionToDb
 import dtos.authorization.ResetPasswordResponse
-import exceptions.ServerErrorException
 import dtos.succeeded
+import exceptions.ServerErrorException
 import io.ktor.http.*
-import managers.interfaces.IPasswordManager
-import managers.interfaces.ITokenManager
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.mindrot.jbcrypt.BCrypt
-import repositories.interfaces.IPasswordRepository
-import repositories.interfaces.IRefreshTokenRepository
+import repositories.PasswordRepository
+import repositories.RefreshTokenRepository
 
 class PasswordManager(
-    private val refreshTokenRepository: IRefreshTokenRepository,
-    private val passwordRepository: IPasswordRepository,
-    private val tokenManager: ITokenManager,
-) : IPasswordManager {
-    private val connectionToDb: IConnectionToDb by inject();
+    private val refreshTokenRepository: RefreshTokenRepository,
+    private val passwordRepository: PasswordRepository,
+    private val tokenManager: TokenManager,
+) : KoinComponent {
+    private val connectionToDb: IConnectionToDb by inject()
 
-    override fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse {
+    fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse {
         validatePassword(oldPassword, authorId)
 
         connectionToDb.database.useTransaction {
@@ -33,14 +32,14 @@ class PasswordManager(
         }
     }
 
-    override fun validatePassword(password: String, authorId: Int): Boolean {
+    fun validatePassword(password: String, authorId: Int): Boolean {
         val passwordRecord = passwordRepository.getPassword(authorId)
             ?: throw ServerErrorException("Failed to retrieve password", this::class.java)
 
         return BCrypt.checkpw(password, passwordRecord.password)
     }
 
-    override fun setNewPassword(password: String, authorId: Int): Boolean {
+    fun setNewPassword(password: String, authorId: Int): Boolean {
         val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
         return passwordRepository.insertPassword(passwordHash, authorId)
     }

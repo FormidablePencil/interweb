@@ -1,7 +1,7 @@
 package managers
 
 import com.typesafe.config.ConfigFactory
-import configurations.interfaces.IAppEnv
+import configurations.AppEnv
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.koin.KoinListener
 import io.ktor.config.*
@@ -10,13 +10,13 @@ import models.profile.Author
 import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailRepository
+import repositories.AuthorRepository
+import repositories.EmailRepository
 import staticData.EmailMessages
 import staticData.IEmailMsgStructure
 
 class EmailManagerTest : BehaviorSpec(), KoinTest {
-    private val appEnv = mockk<IAppEnv>()
+    private val appEnv = mockk<AppEnv>()
     private val configs = HoconApplicationConfig(ConfigFactory.load())
     private val eMailer: SimpleEmail = mockk(relaxed = true)
 
@@ -30,8 +30,8 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
     )
 
     init {
-        val emailRepository: IEmailRepository = mockk(relaxed = true)
-        val authorRepository: IAuthorRepository = mockk()
+        val emailRepository: EmailRepository = mockk(relaxed = true)
+        val authorRepository: AuthorRepository = mockk()
         val authorId = 0
         val author: Author = mockk()
         val email = "someEmailAddress@gmail.com21"

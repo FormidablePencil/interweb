@@ -17,14 +17,14 @@ import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import managers.interfaces.IEmailManager
-import managers.interfaces.IPasswordManager
-import managers.interfaces.ITokenManager
+import managers.EmailManager
+import managers.PasswordManager
+import managers.TokenManager
 import models.profile.Author
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailRepository
+import repositories.AuthorRepository
+import repositories.EmailRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -41,11 +41,11 @@ fun main() {
 }
 
 class AuthorizationService(
-    private val authorRepository: IAuthorRepository,
-    private val tokenManager: ITokenManager,
-    private val emailManager: IEmailManager,
-    private val passwordManager: IPasswordManager,
-    private val emailVerifyCodeRepository: IEmailRepository,
+    private val authorRepository: AuthorRepository,
+    private val tokenManager: TokenManager,
+    private val emailManager: EmailManager,
+    private val passwordManager: PasswordManager,
+    private val emailVerifyCodeRepository: EmailRepository,
 ) : KoinComponent {
     private val connectionToDb: IConnectionToDb by inject()
 

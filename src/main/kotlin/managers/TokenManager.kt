@@ -2,29 +2,28 @@ package managers
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import configurations.interfaces.IAppEnv
+import configurations.AppEnv
 import configurations.interfaces.IConnectionToDb
 import dtos.authorization.TokensResponse
 import dtos.authorization.TokensResponseFailed
 import dtos.failed
 import dtos.succeeded
-import dtos.token.responseData.ITokenResponseData
 import io.ktor.http.*
-import managers.interfaces.ITokenManager
+import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import repositories.interfaces.IRefreshTokenRepository
+import repositories.RefreshTokenRepository
 import serialized.TokenResponseData
 import java.util.*
 
 enum class KindOfTokens { AccessToken, RefreshToken }
 
 class TokenManager(
-    private val refreshTokenRepository: IRefreshTokenRepository,
-) : ITokenManager {
-    private val appEnv: IAppEnv by inject()
+    private val refreshTokenRepository: RefreshTokenRepository,
+) : KoinComponent {
+    private val appEnv: AppEnv by inject()
     private val connectionToDb: IConnectionToDb by inject()
 
-    override fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
+    fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
         return if (isRefreshTokenValid(refreshToken, authorId)) {
             val newTokens = generateTokens(authorId)
             TokensResponse().succeeded(HttpStatusCode.Created, newTokens)
@@ -32,7 +31,7 @@ class TokenManager(
             TokensResponse().failed(TokensResponseFailed.InvalidRefreshToken)
     }
 
-    override fun generateTokens(authorId: Int): TokenResponseData {
+    fun generateTokens(authorId: Int): TokenResponseData {
         val refreshToken = generateToken(authorId, KindOfTokens.RefreshToken)
         val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 

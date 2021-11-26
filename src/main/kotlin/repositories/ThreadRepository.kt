@@ -1,9 +1,8 @@
 package repositories
 
 import models.thread.Thread
-import repositories.interfaces.IThreadingRepository
 
-class ThreadRepository : IThreadingRepository {
+class ThreadRepository {
 
     //region Get
 

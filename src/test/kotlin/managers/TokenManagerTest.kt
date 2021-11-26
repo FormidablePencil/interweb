@@ -12,13 +12,13 @@ import io.ktor.config.*
 import io.ktor.http.*
 import io.mockk.*
 import models.authorization.Token
-import repositories.interfaces.IRefreshTokenRepository
+import repositories.RefreshTokenRepository
 import serialized.TokenResponseData
 import shared.mockFactories.appEnvMK
 import shared.mockFactories.connectionToDbMK
 
 class TokenManagerTest : BehaviorSpec({
-    val refreshTokenRepository: IRefreshTokenRepository = mockk()
+    val refreshTokenRepository: RefreshTokenRepository = mockk()
     val tokenDb: Token = mockk()
     val authorId = 321
     val tokens = TokenResponseData("access token", "refresh token")

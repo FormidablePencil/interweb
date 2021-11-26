@@ -8,23 +8,22 @@ import org.ktorm.dsl.eq
 import org.ktorm.dsl.insert
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
-import repositories.interfaces.IRefreshTokenRepository
 
-class RefreshTokenRepository : RepositoryBase(), IRefreshTokenRepository {
+class RefreshTokenRepository : RepositoryBase() {
     private val Database.token get() = this.sequenceOf(Tokens)
 
-    override fun insertToken(refreshToken: String, authorId: Int): Boolean {
+    fun insertToken(refreshToken: String, authorId: Int): Boolean {
         return database.insert(Tokens) {
             set(it.refreshToken, refreshToken)
             set(it.authorId, authorId)
         } != 0
     }
 
-    override fun deleteOldToken(authorId: Int): Boolean {
+    fun deleteOldToken(authorId: Int): Boolean {
         return database.delete(Tokens) { it.authorId eq authorId } != 0
     }
 
-    override fun getTokenByAuthorId(authorId: Int): Token? {
+    fun getTokenByAuthorId(authorId: Int): Token? {
         return database.token.find { it.authorId eq authorId }
     }
 }

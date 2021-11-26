@@ -1,12 +1,11 @@
 package shared.mockFactories
 
 import com.typesafe.config.ConfigFactory
-import configurations.interfaces.IAppEnv
+import configurations.AppEnv
 import configurations.interfaces.IConnectionToDb
 import io.ktor.config.*
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 
 fun connectionToDbMK(): IConnectionToDb {
     val mock = mockk<IConnectionToDb>(relaxed = true)
@@ -21,8 +20,8 @@ fun connectionToDbMK(): IConnectionToDb {
     return mock
 }
 
-fun appEnvMK(): IAppEnv {
-    val mock = mockk<IAppEnv>()
+fun appEnvMK(): AppEnv {
+    val mock = mockk<AppEnv>()
 
     val configs = HoconApplicationConfig(ConfigFactory.load())
 

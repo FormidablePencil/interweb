@@ -2,25 +2,24 @@ package managers
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
-import configurations.interfaces.IAppEnv
+import configurations.AppEnv
 import exceptions.ServerErrorException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import managers.interfaces.IEmailManager
 import org.apache.commons.mail.DefaultAuthenticator
 import org.apache.commons.mail.SimpleEmail
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailRepository
+import repositories.AuthorRepository
+import repositories.EmailRepository
 import staticData.EmailMessages
 import java.util.*
 
 class EmailManager(
-    private val emailRepository: IEmailRepository,
-    private val authorRepository: IAuthorRepository,
-) : IEmailManager, KoinComponent {
-    private val appEnv: IAppEnv = get()
+    private val emailRepository: EmailRepository,
+    private val authorRepository: AuthorRepository,
+) : KoinComponent {
+    private val appEnv: AppEnv = get()
     private val eMailer: SimpleEmail = get()
     private fun emailConfig(path: String): String {
         return appEnv.getConfig("commonsMail.$path")
@@ -35,7 +34,7 @@ class EmailManager(
         eMailer.isSSLOnConnect = true
     }
 
-    override fun welcomeNewAuthor(authorId: Int) {
+    fun welcomeNewAuthor(authorId: Int) {
         val author = authorRepository.getById(authorId)
             ?: throw ServerErrorException("Resource not found.", this::class.java)
         val welcomeMsg = EmailMessages.WelcomeMsg(firstname = author.firstname)
@@ -47,7 +46,7 @@ class EmailManager(
         eMailer.send()
     }
 
-    override suspend fun sendResetPasswordLink(authorId: Int): Unit = coroutineScope {
+    suspend fun sendResetPasswordLink(authorId: Int): Unit = coroutineScope {
         val author = authorRepository.getById(authorId)
             ?: throw ServerErrorException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.PasswordResetMsg(username = author.username)
@@ -64,7 +63,7 @@ class EmailManager(
         eMailer.send()
     }
 
-    override suspend fun sendValidateEmail(authorId: Int): Unit = coroutineScope {
+    suspend fun sendValidateEmail(authorId: Int): Unit = coroutineScope {
         val author = authorRepository.getById(authorId)
             ?: throw ServerErrorException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.ValidateEmailMsg(username = author.username)

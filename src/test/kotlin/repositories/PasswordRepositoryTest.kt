@@ -2,17 +2,15 @@ package repositories
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import org.koin.test.get
 import org.koin.test.inject
 import org.mindrot.jbcrypt.BCrypt
-import repositories.interfaces.IPasswordRepository
-import shared.testUtils.BehaviorSpecUtRepo
 import shared.persistentId
+import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
 import shared.testUtils.whenUniqueConstraintDeprecated
 
 class PasswordRepositoryTest : BehaviorSpecUtRepo({
-    val passwordRepository: IPasswordRepository by inject()
+    val passwordRepository: PasswordRepository by inject()
     val password = "StrongPassword!123"
     val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
     val authorId = persistentId

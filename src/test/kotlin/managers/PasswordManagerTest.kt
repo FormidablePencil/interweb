@@ -2,17 +2,18 @@ package managers
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
-import managers.interfaces.ITokenManager
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
 import models.authorization.Password
 import org.mindrot.jbcrypt.BCrypt
-import repositories.interfaces.IPasswordRepository
-import repositories.interfaces.IRefreshTokenRepository
+import repositories.PasswordRepository
+import repositories.RefreshTokenRepository
 
 class PasswordManagerTest : BehaviorSpec({
-    val refreshTokenRepository: IRefreshTokenRepository = mockk()
-    val passwordRepository: IPasswordRepository = mockk()
-    val tokenManager: ITokenManager = mockk()
+    val refreshTokenRepository: RefreshTokenRepository = mockk()
+    val passwordRepository: PasswordRepository = mockk()
+    val tokenManager: TokenManager = mockk()
 
     val authorId = 1
     val password = "an unencrypted password"

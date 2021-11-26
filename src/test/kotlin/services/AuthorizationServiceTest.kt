@@ -10,24 +10,24 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.mockk.*
-import managers.interfaces.IEmailManager
-import managers.interfaces.IPasswordManager
-import managers.interfaces.ITokenManager
+import managers.EmailManager
+import managers.PasswordManager
+import managers.TokenManager
 import models.profile.Author
-import repositories.interfaces.IAuthorRepository
-import repositories.interfaces.IEmailRepository
+import repositories.AuthorRepository
+import repositories.EmailRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
 import serialized.TokenResponseData
 import shared.mockFactories.connectionToDbMK
 
-class AuthorizationServiceUnitTest : BehaviorSpec({
-    val authorRepository: IAuthorRepository = mockk()
-    val tokenManager: ITokenManager = mockk()
-    val emailManager: IEmailManager = mockk()
-    val passwordManager: IPasswordManager = mockk()
-    val emailVerifyCodeRepository: IEmailRepository = mockk()
+class AuthorizationServiceTest : BehaviorSpec({
+    val authorRepository: AuthorRepository = mockk()
+    val tokenManager: TokenManager = mockk()
+    val emailManager: EmailManager = mockk()
+    val passwordManager: PasswordManager = mockk()
+    val emailVerifyCodeRepository: EmailRepository = mockk()
     val author: Author = mockk()
     val username = "YourNeighborhoodSpider"
     val email = "testemail12345@gmail.com"
@@ -41,7 +41,7 @@ class AuthorizationServiceUnitTest : BehaviorSpec({
             tokenManager,
             emailManager,
             passwordManager,
-            emailVerifyCodeRepository
+            emailVerifyCodeRepository,
         )
     )
 

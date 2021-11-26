@@ -2,14 +2,13 @@ package repositories
 
 import io.kotest.matchers.shouldBe
 import org.koin.test.inject
-import repositories.interfaces.IAuthorRepository
 import serialized.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.SqlConstraint
 import shared.testUtils.rollback
 
 class AuthorRepositoryTest : BehaviorSpecUtRepo({
-    val authorRepository: IAuthorRepository by inject()
+    val authorRepository: AuthorRepository by inject()
 
     fun genReq(
         username: String = "username",
