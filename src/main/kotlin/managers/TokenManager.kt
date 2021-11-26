@@ -3,7 +3,6 @@ package managers
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import configurations.AppEnv
-import configurations.interfaces.IConnectionToDb
 import dtos.authorization.TokensResponse
 import dtos.authorization.TokensResponseFailed
 import dtos.failed
@@ -21,7 +20,6 @@ class TokenManager(
     private val refreshTokenRepository: RefreshTokenRepository,
 ) : KoinComponent {
     private val appEnv: AppEnv by inject()
-    private val connectionToDb: IConnectionToDb by inject()
 
     fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
         return if (isRefreshTokenValid(refreshToken, authorId)) {
@@ -35,7 +33,7 @@ class TokenManager(
         val refreshToken = generateToken(authorId, KindOfTokens.RefreshToken)
         val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 
-        connectionToDb.database.useTransaction {
+        appEnv.database.useTransaction {
             refreshTokenRepository.deleteOldToken(authorId)
             refreshTokenRepository.insertToken(refreshToken, authorId)
         }
@@ -48,10 +46,10 @@ class TokenManager(
     }
 
     private fun generateToken(authorId: Int, kindOfToken: KindOfTokens): String {
-        val secret = appEnv.appConfig.property("jwt.secret").getString()
-        val issuer = appEnv.appConfig.property("jwt.issuer").getString()
-        val audience = appEnv.appConfig.property("jwt.audience").getString()
-        val myRealm = appEnv.appConfig.property("jwt.realm").getString() // todo - what is this?
+        val secret = appEnv.getConfig("jwt.secret")
+        val issuer = appEnv.getConfig("jwt.issuer")
+        val audience = appEnv.getConfig("jwt.audience")
+        val myRealm = appEnv.getConfig("jwt.realm") // todo - what is this?
 
         val expire = when (kindOfToken) {
             KindOfTokens.RefreshToken -> 10000

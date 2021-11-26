@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
 import com.typesafe.config.ConfigFactory
+import configurations.AppEnv
 import dtos.authorization.TokensResponseFailed
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -14,22 +15,27 @@ import io.mockk.*
 import models.authorization.Token
 import repositories.RefreshTokenRepository
 import serialized.TokenResponseData
-import shared.mockFactories.appEnvMK
-import shared.mockFactories.connectionToDbMK
+import shared.appEnvMockHelper
 
 class TokenManagerTest : BehaviorSpec({
     val refreshTokenRepository: RefreshTokenRepository = mockk()
     val tokenDb: Token = mockk()
     val authorId = 321
     val tokens = TokenResponseData("access token", "refresh token")
+    val appEnv = mockk<AppEnv>()
+    val configs = HoconApplicationConfig(ConfigFactory.load())
 
     val tokenManager = spyk(TokenManager(refreshTokenRepository))
 
     beforeEach {
         clearMocks(refreshTokenRepository, tokenDb)
 
-        every { tokenManager getProperty "connectionToDb" } returns connectionToDbMK()
-        every { tokenManager getProperty "appEnv" } returns appEnvMK()
+        appEnvMockHelper(appEnv, tokenManager)
+
+        val capturedPath = slot<String>()
+        every { appEnv.getConfig(capture(capturedPath)) } answers {
+            configs.property(capturedPath.captured).getString()
+        }
 
         every { refreshTokenRepository.deleteOldToken(authorId) } returns true
         every { refreshTokenRepository.insertToken(any(), authorId) } returns true

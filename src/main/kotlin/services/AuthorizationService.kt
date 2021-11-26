@@ -1,6 +1,6 @@
 package services
 
-import configurations.interfaces.IConnectionToDb
+import configurations.AppEnv
 import dtos.authorization.*
 import dtos.failed
 import dtos.login.LoginBy
@@ -29,7 +29,6 @@ import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
 
-
 fun main() {
     runBlocking {
         launch {
@@ -47,7 +46,7 @@ class AuthorizationService(
     private val passwordManager: PasswordManager,
     private val emailVerifyCodeRepository: EmailRepository,
 ) : KoinComponent {
-    private val connectionToDb: IConnectionToDb by inject()
+    val appEnv: AppEnv by inject()
 
     fun signup(request: CreateAuthorRequest): SignupResponse {
         if (!isStrongPassword(request.password))
@@ -60,7 +59,7 @@ class AuthorizationService(
         if (authorRepository.getIdByUsername(request.username) is Author)
             return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
 
-        connectionToDb.database.useTransaction {
+        appEnv.database.useTransaction {
             val authorId = authorRepository.insertAuthor(request)
             authorId ?: throw ServerErrorException("Failed to create author", this::class.java)
             passwordManager.setNewPassword(request.password, authorId)

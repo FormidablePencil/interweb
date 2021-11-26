@@ -1,12 +1,12 @@
 package configurations
 
 import com.typesafe.config.ConfigFactory
-import configurations.interfaces.IConnectionToDb
 import io.ktor.config.*
 import managers.AuthorsPortfolioManager
 import managers.EmailManager
 import managers.PasswordManager
 import managers.TokenManager
+import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import repositories.AuthorRepository
 import repositories.EmailRepository
@@ -42,9 +42,9 @@ object DIHelper {
         val appConfig: ApplicationConfig = HoconApplicationConfig(ConfigFactory.load("application.conf"))
 
         single { AppEnv(appConfig, dbConnection) }
-        single<IConnectionToDb> { ConnectionToDb() } // database access
+//        single<IConnectionToDb> { ConnectionToDb() } // database access
 
-        // other
-//        single { SimpleEmail() } // e-mailer
+        // third parties
+        single { SimpleEmail() } // e-mailer
     }
 }

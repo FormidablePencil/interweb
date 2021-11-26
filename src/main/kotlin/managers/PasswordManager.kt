@@ -1,6 +1,6 @@
 package managers
 
-import configurations.interfaces.IConnectionToDb
+import configurations.AppEnv
 import dtos.authorization.ResetPasswordResponse
 import dtos.succeeded
 import exceptions.ServerErrorException
@@ -16,12 +16,12 @@ class PasswordManager(
     private val passwordRepository: PasswordRepository,
     private val tokenManager: TokenManager,
 ) : KoinComponent {
-    private val connectionToDb: IConnectionToDb by inject()
+    private val appEnv: AppEnv by inject()
 
     fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse {
         validatePassword(oldPassword, authorId)
 
-        connectionToDb.database.useTransaction {
+        appEnv.database.useTransaction {
             refreshTokenRepository.deleteOldToken(authorId)
             passwordRepository.deletePassword(authorId)
             if (setNewPassword(newPassword, authorId))

@@ -4,9 +4,9 @@ package shared.testUtils
  *  is you cannot test inserting duplicate data because of how db transactions work. */
 suspend fun <T> DoHaveDbConnection.rollback(cleanup: Boolean = true, code: suspend () -> T): T {
     if (cleanup)
-        connectionToDb.database.useTransaction {
+        appEnv.database.useTransaction {
             val result = code()
-            connectionToDb.database.transactionManager.currentTransaction?.rollback()
+            appEnv.database.transactionManager.currentTransaction?.rollback()
             return result
         }
     else {

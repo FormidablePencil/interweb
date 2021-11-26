@@ -12,12 +12,12 @@ import org.koin.dsl.module
 import org.koin.test.KoinTest
 import repositories.AuthorRepository
 import repositories.EmailRepository
+import shared.appEnvMockHelper
 import staticData.EmailMessages
 import staticData.IEmailMsgStructure
 
 class EmailManagerTest : BehaviorSpec(), KoinTest {
     private val appEnv = mockk<AppEnv>()
-    private val configs = HoconApplicationConfig(ConfigFactory.load())
     private val eMailer: SimpleEmail = mockk(relaxed = true)
 
     override fun listeners() = listOf(
@@ -37,6 +37,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
         val email = "someEmailAddress@gmail.com21"
         val username = "Username"
         val firstname = "Firstname"
+        val configs = HoconApplicationConfig(ConfigFactory.load())
 
         lateinit var emailManager: EmailManager
 
@@ -50,11 +51,7 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
         beforeEach {
             clearAllMocks()
 
-            every { appEnv.appConfig } returns configs
-            val capturedPath = slot<String>()
-            every { appEnv.getConfig(capture(capturedPath)) } answers {
-                configs.property(capturedPath.captured).getString()
-            }
+            appEnvMockHelper(appEnv)
 
             every { author.firstname } returns firstname
             every { author.email } returns email

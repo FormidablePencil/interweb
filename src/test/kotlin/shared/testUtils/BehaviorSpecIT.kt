@@ -1,7 +1,7 @@
 package shared.testUtils
 
+import configurations.AppEnv
 import configurations.DIHelper
-import configurations.interfaces.IConnectionToDb
 import integrationTests.auth.flows.LoginFlow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -14,12 +14,12 @@ import org.koin.test.inject
 import shared.DITestHelper
 
 interface DoHaveDbConnection : KoinTest {
-    val connectionToDb: IConnectionToDb
+    val appEnv: AppEnv
 }
 
 /** For integration tests to extend Koin, Kotest.BehaviorSpec, and extension functions. */
 abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoHaveDbConnection {
-    override val connectionToDb: IConnectionToDb by inject()
+    override val appEnv: AppEnv by inject()
     val loginFlow: LoginFlow by inject()
 
     override fun listeners() = listOf(
@@ -40,7 +40,7 @@ abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSp
 }
 
 open class BehaviorSpecFlow(body: BehaviorSpecFlow.() -> Unit = {}) : KoinTest, DoHaveDbConnection {
-    override lateinit var connectionToDb: IConnectionToDb
+    override val appEnv: AppEnv by inject()
 
     init {
         body()

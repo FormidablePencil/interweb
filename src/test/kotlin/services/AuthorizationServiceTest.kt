@@ -1,5 +1,6 @@
 package services
 
+import configurations.AppEnv
 import dtos.authorization.LoginResponse
 import dtos.authorization.LoginResponseFailed
 import dtos.authorization.TokensResponse
@@ -20,7 +21,7 @@ import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
 import serialized.TokenResponseData
-import shared.mockFactories.connectionToDbMK
+import shared.appEnvMockHelper
 
 class AuthorizationServiceTest : BehaviorSpec({
     val authorRepository: AuthorRepository = mockk()
@@ -34,6 +35,7 @@ class AuthorizationServiceTest : BehaviorSpec({
     val password = "Formidable!76"
     val authorId = 3
     val tokenResponseData = TokenResponseData("access token", "refresh token")
+    val appEnv = mockk<AppEnv>()
 
     val authorizationService = spyk(
         AuthorizationService(
@@ -53,7 +55,8 @@ class AuthorizationServiceTest : BehaviorSpec({
     beforeEach {
         clearAllMocks()
 
-        every { authorizationService getProperty "connectionToDb" } returns connectionToDbMK()
+        appEnvMockHelper(appEnv, authorizationService)
+
         every { author.id } returns authorId
         every { author.email } returns email
     }
