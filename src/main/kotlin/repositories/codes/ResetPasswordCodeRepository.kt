@@ -1,26 +1,27 @@
-package repositories
+package repositories.codes
 
-import models.codes.EmailVerificationCode
-import models.codes.EmailVerificationCodes
+import models.codes.ResetPasswordCode
+import models.codes.ResetPasswordCodes
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insert
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
+import repositories.RepositoryBase
 
-class EmailVerificationCodeRepository : RepositoryBase() {
-    private val Database.emailVerifyCodes get() = this.sequenceOf(EmailVerificationCodes)
+class ResetPasswordCodeRepository : RepositoryBase() {
+    private val Database.resetPasswordCode get() = this.sequenceOf(ResetPasswordCodes)
 
     fun insert(code: String, authorId: Int): Boolean {
-        return database.insert(EmailVerificationCodes) {
+        return database.insert(ResetPasswordCodes) {
             set(it.code, code)
             set(it.authorId, authorId)
         } == 1
     }
 
-    fun get(authorId: Int): EmailVerificationCode? {
-        return database.emailVerifyCodes.find {
+    fun get(authorId: Int): ResetPasswordCode? {
+        return database.resetPasswordCode.find {
             it.authorId eq authorId
         }
     }
@@ -30,7 +31,7 @@ class EmailVerificationCodeRepository : RepositoryBase() {
     }
 
     fun delete(authorId: Int) {
-        database.delete(EmailVerificationCodes){
+        database.delete(ResetPasswordCodes) {
             it.authorId eq authorId
         }
     }

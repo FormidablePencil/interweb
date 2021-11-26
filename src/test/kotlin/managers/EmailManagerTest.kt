@@ -11,8 +11,8 @@ import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import org.koin.test.KoinTest
 import repositories.AuthorRepository
-import repositories.EmailVerificationCodeRepository
-import repositories.password.ResetPasswordCodeRepository
+import repositories.codes.EmailVerificationCodeRepository
+import repositories.codes.ResetPasswordCodeRepository
 import shared.appEnvMockHelper
 import staticData.EmailMessages
 import staticData.IEmailMsgStructure

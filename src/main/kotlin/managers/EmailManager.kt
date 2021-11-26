@@ -11,8 +11,8 @@ import org.apache.commons.mail.SimpleEmail
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import repositories.AuthorRepository
-import repositories.EmailVerificationCodeRepository
-import repositories.password.ResetPasswordCodeRepository
+import repositories.codes.EmailVerificationCodeRepository
+import repositories.codes.ResetPasswordCodeRepository
 import staticData.EmailMessages
 import java.util.*
 

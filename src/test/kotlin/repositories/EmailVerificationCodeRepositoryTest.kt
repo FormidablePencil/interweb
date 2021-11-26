@@ -3,6 +3,7 @@ package repositories
 import configurations.DIHelper
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
+import repositories.codes.EmailVerificationCodeRepository
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
 

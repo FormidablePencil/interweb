@@ -1,10 +1,9 @@
 package repositories.password
 
 import configurations.DIHelper
-import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
-import repositories.EmailVerificationCodeRepository
+import repositories.codes.ResetPasswordCodeRepository
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
 

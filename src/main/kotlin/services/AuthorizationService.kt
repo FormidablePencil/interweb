@@ -24,7 +24,7 @@ import models.profile.Author
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import repositories.AuthorRepository
-import repositories.EmailVerificationCodeRepository
+import repositories.codes.EmailVerificationCodeRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest

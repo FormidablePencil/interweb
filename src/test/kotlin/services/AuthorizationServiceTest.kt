@@ -16,7 +16,7 @@ import managers.PasswordManager
 import managers.TokenManager
 import models.profile.Author
 import repositories.AuthorRepository
-import repositories.EmailVerificationCodeRepository
+import repositories.codes.EmailVerificationCodeRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
