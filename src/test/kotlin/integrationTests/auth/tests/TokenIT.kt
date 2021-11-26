@@ -19,8 +19,8 @@ import shared.testUtils.BehaviorSpecIT
 import shared.testUtils.rollback
 
 class TokenIT : BehaviorSpecIT({
-    val signupFlow: SignupFlow = get()
-    val loginFlow: LoginFlow = get()
+    val signupFlow: SignupFlow by inject()
+    val loginFlow: LoginFlow by inject()
     val authorizationService: AuthorizationService by inject()
 
     fun validateThatTokensReturned(data: ITokenResponseData) {

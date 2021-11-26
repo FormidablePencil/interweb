@@ -125,10 +125,6 @@ class AuthorizationServiceUnitTest : BehaviorSpec({
         }
     }
 
-    xgiven("validateEmailSignupCode") {
-
-    }
-
     // todo - increment amount of login attempts to lock account
     given("login") {
         val requestByEmail = LoginByEmailRequest(email, password)
@@ -192,6 +188,12 @@ class AuthorizationServiceUnitTest : BehaviorSpec({
         }
     }
 
+    xgiven("verifyEmail") {
+
+    }
+
+    xgiven("resetPassword") { }
+
     given("requestPasswordResetThroughVerifiedEmail") {
         then("should send reset password link to simpleEmail") {
             every { authorRepository.getById(authorId) } returns author
@@ -204,7 +206,5 @@ class AuthorizationServiceUnitTest : BehaviorSpec({
         }
     }
 
-    xgiven("setNewPasswordForSignup") { }
-
-    xgiven("resetPasswordWithEmailCode") { }
+    xgiven("resetPasswordWithThoughEmail") { }
 })

@@ -2,38 +2,39 @@ package shared.testUtils
 
 import configurations.DIHelper
 import configurations.interfaces.IConnectionToDb
+import integrationTests.auth.flows.LoginFlow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import io.kotest.koin.KoinListener
+import io.mockk.mockk
+import org.apache.commons.mail.SimpleEmail
+import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.koin.test.get
+import org.koin.test.inject
 import shared.DITestHelper
 
-interface DoHaveDbConnection {
+interface DoHaveDbConnection : KoinTest {
     val connectionToDb: IConnectionToDb
 }
 
 /** For integration tests to extend Koin, Kotest.BehaviorSpec, and extension functions. */
 abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoHaveDbConnection {
-    override lateinit var connectionToDb: IConnectionToDb
+    override val connectionToDb: IConnectionToDb by inject()
+    val loginFlow: LoginFlow by inject()
+
+    override fun listeners() = listOf(
+        KoinListener(
+            listOf(
+                DIHelper.CoreModule,
+                DITestHelper.FlowModule,
+                module {
+                    single { mockk<SimpleEmail>(relaxed = true) }
+                }
+            )
+        )
+    )
 
     init {
-        try {
-            startKoin {
-                modules(DIHelper.CoreModule, DITestHelper.FlowModule)
-            }
-        } catch (ex: Exception) {
-        }
-
-        afterEach {
-            stopKoin()
-            startKoin {
-                modules(DIHelper.CoreModule, DITestHelper.FlowModule)
-            }
-        }
-
-        connectionToDb = get()
         body()
     }
 }

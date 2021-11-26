@@ -7,11 +7,11 @@ class EmailRepository : IEmailRepository {
         TODO("Not yet implemented")
     }
 
-    override fun insertResetPasswordCode(code: String, authorId: Int) {
+    override suspend fun insertResetPasswordCode(code: String, authorId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun insertEmailVerificationCode(code: String, authorId: Int) {
+    override suspend fun insertEmailVerificationCode(code: String, authorId: Int) {
         TODO("Not yet implemented")
     }
 }

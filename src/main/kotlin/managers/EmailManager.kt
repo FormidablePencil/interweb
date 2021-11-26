@@ -4,6 +4,8 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import configurations.interfaces.IAppEnv
 import exceptions.ServerErrorException
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import managers.interfaces.IEmailManager
 import org.apache.commons.mail.DefaultAuthenticator
 import org.apache.commons.mail.SimpleEmail
@@ -45,15 +47,15 @@ class EmailManager(
         eMailer.send()
     }
 
-    override suspend fun sendResetPasswordLink(authorId: Int) {
+    override suspend fun sendResetPasswordLink(authorId: Int): Unit = coroutineScope {
         val author = authorRepository.getById(authorId)
             ?: throw ServerErrorException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.PasswordResetMsg(username = author.username)
 
-        // region todo - could run async
-        val code = generateCode(authorId)
-        emailRepository.insertResetPasswordCode(code, authorId)
-        // endregion
+        launch {
+            val code = generateCode(authorId)
+            emailRepository.insertResetPasswordCode(code, authorId)
+        }
 
         eMailer.setFrom(emailConfig("from"))
         eMailer.subject = passwordResetMsg.subject()
@@ -62,15 +64,15 @@ class EmailManager(
         eMailer.send()
     }
 
-    override fun sendValidateEmail(authorId: Int) {
+    override suspend fun sendValidateEmail(authorId: Int): Unit = coroutineScope {
         val author = authorRepository.getById(authorId)
             ?: throw ServerErrorException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.ValidateEmailMsg(username = author.username)
 
-        // region todo - could run async
-        val code = generateCode(authorId)
-        emailRepository.insertEmailVerificationCode(code, authorId)
-        // endregion
+        launch {
+            val code = generateCode(authorId)
+            emailRepository.insertEmailVerificationCode(code, authorId)
+        }
 
         eMailer.setFrom(emailConfig("from"))
         eMailer.subject = passwordResetMsg.subject()

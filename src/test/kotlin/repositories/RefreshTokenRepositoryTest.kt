@@ -2,11 +2,12 @@ package repositories
 
 import io.kotest.matchers.shouldBe
 import org.koin.test.get
+import org.koin.test.inject
 import repositories.interfaces.IRefreshTokenRepository
 import shared.testUtils.BehaviorSpecUtRepo
 
 class RefreshTokenRepositoryTest : BehaviorSpecUtRepo({
-    val refreshTokenRepository: IRefreshTokenRepository = get()
+    val refreshTokenRepository: IRefreshTokenRepository by inject()
     val authorId = 0 // should fail since this doesn't exist. Testing
     val token = "refreshToken"
 

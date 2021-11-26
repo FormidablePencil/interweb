@@ -31,7 +31,6 @@ import serialized.LoginByUsernameRequest
 
 
 fun main() {
-    // how do I make this code run in parallel
     runBlocking {
         launch {
             delay(2000L)
@@ -84,7 +83,27 @@ class AuthorizationService(
         )
     }
 
-    fun verifyEmailCode(request: VerifyEmailCodeRequest): VerifyEmailCodeResponse {
+    private fun login(request: LoginRequest): LoginResponse {
+        val author = when (request.loginBy) {
+            LoginBy.Email -> authorRepository.getByEmail(request.credential)
+                ?: return LoginResponse().failed(LoginResponseFailed.InvalidEmail)
+            LoginBy.Username -> authorRepository.getIdByUsername(request.credential)
+                ?: return LoginResponse().failed(LoginResponseFailed.InvalidUsername)
+        }
+
+        if (!passwordManager.validatePassword(request.password, author.id))
+            return LoginResponse().failed(LoginResponseFailed.InvalidPassword)
+
+        val tokenResponse = tokenManager.generateTokens(author.id)
+        return LoginResponse().succeeded(HttpStatusCode.OK, tokenResponse)
+    }
+
+    fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
+        return tokenManager.refreshAccessToken(refreshToken, authorId)
+    }
+
+    // todo
+    fun verifyEmail(request: VerifyEmailCodeRequest): VerifyEmailCodeResponse {
         val authorId = 2 // todo get authorId from token header
 
         val codeDb = emailVerifyCodeRepository.get(authorId)
@@ -93,10 +112,6 @@ class AuthorizationService(
         return if (codeDb == request.code)
             VerifyEmailCodeResponse().succeeded(HttpStatusCode.OK)
         else VerifyEmailCodeResponse().failed(VerifyEmailCodeResponseFailed.InvalidEmailCode)
-    }
-
-    fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
-        return tokenManager.refreshAccessToken(refreshToken, authorId)
     }
 
     // todo - reset password with current password
@@ -118,7 +133,7 @@ class AuthorizationService(
     }
 
     // todo - reset password through verified simpleEmail
-    fun resetPasswordWithEmailCode(newPassword: String, emailCode: String): ResetPasswordResponse {
+    fun resetPasswordWithThoughEmail(newPassword: String, emailCode: String): ResetPasswordResponse {
 
         TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
 
@@ -128,18 +143,4 @@ class AuthorizationService(
 //        return passwordManager.resetPassword(oldPassword, newPassword, authorId)
     }
 
-    private fun login(request: LoginRequest): LoginResponse {
-        val author = when (request.loginBy) {
-            LoginBy.Email -> authorRepository.getByEmail(request.credential)
-                ?: return LoginResponse().failed(LoginResponseFailed.InvalidEmail)
-            LoginBy.Username -> authorRepository.getIdByUsername(request.credential)
-                ?: return LoginResponse().failed(LoginResponseFailed.InvalidUsername)
-        }
-
-        if (!passwordManager.validatePassword(request.password, author.id))
-            return LoginResponse().failed(LoginResponseFailed.InvalidPassword)
-
-        val tokenResponse = tokenManager.generateTokens(author.id)
-        return LoginResponse().succeeded(HttpStatusCode.OK, tokenResponse)
-    }
 }

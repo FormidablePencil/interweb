@@ -54,6 +54,6 @@ object DIHelper {
 
         // other
         single<IConnectionToDb> { ConnectionToDb() } // database access
-        single { SimpleEmail() } // e-mailer
+//        single { SimpleEmail() } // e-mailer
     }
 }
