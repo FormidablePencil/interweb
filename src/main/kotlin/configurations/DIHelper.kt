@@ -12,6 +12,7 @@ import repositories.AuthorRepository
 import repositories.codes.EmailVerificationCodeRepository
 import repositories.PasswordRepository
 import repositories.RefreshTokenRepository
+import repositories.codes.ResetPasswordCodeRepository
 import services.AuthorizationService
 import services.AuthorsPortfolioService
 import java.io.FileInputStream
@@ -29,6 +30,7 @@ object DIHelper {
         single { PasswordManager(get(), get(), get()) }
         single { EmailManager(get(), get(), get()) }
         single { EmailVerificationCodeRepository() }
+        single { ResetPasswordCodeRepository() }
 
         // repositories
         single { AuthorRepository() }

@@ -9,7 +9,7 @@ class LoginIT : BehaviorSpecIT({
     val loginFlow: LoginFlow by inject()
 
     Given("login") {
-        Then("by simpleEmail") {
+        Then("by email") {
             rollback {
                 loginFlow.loginByEmail()
             }

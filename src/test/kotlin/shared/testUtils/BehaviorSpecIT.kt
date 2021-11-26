@@ -13,14 +13,9 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import shared.DITestHelper
 
-interface DoHaveDbConnection : KoinTest {
-    val appEnv: AppEnv
-}
-
 /** For integration tests to extend Koin, Kotest.BehaviorSpec, and extension functions. */
 abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoHaveDbConnection {
     override val appEnv: AppEnv by inject()
-    val loginFlow: LoginFlow by inject()
 
     override fun listeners() = listOf(
         KoinListener(
@@ -37,6 +32,10 @@ abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSp
     init {
         body()
     }
+}
+
+interface DoHaveDbConnection : KoinTest {
+    val appEnv: AppEnv
 }
 
 open class BehaviorSpecFlow(body: BehaviorSpecFlow.() -> Unit = {}) : KoinTest, DoHaveDbConnection {

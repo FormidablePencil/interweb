@@ -11,7 +11,7 @@ import org.ktorm.entity.sequenceOf
 import repositories.RepositoryBase
 
 class ResetPasswordCodeRepository : RepositoryBase() {
-    private val Database.resetPasswordCode get() = this.sequenceOf(ResetPasswordCodes)
+    private val Database.resetPasswordEmailCode get() = this.sequenceOf(ResetPasswordCodes)
 
     fun insert(code: String, authorId: Int): Boolean {
         return database.insert(ResetPasswordCodes) {
@@ -21,7 +21,7 @@ class ResetPasswordCodeRepository : RepositoryBase() {
     }
 
     fun get(authorId: Int): ResetPasswordCode? {
-        return database.resetPasswordCode.find {
+        return database.resetPasswordEmailCode.find {
             it.authorId eq authorId
         }
     }

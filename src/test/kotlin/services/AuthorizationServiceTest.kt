@@ -79,13 +79,13 @@ class AuthorizationServiceTest : BehaviorSpec({
             result.statusCode() shouldBe HttpStatusCode.BadRequest
             result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.WeakPassword)
         }
-        then("incorrectly format simpleEmail") {
-            val result = authorizationService.signup(genCreateAuthorRequest(aEmail = "simpleEmail"))
+        then("incorrectly format email") {
+            val result = authorizationService.signup(genCreateAuthorRequest(aEmail = "email"))
 
             result.statusCode() shouldBe HttpStatusCode.BadRequest
             result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.InvalidEmailFormat)
         }
-        then("taken simpleEmail") {
+        then("taken email") {
             every { authorRepository.getByEmail(email) } returns author
 
             val result = authorizationService.signup(genCreateAuthorRequest())
@@ -139,12 +139,12 @@ class AuthorizationServiceTest : BehaviorSpec({
             else
                 authorizationService.login(requestByUsername)
         }
-        and("invalid identification (simpleEmail or username)") {
+        and("invalid identification (email or username)") {
             fun invalidIdentificationValidation(result: LoginResponse) {
                 result.message() shouldBe LoginResponseFailed.getMsg(LoginResponseFailed.InvalidEmail)
                 result.statusCode() shouldBe HttpStatusCode.BadRequest
             }
-            then("when attempting to login by simpleEmail") {
+            then("when attempting to login by email") {
                 every { authorRepository.getByEmail(requestByEmail.email) } returns null
 
                 invalidIdentificationValidation(login(true))
@@ -198,7 +198,7 @@ class AuthorizationServiceTest : BehaviorSpec({
     xgiven("resetPassword") { }
 
     given("requestPasswordResetThroughVerifiedEmail") {
-        then("should send reset password link to simpleEmail") {
+        then("should send reset password link to email") {
             every { authorRepository.getById(authorId) } returns author
             coJustRun { emailManager.sendResetPasswordLink(authorId) }
 

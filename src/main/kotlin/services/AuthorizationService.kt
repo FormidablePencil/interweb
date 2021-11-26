@@ -131,12 +131,12 @@ class AuthorizationService(
         )
     }
 
-    // todo - reset password through verified simpleEmail
+    // todo - reset password through verified email
     fun resetPasswordWithThoughEmail(newPassword: String, emailCode: String): ResetPasswordResponse {
 
         TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
 
-        // get authorId base off of emailCode - I wonder if the simpleEmail getStatusCode is a jwt token??? - It could work
+        // get authorId base off of emailCode - I wonder if the email getStatusCode is a jwt token??? - It could work
         val authorId = 1
 
 //        return passwordManager.resetPassword(oldPassword, newPassword, authorId)
