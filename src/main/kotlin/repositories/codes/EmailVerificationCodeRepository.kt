@@ -30,9 +30,9 @@ class EmailVerificationCodeRepository : RepositoryBase() {
         return get(authorId)?.code
     }
 
-    fun delete(authorId: Int) {
-        database.delete(EmailVerificationCodes){
+    fun delete(authorId: Int): Boolean {
+        return database.delete(EmailVerificationCodes){
             it.authorId eq authorId
-        }
+        } != 0
     }
 }

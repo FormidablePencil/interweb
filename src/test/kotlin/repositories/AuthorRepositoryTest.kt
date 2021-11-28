@@ -20,7 +20,7 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
         username = username, email = email, firstname = firstname, lastname = lastname, password = password
     )
 
-    given("insertAuthor()") {
+    given("insert()") {
         then("insert author") {
             rollback {
                 val request = genReq(
@@ -28,7 +28,7 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
                     email = "wallabytest123456789876543210@gmail.com81",
                 )
 
-                val authorId = authorRepository.insertAuthor(request) ?: throw Exception("did not return id")
+                val authorId = authorRepository.insert(request) ?: throw Exception("did not return id")
 
                 and("getByEmail()") {
                     val authorGotByEmail = authorRepository.getByEmail(request.email) ?: throw Exception("test failed")
@@ -38,8 +38,8 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
                     authorGotByEmail.lastname shouldBe request.lastname
                 }
 
-                and("getIdByUsername()") {
-                    authorRepository.getIdByUsername(request.username) ?: throw Exception("test failed")
+                and("getByUsername()") {
+                    authorRepository.getByUsername(request.username) ?: throw Exception("test failed")
                 }
 
                 and("getById()") {
@@ -47,32 +47,44 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
                 }
             }
         }
+    }
 
-        given("constraints") {
-            whenConstraint(SqlConstraint.Unique, "username", null) {
-                authorRepository.insertAuthor(genReq(username = "username", email = "someEmail"))
-            } // todo - create validation with valikator
 
-            whenConstraint(SqlConstraint.Unique, "email", null) {
-                authorRepository.insertAuthor(genReq(email = "email", username = "someUsername"))
+    given("getAuthorAndDetails(insert author)") {
+        then("should have joined table authors with author_details") {
+            rollback {
+                // todo
+                //  author and author_detail must be created first
+                val result = authorRepository.getAuthorAndDetails(394)
+                println(result)
             }
+        }
+    }
 
-            whenConstraint(SqlConstraint.MaxSize, "email", 100) { x ->
-                authorRepository.insertAuthor(genReq(email = x))
-            }
+    given("constraints") {
+        whenConstraint(SqlConstraint.Unique, "username", null) {
+            authorRepository.insert(genReq(username = "username", email = "someEmail"))
+        } // todo - create validation with valikator
 
-            whenConstraint(SqlConstraint.MaxSize, "username", 15) { x ->
-                authorRepository.insertAuthor(genReq(username = x))
-            }
-
-            // failing and passing attempt with repository against sql db
-
-            // failing and passing against http Request model/dto - they use valikator
-
-            // this way no data going in from http doesn't succeed and neither one of use devs don't accidentally attempt to insert the wrong stuff
-            //  - at least the console will tell you that you fucked up when creating integration tests for a functionality.
+        whenConstraint(SqlConstraint.Unique, "email", null) {
+            authorRepository.insert(genReq(email = "email", username = "someUsername"))
         }
 
-        // todo - unit test sql's column type constraints
+        whenConstraint(SqlConstraint.MaxSize, "email", 100) { x ->
+            authorRepository.insert(genReq(email = x))
+        }
+
+        whenConstraint(SqlConstraint.MaxSize, "username", 15) { x ->
+            authorRepository.insert(genReq(username = x))
+        }
+
+        // failing and passing attempt with repository against sql db
+
+        // failing and passing against http Request model/dto - they use valikator
+
+        // this way no data going in from http doesn't succeed and neither one of use devs don't accidentally attempt to insert the wrong stuff
+        //  - at least the console will tell you that you fucked up when creating integration tests for a functionality.
     }
+
+// todo - unit test sql's column type constraints
 })

@@ -3,11 +3,14 @@ package services
 import configurations.AppEnv
 import dtos.authorization.LoginResponse
 import dtos.authorization.LoginResponseFailed
+import dtos.authorization.ResetPasswordResponse
 import dtos.authorization.TokensResponse
+import dtos.responseData.ITokenResponseData
 import dtos.signup.SignupResponseFailed
-import dtos.token.responseData.ITokenResponseData
+import dtos.succeeded
 import helper.maskEmail
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.mockk.*
@@ -95,7 +98,7 @@ class AuthorizationServiceTest : BehaviorSpec({
         }
         then("taken username") {
             every { authorRepository.getByEmail(email) } returns null
-            every { authorRepository.getIdByUsername(username) } returns author
+            every { authorRepository.getByUsername(username) } returns author
 
             val result = authorizationService.signup(genCreateAuthorRequest())
 
@@ -105,20 +108,20 @@ class AuthorizationServiceTest : BehaviorSpec({
         then("provided with valid credentials") {
             val request = genCreateAuthorRequest()
 
-            every { authorRepository.getIdByUsername(request.username) } returns null
+            every { authorRepository.getByUsername(request.username) } returns null
             every { authorRepository.getByEmail(request.email) } returns null
             justRun { emailManager.welcomeNewAuthor(authorId) }
-            every { passwordManager.setNewPassword(request.password, authorId = authorId) } returns true
-            every { tokenManager.generateTokens(authorId = authorId) } returns tokenResponseData
+            justRun { passwordManager.setNewPassword(request.password, authorId = authorId) }
+            every { tokenManager.generateAuthTokens(authorId = authorId) } returns tokenResponseData
 
-            every { authorRepository.insertAuthor(request) } returns authorId
+            every { authorRepository.insert(request) } returns authorId
 
             val result = authorizationService.signup(request)
 
             verifySequence {
                 authorRepository.getByEmail(request.email)
-                authorRepository.getIdByUsername(request.username)
-                authorRepository.insertAuthor(request)
+                authorRepository.getByUsername(request.username)
+                authorRepository.insert(request)
                 passwordManager.setNewPassword(request.password, authorId)
                 emailManager.welcomeNewAuthor(authorId)
             }
@@ -150,13 +153,13 @@ class AuthorizationServiceTest : BehaviorSpec({
                 invalidIdentificationValidation(login(true))
             }
             then("when attempting to login by username") {
-                every { authorRepository.getIdByUsername(requestByUsername.username) } returns null
+                every { authorRepository.getByUsername(requestByUsername.username) } returns null
 
                 invalidIdentificationValidation(login(false))
             }
         }
         then("invalid password") {
-            every { authorRepository.getIdByUsername(requestByUsername.username) } returns author
+            every { authorRepository.getByUsername(requestByUsername.username) } returns author
             every { passwordManager.validatePassword(requestByUsername.password, authorId) } returns false
 
             val result = login(false)
@@ -167,9 +170,9 @@ class AuthorizationServiceTest : BehaviorSpec({
         then("valid credentials") {
             val expectedResponse = TokenResponseData("refresh token", "access token")
 
-            every { authorRepository.getIdByUsername(requestByUsername.username) } returns author
+            every { authorRepository.getByUsername(requestByUsername.username) } returns author
             every { passwordManager.validatePassword(requestByUsername.password, authorId) } returns true
-            every { tokenManager.generateTokens(authorId) } returns expectedResponse
+            every { tokenManager.generateAuthTokens(authorId) } returns expectedResponse
 
             val res = login(false)
 
@@ -195,7 +198,31 @@ class AuthorizationServiceTest : BehaviorSpec({
 
     }
 
-    xgiven("resetPassword") { }
+    given("changePassword") {
+        then("with new weak password") {
+            val res = authorizationService.resetPassword("Current!123", "weakPass", authorId)
+            res.statusCode() shouldBe HttpStatusCode.BadRequest
+        }
+        then("with strong password") {
+            val currentPassword = "MyCurrentPassword!123"
+            val newPassword = "MyNewPassword!123"
+
+            val resetPasswordResponse = ResetPasswordResponse().succeeded(HttpStatusCode.OK, tokenResponseData)
+            every {
+                passwordManager.changePassword(
+                    currentPassword,
+                    newPassword,
+                    authorId
+                )
+            } returns resetPasswordResponse
+
+            val res = authorizationService.resetPassword(currentPassword, newPassword, authorId)
+
+            res.statusCode() shouldBe HttpStatusCode.OK
+            res.data!!.refreshToken.length shouldBeGreaterThan 0
+            res.data!!.accessToken.length shouldBeGreaterThan 0
+        }
+    }
 
     given("requestPasswordResetThroughVerifiedEmail") {
         then("should send reset password link to email") {

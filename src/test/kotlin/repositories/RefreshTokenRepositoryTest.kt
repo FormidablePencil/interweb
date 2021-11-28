@@ -1,8 +1,10 @@
 package repositories
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
 import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.rollback
 
 class RefreshTokenRepositoryTest : BehaviorSpecUtRepo({
     val refreshTokenRepository: RefreshTokenRepository by inject()
@@ -11,23 +13,21 @@ class RefreshTokenRepositoryTest : BehaviorSpecUtRepo({
 
     // todo - how will I go again testing repositories?
 
-    xgiven("insertToken") {
-        refreshTokenRepository.insertToken(token, authorId) shouldBe true
+    given("insert, delete, get") {
+        then("should work") {
+            rollback {
+                // todo - why foreign keys??
+                refreshTokenRepository.insert(token, authorId) shouldBe true
 
-        then("getTokenByAuthorId") {
-            val tokenRes = refreshTokenRepository.getTokenByAuthorId(authorId)
-                ?: throw Exception("test failed")
+                val getRes = refreshTokenRepository.get(authorId)
 
-            tokenRes.refreshToken shouldBe token
+                getRes shouldNotBe null
+                getRes?.refreshToken shouldBe token
+
+                refreshTokenRepository.delete(authorId) shouldBe true
+
+                refreshTokenRepository.get(authorId) shouldBe null
+            }
         }
-
-        then("deleteOldToken") {
-            val f = refreshTokenRepository.deleteOldToken(authorId)
-        }
-
-        then("getTokenByAuthorId again not null") {
-            refreshTokenRepository.getTokenByAuthorId(authorId)
-        }
-
     }
 })

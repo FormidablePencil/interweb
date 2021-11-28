@@ -23,26 +23,26 @@ class TokenManager(
 
     fun refreshAccessToken(refreshToken: String, authorId: Int): TokensResponse {
         return if (isRefreshTokenValid(refreshToken, authorId)) {
-            val newTokens = generateTokens(authorId)
+            val newTokens = generateAuthTokens(authorId)
             TokensResponse().succeeded(HttpStatusCode.Created, newTokens)
         } else
             TokensResponse().failed(TokensResponseFailed.InvalidRefreshToken)
     }
 
-    fun generateTokens(authorId: Int): TokenResponseData {
+    fun generateAuthTokens(authorId: Int): TokenResponseData {
         val refreshToken = generateToken(authorId, KindOfTokens.RefreshToken)
         val accessToken = generateToken(authorId, KindOfTokens.AccessToken)
 
         appEnv.database.useTransaction {
-            refreshTokenRepository.deleteOldToken(authorId)
-            refreshTokenRepository.insertToken(refreshToken, authorId)
+            refreshTokenRepository.delete(authorId)
+            refreshTokenRepository.insert(refreshToken, authorId)
         }
 
         return TokenResponseData(refreshToken = refreshToken, accessToken = accessToken)
     }
 
     private fun isRefreshTokenValid(refreshToken: String, authorId: Int): Boolean {
-        return refreshTokenRepository.getTokenByAuthorId(authorId)?.refreshToken == refreshToken
+        return refreshTokenRepository.get(authorId)?.refreshToken == refreshToken
     }
 
     private fun generateToken(authorId: Int, kindOfToken: KindOfTokens): String {

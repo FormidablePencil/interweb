@@ -10,6 +10,7 @@ import dtos.signup.SignupResponse
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
 import exceptions.ServerErrorException
+import helper.JwtHelper
 import helper.isEmailFormatted
 import helper.isStrongPassword
 import helper.maskEmail
@@ -44,7 +45,7 @@ class AuthorizationService(
     private val emailManager: EmailManager,
     private val passwordManager: PasswordManager,
     private val authorRepository: AuthorRepository,
-    private val emailRepository: EmailVerificationCodeRepository,
+    private val emailVerificationCodeRepository: EmailVerificationCodeRepository,
 ) : KoinComponent {
     val appEnv: AppEnv by inject()
 
@@ -56,15 +57,15 @@ class AuthorizationService(
 
         if (authorRepository.getByEmail(request.email) is Author)
             return SignupResponse().failed(SignupResponseFailed.EmailTaken)
-        if (authorRepository.getIdByUsername(request.username) is Author)
+        if (authorRepository.getByUsername(request.username) is Author)
             return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
 
         appEnv.database.useTransaction {
-            val authorId = authorRepository.insertAuthor(request)
+            val authorId = authorRepository.insert(request)
             authorId ?: throw ServerErrorException("Failed to create author", this::class.java)
             passwordManager.setNewPassword(request.password, authorId)
             emailManager.welcomeNewAuthor(authorId)
-            val tokens = tokenManager.generateTokens(authorId)
+            val tokens = tokenManager.generateAuthTokens(authorId)
 
             return SignupResponse().succeeded(HttpStatusCode.Created, tokens)
         }
@@ -86,14 +87,14 @@ class AuthorizationService(
         val author = when (request.loginBy) {
             LoginBy.Email -> authorRepository.getByEmail(request.credential)
                 ?: return LoginResponse().failed(LoginResponseFailed.InvalidEmail)
-            LoginBy.Username -> authorRepository.getIdByUsername(request.credential)
+            LoginBy.Username -> authorRepository.getByUsername(request.credential)
                 ?: return LoginResponse().failed(LoginResponseFailed.InvalidUsername)
         }
 
         if (!passwordManager.validatePassword(request.password, author.id))
             return LoginResponse().failed(LoginResponseFailed.InvalidPassword)
 
-        val tokenResponse = tokenManager.generateTokens(author.id)
+        val tokenResponse = tokenManager.generateAuthTokens(author.id)
         return LoginResponse().succeeded(HttpStatusCode.OK, tokenResponse)
     }
 
@@ -105,7 +106,7 @@ class AuthorizationService(
     fun verifyEmail(request: VerifyEmailCodeRequest): VerifyEmailCodeResponse {
         val authorId = 2 // todo get authorId from token header
 
-        val codeDb = emailRepository.getCode(authorId)
+        val codeDb = emailVerificationCodeRepository.getCode(authorId)
             ?: return VerifyEmailCodeResponse().failed(VerifyEmailCodeResponseFailed.DoesNotExistEmailCode)
 
         return if (codeDb == request.code)
@@ -113,9 +114,17 @@ class AuthorizationService(
         else VerifyEmailCodeResponse().failed(VerifyEmailCodeResponseFailed.InvalidEmailCode)
     }
 
-    // todo - reset password with current password
-    fun resetPassword(currentPassword: String, newPassword: String) {
+    // todo -
+    //  email verification,
+    //  send reset password code to email,
+    //  reset password with email code,
+    //  reset password with current password
 
+    fun resetPassword(currentPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse {
+        if (!isStrongPassword(newPassword))
+            return ResetPasswordResponse().failed(ResetPasswordResponseFailed.WeakPassword)
+
+        return passwordManager.changePassword(currentPassword, newPassword, authorId)
     }
 
     fun requestPasswordResetThroughVerifiedEmail(authorId: Int): RequestPasswordResetResponse = runBlocking {
@@ -132,14 +141,27 @@ class AuthorizationService(
     }
 
     // todo - reset password through verified email
-    fun resetPasswordWithThoughEmail(newPassword: String, emailCode: String): ResetPasswordResponse {
+    fun resetPasswordThroughEmail(newPassword: String, emailCode: String): ResetPasswordThroughEmailResponse {
+        // todo - verify that email in file is verified
 
-        TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
+//        TODO("validate emailCode") // ideally, a confirmation should be sent to mail and the link to reset password
+
+        val authorId = JwtHelper.verifyAndGetAuthorId(emailCode, appEnv.getConfig("jwt.secret"))
+            ?: return ResetPasswordThroughEmailResponse().failed(ResetPasswordThroughEmailResponseFailed.InvalidEmailCode)
+
+        appEnv.database.useTransaction {
+            if (!emailVerificationCodeRepository.delete(authorId))
+                return ResetPasswordThroughEmailResponse().failed(ResetPasswordThroughEmailResponseFailed.EmailCodeNoInOurRecords)
+
+            passwordManager.setNewPassword(newPassword, authorId)
+        }
+
+        return ResetPasswordThroughEmailResponse().succeeded(HttpStatusCode.Created)
 
         // get authorId base off of emailCode - I wonder if the email getStatusCode is a jwt token??? - It could work
-        val authorId = 1
+//        val authorId = 1
 
-//        return passwordManager.resetPassword(oldPassword, newPassword, authorId)
+//        return passwordManager.changePassword(oldPassword, newPassword, authorId)
     }
 
 }

@@ -4,38 +4,50 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
 import org.mindrot.jbcrypt.BCrypt
-import shared.persistentId
+import serialized.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.SqlConstraint
 import shared.testUtils.rollback
-import shared.testUtils.whenUniqueConstraintDeprecated
 
 class PasswordRepositoryTest : BehaviorSpecUtRepo({
     val passwordRepository: PasswordRepository by inject()
+    val authorRepository: AuthorRepository by inject()
     val password = "StrongPassword!123"
     val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
-    val authorId = persistentId
 
-    // todo - how are we going to go about testing repositories?
-    xgiven("insertPassword()") {
-        rollback {
-            passwordRepository.insertPassword(passwordHash, authorId) shouldBe true
+    fun createAuthor(): Int {
+        return authorRepository.insert(
+            CreateAuthorRequest(
+                "someKind@asd.cof", "first", "last", "!Password123", "user"
+            )
+        )
+            ?: throw Exception("failed to insert")
+    }
 
-            then("getPassword()") {
-                val getPasswordRes = passwordRepository.getPassword(authorId)
+    given("insert, get, deletePassword") {
+        then("work properly") {
+            rollback {
+                val authorId = createAuthor()
+
+                passwordRepository.insert(passwordHash, authorId) shouldBe true
+
+                val getPasswordRes = passwordRepository.get(authorId)
                     ?: throw Exception("test failed")
                 getPasswordRes.password shouldNotBe password
                 BCrypt.checkpw(password, getPasswordRes.password) shouldBe true
-            }
 
-            then("deletePassword()") {
-                passwordRepository.deletePassword(authorId) shouldBe true
+                passwordRepository.delete(authorId) shouldBe true
+                passwordRepository.get(authorId) shouldBe null
             }
         }
     }
 
     given("constraints") {
-        whenUniqueConstraintDeprecated("author_id") {
-            passwordRepository.insertPassword(passwordHash, 2) shouldBe true
+        whenConstraint(SqlConstraint.Unique, "author_id") {
+            val authorId = createAuthor()
+
+            passwordRepository.insert(passwordHash, authorId) shouldBe true
+            // todo - Passwords has a foreign key and so a valid author_id must be provided but if it's not then the whenConstraint should fail, but it does not
         }
     }
 })

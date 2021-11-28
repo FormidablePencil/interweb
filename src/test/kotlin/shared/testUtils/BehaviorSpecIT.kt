@@ -2,8 +2,6 @@ package shared.testUtils
 
 import configurations.AppEnv
 import configurations.DIHelper
-import integrationTests.auth.flows.LoginFlow
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.koin.KoinListener
 import io.mockk.mockk
@@ -13,8 +11,12 @@ import org.koin.test.KoinTest
 import org.koin.test.inject
 import shared.DITestHelper
 
+interface DoesHaveAppEnv : KoinTest {
+    val appEnv: AppEnv
+}
+
 /** For integration tests to extend Koin, Kotest.BehaviorSpec, and extension functions. */
-abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoHaveDbConnection {
+abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSpec(), KoinTest, DoesHaveAppEnv {
     override val appEnv: AppEnv by inject()
 
     override fun listeners() = listOf(
@@ -34,31 +36,10 @@ abstract class BehaviorSpecIT(body: BehaviorSpecIT.() -> Unit = {}) : BehaviorSp
     }
 }
 
-interface DoHaveDbConnection : KoinTest {
-    val appEnv: AppEnv
-}
-
-open class BehaviorSpecFlow(body: BehaviorSpecFlow.() -> Unit = {}) : KoinTest, DoHaveDbConnection {
+open class BehaviorSpecFlow(body: BehaviorSpecFlow.() -> Unit = {}) : KoinTest, DoesHaveAppEnv {
     override val appEnv: AppEnv by inject()
 
     init {
         body()
-    }
-}
-
-suspend fun BehaviorSpecIT.whenUniqueConstraintDeprecated(constraintOn: String, code: suspend () -> Unit) {
-    Given(constraintOn) {
-        shouldThrow<Exception> {
-            try {
-                code()
-            } catch (ex: Exception) {
-                throw Exception(ex)
-            }
-            try {
-                code()
-            } catch (ex: Exception) {
-                throw Exception(ex)
-            }
-        }
     }
 }

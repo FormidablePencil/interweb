@@ -37,11 +37,11 @@ class TokenManagerTest : BehaviorSpec({
             configs.property(capturedPath.captured).getString()
         }
 
-        every { refreshTokenRepository.deleteOldToken(authorId) } returns true
-        every { refreshTokenRepository.insertToken(any(), authorId) } returns true
+        every { refreshTokenRepository.delete(authorId) } returns true
+        every { refreshTokenRepository.insert(any(), authorId) } returns true
 
         every { tokenDb.refreshToken } returns tokens.refreshToken
-        every { refreshTokenRepository.getTokenByAuthorId(authorId) } returns tokenDb
+        every { refreshTokenRepository.get(authorId) } returns tokenDb
     }
 
     given("refreshAccessToken") {
@@ -60,13 +60,13 @@ class TokenManagerTest : BehaviorSpec({
         }
     }
 
-    given("generateTokens") {
+    given("generateAuthTokens") {
         then("valid everything") {
-            val result = tokenManager.generateTokens(authorId)
+            val result = tokenManager.generateAuthTokens(authorId)
 
             verifySequence {
-                refreshTokenRepository.deleteOldToken(authorId)
-                refreshTokenRepository.insertToken(any(), authorId)
+                refreshTokenRepository.delete(authorId)
+                refreshTokenRepository.insert(any(), authorId)
             }
 
             result.refreshToken.length shouldBeGreaterThan 0

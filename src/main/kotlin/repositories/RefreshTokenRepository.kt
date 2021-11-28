@@ -12,18 +12,18 @@ import org.ktorm.entity.sequenceOf
 class RefreshTokenRepository : RepositoryBase() {
     private val Database.token get() = this.sequenceOf(Tokens)
 
-    fun insertToken(refreshToken: String, authorId: Int): Boolean {
+    fun insert(refreshToken: String, authorId: Int): Boolean {
         return database.insert(Tokens) {
             set(it.refreshToken, refreshToken)
             set(it.authorId, authorId)
         } != 0
     }
 
-    fun deleteOldToken(authorId: Int): Boolean {
+    fun delete(authorId: Int): Boolean {
         return database.delete(Tokens) { it.authorId eq authorId } != 0
     }
 
-    fun getTokenByAuthorId(authorId: Int): Token? {
+    fun get(authorId: Int): Token? {
         return database.token.find { it.authorId eq authorId }
     }
 }

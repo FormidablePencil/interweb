@@ -9,9 +9,9 @@ import managers.TokenManager
 import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import repositories.AuthorRepository
-import repositories.codes.EmailVerificationCodeRepository
 import repositories.PasswordRepository
 import repositories.RefreshTokenRepository
+import repositories.codes.EmailVerificationCodeRepository
 import repositories.codes.ResetPasswordCodeRepository
 import services.AuthorizationService
 import services.AuthorsPortfolioService

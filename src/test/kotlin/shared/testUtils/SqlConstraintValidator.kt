@@ -13,12 +13,12 @@ enum class SqlConstraint {
 
 /** To validate sql constraints. */
 // todo - write a test for this
-interface SqlColConstraint : DoHaveDbConnection {
+interface SqlColConstraint : DoesHaveAppEnv {
     /** test both scenarios, with a violating column constraint and without. */
     suspend fun BehaviorSpecGivenContainerContext.whenConstraint(
         constraint: SqlConstraint,
         columnName: String,
-        sizeLimit: Int?,
+        sizeLimit: Int? = null,
         test: suspend (generatedString: String) -> Unit,
     ) {
         runScenario(constraint, columnName, sizeLimit, test, true)

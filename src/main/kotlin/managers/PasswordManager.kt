@@ -18,29 +18,28 @@ class PasswordManager(
 ) : KoinComponent {
     private val appEnv: AppEnv by inject()
 
-    fun resetPassword(oldPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse {
-        validatePassword(oldPassword, authorId)
+    fun changePassword(currentPassword: String, newPassword: String, authorId: Int): ResetPasswordResponse {
+        validatePassword(currentPassword, authorId)
 
         appEnv.database.useTransaction {
-            refreshTokenRepository.deleteOldToken(authorId)
-            passwordRepository.deletePassword(authorId)
-            if (setNewPassword(newPassword, authorId))
-                throw ServerErrorException("Server code. Saving password failed", this::class.java)
-            val tokens = tokenManager.generateTokens(authorId)
-            return ResetPasswordResponse(tokens.accessToken, tokens.refreshToken)
-                .succeeded(HttpStatusCode.MultiStatus) // todo change implementation
+            refreshTokenRepository.delete(authorId)
+            passwordRepository.delete(authorId)
+            setNewPassword(newPassword, authorId)
+            val tokens = tokenManager.generateAuthTokens(authorId)
+            return ResetPasswordResponse().succeeded(HttpStatusCode.OK, tokens)
         }
     }
 
     fun validatePassword(password: String, authorId: Int): Boolean {
-        val passwordRecord = passwordRepository.getPassword(authorId)
-            ?: throw ServerErrorException("Failed to retrieve password", this::class.java)
+        val passwordRecord = passwordRepository.get(authorId)
+            ?: throw ServerErrorException("Failed to retrieve password.", this::class.java)
 
         return BCrypt.checkpw(password, passwordRecord.password)
     }
 
-    fun setNewPassword(password: String, authorId: Int): Boolean {
+    fun setNewPassword(password: String, authorId: Int) {
         val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
-        return passwordRepository.insertPassword(passwordHash, authorId)
+        if (!passwordRepository.insert(passwordHash, authorId))
+            throw ServerErrorException("Server code. Saving password failed.", this::class.java)
     }
 }
