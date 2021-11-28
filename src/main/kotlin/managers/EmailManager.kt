@@ -10,16 +10,16 @@ import org.apache.commons.mail.DefaultAuthenticator
 import org.apache.commons.mail.SimpleEmail
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import repositories.AuthorRepository
 import repositories.codes.EmailVerificationCodeRepository
 import repositories.codes.ResetPasswordCodeRepository
+import repositories.profile.AuthorProfileRelatedRepository
 import staticData.EmailMessages
 import java.util.*
 
 class EmailManager(
     private val emailVerificationCodeRepository: EmailVerificationCodeRepository,
     private val resetPasswordCodeRepository: ResetPasswordCodeRepository,
-    private val authorRepository: AuthorRepository,
+    private val authorProfileRelatedRepository: AuthorProfileRelatedRepository,
 ) : KoinComponent {
     private val appEnv: AppEnv = get()
     private val eMailer: SimpleEmail = get()
@@ -37,7 +37,7 @@ class EmailManager(
     }
 
     fun welcomeNewAuthor(authorId: Int) {
-        val author = authorRepository.getById(authorId)
+        val author = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorId)
             ?: throw ServerErrorException("Resource not found.", this::class.java)
         val welcomeMsg = EmailMessages.WelcomeMsg(firstname = author.firstname)
 
@@ -49,7 +49,7 @@ class EmailManager(
     }
 
     suspend fun sendResetPasswordLink(authorId: Int): Unit = coroutineScope {
-        val author = authorRepository.getById(authorId)
+        val author = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorId)
             ?: throw ServerErrorException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.PasswordResetMsg(username = author.username)
 
@@ -66,7 +66,7 @@ class EmailManager(
     }
 
     suspend fun sendValidateEmail(authorId: Int): Unit = coroutineScope {
-        val author = authorRepository.getById(authorId)
+        val author = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorId)
             ?: throw ServerErrorException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.ValidateEmailMsg(username = author.username)
 

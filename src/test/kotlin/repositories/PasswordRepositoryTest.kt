@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
 import org.mindrot.jbcrypt.BCrypt
+import repositories.profile.AuthorProfileRelatedRepository
 import serialized.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.SqlConstraint
@@ -11,17 +12,17 @@ import shared.testUtils.rollback
 
 class PasswordRepositoryTest : BehaviorSpecUtRepo({
     val passwordRepository: PasswordRepository by inject()
-    val authorRepository: AuthorRepository by inject()
+    val authorProfileRelatedRepository: AuthorProfileRelatedRepository by inject()
     val password = "StrongPassword!123"
     val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
 
     fun createAuthor(): Int {
-        return authorRepository.insert(
+        return authorProfileRelatedRepository.createNewAuthor(
             CreateAuthorRequest(
                 "someKind@asd.cof", "first", "last", "!Password123", "user"
             )
         )
-            ?: throw Exception("failed to insert")
+            ?: throw Exception("failed to create new author")
     }
 
     given("insert, get, deletePassword") {

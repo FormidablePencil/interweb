@@ -4,7 +4,7 @@ import dtos.portfolio.GetLayoutResult
 import models.portfolio.LayoutComponent
 import managers.AuthorsPortfolioManager
 import models.profile.Author
-import repositories.AuthorRepository
+import repositories.profile.AuthorRepository
 
 class AuthorsPortfolioService(
     private val authorRepository: AuthorRepository,
@@ -26,7 +26,7 @@ class AuthorsPortfolioService(
         return authorRepository.getById(userId)
     };
 
-    fun GetAuthorByEmail(email: String): Author? {
-        return authorRepository.getByEmail(email)
-    };
+//    fun GetAuthorByEmail(email: String): Author? {
+////        return authorRepository.getByEmail(email)
+//    };
 }

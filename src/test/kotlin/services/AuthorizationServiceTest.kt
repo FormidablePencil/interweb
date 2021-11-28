@@ -17,9 +17,12 @@ import io.mockk.*
 import managers.EmailManager
 import managers.PasswordManager
 import managers.TokenManager
+import models.profile.Account
 import models.profile.Author
-import repositories.AuthorRepository
 import repositories.codes.EmailVerificationCodeRepository
+import repositories.profile.AccountRepository
+import repositories.profile.AuthorProfileRelatedRepository
+import repositories.profile.AuthorRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -32,7 +35,10 @@ class AuthorizationServiceTest : BehaviorSpec({
     val emailManager: EmailManager = mockk()
     val passwordManager: PasswordManager = mockk()
     val emailVerifyCodeRepository: EmailVerificationCodeRepository = mockk()
+    val authorProfileRelatedRepository: AuthorProfileRelatedRepository = mockk()
+    val accountRepository: AccountRepository = mockk()
     val author: Author = mockk()
+    val account: Account = mockk()
     val username = "YourNeighborhoodSpider"
     val email = "testemail12345@gmail.com"
     val password = "Formidable!76"
@@ -46,6 +52,8 @@ class AuthorizationServiceTest : BehaviorSpec({
             emailManager,
             passwordManager,
             authorRepository,
+            accountRepository,
+            authorProfileRelatedRepository,
             emailVerifyCodeRepository,
         )
     )
@@ -61,7 +69,7 @@ class AuthorizationServiceTest : BehaviorSpec({
         appEnvMockHelper(appEnv, authorizationService)
 
         every { author.id } returns authorId
-        every { author.email } returns email
+        every { account.email } returns email
     }
 
     given("signup") {
@@ -89,7 +97,7 @@ class AuthorizationServiceTest : BehaviorSpec({
             result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.InvalidEmailFormat)
         }
         then("taken email") {
-            every { authorRepository.getByEmail(email) } returns author
+            every { accountRepository.getByEmail(email) } returns account
 
             val result = authorizationService.signup(genCreateAuthorRequest())
 
@@ -97,7 +105,7 @@ class AuthorizationServiceTest : BehaviorSpec({
             result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.EmailTaken)
         }
         then("taken username") {
-            every { authorRepository.getByEmail(email) } returns null
+            every { accountRepository.getByEmail(email) } returns null
             every { authorRepository.getByUsername(username) } returns author
 
             val result = authorizationService.signup(genCreateAuthorRequest())
@@ -109,19 +117,19 @@ class AuthorizationServiceTest : BehaviorSpec({
             val request = genCreateAuthorRequest()
 
             every { authorRepository.getByUsername(request.username) } returns null
-            every { authorRepository.getByEmail(request.email) } returns null
+            every { accountRepository.getByEmail(request.email) } returns null
             justRun { emailManager.welcomeNewAuthor(authorId) }
             justRun { passwordManager.setNewPassword(request.password, authorId = authorId) }
             every { tokenManager.generateAuthTokens(authorId = authorId) } returns tokenResponseData
 
-            every { authorRepository.insert(request) } returns authorId
+            every { authorProfileRelatedRepository.createNewAuthor(request) } returns authorId
 
             val result = authorizationService.signup(request)
 
             verifySequence {
-                authorRepository.getByEmail(request.email)
+                accountRepository.getByEmail(request.email)
                 authorRepository.getByUsername(request.username)
-                authorRepository.insert(request)
+                authorProfileRelatedRepository.createNewAuthor(request)
                 passwordManager.setNewPassword(request.password, authorId)
                 emailManager.welcomeNewAuthor(authorId)
             }
@@ -148,7 +156,7 @@ class AuthorizationServiceTest : BehaviorSpec({
                 result.statusCode() shouldBe HttpStatusCode.BadRequest
             }
             then("when attempting to login by email") {
-                every { authorRepository.getByEmail(requestByEmail.email) } returns null
+                every { accountRepository.getByEmail(requestByEmail.email) } returns null
 
                 invalidIdentificationValidation(login(true))
             }
@@ -226,7 +234,7 @@ class AuthorizationServiceTest : BehaviorSpec({
 
     given("requestPasswordResetThroughVerifiedEmail") {
         then("should send reset password link to email") {
-            every { authorRepository.getById(authorId) } returns author
+            every { accountRepository.getById(authorId) } returns account
             coJustRun { emailManager.sendResetPasswordLink(authorId) }
 
             val res = authorizationService.requestPasswordResetThroughVerifiedEmail(authorId)

@@ -6,13 +6,13 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.koin.KoinListener
 import io.ktor.config.*
 import io.mockk.*
-import models.profile.Author
 import org.apache.commons.mail.SimpleEmail
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import repositories.AuthorRepository
 import repositories.codes.EmailVerificationCodeRepository
 import repositories.codes.ResetPasswordCodeRepository
+import repositories.profile.AuthorProfileRelatedRepository
+import repositories.profile.AuthorWithDetailAndAccount
 import shared.appEnvMockHelper
 import staticData.EmailMessages
 import staticData.IEmailMsgStructure
@@ -33,12 +33,14 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
     init {
         val emailRepository: EmailVerificationCodeRepository = mockk(relaxed = true)
         val resetPasswordCodeRepository: ResetPasswordCodeRepository = mockk(relaxed = true)
-        val authorRepository: AuthorRepository = mockk()
-        val authorId = 0
-        val author: Author = mockk()
-        val email = "someEmailAddress@gmail.com21"
-        val username = "Username"
-        val firstname = "Firstname"
+        val authorProfileRelatedRepository: AuthorProfileRelatedRepository = mockk()
+        val authorWithDetailAndAccount = AuthorWithDetailAndAccount(
+            authorId = 0,
+            username = "aUsername",
+            firstname = "aFirstname",
+            lastname = "aLastname",
+            email = "someEmailAddress@gmail.com21"
+        )
         val configs = HoconApplicationConfig(ConfigFactory.load())
 
         lateinit var emailManager: EmailManager
@@ -55,13 +57,14 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
 
             appEnvMockHelper(appEnv)
 
-            every { author.firstname } returns firstname
-            every { author.email } returns email
-            every { author.username } returns username
-            every { author.id } returns authorId
-            every { authorRepository.getById(authorId) } returns author
+            every {
+                authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorWithDetailAndAccount.authorId)
+            } returns authorWithDetailAndAccount
 
-            emailManager = spyk(EmailManager(emailRepository, resetPasswordCodeRepository, authorRepository), recordPrivateCalls = true)
+            emailManager = spyk(
+                EmailManager(emailRepository, resetPasswordCodeRepository, authorProfileRelatedRepository),
+                recordPrivateCalls = true
+            )
 
             verifyInstantiation()
         }
@@ -74,34 +77,35 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
             eMailer.setFrom(emailFrom)
             eMailer.subject = emailMsg.subject()
             eMailer.setMsg(emailMsg.message())
-            eMailer.addTo(email)
+            eMailer.addTo(authorWithDetailAndAccount.email)
         }
 
         given("sendResetPasswordLink") {
             then("just send reset password link to email on file") {
-                val passwordResetMsg = EmailMessages.PasswordResetMsg(username = author.username)
+                val passwordResetMsg =
+                    EmailMessages.PasswordResetMsg(username = authorWithDetailAndAccount.username)
 
-                emailManager.sendResetPasswordLink(authorId)
+                emailManager.sendResetPasswordLink(authorWithDetailAndAccount.authorId)
 
                 verifyOrder {
-                    authorRepository.getById(authorId)
+                    authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorWithDetailAndAccount.authorId)
                     sendEmailVerificationOrder(passwordResetMsg)
                 }
                 coVerify {
                     appEnv.getConfig("jwt.emailSecret")
-                    resetPasswordCodeRepository.insert(any(), authorId)
+                    resetPasswordCodeRepository.insert(any(), authorWithDetailAndAccount.authorId)
                 }
             }
         }
 
         given("welcomeNewAuthor") {
             then("just send welcoming email") {
-                val welcomeMsg = EmailMessages.WelcomeMsg(firstname = author.firstname)
+                val welcomeMsg = EmailMessages.WelcomeMsg(firstname = authorWithDetailAndAccount.firstname)
 
-                emailManager.welcomeNewAuthor(authorId)
+                emailManager.welcomeNewAuthor(authorWithDetailAndAccount.authorId)
 
                 verifyOrder {
-                    authorRepository.getById(authorId)
+                    authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorWithDetailAndAccount.authorId)
                     sendEmailVerificationOrder(welcomeMsg)
                 }
             }
@@ -109,17 +113,17 @@ class EmailManagerTest : BehaviorSpec(), KoinTest {
 
         given("sendValidateEmail") {
             then("send validation code to email") {
-                val verifyEmailMsg = EmailMessages.ValidateEmailMsg(username = author.username)
+                val verifyEmailMsg = EmailMessages.ValidateEmailMsg(username = authorWithDetailAndAccount.username)
 
-                emailManager.sendValidateEmail(authorId)
+                emailManager.sendValidateEmail(authorWithDetailAndAccount.authorId)
 
                 verifyOrder {
-                    authorRepository.getById(authorId)
+                    authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorWithDetailAndAccount.authorId)
                     sendEmailVerificationOrder(verifyEmailMsg)
                 }
                 coVerify {
                     appEnv.getConfig("jwt.emailSecret")
-                    emailRepository.insert(any(), authorId)
+                    emailRepository.insert(any(), authorWithDetailAndAccount.authorId)
                 }
             }
         }

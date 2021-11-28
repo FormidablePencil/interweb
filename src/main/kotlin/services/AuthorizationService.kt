@@ -21,11 +21,12 @@ import kotlinx.coroutines.runBlocking
 import managers.EmailManager
 import managers.PasswordManager
 import managers.TokenManager
-import models.profile.Author
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import repositories.AuthorRepository
 import repositories.codes.EmailVerificationCodeRepository
+import repositories.profile.AccountRepository
+import repositories.profile.AuthorProfileRelatedRepository
+import repositories.profile.AuthorRepository
 import serialized.CreateAuthorRequest
 import serialized.LoginByEmailRequest
 import serialized.LoginByUsernameRequest
@@ -45,23 +46,18 @@ class AuthorizationService(
     private val emailManager: EmailManager,
     private val passwordManager: PasswordManager,
     private val authorRepository: AuthorRepository,
+    private val accountRepository: AccountRepository,
+    private val authorProfileRelatedRepository: AuthorProfileRelatedRepository,
     private val emailVerificationCodeRepository: EmailVerificationCodeRepository,
 ) : KoinComponent {
     val appEnv: AppEnv by inject()
 
     fun signup(request: CreateAuthorRequest): SignupResponse {
-        if (!isStrongPassword(request.password))
-            return SignupResponse().failed(SignupResponseFailed.WeakPassword)
-        if (!isEmailFormatted(request.email))
-            return SignupResponse().failed(SignupResponseFailed.InvalidEmailFormat)
-
-        if (authorRepository.getByEmail(request.email) is Author)
-            return SignupResponse().failed(SignupResponseFailed.EmailTaken)
-        if (authorRepository.getByUsername(request.username) is Author)
-            return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
+        val validateSignupRequestResult = validateSignupRequest(request)
+        if (validateSignupRequestResult != null) return validateSignupRequestResult
 
         appEnv.database.useTransaction {
-            val authorId = authorRepository.insert(request)
+            val authorId = authorProfileRelatedRepository.createNewAuthor(request)
             authorId ?: throw ServerErrorException("Failed to create author", this::class.java)
             passwordManager.setNewPassword(request.password, authorId)
             emailManager.welcomeNewAuthor(authorId)
@@ -69,6 +65,20 @@ class AuthorizationService(
 
             return SignupResponse().succeeded(HttpStatusCode.Created, tokens)
         }
+    }
+
+    private fun validateSignupRequest(request: CreateAuthorRequest): SignupResponse? {
+        if (!isStrongPassword(request.password))
+            return SignupResponse().failed(SignupResponseFailed.WeakPassword)
+        if (!isEmailFormatted(request.email))
+            return SignupResponse().failed(SignupResponseFailed.InvalidEmailFormat)
+
+        if (accountRepository.getByEmail(request.email) != null)
+            return SignupResponse().failed(SignupResponseFailed.EmailTaken)
+        if (authorRepository.getByUsername(request.username) != null)
+            return SignupResponse().failed(SignupResponseFailed.UsernameTaken)
+
+        return null
     }
 
     fun login(request: LoginByEmailRequest): LoginResponse {
@@ -84,17 +94,17 @@ class AuthorizationService(
     }
 
     private fun login(request: LoginRequest): LoginResponse {
-        val author = when (request.loginBy) {
-            LoginBy.Email -> authorRepository.getByEmail(request.credential)
+        val authorId = when (request.loginBy) {
+            LoginBy.Email -> accountRepository.getByEmail(request.credential)?.authorId
                 ?: return LoginResponse().failed(LoginResponseFailed.InvalidEmail)
-            LoginBy.Username -> authorRepository.getByUsername(request.credential)
+            LoginBy.Username -> authorRepository.getByUsername(request.credential)?.id
                 ?: return LoginResponse().failed(LoginResponseFailed.InvalidUsername)
         }
 
-        if (!passwordManager.validatePassword(request.password, author.id))
+        if (!passwordManager.validatePassword(request.password, authorId))
             return LoginResponse().failed(LoginResponseFailed.InvalidPassword)
 
-        val tokenResponse = tokenManager.generateAuthTokens(author.id)
+        val tokenResponse = tokenManager.generateAuthTokens(authorId)
         return LoginResponse().succeeded(HttpStatusCode.OK, tokenResponse)
     }
 
@@ -128,7 +138,7 @@ class AuthorizationService(
     }
 
     fun requestPasswordResetThroughVerifiedEmail(authorId: Int): RequestPasswordResetResponse = runBlocking {
-        val email = authorRepository.getById(authorId)?.email
+        val email = accountRepository.getById(authorId)?.email
             ?: throw ServerErrorException("author must exist but doesn't.", this::class.java)
 
         launch {

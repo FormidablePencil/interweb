@@ -6,8 +6,12 @@ interface IEmailMsgStructure {
 }
 
 class EmailMessages {
-    class WelcomeMsg(private val firstname: String) : IEmailMsgStructure {
-        override fun subject() = "Welcome dear author $firstname"
+    class WelcomeMsg(private val firstname: String?) : IEmailMsgStructure {
+        override fun subject(): String {
+            return if (firstname == null) "Welcome dear author."
+            else "Welcome dear author $firstname"
+        }
+
         override fun message() = "Welcome to InterWeb!"
     }
 

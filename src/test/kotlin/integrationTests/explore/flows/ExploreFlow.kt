@@ -31,16 +31,16 @@ class ExploreFlow(
 
         //region actions
         // Search author
-        val author: Author = exploreDomainService.SearchAuthors(createAuthorRequest.email)
-        // click author which gets author's layouts
-        val authorsLayouts = authorsPortfolioDomainService.GetAuthorsLayouts(author.id)
-        val layoutChoseToView = authorsLayouts.first()
-        // then choose author's layout to view
-        val authorsLayout = authorsPortfolioDomainService.GetLayout(author.id, layoutChoseToView)
-
-        Assert.assertTrue(authorsLayout.layoutComponents.count() > 0)
-        Assert.assertTrue(authorsLayout.layoutArrangement.count() > 0)
-        //endregion
+//        val author: Author = exploreDomainService.SearchAuthors(createAuthorRequest.email)
+//        // click author which gets author's layouts
+//        val authorsLayouts = authorsPortfolioDomainService.GetAuthorsLayouts(author.id)
+//        val layoutChoseToView = authorsLayouts.first()
+//        // then choose author's layout to view
+//        val authorsLayout = authorsPortfolioDomainService.GetLayout(author.id, layoutChoseToView)
+//
+//        Assert.assertTrue(authorsLayout.layoutComponents.count() > 0)
+//        Assert.assertTrue(authorsLayout.layoutArrangement.count() > 0)
+//        //endregion
     }
 
     fun VisitThread_userflow() {
