@@ -28,8 +28,8 @@ import repositories.profile.AccountRepository
 import repositories.profile.AuthorProfileRelatedRepository
 import repositories.profile.AuthorRepository
 import serialized.CreateAuthorRequest
-import serialized.LoginByEmailRequest
-import serialized.LoginByUsernameRequest
+import serialized.auth.LoginByEmailRequest
+import serialized.auth.LoginByUsernameRequest
 
 fun main() {
     runBlocking {

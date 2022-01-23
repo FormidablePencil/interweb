@@ -8,8 +8,8 @@ import io.ktor.http.*
 import org.koin.test.inject
 import org.opentest4j.AssertionFailedError
 import serialized.CreateAuthorRequest
-import serialized.LoginByEmailRequest
-import serialized.LoginByUsernameRequest
+import serialized.auth.LoginByEmailRequest
+import serialized.auth.LoginByUsernameRequest
 import services.AuthorizationService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback

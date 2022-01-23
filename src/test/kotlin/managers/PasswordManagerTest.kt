@@ -10,7 +10,7 @@ import models.authorization.Password
 import org.mindrot.jbcrypt.BCrypt
 import repositories.PasswordRepository
 import repositories.RefreshTokenRepository
-import serialized.TokenResponseData
+import serialized.auth.TokenResponseData
 import shared.appEnvMockHelper
 
 class PasswordManagerTest : BehaviorSpec({

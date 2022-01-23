@@ -1,4 +1,4 @@
-package serialized
+package serialized.auth
 
 import dtos.responseData.ITokenResponseData
 import kotlinx.serialization.Serializable

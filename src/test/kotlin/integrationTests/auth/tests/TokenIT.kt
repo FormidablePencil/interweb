@@ -9,11 +9,10 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import kotlinx.coroutines.delay
-import org.koin.test.get
 import org.koin.test.inject
 import org.opentest4j.AssertionFailedError
 import serialized.CreateAuthorRequest
-import serialized.LoginByUsernameRequest
+import serialized.auth.LoginByUsernameRequest
 import services.AuthorizationService
 import shared.testUtils.BehaviorSpecIT
 import shared.testUtils.rollback

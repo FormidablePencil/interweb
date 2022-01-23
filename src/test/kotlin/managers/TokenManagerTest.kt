@@ -14,7 +14,7 @@ import io.ktor.http.*
 import io.mockk.*
 import models.authorization.Token
 import repositories.RefreshTokenRepository
-import serialized.TokenResponseData
+import serialized.auth.TokenResponseData
 import shared.appEnvMockHelper
 
 class TokenManagerTest : BehaviorSpec({

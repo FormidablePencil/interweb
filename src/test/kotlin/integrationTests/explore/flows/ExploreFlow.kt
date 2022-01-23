@@ -2,14 +2,12 @@ package integrationTests.explore.flows
 
 import services.AuthorsPortfolioService
 import services.ExploreService
-import services.ThreadService
+import services.SpaceService
 import integrationTests.auth.flows.SignupFlow
-import models.profile.Author
-import org.junit.Assert
 import serialized.CreateAuthorRequest
 
 class ExploreFlow(
-    private val threadDomainService: ThreadService,
+    private val threadDomainService: SpaceService,
     private val exploreDomainService: ExploreService,
     private val authorsPortfolioDomainService: AuthorsPortfolioService,
     private val signupFlows: SignupFlow,

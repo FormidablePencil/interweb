@@ -11,7 +11,7 @@ class AuthorProfileRelatedRepositoryTest : BehaviorSpecUtRepo({
     val authorProfileRelatedRepository: AuthorProfileRelatedRepository by inject()
 
     fun genReq(
-        username: String = "username",
+        username: String = "username123",
         email: String = "email",
         firstname: String = "firstname",
         lastname: String = "lastname",
@@ -23,7 +23,7 @@ class AuthorProfileRelatedRepositoryTest : BehaviorSpecUtRepo({
     beforeTest {
     }
 
-    given("createNewAuthor") {
+    xgiven("createNewAuthor") {
 
     }
 

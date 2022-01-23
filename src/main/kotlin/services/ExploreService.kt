@@ -1,13 +1,12 @@
 package services
 
-import models.profile.Author
 import models.thread.Thread
 import repositories.profile.AuthorRepository
-import repositories.ThreadRepository
+import repositories.SpaceRepository
 
 class ExploreService(
     private var authorRepository: AuthorRepository,
-    private var threadRepository: ThreadRepository,
+    private var threadRepository: SpaceRepository,
 ) {
 
 //    fun Search(search: String) {

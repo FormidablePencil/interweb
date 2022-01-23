@@ -8,15 +8,14 @@ import shared.testUtils.rollback
 
 class RefreshTokenRepositoryTest : BehaviorSpecUtRepo({
     val refreshTokenRepository: RefreshTokenRepository by inject()
-    val authorId = 0 // should fail since this doesn't exist. Testing
+    val authorId = 0 // todo - should fail since this doesn't exist. Testing
     val token = "refreshToken"
 
-    // todo - how will I go again testing repositories?
-
+    // todo -
+    //  authorProfileRelatedRepository.createNewAuthor() must happen first
     xgiven("insert, delete, get") {
         then("should work") {
             rollback {
-                // todo - why foreign keys??
                 refreshTokenRepository.insert(token, authorId) shouldBe true
 
                 val getRes = refreshTokenRepository.get(authorId)

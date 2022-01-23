@@ -5,7 +5,7 @@ import io.ktor.request.*
 import io.ktor.routing.*
 import org.koin.ktor.ext.inject
 import serialized.CreateAuthorRequest
-import serialized.LoginByUsernameRequest
+import serialized.auth.LoginByUsernameRequest
 import services.AuthorizationService
 
 fun Application.registerAuthorizationRoutes() {

@@ -1,4 +1,4 @@
-package serialized
+package serialized.auth
 
 import dtos.login.ILoginByUsernameRequest
 import kotlinx.serialization.Serializable

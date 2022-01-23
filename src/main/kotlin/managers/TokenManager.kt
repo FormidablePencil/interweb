@@ -11,7 +11,7 @@ import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import repositories.RefreshTokenRepository
-import serialized.TokenResponseData
+import serialized.auth.TokenResponseData
 import java.util.*
 
 enum class KindOfTokens { AccessToken, RefreshToken }

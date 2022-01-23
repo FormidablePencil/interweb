@@ -9,7 +9,7 @@ import org.koin.core.context.stopKoin
 import org.koin.test.inject
 import org.opentest4j.AssertionFailedError
 import serialized.CreateAuthorRequest
-import serialized.LoginByUsernameRequest
+import serialized.auth.LoginByUsernameRequest
 import shared.testUtils.BehaviorSpecIT
 import kotlin.test.assertEquals
 

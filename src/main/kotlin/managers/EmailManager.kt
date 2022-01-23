@@ -44,6 +44,7 @@ class EmailManager(
         eMailer.setFrom(emailConfig("from"))
         eMailer.subject = welcomeMsg.subject()
         eMailer.setMsg(welcomeMsg.message())
+        // todo - will throw error if not a gmail account
         eMailer.addTo(author.email)
         eMailer.send()
     }

@@ -24,9 +24,9 @@ import repositories.profile.AccountRepository
 import repositories.profile.AuthorProfileRelatedRepository
 import repositories.profile.AuthorRepository
 import serialized.CreateAuthorRequest
-import serialized.LoginByEmailRequest
-import serialized.LoginByUsernameRequest
-import serialized.TokenResponseData
+import serialized.auth.LoginByEmailRequest
+import serialized.auth.LoginByUsernameRequest
+import serialized.auth.TokenResponseData
 import shared.appEnvMockHelper
 
 class AuthorizationServiceTest : BehaviorSpec({
