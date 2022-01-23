@@ -5,6 +5,8 @@ import dtos.space.CreateSpaceResponse
 import dtos.space.CreateSpaceResponseFailed
 import dtos.space.GetSpaceResponse
 import dtos.space.SpaceResponseFailed
+import dtos.spaceComponents.CreateComponentRequest
+import dtos.spaceComponents.CreateComponentResponse
 import dtos.succeeded
 import helper.RandomStringGenerator
 import io.ktor.http.*
@@ -61,17 +63,16 @@ import serialized.space.GetSpaceRequest
 // graphics: "Intel Iris Plus Graphics 645 1536 MB"
 
 // === model_windows table === filter by id & model_address
-// id 653, model_address: "QQQQQQQQQQQQQQ", memory: "...", processor: "..."
-// id 100, model_address: "ER334K3KJ43NLO", memory: "...", processor: "..."
-// id 653, model_address: "ER334K3KJ43NLO", memory: "...", processor: "..." (correct)
-
+// primaryId: _, id 653, model_address: "QQQQQQQQQQQQQQ", memory: "...", processor: "..."
+// primaryId: _, id 100, model_address: "ER334K3KJ43NLO", memory: "...", processor: "..."
+// primaryId: _, id 653, model_address: "ER334K3KJ43NLO", memory: "...", processor: "..." (correct)
 
 class SpaceService(
     private val spaceRepository: SpaceRepository,
 //    private val spaceManager: SpaceManager,
 ) {
 
-    //region Get
+    //region Get space
     fun getSpaceById(request: GetSpaceRequest): GetSpaceResponse {
         val space = spaceRepository.getSpace(request.address)
             ?: return GetSpaceResponse().failed(SpaceResponseFailed.SpaceNotFound)
@@ -80,13 +81,24 @@ class SpaceService(
     }
     //endregion
 
-    //region Create
+    //region Create space
     fun createSpace(createSpaceRequest: CreateSpaceRequest): CreateSpaceResponse {
         return if (spaceRepository.insertSpace(createSpaceRequest, uniqueAddress()))
             CreateSpaceResponse().succeeded(HttpStatusCode.OK)
         else
             CreateSpaceResponse().failed(CreateSpaceResponseFailed.FailedToCreateSpace)
     }
+    //endregion
+
+    //region Create component
+    fun createComponent(createComponentRequest: CreateComponentRequest): CreateComponentResponse {
+        createComponentRequest.spaceAddress
+
+        // validate that the requester has access to the space address provided
+    }
+    //endregion
+
+    //region Create component
     //endregion
 
     private fun uniqueAddress(): String {
