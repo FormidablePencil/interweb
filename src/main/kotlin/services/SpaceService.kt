@@ -5,12 +5,14 @@ import dtos.space.CreateSpaceResponse
 import dtos.space.CreateSpaceResponseFailed
 import dtos.space.GetSpaceResponse
 import dtos.space.SpaceResponseFailed
-import dtos.spaceComponents.CreateComponentRequest
 import dtos.spaceComponents.CreateComponentResponse
 import dtos.succeeded
 import helper.RandomStringGenerator
 import io.ktor.http.*
+import managers.ComponentManager
+import repositories.components.BannerRepository
 import repositories.SpaceRepository
+import serialized.space.CreateComponentRequest
 import serialized.space.CreateSpaceRequest
 import serialized.space.GetSpaceRequest
 
@@ -69,7 +71,8 @@ import serialized.space.GetSpaceRequest
 
 class SpaceService(
     private val spaceRepository: SpaceRepository,
-//    private val spaceManager: SpaceManager,
+    private val bannerCompsRepository: BannerRepository,
+    private val componentManager: ComponentManager,
 ) {
 
     //region Get space
@@ -90,13 +93,14 @@ class SpaceService(
     }
     //endregion
 
-    //region Create component
-    fun createComponent(createComponentRequest: CreateComponentRequest): CreateComponentResponse {
-        createComponentRequest.spaceAddress
-
+    fun createComponent(request: CreateComponentRequest): CreateComponentResponse {
         // validate that the requester has access to the space address provided
+        componentManager.createComponent(request)
     }
-    //endregion
+    fun deleteComponent(request: CreateComponentRequest): CreateComponentResponse {
+        // validate that the requester has access to the space address provided
+        componentManager.createComponent(request)
+    }
 
     //region Create component
     //endregion
