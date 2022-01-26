@@ -45,17 +45,17 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                     )
 
                     val imageCollectionId = imageRepository.insertCollectionOfImages(images, collectionOf)
+                        ?: throw Exception("failed to get id")
+                    val res = imageRepository.getCollectionOfImagesById(imageCollectionId)
 
-                    imageCollectionId shouldNotBe null
-
-                    val imageCollection = imageRepository.getCollectionOfImagesById(imageCollectionId!!)
-                    imageCollection shouldNotBe null
-                    imageCollection.images.map { item ->
-                        println(item.imageTitle)
-                        println(item.imageUrl)
-                        println(item.orderRank)
+                    res shouldNotBe null
+                    res.images.map {
+                        images.find { image ->
+                            image.orderRank == it.orderRank
+                                    && image.imageTitle == it.imageTitle
+                                    && image.imageUrl == it.imageUrl
+                        } ?: throw Exception("failed to find returned image")
                     }
-//                    imageCollection?.collectionOf shouldNotBe null
                 }
             }
         }

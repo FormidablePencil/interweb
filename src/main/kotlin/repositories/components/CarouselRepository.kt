@@ -21,7 +21,7 @@ class CarouselRepository(
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarousels)
     // region CarouselOfImages
 
-    fun createCarouselBasicImages(component: CarouselBasicImages): Int? {
+    fun insertCarouselBasicImages(component: CarouselBasicImages): Int? {
 
         val imageCollectionId = imageRepository.insertCollectionOfImages(
             component.images, "CarouselBasicImages component"
@@ -44,11 +44,7 @@ class CarouselRepository(
     }
 
     fun getCarouselBasicImagesById(id: Int): CarouselBasicImages {
-//        val carouselOfImages = database.imagesCarousels.find { it.id eq id }
-//        carouselOfImages?.imageCollection
-//        carouselOfImages?.navToTextCollection
-//        carouselOfImages?.privilege
-
+        // region aliases
         val crslImg = ImagesCarousels.aliased("crlsImg")
 
         val imgCol = ImageCollections.aliased("imgCol")
@@ -59,6 +55,7 @@ class CarouselRepository(
 
         val privCol = Privileges.aliased("privCol")
         val priv = PrivilegedAuthors.aliased("priv")
+        // endregion
 
         var title = ""
         val images = mutableListOf<Image>()
@@ -66,6 +63,7 @@ class CarouselRepository(
         val privilegedAuthors = mutableListOf<PrivilegedAuthor>()
 
         database.from(crslImg)
+            // region join
             .leftJoin(imgCol, on = imgCol.id eq crslImg.imageCollectionId)
             .leftJoin(img, on = img.collectionId eq imgCol.id)
 
@@ -74,7 +72,9 @@ class CarouselRepository(
 
             .leftJoin(privCol, on = privCol.id eq crslImg.navToTextCollectionId)
             .leftJoin(priv, on = priv.privilegeId eq privCol.id)
+            // endregion
 
+            //region select
             .select(
                 crslImg.title,
 
@@ -86,13 +86,13 @@ class CarouselRepository(
 
                 privCol.privilegesTo,
                 priv.authorId, priv.modLvl
-            )
+            ).where { crslImg.id eq id }
+            // endregion
             .map { row ->
-//                println(row[crslImg.title])
                 title = row[crslImg.title]!!
 
+                // region images
                 println(row[imgCol.collectionOf])
-//                print(row[img.orderRank]); print(row[img.imageTitle]); println(row[img.imageUrl])
                 images.add(
                     Image(
                         orderRank = row[img.orderRank]!!,
@@ -100,25 +100,25 @@ class CarouselRepository(
                         imageUrl = row[img.imageUrl]!!
                     )
                 )
+                // endregion
 
-                println(row[navToCol.collectionOf])
-//                print(row[navTo.orderRank]); print(row[navTo.text])
+                // region navTos
                 navTos.add(
                     Text(
                         orderRank = row[navTo.orderRank]!!,
                         text = row[navTo.text]!!
                     )
                 )
+                // endregion
 
-                println(row[privCol.privilegesTo])
-//                print(row[priv.authorId]); println(row[priv.modLvl])
+                // region privileges
                 privilegedAuthors.add(
                     PrivilegedAuthor(
                         authorId = row[priv.authorId]!!,
-                        modLvl = row[priv.modLvl]!!
+                        modLvl = row[priv.modLvl]!! // todo - might fail. error handling
                     )
                 )
-                // todo - might fail. error handling
+                // endregion
             }
 
         return CarouselBasicImages(
@@ -127,8 +127,6 @@ class CarouselRepository(
             navToCorrespondingImagesOrder = navTos,
             privilegedAuthors = privilegedAuthors
         )
-
-        // todo get imageCarousel and all of it's data
     }
 
     fun deleteCarouselOfImagesById(id: Int): Boolean {

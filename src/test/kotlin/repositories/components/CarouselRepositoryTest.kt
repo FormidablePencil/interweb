@@ -14,9 +14,6 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(DIHelper.CoreModule))
 
     init {
-//        val textRepository: TextRepository = mockk()
-//        val imageRepository: ImageRepository = mockk()
-//        val privilegeRepository: PrivilegeRepository = mockk()
         lateinit var carouselRepository: CarouselRepository
 
         val carouselBasicImages = CarouselBasicImages(
@@ -58,19 +55,18 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
             carouselRepository = CarouselRepository(TextRepository(), ImageRepository(), PrivilegeRepository())
         }
 
-        given("createCarouselBasicImages")
-        {
+        given("insertCarouselBasicImages && getCarouselBasicImagesById") {
             then("should have been created") {
                 rollback {
                     val savedDataId =
-                        carouselRepository.createCarouselBasicImages(carouselBasicImages)
+                        carouselRepository.insertCarouselBasicImages(carouselBasicImages)
                             ?: throw Exception("failed to save data")
                     val carouselOfImages = carouselRepository.getCarouselBasicImagesById(savedDataId)
-                        ?: throw Exception("failed to return saved data")
 
                     carouselOfImages.title shouldBe carouselBasicImages.title
 
                     // region asserting images
+                    carouselOfImages.images.size shouldBe carouselBasicImages.images.size
                     carouselOfImages.images.map {
                         val item = carouselBasicImages.images.find { item ->
                             item.orderRank == it.orderRank
@@ -81,6 +77,7 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
                     // endregion
 
                     // region asserting navToCorrespondingImagesOrder
+                    carouselOfImages.navToCorrespondingImagesOrder.size shouldBe carouselBasicImages.navToCorrespondingImagesOrder.size
                     carouselOfImages.navToCorrespondingImagesOrder.map {
                         val item = carouselBasicImages.navToCorrespondingImagesOrder.find { item ->
                             item.orderRank == it.orderRank
@@ -90,6 +87,7 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
                     // endregion
 
                     // region asserting privilegedAuthors
+                    carouselOfImages.privilegedAuthors.size shouldBe carouselBasicImages.privilegedAuthors.size
                     carouselOfImages.privilegedAuthors.map {
                         val item = carouselBasicImages.privilegedAuthors.find { item ->
                             item.modLvl == it.modLvl

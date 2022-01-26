@@ -29,5 +29,7 @@ class PrivilegeRepository : RepositoryBase() {
         return privilegeId
     }
 
-    fun givePrivilege() {}
+    fun givePrivilege() {
+
+    }
 }

@@ -1,6 +1,5 @@
 package repositories.components
 
-import dtos.libOfComps.genericStructures.IImage
 import dtos.libOfComps.genericStructures.Image
 import dtos.libOfComps.genericStructures.ImageCollection
 import models.genericStructures.ImageCollections
@@ -43,11 +42,11 @@ class ImageRepository : RepositoryBase() {
             .select(img.imageUrl, img.imageTitle, img.orderRank, imgCol.collectionOf)
             .map { row ->
                 collectionOf = row[imgCol.collectionOf]!!
-                object : IImage {
-                    override val imageTitle = row[img.imageTitle]!! // todo - may fail
-                    override val imageUrl = row[img.imageUrl]!!
-                    override val orderRank = row[img.orderRank]!!
-                }
+                Image(
+                    imageTitle = row[img.imageTitle]!!, // todo - may fail
+                    imageUrl = row[img.imageUrl]!!,
+                    orderRank = row[img.orderRank]!!
+                )
             }
         return ImageCollection(collectionOf, images)
     }

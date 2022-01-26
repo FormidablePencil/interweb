@@ -20,7 +20,7 @@ class ComponentManager(
         return when (request.componentType) {
             // Carousels
             ComponentType.CarouselOfImages -> {
-                val results = carouselRepository.createCarouselBasicImages(
+                val results = carouselRepository.insertCarouselBasicImages(
                     gson.fromJson(request.jsonData, CarouselBasicImages::class.java)
                 )
                 println("ids")

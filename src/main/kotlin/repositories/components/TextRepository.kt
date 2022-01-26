@@ -1,6 +1,7 @@
 package repositories.components
 
 import dtos.libOfComps.genericStructures.IText
+import dtos.libOfComps.genericStructures.Text
 import dtos.libOfComps.genericStructures.TextCollection
 import models.genericStructures.TextCollections
 import models.genericStructures.Texts
@@ -29,25 +30,20 @@ class TextRepository : RepositoryBase() {
         return navToTextCollectionId
     }
 
-fun getCollectionOfTextsById(): TextCollection {
-        val textCol = TextCollections.aliased("textCol") // Line 3, give an alias to the Employees table.
-        val textCol2 = TextCollections.aliased("textCol2") // Line 4, give another alias to the Employees table.
+    fun getCollectionOfTextsById(id: Int): TextCollection {
+        val textCol = TextCollections.aliased("textCol")
         val text = Texts.aliased("img")
 
         var collectionOf = ""
 
-        val images = database.from(textCol)
-            .leftJoin(textCol2, on = textCol.id eq textCol2.id)
+        val texts = database.from(textCol)
             .leftJoin(text, on = textCol.id eq text.collectionId)
             .select(text.text, text.orderRank, textCol.collectionOf)
+            .where { textCol.id eq id }
             .map { row ->
                 collectionOf = row[textCol.collectionOf]!!
-
-                object : IText {
-                    override val text = row[text.text]!! // todo - may fail
-                    override val orderRank = row[text.orderRank]!!
-                }
+                Text(text = row[text.text]!!, orderRank = row[text.orderRank]!!) // todo - log exception
             }
-        return TextCollection(collectionOf, images)
+        return TextCollection(collectionOf, texts)
     }
 }
