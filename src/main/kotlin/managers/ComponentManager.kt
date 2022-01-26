@@ -1,45 +1,71 @@
 package managers
 
-import libOfComps.ComponentType
-import libOfComps.banners.BannerBasic
-import libOfComps.carousels.CarouselFlat
-import libOfComps.carousels.CarouselMagnifying
+import com.google.gson.Gson
+import dtos.libOfComps.ComponentType
+import dtos.libOfComps.banners.BannerBasic
+import dtos.libOfComps.carousels.CarouselBasicImages
+import dtos.libOfComps.carousels.CarouselBlurredOverlay
+import repositories.SpaceRepository
 import repositories.components.BannerRepository
 import repositories.components.CarouselRepository
-import repositories.SpaceRepository
 import serialized.space.CreateComponentRequest
 
 class ComponentManager(
     private val spaceRepository: SpaceRepository,
-    private val bannerCompsRepository: BannerRepository,
-    private val carouselCompsRepository: CarouselRepository,
+    private val bannerRepository: BannerRepository,
+    private val carouselRepository: CarouselRepository,
 ) {
     fun createComponent(request: CreateComponentRequest): Boolean {
-        return when (ComponentType.fromInt(request.componentType)) {
-            ComponentType.CarouselFlat ->
-                carouselCompsRepository.createCarouselFlat(request.jsonData as CarouselFlat)
-            ComponentType.CarouselMagnifying ->
-                carouselCompsRepository.createCarouselMagnifying(request.jsonData as CarouselMagnifying)
+        val gson = Gson()
+        return when (request.componentType) {
+            // Carousels
+            ComponentType.CarouselOfImages -> {
+                val results = carouselRepository.createCarouselBasicImages(
+                    gson.fromJson(request.jsonData, CarouselBasicImages::class.java)
+                )
+                println("ids")
+                println(results)
+                println("ids")
+                return true
+            }
+            ComponentType.CarouselBlurredOverlay ->
+                carouselRepository.createCarouselBlurredOverlay(
+                    gson.fromJson(request.jsonData, CarouselBlurredOverlay::class.java)
+                )
+
+            // Just text
             ComponentType.Markdown -> TODO()
-            ComponentType.BasicBanners ->
-                bannerCompsRepository.createBannerBasic(request.jsonData as BannerBasic)
             ComponentType.BasicText -> TODO()
+
+            // Banners
+            ComponentType.BasicBanners ->
+                bannerRepository.createBannerBasic(
+                    gson.fromJson(request.jsonData, BannerBasic::class.java)
+                )
+
+            // Grids
             ComponentType.OneOffGrid -> TODO()
-            ComponentType.CarouselBlurredOverlay -> TODO()
+
+            // Dividers
             ComponentType.Divider -> TODO()
             ComponentType.LineDivider -> TODO()
         }
     }
 
     fun deleteComponent(request: CreateComponentRequest): Boolean {
-        return when (ComponentType.fromInt(request.componentType)) {
-            ComponentType.CarouselFlat ->
-                carouselCompsRepository.deleteCarouselFlat(request.jsonData as CarouselFlat)
-            ComponentType.CarouselMagnifying ->
-                carouselCompsRepository.deleteCarouselMagnifying(request.jsonData as CarouselMagnifying)
+        val gson = Gson()
+        return when (request.componentType) {
+            ComponentType.CarouselOfImages ->
+                TODO("code")
+//                carouselRepository.deleteCarouselOfImagesById(
+//                    gson.fromJson(request.jsonData, CarouselBasicImages::class.java),
+//                )
             ComponentType.Markdown -> TODO()
             ComponentType.BasicBanners ->
-                bannerCompsRepository.deleteBannerBasic(request.jsonData as BannerBasic)
+                TODO("code")
+//                bannerRepository.deleteBannerBasic(
+//                    gson.fromJson(request.jsonData, BannerBasic::class.java)
+//                )
             ComponentType.BasicText -> TODO()
             ComponentType.OneOffGrid -> TODO()
             ComponentType.CarouselBlurredOverlay -> TODO()

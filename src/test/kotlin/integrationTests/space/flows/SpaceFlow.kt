@@ -13,10 +13,10 @@ class SpaceFlow: BehaviorSpecFlow() {
         cleanup: Boolean = false
     ) {
         return rollback(cleanup) {
-            val space:  Space {
-
-        }
-            spaceService.createSpace()
+//            val space:  Space {
+//
+//        }
+//            spaceService.createSpace()
         }
     }
 

@@ -51,6 +51,7 @@ dependencies {
     implementation "org.valiktor:valiktor-core:$valiktor_version" // validator
     implementation "io.github.microutils:kotlin-logging-jvm:$microutils_version" // Logging
     implementation("org.apache.commons:commons-email:1.5")
+    implementation "com.google.code.gson:gson:2.8.9"
 }
 
 compileKotlin {

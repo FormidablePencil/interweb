@@ -1,6 +1,6 @@
 package repositories.components
 
-import libOfComps.banners.BannerBasic
+import dtos.libOfComps.banners.BannerBasic
 import repositories.RepositoryBase
 
 class BannerRepository : RepositoryBase() {

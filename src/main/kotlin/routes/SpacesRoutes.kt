@@ -11,6 +11,6 @@ fun Route.spaceRoute() {
 
 get("/space:id") {//todo - create tests for spaces
         val spaceId = 1
-        routeRespond(call) { spaceService.getSpaceById(spaceId) }
+//        routeRespond(call) { spaceService.getSpaceById(spaceId) }
     }
 }

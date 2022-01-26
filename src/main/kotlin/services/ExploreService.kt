@@ -6,7 +6,7 @@ import repositories.SpaceRepository
 
 class ExploreService(
     private var authorRepository: AuthorRepository,
-    private var threadRepository: SpaceRepository,
+    private var spaceRepository: SpaceRepository,
 ) {
 
 //    fun Search(search: String) {
@@ -28,7 +28,7 @@ class ExploreService(
     }
 
     fun SearchThreadsByTags(tag: String) {
-        threadRepository.GetThreadsByTag(tag)
+        spaceRepository.getSpace(tag)
     }
 
 }

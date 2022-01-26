@@ -1,16 +1,11 @@
 package services
 
 import dtos.failed
-import dtos.space.CreateSpaceResponse
-import dtos.space.CreateSpaceResponseFailed
-import dtos.space.GetSpaceResponse
-import dtos.space.SpaceResponseFailed
-import dtos.spaceComponents.CreateComponentResponse
+import dtos.space.*
 import dtos.succeeded
 import helper.RandomStringGenerator
 import io.ktor.http.*
 import managers.ComponentManager
-import repositories.components.BannerRepository
 import repositories.SpaceRepository
 import serialized.space.CreateComponentRequest
 import serialized.space.CreateSpaceRequest
@@ -64,6 +59,7 @@ import serialized.space.GetSpaceRequest
 // memory: "16 GB 2133 MHz LPDDR3",
 // graphics: "Intel Iris Plus Graphics 645 1536 MB"
 
+
 // === model_windows table === filter by id & model_address
 // primaryId: _, id 653, model_address: "QQQQQQQQQQQQQQ", memory: "...", processor: "..."
 // primaryId: _, id 100, model_address: "ER334K3KJ43NLO", memory: "...", processor: "..."
@@ -71,7 +67,6 @@ import serialized.space.GetSpaceRequest
 
 class SpaceService(
     private val spaceRepository: SpaceRepository,
-    private val bannerCompsRepository: BannerRepository,
     private val componentManager: ComponentManager,
 ) {
 
@@ -96,10 +91,12 @@ class SpaceService(
     fun createComponent(request: CreateComponentRequest): CreateComponentResponse {
         // validate that the requester has access to the space address provided
         componentManager.createComponent(request)
+        TODO()
     }
     fun deleteComponent(request: CreateComponentRequest): CreateComponentResponse {
         // validate that the requester has access to the space address provided
-        componentManager.createComponent(request)
+        componentManager.deleteComponent(request)
+        TODO()
     }
 
     //region Create component
