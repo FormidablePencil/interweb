@@ -20,20 +20,21 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
         given("insertCollectionOfTexts") {
             then("should have inserted a collection of random texts") {
                 rollback {
-                    val images = listOf(
+                    val texts = listOf(
                         Text(orderRank = 10000, text = "space"),
                         Text(orderRank = 20000, text = "people"),
                         Text(orderRank = 30000, text = "man"),
                     )
                     val collectionOf = "random texts"
 
-                    val id = textRepository.insertCollectionOfTexts(images, collectionOf)
+                    val id = textRepository.insertCollectionOfTexts(texts, collectionOf)
                         ?: throw Exception("failed to get id")
-                    val res = textRepository.getCollectionOfTextsById(id)
+                    val res = textRepository.getCollectionById(id)
 
                     res.collectionOf shouldBe collectionOf
-                    res.images.map {
-                        images.find { image -> image.orderRank == it.orderRank }
+                    res.texts.size shouldBe texts.size
+                    res.texts.map {
+                        texts.find { text -> text.orderRank == it.orderRank }
                             ?: throw Exception("failed to find returned image")
                     }
                 }

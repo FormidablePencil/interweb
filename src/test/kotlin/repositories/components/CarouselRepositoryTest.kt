@@ -10,6 +10,7 @@ import io.kotest.matchers.shouldBe
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
 
+// NOTE: could be just a BehaviorSpec
 class CarouselRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(DIHelper.CoreModule))
 
@@ -47,7 +48,8 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
                 Text(orderRank = 40000, text = "/pokedex"),
             ),
             privilegedAuthors = listOf(
-                PrivilegedAuthor(modLvl = 1, authorId = 84)
+                PrivilegedAuthor(modLvl = 1, authorId = 84),
+                PrivilegedAuthor(modLvl = 1, authorId = 2)
             )
         )
 
@@ -58,9 +60,9 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
         given("insertCarouselBasicImages && getCarouselBasicImagesById") {
             then("should have been created") {
                 rollback {
-                    val savedDataId =
-                        carouselRepository.insertCarouselBasicImages(carouselBasicImages)
-                            ?: throw Exception("failed to save data")
+                    val savedDataId = carouselRepository.insertCarouselBasicImages(carouselBasicImages)
+                        ?: throw Exception("failed to save data")
+
                     val carouselOfImages = carouselRepository.getCarouselBasicImagesById(savedDataId)
 
                     carouselOfImages.title shouldBe carouselBasicImages.title

@@ -10,9 +10,6 @@ import org.ktorm.entity.sequenceOf
 import repositories.RepositoryBase
 
 class ImageRepository : RepositoryBase() {
-    private val Database.images get() = this.sequenceOf(Images)
-    private val Database.imageCollections get() = this.sequenceOf(ImageCollections)
-
     fun insertCollectionOfImages(images: List<Image>, collectionOf: String): Int? {
         val imageCollectionId = database.insertAndGenerateKey(ImageCollections) {
             set(it.collectionOf, collectionOf)
@@ -31,21 +28,21 @@ class ImageRepository : RepositoryBase() {
         return imageCollectionId
     }
 
-    fun getCollectionOfImagesById(id: Int): ImageCollection {
+    fun getCollectionById(id: Int): ImageCollection {
         val imgCol = ImageCollections.aliased("imgCol")
         val img = Images.aliased("img")
 
         var collectionOf = ""
-
         val images = database.from(imgCol)
-            .leftJoin(img, on = imgCol.id eq img.collectionId)
-            .select(img.imageUrl, img.imageTitle, img.orderRank, imgCol.collectionOf)
+            .leftJoin(img, img.collectionId eq imgCol.id)
+            .select(imgCol.collectionOf, img.orderRank, img.imageTitle, img.imageUrl)
+            .where { imgCol.id eq id }
             .map { row ->
                 collectionOf = row[imgCol.collectionOf]!!
                 Image(
-                    imageTitle = row[img.imageTitle]!!, // todo - may fail
-                    imageUrl = row[img.imageUrl]!!,
-                    orderRank = row[img.orderRank]!!
+                    orderRank = row[img.orderRank]!!,
+                    imageTitle = row[img.imageTitle]!!,
+                    imageUrl = row[img.imageUrl]!!
                 )
             }
         return ImageCollection(collectionOf, images)

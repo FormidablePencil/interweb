@@ -30,19 +30,21 @@ class TextRepository : RepositoryBase() {
         return navToTextCollectionId
     }
 
-    fun getCollectionOfTextsById(id: Int): TextCollection {
+    fun getCollectionById(id: Int): TextCollection {
         val textCol = TextCollections.aliased("textCol")
-        val text = Texts.aliased("img")
+        val text = Texts.aliased("text")
 
         var collectionOf = ""
-
         val texts = database.from(textCol)
-            .leftJoin(text, on = textCol.id eq text.collectionId)
-            .select(text.text, text.orderRank, textCol.collectionOf)
+            .leftJoin(text, text.collectionId eq textCol.id)
+            .select(textCol.collectionOf, text.orderRank, text.orderRank, text.text)
             .where { textCol.id eq id }
             .map { row ->
                 collectionOf = row[textCol.collectionOf]!!
-                Text(text = row[text.text]!!, orderRank = row[text.orderRank]!!) // todo - log exception
+                Text(
+                    orderRank = row[text.orderRank]!!,
+                    text = row[text.text]!!
+                )
             }
         return TextCollection(collectionOf, texts)
     }

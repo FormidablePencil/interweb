@@ -7,9 +7,7 @@ import helper.RandomStringGenerator
 import io.ktor.http.*
 import managers.ComponentManager
 import repositories.SpaceRepository
-import serialized.space.CreateComponentRequest
-import serialized.space.CreateSpaceRequest
-import serialized.space.GetSpaceRequest
+import serialized.space.*
 
 // spaces (table) have components (table)
 
@@ -70,33 +68,34 @@ class SpaceService(
     private val componentManager: ComponentManager,
 ) {
 
-    //region Get space
     fun getSpaceById(request: GetSpaceRequest): GetSpaceResponse {
         val space = spaceRepository.getSpace(request.address)
             ?: return GetSpaceResponse().failed(SpaceResponseFailed.SpaceNotFound)
 
         return GetSpaceResponse().succeeded(HttpStatusCode.OK, space)
     }
-    //endregion
 
-    //region Create space
     fun createSpace(createSpaceRequest: CreateSpaceRequest): CreateSpaceResponse {
         return if (spaceRepository.insertSpace(createSpaceRequest, uniqueAddress()))
             CreateSpaceResponse().succeeded(HttpStatusCode.OK)
         else
             CreateSpaceResponse().failed(CreateSpaceResponseFailed.FailedToCreateSpace)
     }
-    //endregion
 
     fun createComponent(request: CreateComponentRequest): CreateComponentResponse {
         // validate that the requester has access to the space address provided
-        componentManager.createComponent(request)
+        componentManager.createComponent(request.createComponent, request.spaceAddress)
         TODO()
     }
-    fun deleteComponent(request: CreateComponentRequest): CreateComponentResponse {
+
+    fun batchCreateComponents(request: CreateComponentsRequest) {
+        componentManager.batchCreateComponents(request.createComponents, request.spaceAddress)
+    }
+
+    fun removeComponent(request: CreateComponentRequest): CreateComponentResponse {
         // validate that the requester has access to the space address provided
-        componentManager.deleteComponent(request)
         TODO()
+        componentManager.deleteComponent(request.createComponent)
     }
 
     //region Create component

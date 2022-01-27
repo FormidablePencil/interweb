@@ -3,6 +3,7 @@ package repositories.components
 import configurations.DIHelper
 import dtos.libOfComps.genericStructures.Image
 import io.kotest.koin.KoinListener
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
@@ -18,7 +19,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("insertCollectionOfImages") {
-            then("getCollectionOfImagesById") {
+            then("getCollectionById") {
                 rollback {
                     val collectionOf = "Pet Projects"
                     val images = listOf(
@@ -46,9 +47,10 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
 
                     val imageCollectionId = imageRepository.insertCollectionOfImages(images, collectionOf)
                         ?: throw Exception("failed to get id")
-                    val res = imageRepository.getCollectionOfImagesById(imageCollectionId)
+                    val res = imageRepository.getCollectionById(imageCollectionId)
 
                     res shouldNotBe null
+                    res.images.size shouldBe images.size
                     res.images.map {
                         images.find { image ->
                             image.orderRank == it.orderRank

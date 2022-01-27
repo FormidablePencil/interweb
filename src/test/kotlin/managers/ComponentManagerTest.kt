@@ -11,6 +11,7 @@ import managers.ComponentManager
 import repositories.SpaceRepository
 import repositories.components.BannerRepository
 import repositories.components.CarouselRepository
+import serialized.space.CreateComponent
 import serialized.space.CreateComponentRequest
 
 class ComponentManagerTest : BehaviorSpec({
@@ -22,7 +23,7 @@ class ComponentManagerTest : BehaviorSpec({
 
     beforeEach { }
 
-    xgiven("createComponent") {
+    xgiven("createComponents") {
         val gson = Gson()
 
         val image = Image(imageTitle = "image title", imageUrl = "image url", orderRank = 1)
@@ -30,18 +31,20 @@ class ComponentManagerTest : BehaviorSpec({
         val privilegedAuthors = PrivilegedAuthor(authorId = 1, modLvl = 2)
 
         val req = CreateComponentRequest(
-            componentType = ComponentType.CarouselOfImages,
-            jsonData = gson.toJson(
-                CarouselBasicImages(
-                    title = "project images",
-                    images = listOf(image),
-                    navToCorrespondingImagesOrder = listOf(navTo),
-                    privilegedAuthors = listOf(privilegedAuthors)
+            spaceAddress = "SDLFJEI",
+            createComponent = CreateComponent(
+                componentType = ComponentType.CarouselOfImages,
+                jsonData = gson.toJson(
+                    CarouselBasicImages(
+                        title = "project images",
+                        images = listOf(image),
+                        navToCorrespondingImagesOrder = listOf(navTo),
+                        privilegedAuthors = listOf(privilegedAuthors)
+                    )
                 )
             ),
-            spaceAddress = "SDLFJEI"
         )
-        spaceService.createComponent(req)
+        val res = spaceService.createComponent(req.createComponent, req.spaceAddress)
     }
 
     xgiven("deleteComponent") { }
