@@ -1,10 +1,81 @@
 package repositories.components
 
+import configurations.DIHelper
+import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
+import integrationTests.auth.flows.AuthUtilities
+import integrationTests.auth.flows.SignupFlow
+import io.kotest.koin.KoinListener
+import io.kotest.matchers.shouldBe
+import serialized.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.rollback
 
 class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
-    // todo
+    override fun listeners() = listOf(KoinListener(DIHelper.CoreModule))
+
     init {
-        given("insertPrivileges") { }
+        lateinit var privilegeRepository: PrivilegeRepository
+        lateinit var signupFlow: SignupFlow
+        lateinit var authUtilities: AuthUtilities
+
+        beforeEach {
+            privilegeRepository = PrivilegeRepository()
+            signupFlow = SignupFlow()
+        }
+
+        // authorId must be created before it's assigned to privilege since it privilege authorId is a foreign key
+        suspend fun generatePrivilegedAuthorsToConsume(): List<PrivilegedAuthor> {
+            return (1..3).map {
+                val createAuthorRequest = CreateAuthorRequest(
+                    email = "steveJohns$it@example.com",
+                    firstname = "firstname",
+                    lastname = "lastname",
+                    password = "password",
+                    username = "steveJohns$it"
+                )
+                signupFlow.signup(createAuthorRequest)
+                val authorId = authUtilities.getAuthorIdByUsername(createAuthorRequest.username)
+                PrivilegedAuthor(authorId = authorId, modLvl = 1)
+            }
+        }
+
+        given("insertPrivilege") {
+            then("getAssertionsById") {
+                rollback {
+                    val privilegesTo = "some libOfComp"
+                    val privilegedAuthor = generatePrivilegedAuthorsToConsume().first()
+
+                    val privilegeId = privilegeRepository.insertPrivilege(privilegedAuthor, privilegesTo)
+                }
+            }
+        }
+
+        given("batchInsertPrivileges") {
+            then("getAssortmentById") {
+                rollback {
+                    val privilegesTo = "some libOfComp"
+                    val privilegedAuthors = generatePrivilegedAuthorsToConsume()
+
+                    val privilegeId = privilegeRepository.batchInsertPrivileges(privilegedAuthors, privilegesTo)
+                        ?: throw Exception("failed to get id")
+                    val res = privilegeRepository.getAssortmentById(privilegeId)
+
+                    res.privilegeTo shouldBe privilegesTo // todo - typo
+                    res.privilegedAuthors.size shouldBe privilegedAuthors.size // todo
+                    res.privilegedAuthors.map {
+                        val privilegedAuthor = privilegedAuthors.find { privilegedAuthor ->
+                            privilegedAuthor.authorId == it.authorId
+                        } ?: throw Exception("failed to find returned image")
+                        privilegedAuthor.modLvl shouldBe it.modLvl
+                    }
+                }
+            }
+            given("updatePrivilegedAuthor") {
+                then("getAssortmentById") {}
+            }
+            given("batchUpdatePrivilegedAuthors") {
+                then("getAssortmentById") {}
+            }
+        }
     }
 }

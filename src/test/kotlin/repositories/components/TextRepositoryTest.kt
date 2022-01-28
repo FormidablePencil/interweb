@@ -18,14 +18,14 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("insertCollectionOfTexts") {
-            then("should have inserted a collection of random texts") {
+            then("getAssortmentById") {
                 rollback {
+                    val collectionOf = "random texts"
                     val texts = listOf(
                         Text(orderRank = 10000, text = "space"),
                         Text(orderRank = 20000, text = "people"),
                         Text(orderRank = 30000, text = "man"),
                     )
-                    val collectionOf = "random texts"
 
                     val id = textRepository.insertCollectionOfTexts(texts, collectionOf)
                         ?: throw Exception("failed to get id")
@@ -34,19 +34,20 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                     res.collectionOf shouldBe collectionOf
                     res.texts.size shouldBe texts.size
                     res.texts.map {
-                        texts.find { text -> text.orderRank == it.orderRank }
+                        val text = texts.find { text -> text.orderRank == it.orderRank }
                             ?: throw Exception("failed to find returned image")
+                        text.text shouldBe it.text
                     }
                 }
             }
         }
 
         given("updateText") {
-
+            then("getAssortmentById") {}
         }
 
         given("batchUpdateTexts") {
-
+            then("getAssortmentById") {}
         }
     }
 }

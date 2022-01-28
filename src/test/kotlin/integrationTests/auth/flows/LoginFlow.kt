@@ -18,16 +18,19 @@ class LoginFlow : BehaviorSpecFlow() {
     private val authorizationService: AuthorizationService by inject()
     private val signupFlow: SignupFlow by inject()
 
-    private val createAuthorRequest = CreateAuthorRequest(
+    // I think I created it so to not need to got through creating an account with every integration tests since that a lot of heavy lifting
+    // there are data like tokens associated with this account
+    private val createAuthorRequestExistentInDb = CreateAuthorRequest(
         "6saberryyTest1235@gmail.com2", "CherryCas6as", "Alex", "Formidable!56", "Martinii"
     )
+
     private val loginByUsernameRequest = LoginByUsernameRequest(
-        username = createAuthorRequest.username,
-        password = createAuthorRequest.password,
+        username = createAuthorRequestExistentInDb.username,
+        password = createAuthorRequestExistentInDb.password,
     )
     private val loginByEmailRequest = LoginByEmailRequest(
-        email = createAuthorRequest.email,
-        password = createAuthorRequest.password,
+        email = createAuthorRequestExistentInDb.email,
+        password = createAuthorRequestExistentInDb.password,
     )
 
     private fun validateLoginResponse(result: LoginResponse) {
@@ -52,7 +55,7 @@ class LoginFlow : BehaviorSpecFlow() {
                 val loginResult = authorizationService.login(request)
                 validateLoginResponse(loginResult)
             } catch (ex: AssertionFailedError) {
-                signupFlow.signup(createAuthorRequest)
+                signupFlow.signup(createAuthorRequestExistentInDb)
             }
 
             val result = authorizationService.login(request)
@@ -72,7 +75,7 @@ class LoginFlow : BehaviorSpecFlow() {
                 val loginResult = authorizationService.login(request)
                 validateLoginResponse(loginResult)
             } catch (ex: AssertionFailedError) {
-                signupFlow.signup(createAuthorRequest)
+                signupFlow.signup(createAuthorRequestExistentInDb)
             }
 
             val result = authorizationService.login(request)

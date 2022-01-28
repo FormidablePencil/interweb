@@ -29,7 +29,7 @@ class ExploreFlow(
 
         //region actions
         // Search author
-//        val author: Author = exploreDomainService.SearchAuthors(createAuthorRequest.email)
+//        val author: Author = exploreDomainService.SearchAuthors(createAuthorRequestExistentInDb.email)
 //        // click author which gets author's layouts
 //        val authorsLayouts = authorsPortfolioDomainService.GetAuthorsLayouts(author.id)
 //        val layoutChoseToView = authorsLayouts.first()

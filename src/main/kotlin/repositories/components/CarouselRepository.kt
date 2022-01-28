@@ -30,7 +30,7 @@ class CarouselRepository(
         val navToTextCollectionId = textRepository.insertCollectionOfTexts(
             component.navToCorrespondingImagesOrder, "carouselNavLinks"
         )
-        val privilegeId = privilegeRepository.insertPrivileges(
+        val privilegeId = privilegeRepository.batchInsertPrivileges(
             component.privilegedAuthors, "carousel of images"
         )
         // endregion
@@ -96,7 +96,7 @@ class CarouselRepository(
             CarouselOfImagesTABLE.NavTos ->
                 textRepository.updateText(componentId, updateToData)
             CarouselOfImagesTABLE.Privileges ->
-                privilegeRepository.updatePrivilege(componentId, updateToData)
+                privilegeRepository.updatePrivilegedAuthor(componentId, updateToData)
         }
     }
     // endregion update

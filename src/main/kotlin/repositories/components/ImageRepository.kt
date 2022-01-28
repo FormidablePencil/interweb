@@ -68,6 +68,27 @@ class ImageRepository : RepositoryBase() {
         return effectedRows > 0
     }
 
+    fun updateImage(collectionId: Int, record: RecordUpdate) {
+        val collection = getImageCollection(collectionId) ?: return // handle gracefully
+
+        val res = database.update(Images) {
+            record.updateRecord.map { updateCol ->
+                when (ImagesCOL.fromInt(updateCol.column)) {
+                    ImagesCOL.ImageUrl -> set(it.imageUrl, updateCol.value)
+                    ImagesCOL.ImageTitle -> set(it.imageTitle, updateCol.value)
+                    ImagesCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
+                    // todo - toInt() may fail
+                }
+            }
+            where {
+                when (ImageIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
+                    ImageIdentifiableRecordByCol.OrderRank ->
+                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
+                } // todo - handle incorrect recordIdentifiableByCol gracefully
+            }
+        }
+    }
+
     fun batchUpdateImages(collectionId: Int, records: List<RecordUpdate>) {
         val collection = getImageCollection(collectionId) ?: return // handle gracefully
 
@@ -89,27 +110,6 @@ class ImageRepository : RepositoryBase() {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    fun updateImage(collectionId: Int, record: RecordUpdate) {
-        val collection = getImageCollection(collectionId) ?: return // handle gracefully
-
-        val res = database.update(Images) {
-            record.updateRecord.map { updateCol ->
-                when (ImagesCOL.fromInt(updateCol.column)) {
-                    ImagesCOL.ImageUrl -> set(it.imageUrl, updateCol.value)
-                    ImagesCOL.ImageTitle -> set(it.imageTitle, updateCol.value)
-                    ImagesCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
-                    // todo - toInt() may fail
-                }
-            }
-            where {
-                when (ImageIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-                    ImageIdentifiableRecordByCol.OrderRank ->
-                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
-                } // todo - handle incorrect recordIdentifiableByCol gracefully
             }
         }
     }

@@ -14,12 +14,26 @@ import serialized.libOfComps.RecordUpdate
 class PrivilegeRepository : RepositoryBase() {
     private val Database.privileges get() = this.sequenceOf(Privileges)
 
-    fun insertPrivileges(privilegedAuthors: List<IPrivilegedAuthor>, privilegesTo: String): Int? {
+    // todo - creates new collection. rename insertNewPrivilege and insertPrivilege(privilegeId: Int). Do the same for CarouselRepo, ImageRepository, TextRepository
+    fun insertPrivilege(privilegedAuthor: PrivilegedAuthor, privilegesTo: String): Int? {
         val privilegeId = database.insertAndGenerateKey(Privileges) {
             set(it.privilegesTo, privilegesTo)
         } as Int?
 
-        val privilegedAuthorsIds = database.batchInsert(PrivilegedAuthors) {
+        val privilegedAuthorsId = database.insert(PrivilegedAuthors) { // todo - test that all have been generated
+            set(it.privilegeId, privilegeId)
+            set(it.authorId, privilegedAuthor.authorId)
+            set(it.modLvl, privilegedAuthor.modLvl)
+        }
+        return privilegeId
+    }
+
+    fun batchInsertPrivileges(privilegedAuthors: List<PrivilegedAuthor>, privilegesTo: String): Int? {
+        val privilegeId = database.insertAndGenerateKey(Privileges) {
+            set(it.privilegesTo, privilegesTo)
+        } as Int?
+
+        val privilegedAuthorsIds = database.batchInsert(PrivilegedAuthors) { // todo - test that all have been generated
             privilegedAuthors.map { privilegedAuthor ->
                 item {
                     set(it.privilegeId, privilegeId)
@@ -30,6 +44,8 @@ class PrivilegeRepository : RepositoryBase() {
         }
         return privilegeId
     }
+
+//    fun insertPrivilege
 
     fun getAssortmentById(id: Int): Privilege {
         val privCol = Privileges.aliased("privCol")
@@ -50,7 +66,7 @@ class PrivilegeRepository : RepositoryBase() {
         return Privilege(privilegesTo, privilegedAuthors)
     }
 
-    fun updatePrivilege(collectionId: Int, record: RecordUpdate) {
+    fun updatePrivilegedAuthor(collectionId: Int, record: RecordUpdate) {
         val collection = getPrivilege(collectionId) ?: return // todo - handle failure gracefully
 
         val res = database.update(PrivilegedAuthors) {

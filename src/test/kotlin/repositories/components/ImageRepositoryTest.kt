@@ -61,5 +61,13 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                 }
             }
         }
+
+        given("updateImage") {
+            then("getAssortmentById") {}
+        }
+
+        given("batchUpdateImages") {
+            then("getAssortmentById") {}
+        }
     }
 }

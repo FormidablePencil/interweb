@@ -13,20 +13,22 @@ import shared.testUtils.rollback
 
 class SignupFlow : BehaviorSpecFlow() {
     private val authorizationService: AuthorizationService by inject()
-    private val createAuthorRequest = CreateAuthorRequest(
-        "6saberryyTest1235@gmail.com1", "CherryCas6as", "Alex", "Formidable!56", "Martini1"
-    )
+
+    private val createAuthorRequest = AuthUtilities.createAuthorRequest
 
     suspend fun signup(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): SignupResponse {
         return rollback(cleanup) {
             val result = authorizationService.signup(request)
 
             result.statusCode() shouldBe HttpStatusCode.Created
-            val data = result.data ?: throw ServerErrorException("Nothing in data after successful signup", this::class.java)
+            val data =
+                result.data ?: throw ServerErrorException("Nothing in data after successful signup", this::class.java)
             data.refreshToken.length.shouldBeGreaterThan(0)
             data.accessToken.length.shouldBeGreaterThan(0)
 
             return@rollback result
         }
     }
+
+
 }
