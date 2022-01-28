@@ -1,25 +1,36 @@
 import com.google.gson.Gson
 import dtos.libOfComps.ComponentType
 import dtos.libOfComps.carousels.CarouselBasicImages
-import dtos.libOfComps.genericStructures.Image
-import dtos.libOfComps.genericStructures.PrivilegedAuthor
-import dtos.libOfComps.genericStructures.Text
+import dtos.libOfComps.genericStructures.images.Image
+import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
+import dtos.libOfComps.genericStructures.texts.Text
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.mockk
 import io.mockk.spyk
 import managers.ComponentManager
 import repositories.SpaceRepository
-import repositories.components.BannerRepository
-import repositories.components.CarouselRepository
-import serialized.libOfComps.UserComponent
+import repositories.components.*
 import serialized.libOfComps.CreateComponentRequest
+import serialized.libOfComps.UserComponent
 
 class ComponentManagerTest : BehaviorSpec({
     val spaceRepository: SpaceRepository = mockk()
     val bannerRepository: BannerRepository = mockk()
+    val imageRepository: ImageRepository = mockk()
     val carouselRepository: CarouselRepository = mockk()
+    val textRepository: TextRepository = mockk()
+    val privilegeRepository: PrivilegeRepository = mockk()
 
-    val spaceService = spyk(ComponentManager(spaceRepository, bannerRepository, carouselRepository))
+    val spaceService = spyk(
+        ComponentManager(
+            spaceRepository,
+            bannerRepository,
+            carouselRepository,
+            imageRepository,
+            textRepository,
+            privilegeRepository,
+        )
+    )
 
     beforeEach { }
 

@@ -1,6 +1,7 @@
 package services
 
 import dtos.failed
+import dtos.responseData.SpaceResponseData
 import dtos.space.*
 import dtos.succeeded
 import helper.RandomStringGenerator
@@ -76,10 +77,11 @@ class SpaceService(
         val space = spaceRepository.getSpace(request.address)
             ?: return GetSpaceResponse().failed(SpaceResponseFailed.SpaceNotFound)
 
-        return GetSpaceResponse().succeeded(HttpStatusCode.OK, space)
-        SpaceResponseData(
-
-        )
+        TODO()
+//        return GetSpaceResponse().succeeded(HttpStatusCode.OK, space)
+//        SpaceResponseData(
+//
+//        )
     }
 
     fun createSpace(createSpaceRequest: CreateSpaceRequest): CreateSpaceResponse {

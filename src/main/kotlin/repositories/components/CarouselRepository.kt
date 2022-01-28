@@ -2,8 +2,8 @@ package repositories.components
 
 import dtos.libOfComps.carousels.CarouselBasicImages
 import dtos.libOfComps.carousels.CarouselOfImagesTABLE
-import dtos.libOfComps.genericStructures.PrivilegedAuthor
 import dtos.libOfComps.genericStructures.images.Image
+import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
 import dtos.libOfComps.genericStructures.texts.Text
 import models.libOfComps.carousels.ImagesCarousels
 import org.ktorm.database.Database

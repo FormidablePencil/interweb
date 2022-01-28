@@ -1,7 +1,7 @@
 package repositories.components
 
 import configurations.DIHelper
-import dtos.libOfComps.genericStructures.Image
+import dtos.libOfComps.genericStructures.images.Image
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe

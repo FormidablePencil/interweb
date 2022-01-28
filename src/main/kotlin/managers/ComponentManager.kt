@@ -145,6 +145,7 @@ class ComponentManager(
             ComponentType.LineDivider -> TODO()
             // endregion
         }
+        return false
     }
 
     fun batchUpdateComponents(request: BatchUpdateComponentsRequest) {
@@ -189,5 +190,6 @@ class ComponentManager(
             ComponentType.LineDivider -> TODO()
             // endregion
         }
+        return false
     }
 }

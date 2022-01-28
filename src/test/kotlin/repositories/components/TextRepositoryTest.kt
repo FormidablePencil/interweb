@@ -1,7 +1,7 @@
 package repositories.components
 
 import configurations.DIHelper
-import dtos.libOfComps.genericStructures.Text
+import dtos.libOfComps.genericStructures.texts.Text
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import shared.testUtils.BehaviorSpecUtRepo
