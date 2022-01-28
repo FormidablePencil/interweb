@@ -2,7 +2,7 @@ package integrationTests.space.flows
 
 import dtos.libOfComps.ComponentType
 import org.koin.test.inject
-import serialized.space.CreateComponent
+import serialized.space.UserComponent
 import serialized.space.CreateComponentRequest
 import serialized.space.CreateComponentsRequest
 import services.SpaceService
@@ -14,14 +14,14 @@ class CmsLibOfCompsFlow : BehaviorSpecFlow() {
 
     private val createComponentsRequest = CreateComponentsRequest(
         spaceAddress = "some address",
-        createComponents = listOf(
-            CreateComponent(componentType = ComponentType.CarouselOfImages, jsonData = ""),
-            CreateComponent(componentType = ComponentType.CarouselOfImages, jsonData = ""),
-            CreateComponent(componentType = ComponentType.CarouselOfImages, jsonData = "")
+        userComponents = listOf(
+            UserComponent(componentType = ComponentType.CarouselOfImages, jsonData = ""),
+            UserComponent(componentType = ComponentType.CarouselOfImages, jsonData = ""),
+            UserComponent(componentType = ComponentType.CarouselOfImages, jsonData = "")
         )
     )
     private val createComponentRequest = CreateComponentRequest(
-        createComponent = createComponentsRequest.createComponents[0],
+        userComponent = createComponentsRequest.userComponents[0],
         spaceAddress = createComponentsRequest.spaceAddress
     )
 

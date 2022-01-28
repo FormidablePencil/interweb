@@ -68,11 +68,14 @@ class SpaceService(
     private val componentManager: ComponentManager,
 ) {
 
-    fun getSpaceById(request: GetSpaceRequest): GetSpaceResponse {
+    fun getSpaceByAddress(request: GetSpaceRequest): GetSpaceResponse {
         val space = spaceRepository.getSpace(request.address)
             ?: return GetSpaceResponse().failed(SpaceResponseFailed.SpaceNotFound)
 
         return GetSpaceResponse().succeeded(HttpStatusCode.OK, space)
+        SpaceResponseData(
+
+        )
     }
 
     fun createSpace(createSpaceRequest: CreateSpaceRequest): CreateSpaceResponse {
@@ -84,18 +87,29 @@ class SpaceService(
 
     fun createComponent(request: CreateComponentRequest): CreateComponentResponse {
         // validate that the requester has access to the space address provided
-        componentManager.createComponent(request.createComponent, request.spaceAddress)
+        componentManager.createComponent(request.userComponent, request.spaceAddress)
         TODO()
     }
 
     fun batchCreateComponents(request: CreateComponentsRequest) {
-        componentManager.batchCreateComponents(request.createComponents, request.spaceAddress)
+        componentManager.batchCreateComponents(request.userComponents, request.spaceAddress)
     }
 
     fun removeComponent(request: CreateComponentRequest): CreateComponentResponse {
         // validate that the requester has access to the space address provided
         TODO()
-        componentManager.deleteComponent(request.createComponent)
+        componentManager.deleteComponent(request.userComponent)
+    }
+
+    fun updateComponent(request: SingleUpdateComponentRequest) {
+        componentManager.updateItem(request)
+    }
+
+    fun updateComponents(request: UpdateComponentsRequest) {
+        // todo - rollback. If one fails all revert
+        request.updateComponent.map {
+            componentManager.updateItem(it)
+        }
     }
 
     //region Create component

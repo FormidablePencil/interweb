@@ -29,7 +29,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
 
                     val id = textRepository.insertCollectionOfTexts(texts, collectionOf)
                         ?: throw Exception("failed to get id")
-                    val res = textRepository.getCollectionById(id)
+                    val res = textRepository.getAssortmentById(id)
 
                     res.collectionOf shouldBe collectionOf
                     res.texts.size shouldBe texts.size

@@ -3,10 +3,12 @@ package repositories.components
 import dtos.libOfComps.genericStructures.IPrivilegedAuthor
 import dtos.libOfComps.genericStructures.Privilege
 import dtos.libOfComps.genericStructures.PrivilegedAuthor
+import models.genericStructures.IPrivilegeSchema
 import models.genericStructures.PrivilegedAuthors
 import models.genericStructures.Privileges
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
+import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 import repositories.RepositoryBase
 
@@ -30,7 +32,7 @@ class PrivilegeRepository : RepositoryBase() {
         return privilegeId
     }
 
-    fun getPrivilegeById(id: Int): Privilege {
+    fun getAssortmentById(id: Int): Privilege {
         val privCol = Privileges.aliased("privCol")
         val priv = PrivilegedAuthors.aliased("priv")
 
@@ -47,5 +49,70 @@ class PrivilegeRepository : RepositoryBase() {
                 )
             }
         return Privilege(privilegesTo, privilegedAuthors)
+    }
+
+    fun updatePrivilege(collectionId: Int, record: RecordUpdate) {
+        val collection = getPrivilege(collectionId) ?: return // todo - handle failure gracefully
+
+        val res = database.update(PrivilegedAuthors) {
+            record.updateRecord.map { updateCol ->
+                when (PrivilegedAuthorCOL.fromInt(updateCol.column)) {
+                    PrivilegedAuthorCOL.ModLvl -> set(it.modLvl, updateCol.value.toInt())
+                    PrivilegedAuthorCOL.AuthorId -> set(it.authorId, updateCol.value.toInt())
+                    // todo - remove changing of authorId
+                    // todo - toInt() may fail
+                }
+            }
+            where {
+                when (PrivilegedAuthorIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
+                    PrivilegedAuthorIdentifiableRecordByCol.AuthorId ->
+                        (it.privilegeId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
+                } // todo - handle incorrect recordIdentifiableByCol gracefully
+            }
+        }
+    }
+
+    fun batchUpdatePrivilegedAuthors(collectionId: Int, records: List<RecordUpdate>) {
+        val collection = getPrivilege(collectionId) ?: return // todo - handle failure gracefully
+
+        database.batchUpdate(PrivilegedAuthors) {
+            records.map { record ->
+                record.updateRecord.map { updateCol ->
+                    item {
+                        when (PrivilegedAuthorCOL.fromInt(updateCol.column)) {
+                            PrivilegedAuthorCOL.AuthorId -> set(it.authorId, updateCol.value.toInt())
+                            PrivilegedAuthorCOL.ModLvl -> set(it.modLvl, updateCol.value.toInt())
+                            // todo - toInt() may fail, handle gracefully
+                        }
+                        where {
+                            when (PrivilegedAuthorIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
+                                PrivilegedAuthorIdentifiableRecordByCol.AuthorId ->
+                                    (it.privilegeId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
+                            } // todo - handle incorrect recordIdentifiableByCol gracefully
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getPrivilege(id: Int): IPrivilegeSchema? {
+        return database.privileges.find { it.id eq id }
+    }
+}
+
+enum class PrivilegedAuthorCOL(private val value: Int) {
+    AuthorId(0), ModLvl(1);
+
+    companion object {
+        fun fromInt(value: Int) = values().first { it.value == value }
+    }
+}
+
+enum class PrivilegedAuthorIdentifiableRecordByCol(private val value: Int) {
+    AuthorId(0);
+
+    companion object {
+        fun fromInt(value: Int) = values().first { it.value == value }
     }
 }

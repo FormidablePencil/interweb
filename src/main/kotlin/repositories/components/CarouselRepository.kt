@@ -35,7 +35,7 @@ class CarouselRepository(
 
         // todo - validate ids, println(ids)
 
-        // todo - could be in a seperate caroutine than the first in this scope
+        // todo - could be in a separate caroutine than the first in this scope
         return database.insertAndGenerateKey(ImagesCarousels) {
             set(it.imageCollectionId, imageCollectionId)
             set(it.navToTextCollectionId, navToTextCollectionId)
@@ -57,9 +57,9 @@ class CarouselRepository(
             .select(crslImg.imageCollectionId, crslImg.navToTextCollectionId, crslImg.privilegeId, crslImg.title)
             .where { crslImg.id eq id }) {
             title = row[crslImg.title]!!
-            images = imageRepository.getCollectionById(row[crslImg.imageCollectionId]!!).images
-            navTos = textRepository.getCollectionById(row[crslImg.navToTextCollectionId]!!).texts
-            privilegedAuthors = privilegeRepository.getPrivilegeById(row[crslImg.privilegeId]!!).privilegedAuthors
+            images = imageRepository.getAssortmentById(row[crslImg.imageCollectionId]!!).images
+            navTos = textRepository.getAssortmentById(row[crslImg.navToTextCollectionId]!!).texts
+            privilegedAuthors = privilegeRepository.getAssortmentById(row[crslImg.privilegeId]!!).privilegedAuthors
         }
 
         return CarouselBasicImages(
@@ -73,5 +73,30 @@ class CarouselRepository(
     fun deleteCarouselOfImagesById(id: Int): Boolean {
         return database.imagesCarousels.removeIf { it.id eq id } != 0
     }
+
+    // region update
+
+    fun batchUpdate(componentId: Int, table: CarouselOfImagesTABLE, updateToData: List<RecordUpdate>) {
+        when (table) {
+            CarouselOfImagesTABLE.Images ->
+                imageRepository.batchUpdateImages(componentId, updateToData)
+            CarouselOfImagesTABLE.NavTos ->
+                textRepository.batchUpdateTexts(componentId, updateToData)
+            CarouselOfImagesTABLE.Privileges ->
+                privilegeRepository.batchUpdatePrivilegedAuthors(componentId, updateToData)
+        }
+    }
+
+    fun update(componentId: Int, column: CarouselOfImagesTABLE, updateToData: RecordUpdate) {
+        when (column) {
+            CarouselOfImagesTABLE.Images ->
+                imageRepository.updateImage(componentId, updateToData)
+            CarouselOfImagesTABLE.NavTos ->
+                textRepository.updateText(componentId, updateToData)
+            CarouselOfImagesTABLE.Privileges ->
+                privilegeRepository.updatePrivilege(componentId, updateToData)
+        }
+    }
+    // endregion update
     // endregion
 }

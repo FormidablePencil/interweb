@@ -22,7 +22,7 @@ class AuthorRepositoryTest : BehaviorSpecUtRepo({
     )
 
     given("created new account.") {
-        then("getByUsername(), getCollectionById()") {
+        then("getByUsername(), getAssortmentById()") {
             rollback {
                 val request = genReq(
                     username = "Wallaby81",

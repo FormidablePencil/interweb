@@ -7,7 +7,7 @@ import shared.testUtils.rollback
 
 class AccountRepositoryTest : BehaviorSpecUtRepo({
 
-    given("getCollectionById") { }
+    given("getAssortmentById") { }
 
     given("getByEmail") {
         then("get by email") {

@@ -4,34 +4,40 @@ import com.google.gson.Gson
 import dtos.libOfComps.ComponentType
 import dtos.libOfComps.banners.BannerBasic
 import dtos.libOfComps.carousels.CarouselBasicImages
+import dtos.space.IUserComponent
+import org.ktorm.dsl.eq
 import repositories.SpaceRepository
-import repositories.components.BannerRepository
-import repositories.components.CarouselRepository
-import serialized.space.CreateComponent
-import serialized.space.CreateComponentRequest
+import repositories.components.*
+import serialized.space.BatchUpdateComponentRequest
+import serialized.space.BatchUpdateComponentsRequest
+import serialized.space.SingleUpdateComponentRequest
+import serialized.space.UpdateComponentsRequest
 
 class ComponentManager(
     private val spaceRepository: SpaceRepository,
     private val bannerRepository: BannerRepository,
     private val carouselRepository: CarouselRepository,
+    private val imageRepository: ImageRepository,
+    private val textRepository: TextRepository,
+    private val privilegeRepository: PrivilegeRepository,
 ) {
     fun getComponents() {
         // given some identifiers
         // get data of ComponentType by identifier
     }
 
-    fun createComponent(request: CreateComponent, spaceAddress: String): Boolean {
+    fun createComponent(request: IUserComponent, spaceAddress: String): Boolean {
         return createComponent(request)
     }
 
-    fun batchCreateComponents(request: List<CreateComponent>, spaceAddress: String) {
+    fun batchCreateComponents(request: List<IUserComponent>, spaceAddress: String) {
         // todo - revert if some component fails to save. Save all or save non
         request.map {
             createComponent(it)
         }
     }
 
-    private fun createComponent(request: CreateComponent): Boolean {
+    private fun createComponent(request: IUserComponent): Boolean {
         val gson = Gson()
         return when (request.componentType) {
             // region Carousels
@@ -66,7 +72,8 @@ class ComponentManager(
         }
     }
 
-    fun deleteComponent(request: CreateComponent): Boolean {
+
+    fun deleteComponent(request: IUserComponent): Boolean {
         val gson = Gson()
         return when (request.componentType) {
             // region Carousels
@@ -100,8 +107,87 @@ class ComponentManager(
     }
 
 
-    fun batchDeleteComponents() {
-        // given the ids of components and the given ComponentType
-        // delete a list of components from all categories of where each is requested
+    fun updateItems(request: UpdateComponentsRequest) {
+        request.updateComponent.map {
+            updateItem(it)
+        }
+    }
+
+    fun updateItem(request: SingleUpdateComponentRequest): Boolean {
+        val gson = Gson()
+        when (ComponentType.fromInt(request.componentType)) {
+            // region Carousels
+            ComponentType.CarouselBlurredOverlay,
+            ComponentType.CarouselOfImages -> {
+                carouselRepository.update(
+                    componentId = request.componentId,
+                    column = CarouselOfImagesTABLE.fromInt(request.where[0].table),
+                    updateToData = request.updateToData
+                )
+            }
+            // endregion
+
+            // region Just texts
+            ComponentType.Markdown -> TODO()
+            ComponentType.BasicText -> TODO()
+            // endregion
+
+            // region Banners
+            ComponentType.BasicBanners -> TODO()
+            // endregion
+
+            // region Grids
+            ComponentType.OneOffGrid -> TODO()
+            // endregion
+
+            // region Dividers
+            ComponentType.Divider -> TODO()
+            ComponentType.LineDivider -> TODO()
+            // endregion
+        }
+    }
+
+    fun batchUpdateComponents(request: BatchUpdateComponentsRequest) {
+        request.updateComponent.map {
+            batchUpdateComponent(it)
+        }
+    }
+
+    fun batchUpdateComponent(request: BatchUpdateComponentRequest): Boolean {
+        val gson = Gson()
+        when (ComponentType.fromInt(request.componentType)) {
+            // region Carousels
+            ComponentType.CarouselBlurredOverlay,
+            ComponentType.CarouselOfImages -> {
+                carouselRepository.batchUpdate(
+                    componentId = request.componentId,
+                    table = CarouselOfImagesTABLE.fromInt(request.where[0].table),
+                    updateToData = request.updateToData
+                )
+            }
+            // endregion
+
+            // region Just texts
+            ComponentType.Markdown,
+            ComponentType.BasicText ->
+                textRepository.batchUpdateTexts(
+                    collectionId = request.componentId,
+                    records = request.updateToData
+                )
+            // endregion
+
+            // region Banners
+            ComponentType.BasicBanners -> TODO()
+            // endregion
+
+            // region Grids
+            ComponentType.OneOffGrid -> TODO()
+            // endregion
+
+            // region Dividers
+            ComponentType.Divider -> TODO()
+            ComponentType.LineDivider -> TODO()
+            // endregion
+        }
     }
 }
