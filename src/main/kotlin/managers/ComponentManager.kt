@@ -4,14 +4,14 @@ import com.google.gson.Gson
 import dtos.libOfComps.ComponentType
 import dtos.libOfComps.banners.BannerBasic
 import dtos.libOfComps.carousels.CarouselBasicImages
+import dtos.libOfComps.carousels.CarouselOfImagesTABLE
 import dtos.space.IUserComponent
-import org.ktorm.dsl.eq
 import repositories.SpaceRepository
 import repositories.components.*
-import serialized.space.BatchUpdateComponentRequest
-import serialized.space.BatchUpdateComponentsRequest
-import serialized.space.SingleUpdateComponentRequest
-import serialized.space.UpdateComponentsRequest
+import serialized.libOfComps.BatchUpdateComponentRequest
+import serialized.libOfComps.BatchUpdateComponentsRequest
+import serialized.libOfComps.SingleUpdateComponentRequest
+import serialized.libOfComps.UpdateComponentsRequest
 
 class ComponentManager(
     private val spaceRepository: SpaceRepository,
@@ -107,13 +107,13 @@ class ComponentManager(
     }
 
 
-    fun updateItems(request: UpdateComponentsRequest) {
+    fun updateComponents(request: UpdateComponentsRequest) {
         request.updateComponent.map {
-            updateItem(it)
+            updateComponent(it)
         }
     }
 
-    fun updateItem(request: SingleUpdateComponentRequest): Boolean {
+    fun updateComponent(request: SingleUpdateComponentRequest): Boolean {
         val gson = Gson()
         when (ComponentType.fromInt(request.componentType)) {
             // region Carousels

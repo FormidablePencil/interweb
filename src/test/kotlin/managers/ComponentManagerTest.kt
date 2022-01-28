@@ -11,8 +11,8 @@ import managers.ComponentManager
 import repositories.SpaceRepository
 import repositories.components.BannerRepository
 import repositories.components.CarouselRepository
-import serialized.space.UserComponent
-import serialized.space.CreateComponentRequest
+import serialized.libOfComps.UserComponent
+import serialized.libOfComps.CreateComponentRequest
 
 class ComponentManagerTest : BehaviorSpec({
     val spaceRepository: SpaceRepository = mockk()

@@ -7,6 +7,10 @@ import helper.RandomStringGenerator
 import io.ktor.http.*
 import managers.ComponentManager
 import repositories.SpaceRepository
+import serialized.libOfComps.CreateComponentRequest
+import serialized.libOfComps.CreateComponentsRequest
+import serialized.libOfComps.SingleUpdateComponentRequest
+import serialized.libOfComps.UpdateComponentsRequest
 import serialized.space.*
 
 // spaces (table) have components (table)
@@ -102,13 +106,13 @@ class SpaceService(
     }
 
     fun updateComponent(request: SingleUpdateComponentRequest) {
-        componentManager.updateItem(request)
+        componentManager.updateComponent(request)
     }
 
     fun updateComponents(request: UpdateComponentsRequest) {
         // todo - rollback. If one fails all revert
         request.updateComponent.map {
-            componentManager.updateItem(it)
+            componentManager.updateComponent(it)
         }
     }
 

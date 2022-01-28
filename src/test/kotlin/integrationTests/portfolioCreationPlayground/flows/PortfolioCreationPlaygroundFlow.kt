@@ -80,7 +80,7 @@ class PortfolioCreationPlaygroundFlow: KoinTest {
         //endregion
     }
 
-    // when user saves in component canvas page, updateItem is triggered
+    // when user saves in component canvas page, updateComponent is triggered
     fun updateComponent() {
         //region setup
         var componentId = addNewComponent();

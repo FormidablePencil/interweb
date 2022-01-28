@@ -2,9 +2,9 @@ package integrationTests.space.flows
 
 import dtos.libOfComps.ComponentType
 import org.koin.test.inject
-import serialized.space.UserComponent
-import serialized.space.CreateComponentRequest
-import serialized.space.CreateComponentsRequest
+import serialized.libOfComps.UserComponent
+import serialized.libOfComps.CreateComponentRequest
+import serialized.libOfComps.CreateComponentsRequest
 import services.SpaceService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback

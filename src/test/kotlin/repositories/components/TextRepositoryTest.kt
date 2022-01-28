@@ -40,5 +40,13 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                 }
             }
         }
+
+        given("updateText") {
+
+        }
+
+        given("batchUpdateTexts") {
+
+        }
     }
 }

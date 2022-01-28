@@ -1,4 +1,4 @@
-package serialized.space
+package serialized.libOfComps
 
 import dtos.libOfComps.ComponentType
 import dtos.space.IUserComponent

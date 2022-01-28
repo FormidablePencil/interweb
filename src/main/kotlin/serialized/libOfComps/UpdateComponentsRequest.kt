@@ -1,4 +1,4 @@
-package serialized.space
+package serialized.libOfComps
 
 import kotlinx.serialization.Serializable
 

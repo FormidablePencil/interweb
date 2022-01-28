@@ -1,8 +1,9 @@
 package repositories.components
 
-import dtos.libOfComps.genericStructures.IText
-import dtos.libOfComps.genericStructures.Text
-import dtos.libOfComps.genericStructures.TextCollection
+import dtos.libOfComps.genericStructures.texts.Text
+import dtos.libOfComps.genericStructures.texts.TextCollection
+import dtos.libOfComps.genericStructures.texts.TextIdentifiableRecordByCol
+import dtos.libOfComps.genericStructures.texts.TextsCOL
 import models.genericStructures.ITextCollectionSchema
 import models.genericStructures.TextCollections
 import models.genericStructures.Texts
@@ -11,12 +12,13 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 import repositories.RepositoryBase
+import serialized.libOfComps.RecordUpdate
 
 class TextRepository : RepositoryBase() {
     private val Database.textCollections get() = this.sequenceOf(TextCollections)
     private val Database.texts get() = this.sequenceOf(Texts)
 
-    fun insertCollectionOfTexts(texts: List<IText>, collectionOf: String): Int? {
+    fun insertCollectionOfTexts(texts: List<Text>, collectionOf: String): Int? {
         val navToTextCollectionId = database.insertAndGenerateKey(TextCollections) {
             set(it.collectionOf, collectionOf)
         } as Int?
@@ -99,21 +101,5 @@ class TextRepository : RepositoryBase() {
 
     private fun getTextCollection(id: Int): ITextCollectionSchema? {
         return database.textCollections.find { it.id eq id }
-    }
-}
-
-enum class TextsCOL(private val value: Int) {
-    Text(0), OrderRank(1);
-
-    companion object {
-        fun fromInt(value: Int) = values().first { it.value == value }
-    }
-}
-
-enum class TextIdentifiableRecordByCol(private val value: Int) {
-    OrderRank(0);
-
-    companion object {
-        fun fromInt(value: Int) = values().first { it.value == value }
     }
 }

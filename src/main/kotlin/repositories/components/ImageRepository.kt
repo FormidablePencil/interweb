@@ -1,8 +1,9 @@
 package repositories.components
 
-import dtos.libOfComps.genericStructures.Image
-import dtos.libOfComps.genericStructures.ImageCollection
-import kotlinx.serialization.Serializable
+import dtos.libOfComps.genericStructures.images.Image
+import dtos.libOfComps.genericStructures.images.ImageCollection
+import dtos.libOfComps.genericStructures.images.ImageIdentifiableRecordByCol
+import dtos.libOfComps.genericStructures.images.ImagesCOL
 import models.genericStructures.IImageCollectionSchema
 import models.genericStructures.ImageCollections
 import models.genericStructures.Images
@@ -12,6 +13,7 @@ import org.ktorm.entity.find
 import org.ktorm.entity.removeIf
 import org.ktorm.entity.sequenceOf
 import repositories.RepositoryBase
+import serialized.libOfComps.RecordUpdate
 
 class ImageRepository : RepositoryBase() {
     private val Database.imageCollections get() = this.sequenceOf(ImageCollections)
@@ -114,50 +116,5 @@ class ImageRepository : RepositoryBase() {
 
     private fun getImageCollection(id: Int): IImageCollectionSchema? {
         return database.imageCollections.find { it.id eq id }
-    }
-}
-
-@Serializable
-data class UpdateColumn(override val column: Int, override val value: String) : IUpdateColumn
-
-interface IUpdateColumn {
-    val column: Int
-    val value: String
-}
-
-@Serializable
-data class RecordUpdate(
-    override val recordIdentifiableByCol: Int, // maps to enums
-    override val recordIdentifiableByColOfValue: String,
-    override val updateRecord: List<UpdateColumn>,
-): IRecordUpdate
-
-interface IRecordUpdate {
-    val recordIdentifiableByCol: Int // maps to enums
-    val recordIdentifiableByColOfValue: String
-    val updateRecord: List<UpdateColumn>
-}
-
-enum class CarouselOfImagesTABLE(private val value: Int) {
-    Images(0), NavTos(1), Privileges(2);
-
-    companion object {
-        fun fromInt(value: Int) = values().first { it.value == value }
-    }
-}
-
-enum class ImagesCOL(private val value: Int) {
-    ImageUrl(0), ImageTitle(1), OrderRank(2);
-
-    companion object {
-        fun fromInt(value: Int) = values().first { it.value == value }
-    }
-}
-
-enum class ImageIdentifiableRecordByCol(private val value: Int) {
-    OrderRank(0);
-
-    companion object {
-        fun fromInt(value: Int) = values().first { it.value == value }
     }
 }

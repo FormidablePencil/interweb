@@ -4,9 +4,9 @@ import dtos.libOfComps.ComponentType
 import integrationTests.space.flows.CmsLibOfCompsFlow
 import io.kotest.matchers.shouldBe
 import org.koin.test.inject
-import serialized.space.CreateComponentRequest
+import serialized.libOfComps.CreateComponentRequest
 import serialized.space.GetSpaceRequest
-import serialized.space.UserComponent
+import serialized.libOfComps.UserComponent
 import services.SpaceService
 import shared.testUtils.BehaviorSpecIT
 

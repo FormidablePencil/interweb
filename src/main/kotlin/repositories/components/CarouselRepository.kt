@@ -1,15 +1,17 @@
 package repositories.components
 
 import dtos.libOfComps.carousels.CarouselBasicImages
-import dtos.libOfComps.genericStructures.Image
+import dtos.libOfComps.carousels.CarouselOfImagesTABLE
 import dtos.libOfComps.genericStructures.PrivilegedAuthor
-import dtos.libOfComps.genericStructures.Text
+import dtos.libOfComps.genericStructures.images.Image
+import dtos.libOfComps.genericStructures.texts.Text
 import models.libOfComps.carousels.ImagesCarousels
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.removeIf
 import org.ktorm.entity.sequenceOf
 import repositories.RepositoryBase
+import serialized.libOfComps.RecordUpdate
 
 class CarouselRepository(
     private val textRepository: TextRepository,
