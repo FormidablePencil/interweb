@@ -1,5 +1,6 @@
 package com.idealIntent.dtos
 
+import dtos.*
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldBeEmpty

@@ -27,7 +27,7 @@ class CarouselRepository(
         val imageCollectionId = imageRepository.insertCollectionOfImages(
             component.images, "CarouselBasicImages component"
         )
-        val navToTextCollectionId = textRepository.batchInsertTexts(
+        val navToTextCollectionId = textRepository.batchInsertNewText(
             component.navToCorrespondingImagesOrder, "carouselNavLinks"
         )
         val privilegeId = privilegeRepository.batchInsertNewPrivilegedAuthors(

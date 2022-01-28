@@ -7,7 +7,6 @@ import dtos.libOfComps.genericStructures.texts.Text
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.mockk
 import io.mockk.spyk
-import com.idealIntent.managers.ComponentManager
 import com.idealIntent.repositories.SpaceRepository
 import com.idealIntent.repositories.components.*
 import com.idealIntent.serialized.libOfComps.CreateComponentRequest

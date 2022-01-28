@@ -9,13 +9,13 @@ import dtos.responseData.ITokenResponseData
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
 import com.idealIntent.helper.maskEmail
+import com.idealIntent.managers.EmailManager
+import com.idealIntent.managers.PasswordManager
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.mockk.*
-import com.idealIntent.managers.EmailManager
-import com.idealIntent.managers.PasswordManager
 import com.idealIntent.managers.TokenManager
 import models.profile.Account
 import models.profile.Author

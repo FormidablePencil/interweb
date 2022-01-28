@@ -1,5 +1,6 @@
 package com.idealIntent.repositories.components
 
+import com.idealIntent.exceptions.ServerErrorException
 import dtos.libOfComps.genericStructures.texts.Text
 import dtos.libOfComps.genericStructures.texts.TextCollection
 import dtos.libOfComps.genericStructures.texts.TextIdentifiableRecordByCol
@@ -55,7 +56,7 @@ class TextRepository : RepositoryBase() {
             set(it.collectionOf, collectionOf)
         } as Int?
 
-        return id ?: ServerErrorException()
+//        return id ?: throw ServerErrorException()
         TODO("handle failure to create id here. Log the error")
     }
 
