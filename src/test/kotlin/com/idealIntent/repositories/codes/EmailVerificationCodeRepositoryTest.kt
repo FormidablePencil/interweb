@@ -1,4 +1,4 @@
-package dtos.
+package com.idealIntent.repositories.codes
 
 import com.idealIntent.configurations.DIHelper
 import io.kotest.koin.KoinListener

@@ -1,4 +1,5 @@
 import com.google.gson.Gson
+import com.idealIntent.managers.ComponentManager
 import dtos.libOfComps.ComponentType
 import dtos.libOfComps.carousels.CarouselBasicImages
 import dtos.libOfComps.genericStructures.images.Image

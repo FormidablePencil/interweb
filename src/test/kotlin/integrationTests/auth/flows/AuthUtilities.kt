@@ -1,5 +1,7 @@
 package integrationTests.auth.flows
 
+import com.idealIntent.repositories.profile.AccountRepository
+import com.idealIntent.repositories.profile.AuthorRepository
 import models.profile.Account
 import org.koin.test.inject
 import com.idealIntent.serialized.CreateAuthorRequest
