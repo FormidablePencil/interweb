@@ -1,7 +1,7 @@
 package shared.testUtils
 
-import configurations.AppEnv
-import configurations.DIHelper
+import com.idealIntent.configurations.AppEnv
+import com.idealIntent.configurations.DIHelper
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.koin.KoinListener
 import io.mockk.mockk

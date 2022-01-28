@@ -1,7 +1,7 @@
 package shared
 
 import com.typesafe.config.ConfigFactory
-import configurations.AppEnv
+import com.idealIntent.configurations.AppEnv
 import io.ktor.config.*
 import io.mockk.every
 import io.mockk.mockk

@@ -1,4 +1,4 @@
-package dtos
+package com.idealIntent.dtos
 
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe

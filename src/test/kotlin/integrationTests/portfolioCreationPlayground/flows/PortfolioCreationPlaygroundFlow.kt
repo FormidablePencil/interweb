@@ -1,6 +1,6 @@
 package integrationTests.portfolioCreationPlayground.flows
 
-import services.PortfolioCreationPlaygroundService
+import com.idealIntent.services.PortfolioCreationPlaygroundService
 import dtos.portfolio.AddNewComponentRequest
 import org.koin.test.KoinTest
 import org.koin.test.inject

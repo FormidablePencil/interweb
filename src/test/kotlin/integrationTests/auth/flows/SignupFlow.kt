@@ -1,13 +1,13 @@
 package integrationTests.auth.flows
 
 import dtos.signup.SignupResponse
-import exceptions.ServerErrorException
+import com.idealIntent.exceptions.ServerErrorException
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import org.koin.test.inject
-import serialized.CreateAuthorRequest
-import services.AuthorizationService
+import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.services.AuthorizationService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
 

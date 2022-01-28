@@ -1,8 +1,7 @@
 package integrationTests.space.flows
 
-import models.space.Space
 import org.koin.test.inject
-import services.SpaceService
+import com.idealIntent.services.SpaceService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
 

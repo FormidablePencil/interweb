@@ -2,9 +2,9 @@ package integrationTests.auth.flows
 
 import models.profile.Account
 import org.koin.test.inject
-import repositories.profile.AccountRepository
-import repositories.profile.AuthorRepository
-import serialized.CreateAuthorRequest
+import com.idealIntent.repositories.profile.AccountRepository
+import com.idealIntent.repositories.profile.AuthorRepository
+import com.idealIntent.serialized.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecFlow
 
 class AuthUtilities : BehaviorSpecFlow() {

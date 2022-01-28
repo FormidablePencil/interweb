@@ -8,8 +8,8 @@ import io.ktor.server.testing.*
 import org.koin.core.context.stopKoin
 import org.koin.test.inject
 import org.opentest4j.AssertionFailedError
-import serialized.CreateAuthorRequest
-import serialized.auth.LoginByUsernameRequest
+import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.serialized.auth.LoginByUsernameRequest
 import shared.testUtils.BehaviorSpecIT
 import kotlin.test.assertEquals
 

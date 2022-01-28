@@ -20,8 +20,8 @@ There are unit tests, integration tests and user flows.
 ## Backend code structures
 
 ### Structure of unit tests  <!-- {docsify-ignore} -->
-- services
-    - managers
+- com.idealIntent.services
+    - com.idealIntent.managers
         - tokenManager - name mimicking file
             - GenerateTokens.kt name mimicking class method
 

@@ -3,7 +3,7 @@ package com.idealIntent
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.typesafe.config.ConfigFactory
-import configurations.DIHelper
+import com.idealIntent.configurations.DIHelper
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -11,10 +11,10 @@ import io.ktor.config.*
 import io.ktor.features.*
 import io.ktor.serialization.*
 import org.koin.core.context.startKoin
-import routes.registerAuthorRoutes
-import routes.registerAuthorizationRoutes
-import routes.registerCustomerRoutes
-import routes.registerOrderRoutes
+import com.idealIntent.routes.registerAuthorRoutes
+import com.idealIntent.routes.registerAuthorizationRoutes
+import com.idealIntent.routes.registerCustomerRoutes
+import com.idealIntent.routes.registerOrderRoutes
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
