@@ -24,10 +24,10 @@ class CarouselRepository(
     fun insertCarouselBasicImages(component: CarouselBasicImages): Int? {
 
         // region todo - could be in a caroutine
-        val imageCollectionId = imageRepository.insertCollectionOfImages(
+        val imageCollectionId = imageRepository.batchInsertNewImages(
             component.images, "CarouselBasicImages component"
         )
-        val navToTextCollectionId = textRepository.batchInsertNewText(
+        val navToTextCollectionId = textRepository.batchInsertNewTexts(
             component.navToCorrespondingImagesOrder, "carouselNavLinks"
         )
         val privilegeId = privilegeRepository.batchInsertNewPrivilegedAuthors(

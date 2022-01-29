@@ -1,12 +1,12 @@
 package com.idealIntent.repositories.components
 
 import com.idealIntent.configurations.DIHelper
+import com.idealIntent.serialized.CreateAuthorRequest
 import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
-import com.idealIntent.serialized.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
 
@@ -23,7 +23,11 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
             signupFlow = SignupFlow()
         }
 
-        // authorId must be created before it's assigned to privilege since it privilege authorId is a foreign key
+        /**
+         * Generate privileged authors to consume
+         *
+         * authorId must be created before it's assigned to privilege since it privilege authorId is a foreign key
+         */
         suspend fun generatePrivilegedAuthorsToConsume(): List<PrivilegedAuthor> {
             return (1..3).map {
                 val createAuthorRequest = CreateAuthorRequest(
@@ -56,8 +60,9 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
                     val privilegesTo = "some libOfComp"
                     val privilegedAuthors = generatePrivilegedAuthorsToConsume()
 
-                    val privilegeId = privilegeRepository.batchInsertNewPrivilegedAuthors(privilegedAuthors, privilegesTo)
-                        ?: throw Exception("failed to get id")
+                    val privilegeId =
+                        privilegeRepository.batchInsertNewPrivilegedAuthors(privilegedAuthors, privilegesTo)
+                            ?: throw Exception("failed to get id")
                     val res = privilegeRepository.getAssortmentById(privilegeId)
 
                     res.privilegeTo shouldBe privilegesTo // todo - typo

@@ -27,7 +27,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                         Text(orderRank = 30000, text = "man"),
                     )
 
-                    val id = textRepository.batchInsertNewText(texts, collectionOf)
+                    val id = textRepository.batchInsertNewTexts(texts, collectionOf)
                     val res = textRepository.getAssortmentById(id)
 
                     res.collectionOf shouldBe collectionOf
