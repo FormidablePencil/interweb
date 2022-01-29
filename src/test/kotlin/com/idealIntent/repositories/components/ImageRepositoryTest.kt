@@ -18,7 +18,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
             imageRepository = ImageRepository()
         }
 
-        given("batchInsertNewImages") {
+        given("batchInsertNewRecords") {
             then("getAssortmentById") {
                 rollback {
                     val collectionOf = "Pet Projects"
@@ -45,7 +45,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                         ),
                     )
 
-                    val imageCollectionId = imageRepository.batchInsertNewImages(images, collectionOf)
+                    val imageCollectionId = imageRepository.batchInsertNewRecords(images, collectionOf)
                         ?: throw Exception("failed to get id")
                     val res = imageRepository.getAssortmentById(imageCollectionId)
 
@@ -62,11 +62,11 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
             }
         }
 
-        given("updateImage") {
+        given("updateRecord") {
             then("getAssortmentById") {}
         }
 
-        given("batchUpdateImages") {
+        given("batchUpdateRecords") {
             then("getAssortmentById") {}
         }
     }

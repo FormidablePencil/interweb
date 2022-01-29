@@ -17,7 +17,7 @@ import org.ktorm.entity.sequenceOf
 /**
  * Responsible for text_collections and texts table
  */
-class TextRepository : RepositoryBase(), ICompRecordCrudStructure<Text> {
+class TextRepository : RepositoryBase(), ICompRecordCrudStructure<Text, ITextCollectionSchema, TextCollection> {
     private val Database.textCollections get() = this.sequenceOf(TextCollections)
     private val Database.texts get() = this.sequenceOf(Texts)
 
@@ -147,5 +147,21 @@ class TextRepository : RepositoryBase(), ICompRecordCrudStructure<Text> {
 
 
     // region Delete
+    override fun deleteRecord(collectionId: Int): Boolean {
+
+        TODO("Not yet implemented")
+    }
+
+    override fun batchDeleteRecords(collectionId: Int): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteAllRecordsInCollection(collectionId: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteCollectionOfRecords() {
+        TODO("Not yet implemented")
+    }
     // endregion Delete
 }

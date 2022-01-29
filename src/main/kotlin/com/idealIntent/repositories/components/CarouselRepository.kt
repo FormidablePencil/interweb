@@ -24,13 +24,13 @@ class CarouselRepository(
     fun insertCarouselBasicImages(component: CarouselBasicImages): Int? {
 
         // region todo - could be in a caroutine
-        val imageCollectionId = imageRepository.batchInsertNewImages(
+        val imageCollectionId = imageRepository.batchInsertNewRecords(
             component.images, "CarouselBasicImages component"
         )
         val navToTextCollectionId = textRepository.batchInsertNewRecords(
             component.navToCorrespondingImagesOrder, "carouselNavLinks"
         )
-        val privilegeId = privilegeRepository.batchInsertNewPrivilegedAuthors(
+        val privilegeId = privilegeRepository.batchInsertNewRecords(
             component.privilegedAuthors, "carousel of images"
         )
         // endregion
@@ -81,22 +81,22 @@ class CarouselRepository(
     fun batchUpdate(componentId: Int, table: CarouselOfImagesTABLE, updateToData: List<RecordUpdate>) {
         when (table) {
             CarouselOfImagesTABLE.Images ->
-                imageRepository.batchUpdateImages(componentId, updateToData)
+                imageRepository.batchUpdateRecords(componentId, updateToData)
             CarouselOfImagesTABLE.NavTos ->
                 textRepository.batchUpdateRecords(componentId, updateToData)
             CarouselOfImagesTABLE.Privileges ->
-                privilegeRepository.batchUpdatePrivilegedAuthors(componentId, updateToData)
+                privilegeRepository.batchUpdateRecords(componentId, updateToData)
         }
     }
 
     fun update(componentId: Int, column: CarouselOfImagesTABLE, updateToData: RecordUpdate) {
         when (column) {
             CarouselOfImagesTABLE.Images ->
-                imageRepository.updateImage(componentId, updateToData)
+                imageRepository.updateRecord(componentId, updateToData)
             CarouselOfImagesTABLE.NavTos ->
                 textRepository.updateRecord(componentId, updateToData)
             CarouselOfImagesTABLE.Privileges ->
-                privilegeRepository.updatePrivilegedAuthor(componentId, updateToData)
+                privilegeRepository.updateRecord(componentId, updateToData)
         }
     }
     // endregion update

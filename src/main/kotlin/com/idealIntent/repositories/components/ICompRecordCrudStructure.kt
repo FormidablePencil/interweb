@@ -5,27 +5,35 @@ import com.idealIntent.serialized.libOfComps.RecordUpdate
 /**
  * Structure for CRUD operations on libOfComps
  *
- * @param Record generic type for data such as Image, Text, PrivilegedAuthor, etc.
+ * for examples:
+ * @see com.idealIntent.repositories.components.TextRepository
+ * @see com.idealIntent.repositories.components.ImageRepository
+ * @see com.idealIntent.repositories.components.PrivilegeRepository
+ * @see com.idealIntent.repositories.components.CarouselRepository
+ *
+ * @param Record Generic type for data such as Image, Text, PrivilegedAuthor, etc.
+ * @param Collection Collection which records are associated under such as ImageCollection, TextCollection, PrivilegesCollection, etc.
+ * @param RecordCollection DTO Collection of Records.
  * @constructor Create empty structure
  */
-interface ICompRecordCrudStructure<Record> {
+interface ICompRecordCrudStructure<Record, Collection, RecordCollection> {
 
     // region Get
     /**
-     * Get items by collection id
+     * Get records by collection id
      *
-     * @param collectionId get items under collection's id
-     * @return items under collectionId or null if failed to find by [collectionId]
+     * @param collectionId get records under collection's id
+     * @return records under collectionId or null if failed to find by [collectionId]
      */
-    fun getAssortmentById(collectionId: Int): Any
+    fun getAssortmentById(collectionId: Int): RecordCollection
 
     /**
-     * Get only text_collection and not it's associated items
+     * Get only collection record and not it's associated records
      *
      * @param id id of collection
-     * @return collection but not associated items or null if failed to find by [id]
+     * @return collection but not associated records or null if failed to find by [id]
      */
-    fun getCollection(id: Int): Any?
+    fun getCollection(id: Int): Collection?
     // endregion Get
 
 
@@ -96,6 +104,30 @@ interface ICompRecordCrudStructure<Record> {
     // endregion Update
 
 
+    // todo deletes
     // region Delete
+    /**
+     * Delete an image of collection
+     *
+     */
+    fun deleteRecord(collectionId: Int): Boolean
+
+    /**
+     * Delete images of collection
+     *
+     */
+    fun batchDeleteRecords(collectionId: Int): Boolean
+
+    /**
+     * Delete all images of collection
+     *
+     */
+    fun deleteAllRecordsInCollection(collectionId: Int)
+
+    /**
+     * Delete image_collection and it's images
+     *
+     */
+    fun deleteCollectionOfRecords()
     // endregion Delete
 }

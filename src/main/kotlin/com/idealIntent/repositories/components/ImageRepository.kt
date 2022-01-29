@@ -19,18 +19,12 @@ import org.ktorm.entity.sequenceOf
 /**
  * Responsible for image_collections and images table
  */
-class ImageRepository : RepositoryBase() {
+class ImageRepository : RepositoryBase(), ICompRecordCrudStructure<Image, IImageCollectionSchema, ImageCollection> {
     private val Database.imageCollections get() = this.sequenceOf(ImageCollections)
     private val Database.images get() = this.sequenceOf(Images)
 
     // region Get
-    /**
-     * Get items by collection id
-     *
-     * @param collectionId
-     * @return items by collection id
-     */
-    fun getAssortmentById(collectionId: Int): ImageCollection { // todo - check privileges if allowed for any author or whether authorId is privileged
+    override fun getAssortmentById(collectionId: Int): ImageCollection { // todo - check privileges if allowed for any author or whether authorId is privileged
         val imgCol = ImageCollections.aliased("imgCol")
         val img = Images.aliased("img")
 
@@ -51,77 +45,43 @@ class ImageRepository : RepositoryBase() {
         return ImageCollection(collectionOf, images)
     }
 
-    /**
-     * Get only image_collection and not it's associated items
-     *
-     * @param id id of collection
-     * @return image_collection but not associated items
-     */
-    private fun getImageCollection(id: Int): IImageCollectionSchema? {
+    override fun getCollection(id: Int): IImageCollectionSchema? {
         return database.imageCollections.find { it.id eq id }
     }
     // endregion Get
 
 
     // region Insert
-    /**
-     * Insert item under a new collection
-     *
-     * @param image
-     * @param collectionOf name the collection
-     * @return collectionId or null if failed
-     */
-    fun insertNewImage(image: Image, collectionOf: String): Int {
-        val collectionId = insertImageCollection(collectionOf)
+    override fun insertNewRecord(record: Image, collectionOf: String): Int {
+        val collectionId = insertRecordCollection(collectionOf)
 
-        insertImage(image, collectionId)
+        insertRecord(record, collectionId)
 
         return collectionId
     }
 
-    /**
-     * Batch insert items under a new collection
-     *
-     * @param images
-     * @param collectionOf name the collection
-     * @return collectionId or null if failed
-     */
-    fun batchInsertNewImages(images: List<Image>, collectionOf: String): Int { // todo = check mod privileges
-        val collectionId = insertImageCollection(collectionOf)
+    override fun batchInsertNewRecords(records: List<Image>, collectionOf: String): Int { // todo = check mod privileges
+        val collectionId = insertRecordCollection(collectionOf)
 
-        val ids = batchInsertImages(images, collectionId)
+        val ids = batchInsertRecords(records, collectionId)
 
         return collectionId
     }
 
-    /**
-     * Insert item
-     *
-     * @param image
-     * @param collectionId id of collection to associate to
-     * @return success or fail in creation
-     */
-    fun insertImage(image: Image, collectionId: Int) {
+    override fun insertRecord(record: Image, collectionId: Int): Boolean {
         val id = database.insert(Images) {
-            set(it.orderRank, image.orderRank)
-            set(it.imageTitle, image.imageTitle)
-            set(it.imageUrl, image.imageUrl)
+            set(it.orderRank, record.orderRank)
+            set(it.imageTitle, record.imageTitle)
+            set(it.imageUrl, record.imageUrl)
             set(it.collectionId, collectionId)
         } as Int? ?: TODO()
 
         // todo - check that ids are all there
     }
 
-    /**
-     * Batch insert items
-     *
-     * @param images
-     * @param collectionId id to identify under what collection to insert
-     * @return success or fail in creation
-     */
-    fun batchInsertImages(images: List<Image>, collectionId: Int) {
+    override fun batchInsertRecords(records: List<Image>, collectionId: Int): Boolean {
         val ids = database.batchInsert(Images) {
-            images.map { image ->
+            records.map { image ->
                 item {
                     set(it.orderRank, image.orderRank)
                     set(it.imageTitle, image.imageTitle)
@@ -132,13 +92,7 @@ class ImageRepository : RepositoryBase() {
         } as IntArray? ?: TODO()
     }
 
-    /**
-     * Insert collection in order to group new items under
-     *
-     * @param collectionOf name the collection
-     * @return collectionId or null if failed
-     */
-    private fun insertImageCollection(collectionOf: String): Int {
+    override fun insertRecordCollection(collectionOf: String): Int {
         val id = database.insertAndGenerateKey(ImageCollections) {
             set(it.collectionOf, collectionOf)
         } as Int?
@@ -149,14 +103,8 @@ class ImageRepository : RepositoryBase() {
 
 
     // region Update
-    /**
-     * Update item
-     *
-     * @param collectionId id of collection of images
-     * @param record update to
-     */
-    fun updateImage(collectionId: Int, record: RecordUpdate) {
-        val collection = getImageCollection(collectionId) ?: return // handle gracefully
+    override fun updateRecord(collectionId: Int, record: RecordUpdate): Boolean {
+        val collection = getCollection(collectionId) ?: return false // todo handle gracefully
 
         val res = database.update(Images) {
             record.updateTo.map { updateCol ->
@@ -176,14 +124,8 @@ class ImageRepository : RepositoryBase() {
         }
     }
 
-    /**
-     * Batch update items
-     *
-     * @param collectionId
-     * @param records update to
-     */
-    fun batchUpdateImages(collectionId: Int, records: List<RecordUpdate>) {
-        val collection = getImageCollection(collectionId) ?: return // handle gracefully
+    override fun batchUpdateRecords(collectionId: Int, records: List<RecordUpdate>): Boolean {
+        val collection = getCollection(collectionId) ?: return // handle gracefully
 
         database.batchUpdate(Images) {
             records.map { record ->
@@ -210,11 +152,7 @@ class ImageRepository : RepositoryBase() {
 
 
     // region Delete
-    /**
-     * Delete an image of collection
-     *
-     */
-    fun deleteImage(collectionId: Int): Boolean {
+    override fun deleteRecord(collectionId: Int): Boolean {
         val imgCol = ImageCollections.aliased("imgCol")
         val img = Images.aliased("img")
 
@@ -224,26 +162,14 @@ class ImageRepository : RepositoryBase() {
         return effectedRows > 0
     }
 
-    /**
-     * Delete images of collection
-     *
-     */
-    fun batchDeleteImages(collectionId: Int): Boolean {
+    override fun batchDeleteRecords(collectionId: Int): Boolean {
         TODO()
     }
 
-    /**
-     * Delete all images of collection
-     *
-     */
-    fun deleteAllImagesInCollection(collectionId: Int) {
+    override fun deleteAllRecordsInCollection(collectionId: Int) {
     }
 
-    /**
-     * Delete image_collection and it's images
-     *
-     */
-    fun deleteCollectionOfImages() {
+    override fun deleteCollectionOfRecords() {
 
     }
     // endregion Delete
