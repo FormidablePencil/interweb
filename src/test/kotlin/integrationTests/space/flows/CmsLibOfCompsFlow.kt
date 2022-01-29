@@ -1,23 +1,23 @@
 package integrationTests.space.flows
 
-import dtos.compositions.CompositionType
-import org.koin.test.inject
-import com.idealIntent.dtos.compositions.UserComposition
 import com.idealIntent.dtos.compositions.CreateCompositionRequest
 import com.idealIntent.dtos.compositions.CreateCompositionsRequest
-import com.idealIntent.services.SpaceService
+import com.idealIntent.dtos.compositions.UserComposition
+import com.idealIntent.services.CompositionService
+import dtos.compositions.CompositionCategory
+import org.koin.test.inject
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
 
 class CmsLibOfCompsFlow : BehaviorSpecFlow() {
-    private val spaceService: SpaceService by inject()
+    private val compositionService: CompositionService by inject()
 
     private val createCompositionsRequest = CreateCompositionsRequest(
         spaceAddress = "some address",
         userCompositions = listOf(
-            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = ""),
-            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = ""),
-            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = "")
+            UserComposition(compositionType = CompositionCategory.Carousel, jsonData = ""),
+            UserComposition(compositionType = CompositionCategory.Carousel, jsonData = ""),
+            UserComposition(compositionType = CompositionCategory.Carousel, jsonData = "")
         )
     )
     private val createCompositionRequest = CreateCompositionRequest(
@@ -30,13 +30,16 @@ class CmsLibOfCompsFlow : BehaviorSpecFlow() {
         cleanup: Boolean = false
     ) {
         return rollback(cleanup) {
-            spaceService.batchCreateCompositions(request)
+//            compositionService.batchCreateCompositions(request)
         }
     }
 
-    suspend fun createComposition(request: CreateCompositionRequest = createCompositionRequest, cleanup: Boolean = false) {
+    suspend fun createComposition(
+        request: CreateCompositionRequest = createCompositionRequest,
+        cleanup: Boolean = false
+    ) {
         return rollback(cleanup) {
-            spaceService.createComposition(request)
+//            compositionService.createComposition(request)
         }
     }
 }

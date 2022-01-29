@@ -4,7 +4,7 @@ import com.idealIntent.dtos.compositions.CreateCompositionRequest
 import com.idealIntent.dtos.compositions.UserComposition
 import com.idealIntent.dtos.space.GetSpaceRequest
 import com.idealIntent.services.SpaceService
-import dtos.compositions.CompositionType
+import dtos.compositions.CompositionCategory
 import integrationTests.space.flows.CmsLibOfCompsFlow
 import io.kotest.matchers.shouldBe
 import org.koin.test.inject
@@ -17,9 +17,9 @@ class CmsOfCompositionsIT : BehaviorSpecIT() {
 
     init {
         val compositions = listOf(
-            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = ""),
-            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = ""),
-            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = "")
+            UserComposition(compositionType = CompositionCategory.Carousel, jsonData = ""),
+            UserComposition(compositionType = CompositionCategory.Banner, jsonData = ""),
+            UserComposition(compositionType = CompositionCategory.Text, jsonData = "")
         )
         given("test that all components of composition work") {
             compositions.forEach {

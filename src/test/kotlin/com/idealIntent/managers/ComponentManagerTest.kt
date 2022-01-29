@@ -1,6 +1,14 @@
 import com.google.gson.Gson
+import com.idealIntent.dtos.compositions.CreateCompositionRequest
+import com.idealIntent.dtos.compositions.UserComposition
 import com.idealIntent.managers.CompositionManager
-import dtos.compositions.CompositionType
+import com.idealIntent.repositories.SpaceRepository
+import com.idealIntent.repositories.collectionsGeneric.ImageRepository
+import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
+import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
+import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CarouselBasicImages
 import dtos.compositions.genericStructures.images.Image
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
@@ -8,15 +16,6 @@ import dtos.compositions.genericStructures.texts.Text
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.mockk
 import io.mockk.spyk
-import com.idealIntent.repositories.SpaceRepository
-import com.idealIntent.repositories.compositions.*
-import com.idealIntent.dtos.compositions.CreateCompositionRequest
-import com.idealIntent.dtos.compositions.UserComposition
-import com.idealIntent.repositories.collectionsGeneric.ImageRepository
-import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
-import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 
 class CompositionManagerTest : BehaviorSpec({
     val spaceRepository: SpaceRepository = mockk()
@@ -26,7 +25,7 @@ class CompositionManagerTest : BehaviorSpec({
     val textRepository: TextRepository = mockk()
     val privilegeRepository: PrivilegeRepository = mockk()
 
-    val spaceService = spyk(
+    val componentManager = spyk(
         CompositionManager(
             spaceRepository,
             bannerRepository,
@@ -49,7 +48,7 @@ class CompositionManagerTest : BehaviorSpec({
         val req = CreateCompositionRequest(
             spaceAddress = "SDLFJEI",
             userComposition = UserComposition(
-                compositionType = CompositionType.CarouselOfImages,
+                compositionType = CompositionCategory.Carousel,
                 jsonData = gson.toJson(
                     CarouselBasicImages(
                         title = "project images",
@@ -60,7 +59,7 @@ class CompositionManagerTest : BehaviorSpec({
                 )
             ),
         )
-        val res = spaceService.createComposition(req.userComposition, req.spaceAddress)
+//        val res = componentManager.createComposition(req.userComposition, req.spaceAddress)
     }
 
     xgiven("deleteComposition") { }

@@ -90,33 +90,32 @@ class SpaceService(
             CreateSpaceResponse().failed(CreateSpaceResponseFailed.FailedToCreateSpace)
     }
 
-    fun createComposition(request: CreateCompositionRequest): CreateCompositionResponse {
-        // validate that the requester has access to the space address provided
-        componentManager.createComposition(request.userComposition, request.spaceAddress)
-        TODO()
-    }
+//    fun createComposition(request: CreateCompositionRequest): CreateCompositionResponse {
+//        // validate that the requester has access to the space address provided
+//        componentManager.createComposition(request.userComposition, request.spaceAddress)
+//    }
 
-    fun batchCreateCompositions(request: CreateCompositionsRequest) {
-        componentManager.batchCreateCompositions(request.userCompositions, request.spaceAddress)
-    }
+//    fun batchCreateCompositions(request: CreateCompositionsRequest) {
+//        componentManager.batchCreateCompositions(request.userCompositions, request.spaceAddress)
+//    }
 
-    fun removeComposition(request: CreateCompositionRequest): CreateCompositionResponse {
-        // validate that the requester has access to the space address provided
-        TODO()
-        componentManager.deleteComposition(request.userComposition)
-    }
+//    fun removeComposition(request: CreateCompositionRequest): CreateCompositionResponse {
+//        // validate that the requester has access to the space address provided
+//        TODO()
+//        componentManager.deleteComposition(request.userComposition)
+//    }
 
-    fun updateComposition(request: SingleUpdateCompositionRequest) {
-
-        componentManager.updateComposition(request)
-    }
-
-    fun updateCompositions(request: UpdateCompositionRequest) {
-        // todo - rollback. If one fails all revert
-        request.updateComposition.map {
-            componentManager.updateComposition(it)
-        }
-    }
+//    fun updateComposition(request: SingleUpdateCompositionRequest) {
+//
+//        componentManager.updateComposition(request)
+//    }
+//
+//    fun updateCompositions(request: UpdateCompositionRequest) {
+//        // todo - rollback. If one fails all revert
+//        request.updateComposition.map {
+//            componentManager.updateComposition(it)
+//        }
+//    }
 
     //region Create component
     //endregion

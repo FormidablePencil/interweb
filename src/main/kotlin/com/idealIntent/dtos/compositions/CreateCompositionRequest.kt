@@ -1,6 +1,6 @@
 package com.idealIntent.dtos.compositions
 
-import dtos.compositions.CompositionType
+import dtos.compositions.CompositionCategory
 import dtos.space.IUserComposition
 import kotlinx.serialization.Serializable
 
@@ -12,6 +12,6 @@ data class CreateCompositionRequest(
 
 @Serializable
 data class UserComposition(
-    override val compositionType: CompositionType,
+    override val compositionType: CompositionCategory,
     override val jsonData: String,
 ) : IUserComposition
