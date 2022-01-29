@@ -1,4 +1,4 @@
-package com.idealIntent.helper
+package com.idealIntent.helpers
 
 import io.kotest.common.ExperimentalKotest
 import io.kotest.core.spec.style.BehaviorSpec

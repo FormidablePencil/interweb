@@ -1,4 +1,4 @@
-package com.idealIntent.helper
+package com.idealIntent.helpers
 
 fun isStrongPassword(password: String): Boolean {
     val passwordRegex = """^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#${'$'}%!\-_?&])(?=\S+${'$'}).{8,}""".toRegex()

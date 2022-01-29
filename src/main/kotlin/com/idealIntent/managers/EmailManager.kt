@@ -16,6 +16,15 @@ import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.staticData.EmailMessages
 import java.util.*
 
+// todo - comments
+/**
+ * Email manager
+ *
+ * @property emailVerificationCodeRepository
+ * @property resetPasswordCodeRepository
+ * @property authorProfileRelatedRepository
+ * @constructor
+ */
 class EmailManager(
     private val emailVerificationCodeRepository: EmailVerificationCodeRepository,
     private val resetPasswordCodeRepository: ResetPasswordCodeRepository,

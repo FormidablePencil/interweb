@@ -4,7 +4,7 @@ import com.idealIntent.services.AuthorsPortfolioService
 import com.idealIntent.services.ExploreService
 import com.idealIntent.services.SpaceService
 import integrationTests.auth.flows.SignupFlow
-import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.dtos.CreateAuthorRequest
 
 class ExploreFlow(
     private val threadDomainService: SpaceService,

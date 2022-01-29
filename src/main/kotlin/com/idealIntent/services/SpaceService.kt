@@ -3,15 +3,15 @@ package com.idealIntent.services
 import dtos.failed
 import dtos.space.*
 import dtos.succeeded
-import com.idealIntent.helper.RandomStringGenerator
+import com.idealIntent.helpers.RandomStringGenerator
 import io.ktor.http.*
 import com.idealIntent.managers.ComponentManager
 import com.idealIntent.repositories.SpaceRepository
-import com.idealIntent.serialized.libOfComps.CreateComponentRequest
-import com.idealIntent.serialized.libOfComps.CreateComponentsRequest
-import com.idealIntent.serialized.libOfComps.SingleUpdateComponentRequest
-import com.idealIntent.serialized.libOfComps.UpdateComponentsRequest
-import com.idealIntent.serialized.space.*
+import com.idealIntent.dtos.libOfComps.CreateComponentRequest
+import com.idealIntent.dtos.libOfComps.CreateComponentsRequest
+import com.idealIntent.dtos.libOfComps.SingleUpdateComponentRequest
+import com.idealIntent.dtos.libOfComps.UpdateComponentsRequest
+import com.idealIntent.dtos.space.*
 
 // spaces (table) have components (table)
 

@@ -1,7 +1,7 @@
 package com.idealIntent.repositories.components
 
 import com.idealIntent.configurations.DIHelper
-import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.dtos.CreateAuthorRequest
 import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow

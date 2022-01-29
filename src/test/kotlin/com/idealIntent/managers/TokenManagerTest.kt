@@ -14,7 +14,7 @@ import io.ktor.http.*
 import io.mockk.*
 import models.authorization.Token
 import com.idealIntent.repositories.RefreshTokenRepository
-import com.idealIntent.serialized.auth.TokenResponseData
+import com.idealIntent.dtos.auth.TokenResponseData
 import shared.appEnvMockHelper
 
 class TokenManagerTest : BehaviorSpec({

@@ -10,8 +10,8 @@ import io.mockk.mockk
 import io.mockk.spyk
 import com.idealIntent.repositories.SpaceRepository
 import com.idealIntent.repositories.components.*
-import com.idealIntent.serialized.libOfComps.CreateComponentRequest
-import com.idealIntent.serialized.libOfComps.UserComponent
+import com.idealIntent.dtos.libOfComps.CreateComponentRequest
+import com.idealIntent.dtos.libOfComps.UserComponent
 
 class ComponentManagerTest : BehaviorSpec({
     val spaceRepository: SpaceRepository = mockk()

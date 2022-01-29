@@ -2,6 +2,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version "$kotlin_version"
     id 'org.jetbrains.kotlin.plugin.serialization' version "$kotlin_version"
     id 'application'
+    id "org.jetbrains.dokka" version "1.6.10"
 }
 
 group 'com.idealIntent'
@@ -53,6 +54,21 @@ dependencies {
     implementation("org.apache.commons:commons-email:1.5")
     implementation "com.google.code.gson:gson:2.8.9"
 }
+
+tasks.dokkaHtml.configure {
+//    outputDirectory.set(buildDir.resolve("dokka"))
+
+    dokkaSourceSets {
+//        named("main") {
+        configureEach { // Or source set name, for single-platform the default source sets are `main` and `test`
+//            moduleName.set("Dokka Gradle Example")
+            includes.from("Module.md")
+//            includes.from("packages.md", "extra.md")
+
+        }
+    }
+}
+
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"

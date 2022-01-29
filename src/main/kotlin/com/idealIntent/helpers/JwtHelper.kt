@@ -1,4 +1,4 @@
-package com.idealIntent.helper
+package com.idealIntent.helpers
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm

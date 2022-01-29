@@ -8,7 +8,7 @@ import dtos.authorization.TokensResponse
 import dtos.responseData.ITokenResponseData
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
-import com.idealIntent.helper.maskEmail
+import com.idealIntent.helpers.maskEmail
 import com.idealIntent.managers.EmailManager
 import com.idealIntent.managers.PasswordManager
 import io.kotest.core.spec.style.BehaviorSpec
@@ -23,10 +23,10 @@ import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
-import com.idealIntent.serialized.CreateAuthorRequest
-import com.idealIntent.serialized.auth.LoginByEmailRequest
-import com.idealIntent.serialized.auth.LoginByUsernameRequest
-import com.idealIntent.serialized.auth.TokenResponseData
+import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.dtos.auth.LoginByEmailRequest
+import com.idealIntent.dtos.auth.LoginByUsernameRequest
+import com.idealIntent.dtos.auth.TokenResponseData
 import shared.appEnvMockHelper
 
 class AuthorizationServiceTest : BehaviorSpec({

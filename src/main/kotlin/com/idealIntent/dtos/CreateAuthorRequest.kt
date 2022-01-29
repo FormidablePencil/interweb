@@ -1,4 +1,4 @@
-package com.idealIntent.serialized
+package com.idealIntent.dtos
 
 import ICreateAuthorRequest
 import kotlinx.serialization.Serializable

@@ -2,13 +2,13 @@ package com.idealIntent.exceptions
 
 import org.slf4j.LoggerFactory
 
-
 /***
- * A logger will log errors and may throw an exception.
- * In Julia.main project is caught at the routing level and responds to the client.
+ * A logger that log errors and throw an exception
+ *
+ * In Julia.main project an exception may propagate to the routing level and responds to the client with a message.
  * @see com.idealIntent.routes.routeRespond
  *
- * @constructor logs and throws error
+ * @constructor logs and throws error.
  */
 class ServerErrorException : Exception {
     constructor(message: String, happenedWhere: Class<*>) : super(message) {
@@ -30,7 +30,7 @@ class ServerErrorException : Exception {
     /**
      * Log error
      *
-     * @param message for catch block to get. Typically, this exception will be caught in the routing and will return the message
+     * @param message
      * @param happenedWhere context of what class an exception happened
      */
     private fun logError(message: String, happenedWhere: Class<*>) {
@@ -41,7 +41,7 @@ class ServerErrorException : Exception {
     /**
      * Log error and name where error occurred
      *
-     * @param message for catch block to get. Typically, this exception will be caught in the routing and will return the message
+     * @param message
      * @param name just name where the exception occurred for when class<*> is not available
      */
     private fun logErrorName(message: String, name: String) {
@@ -53,10 +53,10 @@ class ServerErrorException : Exception {
         /**
          * Log error
          *
-         * Log error but doesn't throw it.
+         * Log error but don't throw it.
          *
          * @param message
-         * @param name
+         * @param name just name where the exception occurred for when class<*> is not available
          */
         fun logError(message: String, name: String) {
             val logger = LoggerFactory.getLogger(name)

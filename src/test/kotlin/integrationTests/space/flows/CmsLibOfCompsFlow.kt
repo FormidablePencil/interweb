@@ -2,9 +2,9 @@ package integrationTests.space.flows
 
 import dtos.libOfComps.ComponentType
 import org.koin.test.inject
-import com.idealIntent.serialized.libOfComps.UserComponent
-import com.idealIntent.serialized.libOfComps.CreateComponentRequest
-import com.idealIntent.serialized.libOfComps.CreateComponentsRequest
+import com.idealIntent.dtos.libOfComps.UserComponent
+import com.idealIntent.dtos.libOfComps.CreateComponentRequest
+import com.idealIntent.dtos.libOfComps.CreateComponentsRequest
 import com.idealIntent.services.SpaceService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback

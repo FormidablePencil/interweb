@@ -6,7 +6,7 @@ import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import org.koin.test.inject
-import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.services.AuthorizationService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback

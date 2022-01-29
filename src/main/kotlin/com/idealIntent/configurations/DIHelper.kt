@@ -20,6 +20,9 @@ import com.idealIntent.services.AuthorsPortfolioService
 import java.io.FileInputStream
 import java.util.*
 
+/**
+ * Dependency injection singleton
+ */
 object DIHelper {
     val CoreModule = module {
         // domain com.idealIntent.services

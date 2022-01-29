@@ -1,6 +1,6 @@
 package com.idealIntent.repositories.components
 
-import com.idealIntent.serialized.libOfComps.RecordUpdate
+import com.idealIntent.dtos.libOfComps.RecordUpdate
 
 /**
  * Structure for CRUD operations on libOfComps

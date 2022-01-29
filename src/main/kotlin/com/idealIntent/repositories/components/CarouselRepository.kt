@@ -11,14 +11,30 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.removeIf
 import org.ktorm.entity.sequenceOf
 import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.serialized.libOfComps.RecordUpdate
+import com.idealIntent.dtos.libOfComps.RecordUpdate
 
+// todo - get ICompRecordCrudStructure implemented or create a new one just for Component lvl repositories
 class CarouselRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
     private val privilegeRepository: PrivilegeRepository
 ) : RepositoryBase() {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarousels)
+
+    // region Get
+
+    // endregion Get
+
+
+    // region Insert
+
+    // endregion Insert
+
+
+    // region Delete
+
+    // endregion Delete
+
 
     // region CarouselOfImages
     fun insertCarouselBasicImages(component: CarouselBasicImages): Int? {

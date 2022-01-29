@@ -10,10 +10,10 @@ import dtos.signup.SignupResponse
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
 import com.idealIntent.exceptions.ServerErrorException
-import com.idealIntent.helper.JwtHelper
-import com.idealIntent.helper.isEmailFormatted
-import com.idealIntent.helper.isStrongPassword
-import com.idealIntent.helper.maskEmail
+import com.idealIntent.helpers.JwtHelper
+import com.idealIntent.helpers.isEmailFormatted
+import com.idealIntent.helpers.isStrongPassword
+import com.idealIntent.helpers.maskEmail
 import io.ktor.http.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -27,9 +27,9 @@ import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
-import com.idealIntent.serialized.CreateAuthorRequest
-import com.idealIntent.serialized.auth.LoginByEmailRequest
-import com.idealIntent.serialized.auth.LoginByUsernameRequest
+import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.dtos.auth.LoginByEmailRequest
+import com.idealIntent.dtos.auth.LoginByUsernameRequest
 
 fun main() {
     runBlocking {

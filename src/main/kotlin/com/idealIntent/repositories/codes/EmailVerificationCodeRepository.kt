@@ -10,6 +10,12 @@ import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 import com.idealIntent.repositories.RepositoryBase
 
+// todo - comments
+/**
+ * Email verification code repository
+ *
+ * @constructor Create empty Email verification code repository
+ */
 class EmailVerificationCodeRepository : RepositoryBase() {
     private val Database.emailVerifyCodes get() = this.sequenceOf(EmailVerificationCodes)
 

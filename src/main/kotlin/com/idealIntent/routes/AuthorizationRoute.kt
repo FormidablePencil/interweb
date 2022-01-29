@@ -4,8 +4,8 @@ import io.ktor.application.*
 import io.ktor.request.*
 import io.ktor.routing.*
 import org.koin.ktor.ext.inject
-import com.idealIntent.serialized.CreateAuthorRequest
-import com.idealIntent.serialized.auth.LoginByUsernameRequest
+import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.dtos.auth.LoginByUsernameRequest
 import com.idealIntent.services.AuthorizationService
 
 fun Application.registerAuthorizationRoutes() {

@@ -7,7 +7,7 @@ import org.ktorm.dsl.eq
 import org.ktorm.dsl.insert
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
-import com.idealIntent.serialized.space.CreateSpaceRequest
+import com.idealIntent.dtos.space.CreateSpaceRequest
 
 class SpaceRepository : RepositoryBase() {
     private val Database.spaces get() = this.sequenceOf(Spaces)

@@ -2,7 +2,7 @@ package com.idealIntent.repositories.components
 
 import com.idealIntent.exceptions.ServerErrorException
 import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.serialized.libOfComps.RecordUpdate
+import com.idealIntent.dtos.libOfComps.RecordUpdate
 import dtos.libOfComps.genericStructures.images.Image
 import dtos.libOfComps.genericStructures.images.ImageCollection
 import dtos.libOfComps.genericStructures.images.ImageIdentifiableRecordByCol

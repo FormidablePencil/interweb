@@ -1,4 +1,4 @@
-package com.idealIntent.serialized.space
+package com.idealIntent.dtos.space
 
 import dtos.space.ICreateSpaceRequest
 import kotlinx.serialization.Serializable

@@ -2,7 +2,7 @@ package com.idealIntent.repositories.profile
 
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
-import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.dtos.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.SqlConstraint
 import shared.testUtils.rollback

@@ -9,7 +9,7 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.add
 import org.ktorm.entity.sequenceOf
 import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.dtos.CreateAuthorRequest
 
 class AuthorProfileRelatedRepository : RepositoryBase() {
     private val Database.authors get() = this.sequenceOf(Authors)

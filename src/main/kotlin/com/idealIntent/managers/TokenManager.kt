@@ -11,11 +11,12 @@ import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.idealIntent.repositories.RefreshTokenRepository
-import com.idealIntent.serialized.auth.TokenResponseData
+import com.idealIntent.dtos.auth.TokenResponseData
 import java.util.*
 
 enum class KindOfTokens { AccessToken, RefreshToken }
 
+// todo - comments
 class TokenManager(
     private val refreshTokenRepository: RefreshTokenRepository,
 ) : KoinComponent {

@@ -1,4 +1,4 @@
-package com.idealIntent.serialized.libOfComps
+package com.idealIntent.dtos.libOfComps
 
 import dtos.libOfComps.IUpdateColumn
 import kotlinx.serialization.Serializable

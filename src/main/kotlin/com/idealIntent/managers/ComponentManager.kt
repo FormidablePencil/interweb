@@ -8,11 +8,12 @@ import dtos.libOfComps.carousels.CarouselOfImagesTABLE
 import dtos.space.IUserComponent
 import com.idealIntent.repositories.SpaceRepository
 import com.idealIntent.repositories.components.*
-import com.idealIntent.serialized.libOfComps.BatchUpdateComponentRequest
-import com.idealIntent.serialized.libOfComps.BatchUpdateComponentsRequest
-import com.idealIntent.serialized.libOfComps.SingleUpdateComponentRequest
-import com.idealIntent.serialized.libOfComps.UpdateComponentsRequest
+import com.idealIntent.dtos.libOfComps.BatchUpdateComponentRequest
+import com.idealIntent.dtos.libOfComps.BatchUpdateComponentsRequest
+import com.idealIntent.dtos.libOfComps.SingleUpdateComponentRequest
+import com.idealIntent.dtos.libOfComps.UpdateComponentsRequest
 
+// todo - comments
 class ComponentManager(
     private val spaceRepository: SpaceRepository,
     private val bannerRepository: BannerRepository,

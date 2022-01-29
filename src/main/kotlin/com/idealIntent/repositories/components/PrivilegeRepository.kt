@@ -1,7 +1,7 @@
 package com.idealIntent.repositories.components
 
 import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.serialized.libOfComps.RecordUpdate
+import com.idealIntent.dtos.libOfComps.RecordUpdate
 import dtos.libOfComps.genericStructures.privileges.Privilege
 import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
 import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthorCOL

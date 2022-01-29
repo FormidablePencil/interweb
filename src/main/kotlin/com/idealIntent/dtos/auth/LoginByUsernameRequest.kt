@@ -1,4 +1,4 @@
-package com.idealIntent.serialized.auth
+package com.idealIntent.dtos.auth
 
 import dtos.login.ILoginByUsernameRequest
 import kotlinx.serialization.Serializable

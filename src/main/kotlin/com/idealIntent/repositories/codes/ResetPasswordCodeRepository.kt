@@ -10,6 +10,7 @@ import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 import com.idealIntent.repositories.RepositoryBase
 
+// todo - comments
 class ResetPasswordCodeRepository : RepositoryBase() {
     private val Database.resetPasswordEmailCode get() = this.sequenceOf(ResetPasswordCodes)
 

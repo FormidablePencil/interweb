@@ -4,7 +4,7 @@ import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorRepository
 import models.profile.Account
 import org.koin.test.inject
-import com.idealIntent.serialized.CreateAuthorRequest
+import com.idealIntent.dtos.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecFlow
 
 class AuthUtilities : BehaviorSpecFlow() {
