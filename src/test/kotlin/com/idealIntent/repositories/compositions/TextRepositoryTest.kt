@@ -1,7 +1,8 @@
-package com.idealIntent.repositories.components
+package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import dtos.libOfComps.genericStructures.texts.Text
+import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import dtos.compositions.genericStructures.texts.Text
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import shared.testUtils.BehaviorSpecUtRepo
@@ -28,6 +29,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                     )
 
                     val id = textRepository.batchInsertNewRecords(texts, collectionOf)
+                        ?: throw Exception("failed to insert records")
                     val res = textRepository.getAssortmentById(id)
 
                     res.collectionOf shouldBe collectionOf

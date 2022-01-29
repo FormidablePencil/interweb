@@ -1,6 +1,6 @@
-package com.idealIntent.dtos.libOfComps
+package com.idealIntent.dtos.compositions
 
-import dtos.libOfComps.IUpdateColumn
+import dtos.compositions.IUpdateColumn
 import kotlinx.serialization.Serializable
 
 @Serializable

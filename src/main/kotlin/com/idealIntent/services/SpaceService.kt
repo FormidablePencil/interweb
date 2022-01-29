@@ -5,12 +5,12 @@ import dtos.space.*
 import dtos.succeeded
 import com.idealIntent.helpers.RandomStringGenerator
 import io.ktor.http.*
-import com.idealIntent.managers.ComponentManager
+import com.idealIntent.managers.CompositionManager
 import com.idealIntent.repositories.SpaceRepository
-import com.idealIntent.dtos.libOfComps.CreateComponentRequest
-import com.idealIntent.dtos.libOfComps.CreateComponentsRequest
-import com.idealIntent.dtos.libOfComps.SingleUpdateComponentRequest
-import com.idealIntent.dtos.libOfComps.UpdateComponentsRequest
+import com.idealIntent.dtos.compositions.CreateCompositionRequest
+import com.idealIntent.dtos.compositions.CreateCompositionsRequest
+import com.idealIntent.dtos.compositions.SingleUpdateCompositionRequest
+import com.idealIntent.dtos.compositions.UpdateCompositionRequest
 import com.idealIntent.dtos.space.*
 
 // spaces (table) have components (table)
@@ -69,7 +69,7 @@ import com.idealIntent.dtos.space.*
 
 class SpaceService(
     private val spaceRepository: SpaceRepository,
-    private val componentManager: ComponentManager,
+    private val componentManager: CompositionManager,
 ) {
 
     fun getSpaceByAddress(request: GetSpaceRequest): GetSpaceResponse {
@@ -90,30 +90,31 @@ class SpaceService(
             CreateSpaceResponse().failed(CreateSpaceResponseFailed.FailedToCreateSpace)
     }
 
-    fun createComponent(request: CreateComponentRequest): CreateComponentResponse {
+    fun createComposition(request: CreateCompositionRequest): CreateCompositionResponse {
         // validate that the requester has access to the space address provided
-        componentManager.createComponent(request.userComponent, request.spaceAddress)
+        componentManager.createComposition(request.userComposition, request.spaceAddress)
         TODO()
     }
 
-    fun batchCreateComponents(request: CreateComponentsRequest) {
-        componentManager.batchCreateComponents(request.userComponents, request.spaceAddress)
+    fun batchCreateCompositions(request: CreateCompositionsRequest) {
+        componentManager.batchCreateCompositions(request.userCompositions, request.spaceAddress)
     }
 
-    fun removeComponent(request: CreateComponentRequest): CreateComponentResponse {
+    fun removeComposition(request: CreateCompositionRequest): CreateCompositionResponse {
         // validate that the requester has access to the space address provided
         TODO()
-        componentManager.deleteComponent(request.userComponent)
+        componentManager.deleteComposition(request.userComposition)
     }
 
-    fun updateComponent(request: SingleUpdateComponentRequest) {
-        componentManager.updateComponent(request)
+    fun updateComposition(request: SingleUpdateCompositionRequest) {
+
+        componentManager.updateComposition(request)
     }
 
-    fun updateComponents(request: UpdateComponentsRequest) {
+    fun updateCompositions(request: UpdateCompositionRequest) {
         // todo - rollback. If one fails all revert
-        request.updateComponent.map {
-            componentManager.updateComponent(it)
+        request.updateComposition.map {
+            componentManager.updateComposition(it)
         }
     }
 

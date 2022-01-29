@@ -1,11 +1,12 @@
-package com.idealIntent.repositories.components
+package com.idealIntent.repositories.collectionsGeneric
 
 import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.dtos.libOfComps.RecordUpdate
-import dtos.libOfComps.genericStructures.privileges.Privilege
-import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
-import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthorCOL
-import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthorIdentifiableRecordByCol
+import com.idealIntent.dtos.compositions.RecordUpdate
+import com.idealIntent.repositories.collections.ICollectionStructure
+import dtos.compositions.genericStructures.privileges.Privilege
+import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
+import dtos.compositions.genericStructures.privileges.PrivilegedAuthorCOL
+import dtos.compositions.genericStructures.privileges.PrivilegedAuthorIdentifiableRecordByCol
 import models.genericStructures.IPrivilegeSchema
 import models.genericStructures.PrivilegedAuthors
 import models.genericStructures.Privileges
@@ -15,11 +16,12 @@ import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 
 // todo privilege and privileges are used interchangeably. Fix this typo
-class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<PrivilegedAuthor, IPrivilegeSchema, Privilege> {
+class PrivilegeRepository : RepositoryBase(),
+    ICollectionStructure<PrivilegedAuthor, IPrivilegeSchema, Privilege> {
     private val Database.privileges get() = this.sequenceOf(Privileges)
 
     // region Get
-    override fun getAssortmentById(collectionId: Int): Privilege {
+    override fun getAssortmentById(id: Int): Privilege {
         val privCol = Privileges.aliased("privCol")
         val priv = PrivilegedAuthors.aliased("priv")
 
@@ -27,7 +29,7 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
         val privilegedAuthors = database.from(privCol)
             .rightJoin(priv, priv.privilegeId eq privCol.id)
             .select(privCol.privilegesTo, priv.modLvl, priv.authorId)
-            .where { privCol.id eq collectionId }
+            .where { privCol.id eq id }
             .map { row ->
                 privilegesTo = row[privCol.privilegesTo]!!
                 PrivilegedAuthor(
@@ -38,7 +40,7 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
         return Privilege(privilegesTo, privilegedAuthors)
     }
 
-    override fun getCollection(id: Int): IPrivilegeSchema? {
+    override fun getMetadataOfCollection(id: Int): IPrivilegeSchema? {
         return database.privileges.find { it.id eq id }
     }
     // endregion Get
@@ -46,12 +48,12 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
 
     // region Insert
     // todo - creates new collection. rename insertNewRecord and insertNewRecord(privilegeId: Int). Do the same for CarouselRepo, ImageRepository, TextRepository
-    override fun insertNewRecord(record: PrivilegedAuthor, collectionOf: String): Int? {
-        val privilegeId = insertRecordCollection(collectionOf)
+    override fun insertNewRecord(record: PrivilegedAuthor, label: String): Int? {
+        val privilegeId = insertRecordCollection(label)
             ?: TODO("handle gracefully")
 
         val id = insertRecord(record, privilegeId)
-        return
+        TODO()
     }
 
     override fun batchInsertNewRecords(records: List<PrivilegedAuthor>, privilegesTo: String): Int? {
@@ -63,16 +65,16 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
         return privilegeId
     }
 
-    override fun insertRecord(record: PrivilegedAuthor, collectionId: Int): Boolean {
+    override fun insertRecord(record: PrivilegedAuthor, id: Int): Boolean {
         return database.insert(PrivilegedAuthors) { // todo - test that all have been generated
-            set(it.privilegeId, collectionId)
+            set(it.privilegeId, id)
             set(it.authorId, record.authorId)
             set(it.modLvl, record.modLvl)
         } != 0
     }
 
     override fun batchInsertRecords(records: List<PrivilegedAuthor>, collectionId: Int): Boolean {
-        return database.batchInsert(PrivilegedAuthors) { // todo - test that all have been generated
+        database.batchInsert(PrivilegedAuthors) { // todo - test that all have been generated
             records.map { privilegedAuthor ->
                 item {
                     set(it.privilegeId, collectionId)
@@ -81,6 +83,7 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
                 }
             }
         }
+        TODO()
     }
 
     override fun insertRecordCollection(privilegesTo: String): Int {
@@ -92,8 +95,8 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
 
 
     // region Update
-    override fun updateRecord(collectionId: Int, record: RecordUpdate): Boolean {
-        val collection = getCollection(collectionId) ?: return // todo - handle failure gracefully
+    override fun updateRecord(record: RecordUpdate, id: Int): Boolean {
+        val collection = getMetadataOfCollection(id) ?: return false // todo - handle failure gracefully
 
         val res = database.update(PrivilegedAuthors) {
             record.updateTo.map { updateCol ->
@@ -111,10 +114,12 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
                 } // todo - handle incorrect recordIdentifiableByCol gracefully
             }
         }
+
+        TODO()
     }
 
-    override fun batchUpdateRecords(collectionId: Int, records: List<RecordUpdate>): Boolean {
-        val collection = getCollection(collectionId) ?: return // todo - handle failure gracefully
+    override fun batchUpdateRecords(records: List<RecordUpdate>, id: Int): Boolean {
+        val collection = getMetadataOfCollection(id) ?: return false // todo - handle failure gracefully
 
         database.batchUpdate(PrivilegedAuthors) {
             records.map { record ->
@@ -135,20 +140,21 @@ class PrivilegeRepository : RepositoryBase(), ICompRecordCrudStructure<Privilege
                 }
             }
         }
+        TODO()
     }
     // endregion Update
 
 
     // region Delete
-    override fun deleteRecord(collectionId: Int): Boolean {
+    override fun deleteRecord(id: Int): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun batchDeleteRecords(collectionId: Int): Boolean {
+    override fun batchDeleteRecords(id: Int): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun deleteAllRecordsInCollection(collectionId: Int) {
+    override fun deleteAllRecordsInCollection(id: Int) {
         TODO("Not yet implemented")
     }
 

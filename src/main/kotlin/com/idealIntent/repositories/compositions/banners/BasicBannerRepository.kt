@@ -1,9 +1,9 @@
-package com.idealIntent.repositories.components
+package com.idealIntent.repositories.compositions.banners
 
-import dtos.libOfComps.banners.BannerBasic
+import dtos.compositions.banners.BannerBasic
 import com.idealIntent.repositories.RepositoryBase
 
-class BannerRepository : RepositoryBase() {
+class BasicBannerRepository : RepositoryBase() {
 //    private val Database.component get() = this.sequenceOf(Spaces)
 
     fun createBannerBasic(component: BannerBasic): Int? {

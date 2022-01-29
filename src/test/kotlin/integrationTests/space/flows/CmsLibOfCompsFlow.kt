@@ -1,10 +1,10 @@
 package integrationTests.space.flows
 
-import dtos.libOfComps.ComponentType
+import dtos.compositions.CompositionType
 import org.koin.test.inject
-import com.idealIntent.dtos.libOfComps.UserComponent
-import com.idealIntent.dtos.libOfComps.CreateComponentRequest
-import com.idealIntent.dtos.libOfComps.CreateComponentsRequest
+import com.idealIntent.dtos.compositions.UserComposition
+import com.idealIntent.dtos.compositions.CreateCompositionRequest
+import com.idealIntent.dtos.compositions.CreateCompositionsRequest
 import com.idealIntent.services.SpaceService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
@@ -12,31 +12,31 @@ import shared.testUtils.rollback
 class CmsLibOfCompsFlow : BehaviorSpecFlow() {
     private val spaceService: SpaceService by inject()
 
-    private val createComponentsRequest = CreateComponentsRequest(
+    private val createCompositionsRequest = CreateCompositionsRequest(
         spaceAddress = "some address",
-        userComponents = listOf(
-            UserComponent(componentType = ComponentType.CarouselOfImages, jsonData = ""),
-            UserComponent(componentType = ComponentType.CarouselOfImages, jsonData = ""),
-            UserComponent(componentType = ComponentType.CarouselOfImages, jsonData = "")
+        userCompositions = listOf(
+            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = ""),
+            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = ""),
+            UserComposition(compositionType = CompositionType.CarouselOfImages, jsonData = "")
         )
     )
-    private val createComponentRequest = CreateComponentRequest(
-        userComponent = createComponentsRequest.userComponents[0],
-        spaceAddress = createComponentsRequest.spaceAddress
+    private val createCompositionRequest = CreateCompositionRequest(
+        userComposition = createCompositionsRequest.userCompositions[0],
+        spaceAddress = createCompositionsRequest.spaceAddress
     )
 
-    suspend fun createBatchOfComponents(
-        request: CreateComponentsRequest = createComponentsRequest,
+    suspend fun createBatchOfCompositions(
+        request: CreateCompositionsRequest = createCompositionsRequest,
         cleanup: Boolean = false
     ) {
         return rollback(cleanup) {
-            spaceService.batchCreateComponents(request)
+            spaceService.batchCreateCompositions(request)
         }
     }
 
-    suspend fun createComponent(request: CreateComponentRequest = createComponentRequest, cleanup: Boolean = false) {
+    suspend fun createComposition(request: CreateCompositionRequest = createCompositionRequest, cleanup: Boolean = false) {
         return rollback(cleanup) {
-            spaceService.createComponent(request)
+            spaceService.createComposition(request)
         }
     }
 }

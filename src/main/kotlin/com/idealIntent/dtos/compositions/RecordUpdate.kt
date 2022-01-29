@@ -1,6 +1,6 @@
-package com.idealIntent.dtos.libOfComps
+package com.idealIntent.dtos.compositions
 
-import dtos.libOfComps.IRecordUpdate
+import dtos.compositions.IRecordUpdate
 import kotlinx.serialization.Serializable
 
 @Serializable

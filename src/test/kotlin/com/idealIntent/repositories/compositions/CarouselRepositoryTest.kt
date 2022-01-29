@@ -1,10 +1,14 @@
-package com.idealIntent.repositories.components
+package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import dtos.libOfComps.carousels.CarouselBasicImages
-import dtos.libOfComps.genericStructures.images.Image
-import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
-import dtos.libOfComps.genericStructures.texts.Text
+import com.idealIntent.repositories.collectionsGeneric.ImageRepository
+import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
+import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import dtos.compositions.carousels.CarouselBasicImages
+import dtos.compositions.genericStructures.images.Image
+import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
+import dtos.compositions.genericStructures.texts.Text
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import shared.testUtils.BehaviorSpecUtRepo
@@ -15,7 +19,7 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(DIHelper.CoreModule))
 
     init {
-        lateinit var carouselRepository: CarouselRepository
+        lateinit var carouselRepository: CarouselOfImagesRepository
 
         val carouselBasicImages = CarouselBasicImages(
             title = "Pet Projects",
@@ -54,16 +58,16 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
         )
 
         beforeEach {
-            carouselRepository = CarouselRepository(TextRepository(), ImageRepository(), PrivilegeRepository())
+            carouselRepository = CarouselOfImagesRepository(TextRepository(), ImageRepository(), PrivilegeRepository())
         }
 
-        given("insertCarouselBasicImages && getCarouselBasicImagesById") {
+        given("insertNewComposition && getAssortmentById") {
             then("should have been created") {
                 rollback {
-                    val savedDataId = carouselRepository.insertCarouselBasicImages(carouselBasicImages)
+                    val savedDataId = carouselRepository.insertNewComposition(carouselBasicImages)
                         ?: throw Exception("failed to save data")
 
-                    val carouselOfImages = carouselRepository.getCarouselBasicImagesById(savedDataId)
+                    val carouselOfImages = carouselRepository.getAssortmentById(savedDataId)
 
                     carouselOfImages.title shouldBe carouselBasicImages.title
 

@@ -1,8 +1,9 @@
-package com.idealIntent.repositories.components
+package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.CreateAuthorRequest
-import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
+import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
+import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.koin.KoinListener

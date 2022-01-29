@@ -1,28 +1,33 @@
 import com.google.gson.Gson
-import com.idealIntent.managers.ComponentManager
-import dtos.libOfComps.ComponentType
-import dtos.libOfComps.carousels.CarouselBasicImages
-import dtos.libOfComps.genericStructures.images.Image
-import dtos.libOfComps.genericStructures.privileges.PrivilegedAuthor
-import dtos.libOfComps.genericStructures.texts.Text
+import com.idealIntent.managers.CompositionManager
+import dtos.compositions.CompositionType
+import dtos.compositions.carousels.CarouselBasicImages
+import dtos.compositions.genericStructures.images.Image
+import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
+import dtos.compositions.genericStructures.texts.Text
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.mockk
 import io.mockk.spyk
 import com.idealIntent.repositories.SpaceRepository
-import com.idealIntent.repositories.components.*
-import com.idealIntent.dtos.libOfComps.CreateComponentRequest
-import com.idealIntent.dtos.libOfComps.UserComponent
+import com.idealIntent.repositories.compositions.*
+import com.idealIntent.dtos.compositions.CreateCompositionRequest
+import com.idealIntent.dtos.compositions.UserComposition
+import com.idealIntent.repositories.collectionsGeneric.ImageRepository
+import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
+import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
+import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 
-class ComponentManagerTest : BehaviorSpec({
+class CompositionManagerTest : BehaviorSpec({
     val spaceRepository: SpaceRepository = mockk()
-    val bannerRepository: BannerRepository = mockk()
+    val bannerRepository: BasicBannerRepository = mockk()
     val imageRepository: ImageRepository = mockk()
-    val carouselRepository: CarouselRepository = mockk()
+    val carouselRepository: CarouselOfImagesRepository = mockk()
     val textRepository: TextRepository = mockk()
     val privilegeRepository: PrivilegeRepository = mockk()
 
     val spaceService = spyk(
-        ComponentManager(
+        CompositionManager(
             spaceRepository,
             bannerRepository,
             carouselRepository,
@@ -34,17 +39,17 @@ class ComponentManagerTest : BehaviorSpec({
 
     beforeEach { }
 
-    xgiven("userComponents") {
+    xgiven("userCompositions") {
         val gson = Gson()
 
         val image = Image(imageTitle = "image title", imageUrl = "image url", orderRank = 1)
         val navTo = Text(orderRank = 10000, text = "some link")
         val privilegedAuthors = PrivilegedAuthor(authorId = 1, modLvl = 2)
 
-        val req = CreateComponentRequest(
+        val req = CreateCompositionRequest(
             spaceAddress = "SDLFJEI",
-            userComponent = UserComponent(
-                componentType = ComponentType.CarouselOfImages,
+            userComposition = UserComposition(
+                compositionType = CompositionType.CarouselOfImages,
                 jsonData = gson.toJson(
                     CarouselBasicImages(
                         title = "project images",
@@ -55,8 +60,8 @@ class ComponentManagerTest : BehaviorSpec({
                 )
             ),
         )
-        val res = spaceService.createComponent(req.userComponent, req.spaceAddress)
+        val res = spaceService.createComposition(req.userComposition, req.spaceAddress)
     }
 
-    xgiven("deleteComponent") { }
+    xgiven("deleteComposition") { }
 })

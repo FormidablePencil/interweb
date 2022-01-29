@@ -56,19 +56,12 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-//    outputDirectory.set(buildDir.resolve("dokka"))
-
     dokkaSourceSets {
-//        named("main") {
-        configureEach { // Or source set name, for single-platform the default source sets are `main` and `test`
-//            moduleName.set("Dokka Gradle Example")
+        configureEach {
             includes.from("Module.md")
-//            includes.from("packages.md", "extra.md")
-
         }
     }
 }
-
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"

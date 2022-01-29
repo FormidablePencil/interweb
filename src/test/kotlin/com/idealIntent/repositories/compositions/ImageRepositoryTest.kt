@@ -1,7 +1,8 @@
-package com.idealIntent.repositories.components
+package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import dtos.libOfComps.genericStructures.images.Image
+import com.idealIntent.repositories.collectionsGeneric.ImageRepository
+import dtos.compositions.genericStructures.images.Image
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe

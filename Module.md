@@ -6,7 +6,7 @@ Configuration stuff like environment variables and dependency injection.
 
 # Package com.idealIntent.dtos
 # Package com.idealIntent.dtos.auth
-# Package com.idealIntent.dtos.libOfComps
+# Package com.idealIntent.dtos.compositions
 # Package com.idealIntent.dtos.space
 
 # Package com.idealIntent.exceptions
@@ -23,7 +23,7 @@ com.idealIntent.services.
 
 # Package com.idealIntent.repositories
 # Package com.idealIntent.repositories.codes
-# Package com.idealIntent.repositories.components
+# Package com.idealIntent.repositories.compositions
 # Package com.idealIntent.repositories.password
 # Package com.idealIntent.repositories.profile
 
