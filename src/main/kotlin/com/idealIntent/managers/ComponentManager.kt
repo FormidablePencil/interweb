@@ -171,7 +171,7 @@ class ComponentManager(
             // region Just texts
             ComponentType.Markdown,
             ComponentType.BasicText ->
-                textRepository.batchUpdateTexts(
+                textRepository.batchUpdateRecords(
                     collectionId = request.componentId,
                     records = request.updateToData
                 )

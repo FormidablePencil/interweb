@@ -23,6 +23,7 @@ class ImageRepository : RepositoryBase() {
     private val Database.imageCollections get() = this.sequenceOf(ImageCollections)
     private val Database.images get() = this.sequenceOf(Images)
 
+    // region Get
     /**
      * Get items by collection id
      *
@@ -59,8 +60,10 @@ class ImageRepository : RepositoryBase() {
     private fun getImageCollection(id: Int): IImageCollectionSchema? {
         return database.imageCollections.find { it.id eq id }
     }
+    // endregion Get
 
 
+    // region Insert
     /**
      * Insert item under a new collection
      *
@@ -142,8 +145,71 @@ class ImageRepository : RepositoryBase() {
             ?: throw ServerErrorException("failed to create ImageCollection", this::class.java)
         return id
     }
+    // endregion Insert
 
 
+    // region Update
+    /**
+     * Update item
+     *
+     * @param collectionId id of collection of images
+     * @param record update to
+     */
+    fun updateImage(collectionId: Int, record: RecordUpdate) {
+        val collection = getImageCollection(collectionId) ?: return // handle gracefully
+
+        val res = database.update(Images) {
+            record.updateTo.map { updateCol ->
+                when (ImagesCOL.fromInt(updateCol.column)) {
+                    ImagesCOL.ImageUrl -> set(it.imageUrl, updateCol.value)
+                    ImagesCOL.ImageTitle -> set(it.imageTitle, updateCol.value)
+                    ImagesCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
+                    // todo - toInt() may fail
+                }
+            }
+            where {
+                when (ImageIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
+                    ImageIdentifiableRecordByCol.OrderRank ->
+                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
+                } // todo - handle incorrect recordIdentifiableByCol gracefully
+            }
+        }
+    }
+
+    /**
+     * Batch update items
+     *
+     * @param collectionId
+     * @param records update to
+     */
+    fun batchUpdateImages(collectionId: Int, records: List<RecordUpdate>) {
+        val collection = getImageCollection(collectionId) ?: return // handle gracefully
+
+        database.batchUpdate(Images) {
+            records.map { record ->
+                item {
+                    record.updateTo.map { updateCol ->
+                        when (ImagesCOL.fromInt(updateCol.column)) {
+                            ImagesCOL.ImageUrl -> set(it.imageUrl, updateCol.value)
+                            ImagesCOL.ImageTitle -> set(it.imageTitle, updateCol.value)
+                            ImagesCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
+                            // todo - toInt() may fail
+                        }
+                        where {
+                            when (ImageIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
+                                ImageIdentifiableRecordByCol.OrderRank ->
+                                    (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
+                            } // todo - handle incorrect recordIdentifiableByCol gracefully
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // endregion Update
+
+
+    // region Delete
     /**
      * Delete an image of collection
      *
@@ -180,63 +246,5 @@ class ImageRepository : RepositoryBase() {
     fun deleteCollectionOfImages() {
 
     }
-
-
-    /**
-     * Update item
-     *
-     * @param collectionId id of collection of images
-     * @param record update to
-     */
-    fun updateImage(collectionId: Int, record: RecordUpdate) {
-        val collection = getImageCollection(collectionId) ?: return // handle gracefully
-
-        val res = database.update(Images) {
-            record.updateRecord.map { updateCol ->
-                when (ImagesCOL.fromInt(updateCol.column)) {
-                    ImagesCOL.ImageUrl -> set(it.imageUrl, updateCol.value)
-                    ImagesCOL.ImageTitle -> set(it.imageTitle, updateCol.value)
-                    ImagesCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
-                    // todo - toInt() may fail
-                }
-            }
-            where {
-                when (ImageIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-                    ImageIdentifiableRecordByCol.OrderRank ->
-                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
-                } // todo - handle incorrect recordIdentifiableByCol gracefully
-            }
-        }
-    }
-
-    /**
-     * Batch update items
-     *
-     * @param collectionId
-     * @param records update to
-     */
-    fun batchUpdateImages(collectionId: Int, records: List<RecordUpdate>) {
-        val collection = getImageCollection(collectionId) ?: return // handle gracefully
-
-        database.batchUpdate(Images) {
-            records.map { record ->
-                item {
-                    record.updateRecord.map { updateCol ->
-                        when (ImagesCOL.fromInt(updateCol.column)) {
-                            ImagesCOL.ImageUrl -> set(it.imageUrl, updateCol.value)
-                            ImagesCOL.ImageTitle -> set(it.imageTitle, updateCol.value)
-                            ImagesCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
-                            // todo - toInt() may fail
-                        }
-                        where {
-                            when (ImageIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-                                ImageIdentifiableRecordByCol.OrderRank ->
-                                    (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
-                            } // todo - handle incorrect recordIdentifiableByCol gracefully
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // endregion Delete
 }

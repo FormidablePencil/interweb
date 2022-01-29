@@ -17,17 +17,12 @@ import org.ktorm.entity.sequenceOf
 /**
  * Responsible for text_collections and texts table
  */
-class TextRepository : RepositoryBase() {
+class TextRepository : RepositoryBase(), ICompRecordCrudStructure<Text> {
     private val Database.textCollections get() = this.sequenceOf(TextCollections)
     private val Database.texts get() = this.sequenceOf(Texts)
 
-    /**
-     * Get items by collection id
-     *
-     * @param collectionId
-     * @return items by collection id
-     */
-    fun getAssortmentById(collectionId: Int): TextCollection {
+    // region Get
+    override fun getAssortmentById(collectionId: Int): TextCollection {
         val textCol = TextCollections.aliased("textCol")
         val text = Texts.aliased("text")
 
@@ -46,63 +41,42 @@ class TextRepository : RepositoryBase() {
         return TextCollection(collectionOf, texts)
     }
 
-    /**
-     * Insert item under a new collection
-     *
-     * @param text
-     * @param collectionOf name the collection
-     * @return collectionId or null if failed
-     */
-    fun insertNewText(text: Text, collectionOf: String): Int? {
-        val collectionId = insertTextCollection(collectionOf)
+    override fun getCollection(id: Int): ITextCollectionSchema? {
+        return database.textCollections.find { it.id eq id }
+    }
+    // endregion Get
+
+
+    // region Insert
+    override fun insertNewRecord(record: Text, collectionOf: String): Int? {
+        val collectionId = insertRecordCollection(collectionOf)
             ?: return null
 
-        insertText(text, collectionId)
+        insertRecord(record, collectionId)
 
         return collectionId
     }
 
-    /**
-     * Batch insert items under a new collection
-     *
-     * @param texts
-     * @param collectionOf name the collection
-     * @return collectionId or null if failed
-     */
-    fun batchInsertNewTexts(texts: List<Text>, collectionOf: String): Int? {
-        val collectionId = insertTextCollection(collectionOf)
+    override fun batchInsertNewRecords(records: List<Text>, collectionOf: String): Int? {
+        val collectionId = insertRecordCollection(collectionOf)
             ?: return null
 
-        batchInsertTexts(texts, collectionId)
+        batchInsertRecords(records, collectionId)
 
         return collectionId
     }
 
-    /**
-     * Insert item
-     *
-     * @param text
-     * @param collectionId id of collection to associate to
-     * @return success or fail in creation
-     */
-    fun insertText(text: Text, collectionId: Int): Boolean {
+    override fun insertRecord(record: Text, collectionId: Int): Boolean {
         return database.insert(Texts) { // todo - validate idsOfTexts
-            set(it.orderRank, text.orderRank)
-            set(it.text, text.text)
+            set(it.orderRank, record.orderRank)
+            set(it.text, record.text)
             set(it.collectionId, collectionId)
         } != 0
     }
 
-    /**
-     * Batch insert items
-     *
-     * @param texts
-     * @param collectionId id to identify under what collection to insert
-     * @return success or fail in creation
-     */
-    fun batchInsertTexts(texts: List<Text>, collectionId: Int): Boolean {
+    override fun batchInsertRecords(records: List<Text>, collectionId: Int): Boolean {
         val effectedRows = database.batchInsert(Texts) { // todo - validate idsOfTexts
-            texts.map { text ->
+            records.map { text ->
                 item {
                     set(it.orderRank, text.orderRank)
                     set(it.text, text.text)
@@ -114,33 +88,23 @@ class TextRepository : RepositoryBase() {
         return false
     }
 
-    /**
-     * Insert collection in order to group new items under
-     *
-     * @param collectionOf name the collection
-     * @return collectionId or null if failed
-     */
-    private fun insertTextCollection(collectionOf: String): Int? {
+    override fun insertRecordCollection(collectionOf: String): Int {
         return database.insertAndGenerateKey(TextCollections) {
             set(it.collectionOf, collectionOf)
-        } as Int?
+        } as Int? ?: TODO("no reason to fail, therefore return Int or throw ServerError and log Exception")
     }
+    // endregion Insert
 
 
-    /**
-     * Update item
-     *
-     * @param collectionId
-     * @param record update to
-     */
-    fun updateText(collectionId: Int, record: RecordUpdate) {
-        val collection = getTextCollection(collectionId) ?: return // todo - handle gracefully
+    // region Update
+    override fun updateRecord(collectionId: Int, record: RecordUpdate): Boolean {
+        val collection = getCollection(collectionId) ?: return false // todo - handle gracefully
 
         database.update(Texts) {
-            record.updateRecord.map { updateCol ->
-                when (TextsCOL.fromInt(updateCol.column)) {
-                    TextsCOL.Text -> set(it.text, updateCol.value)
-                    TextsCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt()) // todo - may fail
+            record.updateTo.map { recordCol ->
+                when (TextsCOL.fromInt(recordCol.column)) {
+                    TextsCOL.Text -> set(it.text, recordCol.value)
+                    TextsCOL.OrderRank -> set(it.orderRank, recordCol.value.toInt()) // todo - may fail
                     // todo - toInt() may fail
                 }
             }
@@ -152,21 +116,16 @@ class TextRepository : RepositoryBase() {
                 // todo - handle failure gracefully
             }
         }
+        TODO("validate if successful")
     }
 
-    /**
-     * Batch update items
-     *
-     * @param collectionId
-     * @param records update to
-     */
-    fun batchUpdateTexts(collectionId: Int, records: List<RecordUpdate>) {
-        val collection = getTextCollection(collectionId) ?: return // todo - handle gracefully
+    override fun batchUpdateRecords(collectionId: Int, records: List<RecordUpdate>): Boolean {
+        val collection = getCollection(collectionId) ?: return false // todo - hadle gracefully
 
         database.batchUpdate(Texts) {
             records.map { record ->
                 item {
-                    record.updateRecord.map { updateCol ->
+                    record.updateTo.map { updateCol ->
                         when (TextsCOL.fromInt(updateCol.column)) {
                             TextsCOL.Text -> set(it.text, updateCol.value)
                             TextsCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
@@ -182,16 +141,11 @@ class TextRepository : RepositoryBase() {
                 }
             }
         }
+        TODO("validate if successful")
     }
+    // endregion Update
 
 
-    /**
-     * Get only text_collection and not it's associated items
-     *
-     * @param id id of collection
-     * @return image_collection but not associated items
-     */
-    private fun getTextCollection(id: Int): ITextCollectionSchema? {
-        return database.textCollections.find { it.id eq id }
-    }
+    // region Delete
+    // endregion Delete
 }

@@ -27,7 +27,7 @@ class CarouselRepository(
         val imageCollectionId = imageRepository.batchInsertNewImages(
             component.images, "CarouselBasicImages component"
         )
-        val navToTextCollectionId = textRepository.batchInsertNewTexts(
+        val navToTextCollectionId = textRepository.batchInsertNewRecords(
             component.navToCorrespondingImagesOrder, "carouselNavLinks"
         )
         val privilegeId = privilegeRepository.batchInsertNewPrivilegedAuthors(
@@ -83,7 +83,7 @@ class CarouselRepository(
             CarouselOfImagesTABLE.Images ->
                 imageRepository.batchUpdateImages(componentId, updateToData)
             CarouselOfImagesTABLE.NavTos ->
-                textRepository.batchUpdateTexts(componentId, updateToData)
+                textRepository.batchUpdateRecords(componentId, updateToData)
             CarouselOfImagesTABLE.Privileges ->
                 privilegeRepository.batchUpdatePrivilegedAuthors(componentId, updateToData)
         }
@@ -94,7 +94,7 @@ class CarouselRepository(
             CarouselOfImagesTABLE.Images ->
                 imageRepository.updateImage(componentId, updateToData)
             CarouselOfImagesTABLE.NavTos ->
-                textRepository.updateText(componentId, updateToData)
+                textRepository.updateRecord(componentId, updateToData)
             CarouselOfImagesTABLE.Privileges ->
                 privilegeRepository.updatePrivilegedAuthor(componentId, updateToData)
         }

@@ -85,7 +85,7 @@ class PrivilegeRepository : RepositoryBase() {
         val collection = getPrivilege(collectionId) ?: return // todo - handle failure gracefully
 
         val res = database.update(PrivilegedAuthors) {
-            record.updateRecord.map { updateCol ->
+            record.updateTo.map { updateCol ->
                 when (PrivilegedAuthorCOL.fromInt(updateCol.column)) {
                     PrivilegedAuthorCOL.ModLvl -> set(it.modLvl, updateCol.value.toInt())
                     PrivilegedAuthorCOL.AuthorId -> set(it.authorId, updateCol.value.toInt())
@@ -107,7 +107,7 @@ class PrivilegeRepository : RepositoryBase() {
 
         database.batchUpdate(PrivilegedAuthors) {
             records.map { record ->
-                record.updateRecord.map { updateCol ->
+                record.updateTo.map { updateCol ->
                     item {
                         when (PrivilegedAuthorCOL.fromInt(updateCol.column)) {
                             PrivilegedAuthorCOL.AuthorId -> set(it.authorId, updateCol.value.toInt())

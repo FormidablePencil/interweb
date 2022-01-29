@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class RecordUpdate(
     override val recordIdentifiableByCol: Int, // maps to enums
     override val recordIdentifiableByColOfValue: String,
-    override val updateRecord: List<UpdateColumn>,
+    override val updateTo: List<UpdateColumn>,
 ): IRecordUpdate

@@ -17,7 +17,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
             textRepository = TextRepository()
         }
 
-        given("batchInsertTexts") {
+        given("batchInsertRecords") {
             then("getAssortmentById") {
                 rollback {
                     val collectionOf = "random texts"
@@ -27,7 +27,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                         Text(orderRank = 30000, text = "man"),
                     )
 
-                    val id = textRepository.batchInsertNewTexts(texts, collectionOf)
+                    val id = textRepository.batchInsertNewRecords(texts, collectionOf)
                     val res = textRepository.getAssortmentById(id)
 
                     res.collectionOf shouldBe collectionOf
@@ -41,11 +41,11 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
             }
         }
 
-        given("updateText") {
+        given("updateTo") {
             then("getAssortmentById") {}
         }
 
-        given("batchUpdateTexts") {
+        given("batchUpdateRecords") {
             then("getAssortmentById") {}
         }
     }
