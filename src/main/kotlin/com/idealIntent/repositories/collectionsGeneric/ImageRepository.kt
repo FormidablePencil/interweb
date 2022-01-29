@@ -33,11 +33,11 @@ class ImageRepository : RepositoryBase(),
         var label = ""
         val images = database.from(imgCol)
             .leftJoin(img, img.collectionId eq imgCol.id)
-            .select(imgCol.collectionOf, img.orderRank, img.imageTitle, img.imageUrl)
+            .select(imgCol.label, img.orderRank, img.imageTitle, img.imageUrl)
 
             .where { imgCol.id eq id }
             .map { row ->
-                label = row[imgCol.collectionOf]!!
+                label = row[imgCol.label]!!
                 Image(
                     orderRank = row[img.orderRank]!!,
                     imageTitle = row[img.imageTitle]!!,
@@ -96,7 +96,7 @@ class ImageRepository : RepositoryBase(),
 
     override fun insertRecordCollection(label: String): Int {
         val id = database.insertAndGenerateKey(ImageCollections) {
-            set(it.collectionOf, label)
+            set(it.label, label)
         } as Int?
             ?: throw ServerErrorException("failed to create ImageCollection", this::class.java)
         return id

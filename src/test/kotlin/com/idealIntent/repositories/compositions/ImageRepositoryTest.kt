@@ -22,7 +22,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
         given("batchInsertNewRecords") {
             then("getAssortmentById") {
                 rollback {
-                    val collectionOf = "Pet Projects"
+                    val label = "Pet Projects"
                     val images = listOf(
                         Image(
                             orderRank = 10000,
@@ -46,7 +46,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                         ),
                     )
 
-                    val imageCollectionId = imageRepository.batchInsertNewRecords(images, collectionOf)
+                    val imageCollectionId = imageRepository.batchInsertNewRecords(images, label)
                         ?: throw Exception("failed to get id")
                     val res = imageRepository.getAssortmentById(imageCollectionId)
 

@@ -129,7 +129,7 @@ class CarouselOfImagesRepository(
     }
 
 
-    override fun batchInsertNewCompositions(components: List<CarouselBasicImages>, collectionOf: String): Int? {
+    override fun batchInsertNewCompositions(components: List<CarouselBasicImages>, label: String): Int? {
         TODO("Not yet implemented")
     }
 

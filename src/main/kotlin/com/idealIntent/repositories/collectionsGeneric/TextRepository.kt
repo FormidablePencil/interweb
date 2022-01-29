@@ -27,19 +27,19 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
         val textCol = TextCollections.aliased("textCol")
         val text = Texts.aliased("text")
 
-        var collectionOf = ""
+        var label = ""
         val texts = database.from(textCol)
             .leftJoin(text, text.collectionId eq textCol.id)
-            .select(textCol.collectionOf, text.orderRank, text.orderRank, text.text)
+            .select(textCol.label, text.orderRank, text.orderRank, text.text)
             .where { textCol.id eq id }
             .map { row ->
-                collectionOf = row[textCol.collectionOf]!!
+                label = row[textCol.label]!!
                 Text(
                     orderRank = row[text.orderRank]!!,
                     text = row[text.text]!!
                 )
             }
-        return TextCollection(collectionOf, texts)
+        return TextCollection(label, texts)
     }
 
     override fun getMetadataOfCollection(id: Int): ITextCollectionSchema? {
@@ -91,7 +91,7 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
 
     override fun insertRecordCollection(label: String): Int {
         return database.insertAndGenerateKey(TextCollections) {
-            set(it.collectionOf, label)
+            set(it.label, label)
         } as Int? ?: TODO("no reason to fail, therefore return Int or throw ServerError and log Exception")
     }
     // endregion Insert
