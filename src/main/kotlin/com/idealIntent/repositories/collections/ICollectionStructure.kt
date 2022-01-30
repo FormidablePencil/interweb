@@ -21,7 +21,7 @@ interface ICollectionStructure<Record, MetadataOfCollection, Collection> {
      * @param id Get records under collection's id
      * @return Records under [id] or null if failed to find by [id]
      */
-    fun getAssortmentById(id: Int): Collection
+    fun getCollection(id: Int): Collection
 
     /**
      * Get only record collection's metadata and not it's associated records

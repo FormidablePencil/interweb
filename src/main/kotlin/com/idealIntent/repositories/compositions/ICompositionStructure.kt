@@ -21,7 +21,7 @@ interface ICompositionStructure<MetadataOfComposition, Composition> {
      * @param id Get composition records under composition's id
      * @return Composition records under [id] or null if failed to find by [id]
      */
-    fun getAssortmentById(id: Int): Composition
+    fun getComposition(id: Int): Composition
 
     /**
      * Get only composition's metadata and not it's associated records
@@ -40,7 +40,7 @@ interface ICompositionStructure<MetadataOfComposition, Composition> {
      * @param composition Composition to insert
      * @return CollectionId or null if failed to insert [composition]
      */
-    fun insertNewComposition(composition: Composition): Int?
+    fun insertComposition(composition: Composition): Int?
 
     /**
      * Batch insert [compositions] under a new collection
@@ -49,7 +49,7 @@ interface ICompositionStructure<MetadataOfComposition, Composition> {
      * @param label Name the collection
      * @return CollectionId or null if failed to insert [compositions]
      */
-    fun batchInsertNewCompositions(compositions: List<Composition>, label: String): Int?
+    fun insertCompositions(compositions: List<Composition>, label: String): Int?
     // endregion Insert
 
     // region Update

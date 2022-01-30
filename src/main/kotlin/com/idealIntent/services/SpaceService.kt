@@ -7,10 +7,6 @@ import com.idealIntent.helpers.RandomStringGenerator
 import io.ktor.http.*
 import com.idealIntent.managers.CompositionManager
 import com.idealIntent.repositories.SpaceRepository
-import com.idealIntent.dtos.compositions.CreateCompositionRequest
-import com.idealIntent.dtos.compositions.CreateCompositionsRequest
-import com.idealIntent.dtos.compositions.SingleUpdateCompositionRequest
-import com.idealIntent.dtos.compositions.UpdateCompositionRequest
 import com.idealIntent.dtos.space.*
 
 // spaces (table) have components (table)

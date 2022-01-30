@@ -19,7 +19,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("batchInsertRecords") {
-            then("getAssortmentById") {
+            then("getComposition") {
                 rollback {
                     val label = "random texts"
                     val texts = listOf(
@@ -30,7 +30,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
 
                     val id = textRepository.batchInsertNewRecords(texts, label)
                         ?: throw Exception("failed to insert records")
-                    val res = textRepository.getAssortmentById(id)
+                    val res = textRepository.getCollection(id)
 
                     res.label shouldBe label
                     res.texts.size shouldBe texts.size
@@ -44,11 +44,11 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("updateTo") {
-            then("getAssortmentById") {}
+            then("getComposition") {}
         }
 
         given("batchUpdateRecords") {
-            then("getAssortmentById") {}
+            then("getComposition") {}
         }
     }
 }

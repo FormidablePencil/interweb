@@ -23,7 +23,7 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
     private val Database.texts get() = this.sequenceOf(Texts)
 
     // region Get
-    override fun getAssortmentById(id: Int): TextCollection {
+    override fun getCollection(id: Int): TextCollection {
         val textCol = TextCollections.aliased("textCol")
         val text = Texts.aliased("text")
 

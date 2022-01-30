@@ -9,6 +9,11 @@ import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 import com.idealIntent.dtos.space.CreateSpaceRequest
 
+/**
+ * Space repository
+ *
+ * Each space consist of one compositional layout and a compositional layout consists of compositions.
+ */
 class SpaceRepository : RepositoryBase() {
     private val Database.spaces get() = this.sequenceOf(Spaces)
 
@@ -23,6 +28,31 @@ class SpaceRepository : RepositoryBase() {
             set(it.jsonData, space.jsonData)
         } != 0
     }
+
+    /**
+     * Get layouts of space
+     *
+     * @param spaceAddress
+     */
+    fun getSpaceLayout(spaceAddress: String) {
+        return database.compositionalLayouts.find { it.address eq spaceAddress }
+    }
+    // todo - there are 2 different kinds of spaces. Author space (multiple spaces), public space
+
+    /**
+     * Associate a layout to space
+     *
+     * @param layoutId Id of composition layout
+     * @param spaceAddress Space to associate to by space's address
+     */
+    fun addLayoutToSpace(layoutId: Int, spaceAddress: String){
+    }
+
+    fun
+
+    // space own layouts.
+    // layout owns compositions (components)
+    //
 }
 
 //    fun getSpacesByAuthor(authorId: Int): Space? {

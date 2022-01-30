@@ -3,14 +3,14 @@ package integrationTests.space.flows
 import com.idealIntent.dtos.compositions.CreateCompositionRequest
 import com.idealIntent.dtos.compositions.CreateCompositionsRequest
 import com.idealIntent.dtos.compositions.UserComposition
-import com.idealIntent.services.CompositionService
+import com.idealIntent.services.CmsService
 import dtos.compositions.CompositionCategory
 import org.koin.test.inject
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
 
 class CmsLibOfCompsFlow : BehaviorSpecFlow() {
-    private val compositionService: CompositionService by inject()
+    private val compositionService: CmsService by inject()
 
     private val createCompositionsRequest = CreateCompositionsRequest(
         spaceAddress = "some address",

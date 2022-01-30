@@ -8,6 +8,7 @@ import com.idealIntent.dtos.compositions.UpdateCompositionRequest
 import com.idealIntent.managers.CompositionManager
 import com.idealIntent.repositories.SpaceRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.banners.BannerBasic
@@ -15,25 +16,43 @@ import dtos.compositions.carousels.CarouselBasicImages
 import dtos.compositions.carousels.CarouselOfImagesTABLE
 import dtos.space.IUserComposition
 
-class CompositionService(
+class CmsService(
     private val spaceRepository: SpaceRepository,
-    private val componentManager: CompositionManager,
+    private val compositionManager: CompositionManager,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
     private val textRepository: TextRepository,
+    private val bannerRepository: BasicBannerRepository,
 ) {
 
-    // todo - Response object
-    fun insertComposition(request: IUserComposition, spaceAddress: String): Boolean {
-        componentManager.insertComposition(request)
-        TODO()
+    fun getAuthorsCompositions(authorId: Int) {
+
     }
 
-    fun batchInsertCompositions(request: List<IUserComposition>, spaceAddress: String) {
+    fun getCompositionOfSpace(spaceAddress: String) {
+        // spaces table should hold a collection of all components, id of components and what component (whatComponent: Enum(value: Int))
+        compositionManager.getCompositionOfSpace(spaceAddress)
+    }
+
+    /**
+     * Batch insert compositions
+     *
+     * @param request
+     * @param spaceAddress
+     */
+    fun insertCompositions(request: List<IUserComposition>, spaceAddress: String) {
         // todo - revert if some component fails to save. Save all or save non
         request.map {
-            componentManager.insertComposition(it)
+            compositionManager.insertComposition(it.compositionType)
         }
     }
+
+    /**
+     * Insert composition
+     *
+     * @param request
+     * @param spaceAddress
+     * @return
+     */
 
 
     fun deleteComposition(request: IUserComposition): Boolean {

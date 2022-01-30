@@ -13,6 +13,7 @@ import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
 import dtos.compositions.genericStructures.texts.Text
 import models.composition.carousels.IImagesCarouselSchema
 import models.composition.carousels.ImagesCarousels
+import models.compositions.carousels.ImagesCarousels
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.removeIf
@@ -29,7 +30,7 @@ class CarouselOfImagesRepository(
     // todo - there will be multiple kinds of carousels thus will be a component of a component some day
 
     // region Get
-    override fun getAssortmentById(id: Int): CarouselBasicImages {
+    override fun getComposition(id: Int): CarouselBasicImages {
         var title = ""
         var images = listOf<Image>()
         var navTos = listOf<Text>()
@@ -41,9 +42,9 @@ class CarouselOfImagesRepository(
             .select(crslImg.imageCollectionId, crslImg.navToTextCollectionId, crslImg.privilegeId, crslImg.title)
             .where { crslImg.id eq id }) {
             title = row[crslImg.title]!!
-            images = imageRepository.getAssortmentById(row[crslImg.imageCollectionId]!!).images
-            navTos = textRepository.getAssortmentById(row[crslImg.navToTextCollectionId]!!).texts
-            privilegedAuthors = privilegeRepository.getAssortmentById(row[crslImg.privilegeId]!!).privilegedAuthors
+            images = imageRepository.getCollection(row[crslImg.imageCollectionId]!!).images
+            navTos = textRepository.getCollection(row[crslImg.navToTextCollectionId]!!).texts
+            privilegedAuthors = privilegeRepository.getCollection(row[crslImg.privilegeId]!!).privilegedAuthors
         }
 
         return CarouselBasicImages(
@@ -61,7 +62,7 @@ class CarouselOfImagesRepository(
 
 
     // region Insert
-    override fun insertNewComposition(composition: CarouselBasicImages): Int? {
+    override fun insertComposition(composition: CarouselBasicImages): Int? {
         // region todo - could be in a caroutine
         val imageCollectionId = imageRepository.batchInsertNewRecords(
             composition.images, "CarouselBasicImages composition"
@@ -129,7 +130,7 @@ class CarouselOfImagesRepository(
     }
 
 
-    override fun batchInsertNewCompositions(components: List<CarouselBasicImages>, label: String): Int? {
+    override fun insertCompositions(components: List<CarouselBasicImages>, label: String): Int? {
         TODO("Not yet implemented")
     }
 

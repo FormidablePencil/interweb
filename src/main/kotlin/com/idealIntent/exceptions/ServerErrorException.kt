@@ -2,7 +2,7 @@ package com.idealIntent.exceptions
 
 import org.slf4j.LoggerFactory
 
-/***
+/**
  * A logger that log errors and throw an exception
  *
  * In Julia.main project an exception may propagate to the routing level and responds to the client with a message.

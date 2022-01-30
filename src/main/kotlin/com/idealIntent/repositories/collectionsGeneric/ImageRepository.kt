@@ -26,7 +26,7 @@ class ImageRepository : RepositoryBase(),
     private val Database.images get() = this.sequenceOf(Images)
 
     // region Get
-    override fun getAssortmentById(id: Int): ImageCollection { // todo - check privileges if allowed for any author or whether authorId is privileged
+    override fun getCollection(id: Int): ImageCollection { // todo - check privileges if allowed for any author or whether authorId is privileged
         val imgCol = ImageCollections.aliased("imgCol")
         val img = Images.aliased("img")
 

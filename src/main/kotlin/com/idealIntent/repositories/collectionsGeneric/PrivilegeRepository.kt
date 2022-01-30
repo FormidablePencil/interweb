@@ -21,7 +21,7 @@ class PrivilegeRepository : RepositoryBase(),
     private val Database.privileges get() = this.sequenceOf(Privileges)
 
     // region Get
-    override fun getAssortmentById(id: Int): Privilege {
+    override fun getCollection(id: Int): Privilege {
         val privCol = Privileges.aliased("privCol")
         val priv = PrivilegedAuthors.aliased("priv")
 

@@ -22,8 +22,15 @@ import io.kotest.matchers.shouldBe
  * If the length of Set collection is less than Enum then there are multiple enum
  * entries under the same value. Test will fail.
  */
-class IntValueEnumsTests : BehaviorSpec({
-    // region Composition related
+class EnumsIntValueDuplicatesTests : BehaviorSpec({
+    // region Compositions
+    given("CompositionModLvl") {
+        val setCollection = CompositionModLvl.values().map {
+            return@map CompositionModLvl.fromInt(it.value).name
+        }.toSet()
+
+        setCollection.size shouldBe CompositionModLvl.values().size
+    }
     given("CompositionCategory") {
         val setCollection = CompositionCategory.values().map {
             return@map CompositionCategory.fromInt(it.value).name
@@ -59,9 +66,9 @@ class IntValueEnumsTests : BehaviorSpec({
 
         setCollection.size shouldBe CompositionHeader.values().size
     }
-    // endregion Composition related
+    // endregion
 
-    // region tables and columns
+    // region tables and columns for CRUD on compositions and collections
     given("CarouselOfImagesTABLE") {
         val setCollection = CarouselOfImagesTABLE.values().map {
             return@map CarouselOfImagesTABLE.fromInt(it.value).name
@@ -107,5 +114,8 @@ class IntValueEnumsTests : BehaviorSpec({
 
         setCollection.size shouldBe TextsCOL.values().size
     }
-    // endregion tables and columns
+    // endregion
+
+    // region Other
+    // endregion
 })
