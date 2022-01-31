@@ -1,27 +1,27 @@
 package com.idealIntent.repositories.codes
 
-import models.codes.ResetPasswordCode
-import models.codes.ResetPasswordCodes
+import com.idealIntent.repositories.RepositoryBase
+import models.codes.IResetPasswordCodeEntity
+import models.codes.ResetPasswordCodesModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insert
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
-import com.idealIntent.repositories.RepositoryBase
 
 // todo - comments
 class ResetPasswordCodeRepository : RepositoryBase() {
-    private val Database.resetPasswordEmailCode get() = this.sequenceOf(ResetPasswordCodes)
+    private val Database.resetPasswordEmailCode get() = this.sequenceOf(ResetPasswordCodesModel)
 
     fun insert(code: String, authorId: Int): Boolean {
-        return database.insert(ResetPasswordCodes) {
+        return database.insert(ResetPasswordCodesModel) {
             set(it.code, code)
             set(it.authorId, authorId)
         } == 1
     }
 
-    fun get(authorId: Int): ResetPasswordCode? {
+    fun get(authorId: Int): IResetPasswordCodeEntity? {
         return database.resetPasswordEmailCode.find {
             it.authorId eq authorId
         }
@@ -32,7 +32,7 @@ class ResetPasswordCodeRepository : RepositoryBase() {
     }
 
     fun delete(authorId: Int) {
-        database.delete(ResetPasswordCodes) {
+        database.delete(ResetPasswordCodesModel) {
             it.authorId eq authorId
         }
     }

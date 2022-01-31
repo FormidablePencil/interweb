@@ -11,8 +11,6 @@ import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.CompositionCategory
-import dtos.compositions.banners.BannerBasic
-import dtos.compositions.carousels.CarouselBasicImages
 import dtos.compositions.carousels.CarouselOfImagesTABLE
 import dtos.space.IUserComposition
 
@@ -154,7 +152,7 @@ class CmsService(
             CompositionCategory.Text ->
                 textRepository.batchUpdateRecords(
                     records = request.updateToData,
-                    id = request.id
+                    collectionId = request.id
                 )
             // endregion
 

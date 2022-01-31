@@ -11,7 +11,7 @@ import dtos.compositions.carousels.CarouselOfImagesTABLE
 import dtos.compositions.genericStructures.images.Image
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
 import dtos.compositions.genericStructures.texts.Text
-import models.composition.carousels.IImagesCarouselSchema
+import models.composition.carousels.IImagesCarouselEntity
 import models.composition.carousels.ImagesCarousels
 import models.compositions.carousels.ImagesCarousels
 import org.ktorm.database.Database
@@ -25,7 +25,7 @@ class CarouselOfImagesRepository(
     private val imageRepository: ImageRepository,
     private val privilegeRepository: PrivilegeRepository
     // todo replace Image
-) : RepositoryBase(), ICompositionStructure<IImagesCarouselSchema, CarouselBasicImages> {
+) : RepositoryBase(), ICompositionStructure<IImagesCarouselEntity, CarouselBasicImages> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarousels)
     // todo - there will be multiple kinds of carousels thus will be a component of a component some day
 
@@ -42,9 +42,9 @@ class CarouselOfImagesRepository(
             .select(crslImg.imageCollectionId, crslImg.navToTextCollectionId, crslImg.privilegeId, crslImg.title)
             .where { crslImg.id eq id }) {
             title = row[crslImg.title]!!
-            images = imageRepository.getCollection(row[crslImg.imageCollectionId]!!).images
-            navTos = textRepository.getCollection(row[crslImg.navToTextCollectionId]!!).texts
-            privilegedAuthors = privilegeRepository.getCollection(row[crslImg.privilegeId]!!).privilegedAuthors
+            images = imageRepository.getCollectionOfRecords(row[crslImg.imageCollectionId]!!).images
+            navTos = textRepository.getCollectionOfRecords(row[crslImg.navToTextCollectionId]!!).texts
+            privilegedAuthors = privilegeRepository.getCollectionOfRecords(row[crslImg.privilegeId]!!).privilegedAuthors
         }
 
         return CarouselBasicImages(
@@ -55,7 +55,7 @@ class CarouselOfImagesRepository(
         )
     }
 
-    override fun getMetadataOfComposition(id: Int): IImagesCarouselSchema {
+    override fun getMetadataOfComposition(id: Int): IImagesCarouselEntity {
         TODO()
     }
     // endregion Get
@@ -65,13 +65,13 @@ class CarouselOfImagesRepository(
     override fun insertComposition(composition: CarouselBasicImages): Int? {
         // region todo - could be in a caroutine
         val imageCollectionId = imageRepository.batchInsertNewRecords(
-            composition.images, "CarouselBasicImages composition"
+            composition.images
         )
         val navToTextCollectionId = textRepository.batchInsertNewRecords(
-            composition.navToCorrespondingImagesOrder, "carouselNavLinks"
+            composition.navToCorrespondingImagesOrder
         )
         val privilegeId = privilegeRepository.batchInsertNewRecords(
-            composition.privilegedAuthors, "carousel of images"
+            composition.privilegedAuthors
         )
         // endregion
 
@@ -121,11 +121,11 @@ class CarouselOfImagesRepository(
     fun update(componentId: Int, column: CarouselOfImagesTABLE, updateToData: RecordUpdate) {
         when (column) {
             CarouselOfImagesTABLE.Images ->
-                imageRepository.updateRecord(updateToData, componentId)
+                imageRepository.updateRecord(updateToData,, componentId)
             CarouselOfImagesTABLE.NavTos ->
-                textRepository.updateRecord(updateToData, componentId)
+                textRepository.updateRecord(updateToData,, componentId)
             CarouselOfImagesTABLE.Privileges ->
-                privilegeRepository.updateRecord(updateToData, componentId)
+                privilegeRepository.updateRecord(updateToData,, componentId)
         }
     }
 

@@ -62,9 +62,9 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
                     val privilegedAuthors = generatePrivilegedAuthorsToConsume()
 
                     val privilegeId =
-                        privilegeRepository.batchInsertNewRecords(privilegedAuthors, privilegesTo)
+                        privilegeRepository.batchInsertNewRecords(privilegedAuthors)
                             ?: throw Exception("failed to get id")
-                    val res = privilegeRepository.getCollection(privilegeId)
+                    val res = privilegeRepository.getCollectionOfRecords(privilegeId)
 
                     res.privilegeTo shouldBe privilegesTo // todo - typo
                     res.privilegedAuthors.size shouldBe privilegedAuthors.size // todo

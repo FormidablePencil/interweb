@@ -46,9 +46,9 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                         ),
                     )
 
-                    val imageCollectionId = imageRepository.batchInsertNewRecords(images, label)
+                    val imageCollectionId = imageRepository.batchInsertNewRecords(images)
                         ?: throw Exception("failed to get id")
-                    val res = imageRepository.getCollection(imageCollectionId)
+                    val res = imageRepository.getCollectionOfRecords(imageCollectionId)
 
                     res shouldNotBe null
                     res.images.size shouldBe images.size

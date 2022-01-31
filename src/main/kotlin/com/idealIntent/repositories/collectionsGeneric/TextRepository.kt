@@ -7,7 +7,7 @@ import dtos.compositions.genericStructures.texts.Text
 import dtos.compositions.genericStructures.texts.TextCollection
 import dtos.compositions.genericStructures.texts.TextIdentifiableRecordByCol
 import dtos.compositions.genericStructures.texts.TextsCOL
-import models.genericStructures.ITextCollectionSchema
+import models.genericStructures.ITextCollectionEntity
 import models.genericStructures.TextCollections
 import models.genericStructures.Texts
 import org.ktorm.database.Database
@@ -18,12 +18,12 @@ import org.ktorm.entity.sequenceOf
 /**
  * Responsible for text_collections and texts table
  */
-class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollectionSchema, TextCollection> {
+class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollectionEntity, TextCollection> {
     private val Database.textCollections get() = this.sequenceOf(TextCollections)
     private val Database.texts get() = this.sequenceOf(Texts)
 
     // region Get
-    override fun getCollection(id: Int): TextCollection {
+    override fun getCollectionOfRecords(id: Int): TextCollection {
         val textCol = TextCollections.aliased("textCol")
         val text = Texts.aliased("text")
 
@@ -42,7 +42,7 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
         return TextCollection(label, texts)
     }
 
-    override fun getMetadataOfCollection(id: Int): ITextCollectionSchema? {
+    override fun validateRecordToCollectionRelationship(id: Int): ITextCollectionEntity? {
         return database.textCollections.find { it.id eq id }
     }
     // endregion Get
@@ -58,7 +58,7 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
         return collectionId
     }
 
-    override fun batchInsertNewRecords(records: List<Text>, label: String): Int? {
+    override fun batchInsertNewRecords(records: List<Any>): Int? {
         val collectionId = insertRecordCollection(label)
             ?: return null
 
@@ -67,21 +67,21 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
         return collectionId
     }
 
-    override fun insertRecord(record: Text, id: Int): Boolean {
+    override fun insertRecord(record: Text, collectionId: Int): Boolean {
         return database.insert(Texts) { // todo - validate idsOfTexts
             set(it.orderRank, record.orderRank)
             set(it.text, record.text)
-            set(it.collectionId, id)
+            set(it.collectionId, collectionId)
         } != 0
     }
 
-    override fun batchInsertRecords(records: List<Text>, id: Int): Boolean {
+    override fun batchInsertRecords(records: List<Text>, collectionId: Int): Boolean {
         val effectedRows = database.batchInsert(Texts) { // todo - validate idsOfTexts
             records.map { text ->
                 item {
                     set(it.orderRank, text.orderRank)
                     set(it.text, text.text)
-                    set(it.collectionId, id)
+                    set(it.collectionId, collectionId)
                 }
             }
         }
@@ -98,8 +98,8 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
 
 
     // region Update
-    override fun updateRecord(record: RecordUpdate, id: Int): Boolean {
-        val collection = getMetadataOfCollection(id) ?: return false // todo - handle gracefully
+    override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
+        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle gracefully
 
         database.update(Texts) {
             record.updateTo.map { recordCol ->
@@ -120,8 +120,8 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
         TODO("validate if successful")
     }
 
-    override fun batchUpdateRecords(records: List<RecordUpdate>, id: Int): Boolean {
-        val collection = getMetadataOfCollection(id) ?: return false // todo - hadle gracefully
+    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
+        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - hadle gracefully
 
         database.batchUpdate(Texts) {
             records.map { record ->
@@ -148,7 +148,7 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
 
 
     // region Delete
-    override fun deleteRecord(id: Int): Boolean {
+    override fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
 
         TODO("Not yet implemented")
     }
@@ -157,11 +157,11 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
         TODO("Not yet implemented")
     }
 
-    override fun deleteAllRecordsInCollection(id: Int) {
+    override fun deleteAllRecordsInCollection(collectionId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun deleteCollectionOfRecords() {
+    override fun deleteCollectionButNotRecord() {
         TODO("Not yet implemented")
     }
     // endregion Delete

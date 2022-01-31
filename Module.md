@@ -7,7 +7,7 @@ Configuration stuff like environment variables and dependency injection.
 # Package com.idealIntent.dtos
 # Package com.idealIntent.dtos.auth
 # Package com.idealIntent.dtos.compositions
-Examples of a composition are [image carousel][models.compositions.carousels.ImagesCarouselsTable] and [one off grid][models.compositions.grids.OneOffGridsTable].
+Examples of a composition are [image carousel][models.compositions.carousels.ImagesCarouselsModel] and [one off grid][models.compositions.grids.OneOffGridsModel].
 
 # Package com.idealIntent.dtos.space
 

@@ -28,9 +28,9 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                         Text(orderRank = 30000, text = "man"),
                     )
 
-                    val id = textRepository.batchInsertNewRecords(texts, label)
+                    val id = textRepository.batchInsertNewRecords(texts)
                         ?: throw Exception("failed to insert records")
-                    val res = textRepository.getCollection(id)
+                    val res = textRepository.getCollectionOfRecords(id)
 
                     res.label shouldBe label
                     res.texts.size shouldBe texts.size

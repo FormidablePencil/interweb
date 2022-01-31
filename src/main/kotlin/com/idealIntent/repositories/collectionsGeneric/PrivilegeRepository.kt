@@ -7,7 +7,7 @@ import dtos.compositions.genericStructures.privileges.Privilege
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthorCOL
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthorIdentifiableRecordByCol
-import models.genericStructures.IPrivilegeSchema
+import models.genericStructures.IPrivilegeEntity
 import models.genericStructures.PrivilegedAuthors
 import models.genericStructures.Privileges
 import org.ktorm.database.Database
@@ -17,11 +17,11 @@ import org.ktorm.entity.sequenceOf
 
 // todo privilege and privileges are used interchangeably. Fix this typo
 class PrivilegeRepository : RepositoryBase(),
-    ICollectionStructure<PrivilegedAuthor, IPrivilegeSchema, Privilege> {
+    ICollectionStructure<PrivilegedAuthor, IPrivilegeEntity, Privilege> {
     private val Database.privileges get() = this.sequenceOf(Privileges)
 
     // region Get
-    override fun getCollection(id: Int): Privilege {
+    override fun getCollectionOfRecords(id: Int): Privilege {
         val privCol = Privileges.aliased("privCol")
         val priv = PrivilegedAuthors.aliased("priv")
 
@@ -40,7 +40,7 @@ class PrivilegeRepository : RepositoryBase(),
         return Privilege(privilegesTo, privilegedAuthors)
     }
 
-    override fun getMetadataOfCollection(id: Int): IPrivilegeSchema? {
+    override fun validateRecordToCollectionRelationship(id: Int): IPrivilegeEntity? {
         return database.privileges.find { it.id eq id }
     }
     // endregion Get
@@ -56,7 +56,7 @@ class PrivilegeRepository : RepositoryBase(),
         TODO()
     }
 
-    override fun batchInsertNewRecords(records: List<PrivilegedAuthor>, privilegesTo: String): Int? {
+    override fun batchInsertNewRecords(records: List<Any>): Int? {
         val privilegeId = insertRecordCollection(privilegesTo)
             ?: TODO("handle gracefully")
 
@@ -65,9 +65,9 @@ class PrivilegeRepository : RepositoryBase(),
         return privilegeId
     }
 
-    override fun insertRecord(record: PrivilegedAuthor, id: Int): Boolean {
+    override fun insertRecord(record: PrivilegedAuthor, collectionId: Int): Boolean {
         return database.insert(PrivilegedAuthors) { // todo - test that all have been generated
-            set(it.privilegeId, id)
+            set(it.privilegeId, collectionId)
             set(it.authorId, record.authorId)
             set(it.modLvl, record.modLvl)
         } != 0
@@ -95,8 +95,8 @@ class PrivilegeRepository : RepositoryBase(),
 
 
     // region Update
-    override fun updateRecord(record: RecordUpdate, id: Int): Boolean {
-        val collection = getMetadataOfCollection(id) ?: return false // todo - handle failure gracefully
+    override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
+        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
 
         val res = database.update(PrivilegedAuthors) {
             record.updateTo.map { updateCol ->
@@ -118,8 +118,8 @@ class PrivilegeRepository : RepositoryBase(),
         TODO()
     }
 
-    override fun batchUpdateRecords(records: List<RecordUpdate>, id: Int): Boolean {
-        val collection = getMetadataOfCollection(id) ?: return false // todo - handle failure gracefully
+    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
+        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
 
         database.batchUpdate(PrivilegedAuthors) {
             records.map { record ->
@@ -146,7 +146,7 @@ class PrivilegeRepository : RepositoryBase(),
 
 
     // region Delete
-    override fun deleteRecord(id: Int): Boolean {
+    override fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -154,11 +154,11 @@ class PrivilegeRepository : RepositoryBase(),
         TODO("Not yet implemented")
     }
 
-    override fun deleteAllRecordsInCollection(id: Int) {
+    override fun deleteAllRecordsInCollection(collectionId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun deleteCollectionOfRecords() {
+    override fun deleteCollectionButNotRecord() {
         TODO("Not yet implemented")
     }
     // region Delete

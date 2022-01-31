@@ -1,14 +1,14 @@
 package com.idealIntent.repositories.codes
 
-import models.codes.EmailVerificationCode
-import models.codes.EmailVerificationCodes
+import com.idealIntent.repositories.RepositoryBase
+import models.codes.EmailVerificationCodesModel
+import models.codes.IEmailVerificationCodeEntity
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insert
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
-import com.idealIntent.repositories.RepositoryBase
 
 // todo - comments
 /**
@@ -17,16 +17,16 @@ import com.idealIntent.repositories.RepositoryBase
  * @constructor Create empty Email verification code repository
  */
 class EmailVerificationCodeRepository : RepositoryBase() {
-    private val Database.emailVerifyCodes get() = this.sequenceOf(EmailVerificationCodes)
+    private val Database.emailVerifyCodes get() = this.sequenceOf(EmailVerificationCodesModel)
 
     fun insert(code: String, authorId: Int): Boolean {
-        return database.insert(EmailVerificationCodes) {
+        return database.insert(EmailVerificationCodesModel) {
             set(it.code, code)
             set(it.authorId, authorId)
         } == 1
     }
 
-    fun get(authorId: Int): EmailVerificationCode? {
+    fun get(authorId: Int): IEmailVerificationCodeEntity? {
         return database.emailVerifyCodes.find {
             it.authorId eq authorId
         }
@@ -37,7 +37,7 @@ class EmailVerificationCodeRepository : RepositoryBase() {
     }
 
     fun delete(authorId: Int): Boolean {
-        return database.delete(EmailVerificationCodes){
+        return database.delete(EmailVerificationCodesModel){
             it.authorId eq authorId
         } != 0
     }
