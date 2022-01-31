@@ -1,7 +1,7 @@
 package com.idealIntent.repositories
 
-import models.authorization.Password
-import models.authorization.Passwords
+import models.authorization.IPasswordEntity
+import models.authorization.PasswordsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq
@@ -10,20 +10,20 @@ import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 
 class PasswordRepository : RepositoryBase() {
-    private val Database.password get() = this.sequenceOf(Passwords)
+    private val Database.password get() = this.sequenceOf(PasswordsModel)
 
     fun insert(passwordHash: String, authorId: Int): Boolean {
-        return database.insert(Passwords) {
-            set(it.password, passwordHash)
+        return database.insert(PasswordsModel) {
+            set(it.passwordHash, passwordHash)
             set(it.authorId, authorId)
         } != 0
     }
 
-    fun get(authorId: Int): Password? {
+    fun get(authorId: Int): IPasswordEntity? {
         return database.password.find { it.authorId eq authorId }
     }
 
     fun delete(authorId: Int): Boolean {
-        return database.delete(Passwords) { it.authorId eq authorId } != 0
+        return database.delete(PasswordsModel) { it.authorId eq authorId } != 0
     }
 }

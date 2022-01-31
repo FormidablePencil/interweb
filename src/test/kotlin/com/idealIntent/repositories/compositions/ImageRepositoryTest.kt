@@ -2,7 +2,7 @@ package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
-import dtos.compositions.genericStructures.images.Image
+import dtos.collectionsGeneric.images.Image
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -25,38 +25,42 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                     val label = "Pet Projects"
                     val images = listOf(
                         Image(
+                            id = null,
                             orderRank = 10000,
-                            imageTitle = "PAO Mnemonic System",
-                            imageUrl = " https://i.ibb.co/1K7jQJw/pao.png"
+                            description = "PAO Mnemonic System",
+                            url = " https://i.ibb.co/1K7jQJw/pao.png"
                         ),
                         Image(
+                            id = null,
                             orderRank = 20000,
-                            imageTitle = "Emoji Tack Toes",
-                            imageUrl = "https://i.ibb.co/pXgcQ16/ticktacktoe.png"
+                            description = "Emoji Tack Toes",
+                            url = "https://i.ibb.co/pXgcQ16/ticktacktoe.png"
                         ),
                         Image(
+                            id = null,
                             orderRank = 30000,
-                            imageTitle = "Crackalackin",
-                            imageUrl = "https://i.ibb.co/4YP7yDb/crackalackin.png"
+                            description = "Crackalackin",
+                            url = "https://i.ibb.co/4YP7yDb/crackalackin.png"
                         ),
                         Image(
+                            id = null,
                             orderRank = 40000,
-                            imageTitle = "Pokedex",
-                            imageUrl = "https://i.ibb.co/w0m4pF3/pokedex.png"
+                            description = "Pokedex",
+                            url = "https://i.ibb.co/w0m4pF3/pokedex.png"
                         ),
                     )
 
                     val imageCollectionId = imageRepository.batchInsertNewRecords(images)
                         ?: throw Exception("failed to get id")
-                    val res = imageRepository.getCollectionOfRecords(imageCollectionId)
+                    val res = imageRepository.getCollectionOfRecords(0, 0) // todo
 
                     res shouldNotBe null
                     res.images.size shouldBe images.size
                     res.images.map {
                         images.find { image ->
                             image.orderRank == it.orderRank
-                                    && image.imageTitle == it.imageTitle
-                                    && image.imageUrl == it.imageUrl
+                                    && image.description == it.description
+                                    && image.url == it.url
                         } ?: throw Exception("failed to find returned image")
                     }
                 }

@@ -1,10 +1,10 @@
 package com.idealIntent.services
 
+import com.idealIntent.managers.AuthorsPortfolioManager
+import com.idealIntent.repositories.profile.AuthorRepository
 import dtos.portfolio.GetLayoutResult
 import models.portfolio.LayoutComponent
-import com.idealIntent.managers.AuthorsPortfolioManager
-import models.profile.Author
-import com.idealIntent.repositories.profile.AuthorRepository
+import models.profile.IAuthorEntity
 
 class AuthorsPortfolioService(
     private val authorRepository: AuthorRepository,
@@ -22,7 +22,7 @@ class AuthorsPortfolioService(
         return listOf<Int>(32, 43)
     }
 
-    fun GetAuthorById(userId: Int): Author? {
+    fun GetAuthorById(userId: Int): IAuthorEntity? {
         return authorRepository.getById(userId)
     };
 

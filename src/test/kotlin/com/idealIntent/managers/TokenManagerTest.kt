@@ -3,8 +3,10 @@ package com.idealIntent.managers
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
-import com.typesafe.config.ConfigFactory
 import com.idealIntent.configurations.AppEnv
+import com.idealIntent.dtos.auth.TokenResponseData
+import com.idealIntent.repositories.RefreshTokenRepository
+import com.typesafe.config.ConfigFactory
 import dtos.authorization.TokensResponseFailed
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan
@@ -12,14 +14,12 @@ import io.kotest.matchers.shouldBe
 import io.ktor.config.*
 import io.ktor.http.*
 import io.mockk.*
-import models.authorization.Token
-import com.idealIntent.repositories.RefreshTokenRepository
-import com.idealIntent.dtos.auth.TokenResponseData
+import models.authorization.ITokenEntity
 import shared.appEnvMockHelper
 
 class TokenManagerTest : BehaviorSpec({
     val refreshTokenRepository: RefreshTokenRepository = mockk()
-    val tokenDb: Token = mockk()
+    val tokenDb: ITokenEntity = mockk()
     val authorId = 321
     val tokens = TokenResponseData("access token", "refresh token")
     val appEnv = mockk<AppEnv>()

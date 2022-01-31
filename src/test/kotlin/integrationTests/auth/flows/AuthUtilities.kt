@@ -1,10 +1,10 @@
 package integrationTests.auth.flows
 
+import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorRepository
-import models.profile.Account
+import models.profile.IAccountEntity
 import org.koin.test.inject
-import com.idealIntent.dtos.CreateAuthorRequest
 import shared.testUtils.BehaviorSpecFlow
 
 class AuthUtilities : BehaviorSpecFlow() {
@@ -16,12 +16,12 @@ class AuthUtilities : BehaviorSpecFlow() {
             ?: throw Exception("failed to get authorId by username. Author doesn't exist by that username")
     }
 
-    fun getAccountByEmail(email: String = createAuthorRequest.email): Account {
+    fun getAccountByEmail(email: String = createAuthorRequest.email): IAccountEntity {
         return accountRepository.getByEmail(email)
             ?: throw Exception("failed to get user's Account by email. Account doesn't exist by that username")
     }
 
-    fun getAccountByUsername(username: String = createAuthorRequest.username): Account {
+    fun getAccountByUsername(username: String = createAuthorRequest.username): IAccountEntity {
         val id = getAuthorIdByUsername(username)
         return accountRepository.getById(id)
             ?: throw Exception("failed to get user's Account by id. Account doesn't exist by that id")

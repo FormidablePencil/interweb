@@ -1,14 +1,15 @@
 package com.idealIntent.other
 
+import dtos.collectionsGeneric.images.ImageIdentifiableRecordByCol
+import dtos.collectionsGeneric.images.ImagesCOL
+import dtos.collectionsGeneric.privileges.PrivilegedAuthorCOL
+import dtos.collectionsGeneric.privileges.PrivilegedAuthorIdentifiableRecordByCol
+import dtos.collectionsGeneric.texts.TextsCOL
 import dtos.compositions.CompositionCategory
+import dtos.compositions.CompositionModLvl
 import dtos.compositions.banners.CompositionBanner
 import dtos.compositions.carousels.CarouselOfImagesTABLE
 import dtos.compositions.carousels.CompositionCarousel
-import dtos.compositions.genericStructures.images.ImageIdentifiableRecordByCol
-import dtos.compositions.genericStructures.images.ImagesCOL
-import dtos.compositions.genericStructures.privileges.PrivilegedAuthorCOL
-import dtos.compositions.genericStructures.privileges.PrivilegedAuthorIdentifiableRecordByCol
-import dtos.compositions.genericStructures.texts.TextsCOL
 import dtos.compositions.grids.CompositionGrid
 import dtos.compositions.headers.CompositionHeader
 import io.kotest.core.spec.style.BehaviorSpec

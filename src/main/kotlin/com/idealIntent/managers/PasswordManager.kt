@@ -35,7 +35,7 @@ class PasswordManager(
         val passwordRecord = passwordRepository.get(authorId)
             ?: throw ServerErrorException("Failed to retrieve password.", this::class.java)
 
-        return BCrypt.checkpw(password, passwordRecord.password)
+        return BCrypt.checkpw(password, passwordRecord.passwordHash)
     }
 
     fun setNewPassword(password: String, authorId: Int) {

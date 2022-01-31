@@ -7,7 +7,6 @@ import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
-import dtos.compositions.carousels.CarouselBasicImages
 import dtos.compositions.carousels.CompositionCarousel
 
 // todo - comments
@@ -30,15 +29,18 @@ class CompositionManager(
     }
 
     fun insertComposition(carouselType: Int): Int? {
+        TODO()
         val gson = Gson()
         return when (CompositionCarousel.fromInt(carouselType)) {
             CompositionCarousel.CarouselBlurredOverlay -> TODO()
             CompositionCarousel.CarouselMagnifying -> TODO()
             CompositionCarousel.BasicImages ->
-                carouselOfImagesRepository.insertComposition(
-                    gson.fromJson(request.jsonData, CarouselBasicImages::class.java),
-                )
+                TODO()
+//                carouselOfImagesRepository.insertComposition(
+//                    gson.fromJson(request.jsonData, CarouselBasicImages::class.java),
+//                )
         }
-
-        // todo - Response object
     }
+
+    // todo - Response object
+}

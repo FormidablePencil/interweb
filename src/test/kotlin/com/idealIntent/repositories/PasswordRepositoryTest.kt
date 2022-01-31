@@ -34,8 +34,8 @@ class PasswordRepositoryTest : BehaviorSpecUtRepo({
 
                 val getPasswordRes = passwordRepository.get(authorId)
                     ?: throw Exception("test failed")
-                getPasswordRes.password shouldNotBe password
-                BCrypt.checkpw(password, getPasswordRes.password) shouldBe true
+                getPasswordRes.passwordHash shouldNotBe password
+                BCrypt.checkpw(password, getPasswordRes.passwordHash) shouldBe true
 
                 passwordRepository.delete(authorId) shouldBe true
                 passwordRepository.get(authorId) shouldBe null

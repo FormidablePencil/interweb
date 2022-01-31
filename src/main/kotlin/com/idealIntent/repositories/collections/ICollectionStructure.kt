@@ -17,7 +17,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
 
     // region Get
     /**
-     * Get records by collection id
+     * Get records by collection id.
      *
      * @param id Get records under collection's id
      * @return Records under [id] or null if failed to find by [id]
@@ -25,7 +25,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
     fun getCollectionOfRecords(recordId: Int, collectionId: Int): CollectionOfRecords
 
     /**
-     * Get records to collection info
+     * Get records to collection info.
      *
      * @param recordId []
      * @param collectionId
@@ -76,7 +76,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
     /**
      * Insert a new collection to associate records to.
      *
-     * Method would have been private if it was not in [interface][ICollectionStructure].
+     * Method would have been private if it was not of [interface][ICollectionStructure].
      *
      * @return collection id
      */
@@ -107,41 +107,37 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
     // todo deletes
     // region Delete
     /**
-     * Delete an image of collection
-     *
+     * Delete a record from collection of [collectionId].
      */
     fun deleteRecord(recordId: Int, collectionId: Int): Boolean
 
     /**
-     * Delete images of collection
-     *
+     * Delete records from collection of [collectionId].
      */
-    fun batchDeleteRecords(id: Int): Boolean
+    fun batchDeleteRecords(id: Int, collectionId: Int): Boolean
 
     /**
-     * Delete all images of collection
-     *
+     * Delete all records from collection of [collectionId].
      */
     fun deleteAllRecordsInCollection(collectionId: Int)
 
+    /**
+     * Disassociate all records from collection of [collectionId].
+     */
     fun disassociateRecordFromCollection(recordId: Int, collectionId: Int)
 
     /**
-     * Delete image_collection and it's images
-     *
+     * Delete only the collection and its relationship to records but not the records themselves.
      */
     fun deleteCollectionButNotRecord()
 
     // endregion Delete
 
-
     /**
      * validate image to collection relationship.
      *
-     * Method was to be private if it wasn't part of the [ICollectionStructure][ICollectionStructure].
-     *
-     * @param id ID of collection
-     * @return Collection's metadata and not associated records or null if failed to find by [id]
+     * Method would have been private if it wasn't of [interface][ICollectionStructure].
      */
-    fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean
+    fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
+        getRecordsToCollectionInfo(recordId, collectionId) != null
 }

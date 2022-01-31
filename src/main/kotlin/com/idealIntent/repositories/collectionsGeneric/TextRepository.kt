@@ -14,7 +14,12 @@ import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 
 /**
- * Responsible for text_collections and texts table
+ * Responsible for collections of texts.
+ *
+ * Related -
+ * [text][models.compositions.basicsCollections.texts.IText],
+ * [text to collections][models.compositions.basicsCollections.texts.ITextToCollection],
+ * [text collection][models.compositions.basicsCollections.texts.ITextCollection].
  */
 class TextRepository : RepositoryBase(),
     ICollectionStructure<Text, ITextToCollectionEntity, TextToCollection, TextCollection> {
@@ -155,7 +160,7 @@ class TextRepository : RepositoryBase(),
         TODO("Not yet implemented")
     }
 
-    override fun batchDeleteRecords(id: Int): Boolean {
+    override fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -163,15 +168,12 @@ class TextRepository : RepositoryBase(),
         TODO("Not yet implemented")
     }
 
+    override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
+        TODO("Not yet implemented")
+    }
+
     override fun deleteCollectionButNotRecord() {
         TODO("Not yet implemented")
     }
     // endregion Delete
-
-    override fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
-        getRecordsToCollectionInfo(recordId, collectionId) != null
-
-    override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
-        TODO("Not yet implemented")
-    }
 }

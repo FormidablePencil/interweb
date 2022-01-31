@@ -39,9 +39,10 @@ class CmsService(
      */
     fun insertCompositions(request: List<IUserComposition>, spaceAddress: String) {
         // todo - revert if some component fails to save. Save all or save non
-        request.map {
-            compositionManager.insertComposition(it.compositionType)
-        }
+        TODO()
+//        request.map {
+//            compositionManager.insertComposition(it.compositionType)
+//        }
     }
 
     /**

@@ -1,6 +1,18 @@
 package com.idealIntent.services
 
 import com.idealIntent.configurations.AppEnv
+import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.dtos.auth.LoginByEmailRequest
+import com.idealIntent.dtos.auth.LoginByUsernameRequest
+import com.idealIntent.dtos.auth.TokenResponseData
+import com.idealIntent.helpers.maskEmail
+import com.idealIntent.managers.EmailManager
+import com.idealIntent.managers.PasswordManager
+import com.idealIntent.managers.TokenManager
+import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
+import com.idealIntent.repositories.profile.AccountRepository
+import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
+import com.idealIntent.repositories.profile.AuthorRepository
 import dtos.authorization.LoginResponse
 import dtos.authorization.LoginResponseFailed
 import dtos.authorization.ResetPasswordResponse
@@ -8,25 +20,13 @@ import dtos.authorization.TokensResponse
 import dtos.responseData.ITokenResponseData
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded
-import com.idealIntent.helpers.maskEmail
-import com.idealIntent.managers.EmailManager
-import com.idealIntent.managers.PasswordManager
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import io.mockk.*
-import com.idealIntent.managers.TokenManager
-import models.profile.Account
-import models.profile.Author
-import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
-import com.idealIntent.repositories.profile.AccountRepository
-import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
-import com.idealIntent.repositories.profile.AuthorRepository
-import com.idealIntent.dtos.CreateAuthorRequest
-import com.idealIntent.dtos.auth.LoginByEmailRequest
-import com.idealIntent.dtos.auth.LoginByUsernameRequest
-import com.idealIntent.dtos.auth.TokenResponseData
+import models.profile.IAccountEntity
+import models.profile.IAuthorEntity
 import shared.appEnvMockHelper
 
 class AuthorizationServiceTest : BehaviorSpec({
@@ -37,8 +37,8 @@ class AuthorizationServiceTest : BehaviorSpec({
     val emailVerifyCodeRepository: EmailVerificationCodeRepository = mockk()
     val authorProfileRelatedRepository: AuthorProfileRelatedRepository = mockk()
     val accountRepository: AccountRepository = mockk()
-    val author: Author = mockk()
-    val account: Account = mockk()
+    val author: IAuthorEntity = mockk()
+    val account: IAccountEntity = mockk()
     val username = "YourNeighborhoodSpider"
     val email = "testemail12345@gmail.com"
     val password = "Formidable!76"

@@ -1,6 +1,5 @@
 package com.idealIntent.services
 
-import models.thread.Thread
 import com.idealIntent.repositories.profile.AuthorRepository
 import com.idealIntent.repositories.SpaceRepository
 

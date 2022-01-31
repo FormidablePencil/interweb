@@ -1,21 +1,21 @@
 package com.idealIntent.repositories.profile
 
-import models.profile.Accounts
-import models.profile.Author
+import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.repositories.RepositoryBase
+import models.profile.AccountsModel
 import models.profile.AuthorDetails
-import models.profile.Authors
+import models.profile.AuthorsModel
+import models.profile.IAuthorEntity
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.add
 import org.ktorm.entity.sequenceOf
-import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.dtos.CreateAuthorRequest
 
 class AuthorProfileRelatedRepository : RepositoryBase() {
-    private val Database.authors get() = this.sequenceOf(Authors)
+    private val Database.authors get() = this.sequenceOf(AuthorsModel)
 
     fun createNewAuthor(request: CreateAuthorRequest): Int? {
-        val author = Author {
+        val author = IAuthorEntity {
             username = request.username
         }
 
@@ -27,7 +27,7 @@ class AuthorProfileRelatedRepository : RepositoryBase() {
             set(it.lastname, request.lastname)
         }
 
-        database.insert(Accounts) {
+        database.insert(AccountsModel) {
             set(it.authorId, author.id)
             set(it.email, request.email)
         }
@@ -36,17 +36,17 @@ class AuthorProfileRelatedRepository : RepositoryBase() {
     }
 
     fun getAuthorWithDetail(authorId: Int): AuthorWithDetail {
-        return database.from(Authors)
-            .leftJoin(AuthorDetails, Authors.id eq AuthorDetails.authorId)
+        return database.from(AuthorsModel)
+            .leftJoin(AuthorDetails, AuthorsModel.id eq AuthorDetails.authorId)
             .select(
-                Authors.id,
-                Authors.username,
+                AuthorsModel.id,
+                AuthorsModel.username,
                 AuthorDetails.firstname,
                 AuthorDetails.lastname,
-            ).where(Authors.id eq authorId).map { row ->
+            ).where(AuthorsModel.id eq authorId).map { row ->
                 AuthorWithDetail(
-                    authorId = row[Authors.id],
-                    username = row[Authors.username],
+                    authorId = row[AuthorsModel.id],
+                    username = row[AuthorsModel.username],
                     firstname = row[AuthorDetails.firstname],
                     lastname = row[AuthorDetails.lastname]
                 )
@@ -54,23 +54,23 @@ class AuthorProfileRelatedRepository : RepositoryBase() {
     }
 
     fun getAuthorWithDetailAndAccount(authorId: Int): AuthorWithDetailAndAccount? {
-        return database.from(Authors)
-            .leftJoin(AuthorDetails, Authors.id eq AuthorDetails.authorId)
-            .leftJoin(Accounts, Authors.id eq Accounts.authorId)
+        return database.from(AuthorsModel)
+            .leftJoin(AuthorDetails, AuthorsModel.id eq AuthorDetails.authorId)
+            .leftJoin(AccountsModel, AuthorsModel.id eq AccountsModel.authorId)
             .select(
-                Authors.id,
-                Authors.username,
+                AuthorsModel.id,
+                AuthorsModel.username,
                 AuthorDetails.firstname,
                 AuthorDetails.lastname,
-                Accounts.email,
-            ).where(Authors.id eq authorId).map { row ->
-                if (row[Authors.id] == null) return null
+                AccountsModel.email,
+            ).where(AuthorsModel.id eq authorId).map { row ->
+                if (row[AuthorsModel.id] == null) return null
                 AuthorWithDetailAndAccount(
-                    authorId = row[Authors.id]!!,
-                    username = row[Authors.username]!!,
+                    authorId = row[AuthorsModel.id]!!,
+                    username = row[AuthorsModel.username]!!,
                     firstname = row[AuthorDetails.firstname],
                     lastname = row[AuthorDetails.lastname],
-                    email = row[Accounts.email]
+                    email = row[AccountsModel.email]
                 )
             }.first()
     }

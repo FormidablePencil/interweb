@@ -155,22 +155,19 @@ class ImageRepository : RepositoryBase(),
         if (!validateRecordToCollectionRelationship(recordId, collectionId)) false
         else database.images.removeIf { it.id eq collectionId } == 0
 
-    override fun batchDeleteRecords(id: Int): Boolean {
+    override fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
         TODO()
     }
 
     override fun deleteAllRecordsInCollection(collectionId: Int) {
     }
 
+    override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
+        TODO("Not yet implemented")
+    }
+
     override fun deleteCollectionButNotRecord() {
 
     }
     // endregion Delete
-
-    override fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
-        getRecordsToCollectionInfo(recordId, collectionId) != null
-
-    override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
-        TODO("Not yet implemented")
-    }
 }
