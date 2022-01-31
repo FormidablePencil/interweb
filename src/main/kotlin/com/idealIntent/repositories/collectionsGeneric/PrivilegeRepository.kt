@@ -1,15 +1,18 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.dtos.compositions.RecordUpdate
+import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.compositions.genericStructures.privileges.Privilege
+import dtos.collectionsGeneric.images.ImageToCollection
+import dtos.collectionsGeneric.privileges.AuthorToPrivilege
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthor
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthorCOL
 import dtos.compositions.genericStructures.privileges.PrivilegedAuthorIdentifiableRecordByCol
-import models.genericStructures.IPrivilegeEntity
 import models.genericStructures.PrivilegedAuthors
 import models.genericStructures.Privileges
+import models.privileges.IAuthorToPrivilegeEntity
+import models.privileges.IPrivilegeEntity
+import models.privileges.PrivilegesModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
@@ -17,11 +20,11 @@ import org.ktorm.entity.sequenceOf
 
 // todo privilege and privileges are used interchangeably. Fix this typo
 class PrivilegeRepository : RepositoryBase(),
-    ICollectionStructure<PrivilegedAuthor, IPrivilegeEntity, Privilege> {
-    private val Database.privileges get() = this.sequenceOf(Privileges)
+    ICollectionStructure<, AuthorToPrivilege, IAuthorToPrivilegeEntity, PrivilegesModel> {
+    private val Database.privileges get() = this.sequenceOf(PrivilegesModel)
 
     // region Get
-    override fun getCollectionOfRecords(id: Int): Privilege {
+    override fun getCollectionOfRecords(id: Int): AuthorToPrivilege {
         val privCol = Privileges.aliased("privCol")
         val priv = PrivilegedAuthors.aliased("priv")
 
@@ -37,7 +40,7 @@ class PrivilegeRepository : RepositoryBase(),
                     modLvl = row[priv.modLvl]!! // todo - might fail. error handling
                 )
             }
-        return Privilege(privilegesTo, privilegedAuthors)
+        return AuthorToPrivilege(privilegesTo, privilegedAuthors)
     }
 
     override fun validateRecordToCollectionRelationship(id: Int): IPrivilegeEntity? {
@@ -48,7 +51,7 @@ class PrivilegeRepository : RepositoryBase(),
 
     // region Insert
     // todo - creates new collection. rename insertNewRecord and insertNewRecord(privilegeId: Int). Do the same for CarouselRepo, ImageRepository, TextRepository
-    override fun insertNewRecord(record: PrivilegedAuthor, label: String): Int? {
+    override fun insertNewRecord(record: AuthorToPrivilege, label: String): Int? {
         val privilegeId = insertRecordCollection(label)
             ?: TODO("handle gracefully")
 
@@ -65,7 +68,7 @@ class PrivilegeRepository : RepositoryBase(),
         return privilegeId
     }
 
-    override fun insertRecord(record: PrivilegedAuthor, collectionId: Int): Boolean {
+    override fun insertRecord(record: AuthorToPrivilege, collectionId: Int): ImageToCollection? {
         return database.insert(PrivilegedAuthors) { // todo - test that all have been generated
             set(it.privilegeId, collectionId)
             set(it.authorId, record.authorId)
@@ -73,7 +76,7 @@ class PrivilegeRepository : RepositoryBase(),
         } != 0
     }
 
-    override fun batchInsertRecords(records: List<PrivilegedAuthor>, collectionId: Int): Boolean {
+    override fun batchInsertRecords(records: List<AuthorToPrivilege>, collectionId: Int): Boolean {
         database.batchInsert(PrivilegedAuthors) { // todo - test that all have been generated
             records.map { privilegedAuthor ->
                 item {
@@ -96,7 +99,8 @@ class PrivilegeRepository : RepositoryBase(),
 
     // region Update
     override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
-        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
+        val collection =
+            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
 
         val res = database.update(PrivilegedAuthors) {
             record.updateTo.map { updateCol ->
@@ -119,7 +123,8 @@ class PrivilegeRepository : RepositoryBase(),
     }
 
     override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
-        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
+        val collection =
+            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
 
         database.batchUpdate(PrivilegedAuthors) {
             records.map { record ->

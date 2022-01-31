@@ -1,15 +1,13 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.dtos.compositions.RecordUpdate
+import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.compositions.genericStructures.texts.Text
-import dtos.compositions.genericStructures.texts.TextCollection
-import dtos.compositions.genericStructures.texts.TextIdentifiableRecordByCol
-import dtos.compositions.genericStructures.texts.TextsCOL
-import models.genericStructures.ITextCollectionEntity
-import models.genericStructures.TextCollections
-import models.genericStructures.Texts
+import dtos.collectionsGeneric.texts.*
+import models.compositions.basicsCollections.texts.ITextToCollectionEntity
+import models.compositions.basicsCollections.texts.TextCollectionsModel
+import models.compositions.basicsCollections.texts.TextToCollectionsModel
+import models.compositions.basicsCollections.texts.TextsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
@@ -18,101 +16,104 @@ import org.ktorm.entity.sequenceOf
 /**
  * Responsible for text_collections and texts table
  */
-class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollectionEntity, TextCollection> {
-    private val Database.textCollections get() = this.sequenceOf(TextCollections)
-    private val Database.texts get() = this.sequenceOf(Texts)
+class TextRepository : RepositoryBase(),
+    ICollectionStructure<Text, ITextToCollectionEntity, TextToCollection, TextCollection> {
+    private val Database.textCollections get() = this.sequenceOf(TextCollectionsModel)
+    private val Database.textToCollections get() = this.sequenceOf(TextToCollectionsModel)
+    private val Database.texts get() = this.sequenceOf(TextsModel)
 
     // region Get
-    override fun getCollectionOfRecords(id: Int): TextCollection {
-        val textCol = TextCollections.aliased("textCol")
-        val text = Texts.aliased("text")
+    override fun getCollectionOfRecords(recordId: Int, collectionId: Int): TextCollection {
+        val itemCol = TextCollectionsModel.aliased("textCol")
+        val itemToCol = TextToCollectionsModel.aliased("textToCol")
+        val item = TextsModel.aliased("text")
 
         var label = ""
-        val texts = database.from(textCol)
-            .leftJoin(text, text.collectionId eq textCol.id)
-            .select(textCol.label, text.orderRank, text.orderRank, text.text)
-            .where { textCol.id eq id }
+        val texts = database.from(itemToCol)
+            .select(item.text, itemToCol.orderRank)
+            .where { (itemCol.id eq recordId) and (itemToCol.collectionId eq collectionId) }
             .map { row ->
-                label = row[textCol.label]!!
                 Text(
-                    orderRank = row[text.orderRank]!!,
-                    text = row[text.text]!!
+                    orderRank = row[itemToCol.orderRank]!!,
+                    text = row[item.text]!!
                 )
             }
         return TextCollection(label, texts)
     }
 
-    override fun validateRecordToCollectionRelationship(id: Int): ITextCollectionEntity? {
-        return database.textCollections.find { it.id eq id }
-    }
+    override fun getRecordsToCollectionInfo(recordId: Int, collectionId: Int): ITextToCollectionEntity? =
+        database.textToCollections.find { (it.textId eq recordId) and (it.collectionId eq collectionId) }
+
     // endregion Get
 
 
     // region Insert
-    override fun insertNewRecord(record: Text, label: String): Int? {
-        val collectionId = insertRecordCollection(label)
-            ?: return null
-
-        insertRecord(record, collectionId)
-
-        return collectionId
+    override fun insertNewRecord(record: Text): TextToCollection? {
+        TODO()
+//        val collectionId = insertRecordCollection(record)
+//            ?: return null
+//
+//        insertRecord(record, collectionId)
+//
+//        return collectionId
     }
 
-    override fun batchInsertNewRecords(records: List<Any>): Int? {
-        val collectionId = insertRecordCollection(label)
+    override fun batchInsertNewRecords(records: List<Text>): List<TextToCollection>? {
+        TODO()
+        val collectionId = addRecordCollection()
             ?: return null
 
         batchInsertRecords(records, collectionId)
-
-        return collectionId
     }
 
-    override fun insertRecord(record: Text, collectionId: Int): Boolean {
-        return database.insert(Texts) { // todo - validate idsOfTexts
-            set(it.orderRank, record.orderRank)
+    override fun insertRecord(record: Text, collectionId: Int): TextToCollection? {
+        TODO()
+        database.insert(TextsModel) { // todo - validate idsOfTexts
+//            set(it.orderRank, record.orderRank)
             set(it.text, record.text)
-            set(it.collectionId, collectionId)
+//            set(it.collectionId, collectionId)
         } != 0
     }
 
-    override fun batchInsertRecords(records: List<Text>, collectionId: Int): Boolean {
-        val effectedRows = database.batchInsert(Texts) { // todo - validate idsOfTexts
+    override fun batchInsertRecords(records: List<Text>, collectionId: Int): List<TextToCollection>? {
+        TODO()
+        val effectedRows = database.batchInsert(TextsModel) { // todo - validate idsOfTexts
             records.map { text ->
                 item {
-                    set(it.orderRank, text.orderRank)
+//                    set(it.orderRank, text.orderRank)
                     set(it.text, text.text)
-                    set(it.collectionId, collectionId)
+//                    set(it.collectionId, collectionId)
                 }
             }
         }
         effectedRows // todo - handle create all or create non here
-        return false
+
     }
 
-    override fun insertRecordCollection(label: String): Int {
-        return database.insertAndGenerateKey(TextCollections) {
-            set(it.label, label)
-        } as Int? ?: TODO("no reason to fail, therefore return Int or throw ServerError and log Exception")
-    }
+    override fun addRecordCollection(): Int =
+        database.insertAndGenerateKey(TextCollectionsModel) { } as Int?
+            ?: TODO("no reason to fail, therefore return Int or throw ServerError and log Exception")
     // endregion Insert
 
 
     // region Update
     override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
-        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle gracefully
+//        val collection =
+//            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle gracefully
 
-        database.update(Texts) {
+        database.update(TextsModel) {
             record.updateTo.map { recordCol ->
                 when (TextsCOL.fromInt(recordCol.column)) {
                     TextsCOL.Text -> set(it.text, recordCol.value)
-                    TextsCOL.OrderRank -> set(it.orderRank, recordCol.value.toInt()) // todo - may fail
+//                    TextsCOL.OrderRank -> set(it.orderRank, recordCol.value.toInt()) // todo - may fail
                     // todo - toInt() may fail
                 }
             }
             where {
                 when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
                     TextIdentifiableRecordByCol.OrderRank ->
-                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
+                        TODO()
+//                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
                 } // todo - handle incorrect recordIdentifiableByCol gracefully
                 // todo - handle failure gracefully
             }
@@ -121,22 +122,23 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
     }
 
     override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
-        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - hadle gracefully
+//        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - hadle gracefully
 
-        database.batchUpdate(Texts) {
+        database.batchUpdate(TextsModel) {
             records.map { record ->
                 item {
                     record.updateTo.map { updateCol ->
                         when (TextsCOL.fromInt(updateCol.column)) {
                             TextsCOL.Text -> set(it.text, updateCol.value)
-                            TextsCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
+//                            TextsCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
                             // todo - toInt() may fail, handle gracefully
                         }
                     }
                     where {
                         when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
                             TextIdentifiableRecordByCol.OrderRank ->
-                                (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
+                                TODO()
+//                                (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
                         } // todo - handle incorrect recordIdentifiableByCol gracefully
                     }
                 }
@@ -165,4 +167,11 @@ class TextRepository : RepositoryBase(), ICollectionStructure<Text, ITextCollect
         TODO("Not yet implemented")
     }
     // endregion Delete
+
+    override fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
+        getRecordsToCollectionInfo(recordId, collectionId) != null
+
+    override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
+        TODO("Not yet implemented")
+    }
 }

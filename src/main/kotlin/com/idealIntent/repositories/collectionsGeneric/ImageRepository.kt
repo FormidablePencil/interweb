@@ -22,7 +22,7 @@ import org.ktorm.entity.sequenceOf
  * Responsible for image_collections and images table
  */
 class ImageRepository : RepositoryBase(),
-    ICollectionStructure<Image, IImageToCollectionEntity, ImageCollection> {
+    ICollectionStructure<Image, IImageToCollectionEntity, ImageToCollection, ImageCollection> {
     private val Database.imageCollections get() = this.sequenceOf(ImageCollectionsModel)
     private val Database.imageToCollections get() = this.sequenceOf(ImageToCollectionsModel)
     private val Database.images get() = this.sequenceOf(ImagesModel)
@@ -37,7 +37,7 @@ class ImageRepository : RepositoryBase(),
         val images = database.from(imgToCol) // should automatically join
 ////            .leftJoin(img, img.collectionId eq imgToCol.id)
 ////            .leftJoin(img, img.collectionId eq imgToCol.id)
-            .select(imgCol.id, imgToCol.orderRank, img.url, img.url)
+            .select(imgCol.id, imgToCol.orderRank, img.url)
             .where { (img.id eq imgToCol.imageId) and (imgCol.id eq imgToCol.collectionId) }
             .map { row ->
                 Image(
@@ -122,7 +122,6 @@ class ImageRepository : RepositoryBase(),
     }
 
     override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
-
         database.batchUpdate(ImagesModel) {
             records.map { record ->
 //                val collection = validateRecordToCollectionRelationship(record.recordId, collectionId) ?: return false // handle gracefully

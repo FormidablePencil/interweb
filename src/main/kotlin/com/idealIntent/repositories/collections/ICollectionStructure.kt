@@ -1,20 +1,19 @@
 package com.idealIntent.repositories.collections
 
 import com.idealIntent.dtos.compositions.RecordUpdate
-import dtos.collectionsGeneric.images.ImageToCollection
-import models.compositions.basicsCollections.images.IImageToCollectionEntity
 
 /**
  * Structure for CRUD operations on compositions' collections
  *
  * Methods of this interface is applicable only to low level specific such as ImageCollection, TextCollection and PrivilegesCollection
  *
- * @param Record Generic type for data such as Image, Text, PrivilegedAuthor, etc.
- * @param RecordToCollection Metadata of collection such as ImageCollection, TextCollection, PrivilegesCollection, etc.
- * @param Collection DTO collection of Records.
+ * @param Record DTO for Generic type for data such as Image, Text, PrivilegedAuthor, etc.
+ * @param RecordToCollectionEntity Entity of collection table that hold the relationship between a record and collection by their ids.
+ * @param RecordToCollection DTO for [RecordToCollectionEntity].
+ * @param CollectionOfRecords DTO of [Record]s.
  * @constructor Create empty structure for collections
  */
-interface ICollectionStructure<Record, RecordToCollection, Collection> {
+interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollection, CollectionOfRecords> {
 
     // region Get
     /**
@@ -23,7 +22,7 @@ interface ICollectionStructure<Record, RecordToCollection, Collection> {
      * @param id Get records under collection's id
      * @return Records under [id] or null if failed to find by [id]
      */
-    fun getCollectionOfRecords(recordId: Int, collectionId: Int): Collection
+    fun getCollectionOfRecords(recordId: Int, collectionId: Int): CollectionOfRecords
 
     /**
      * Get records to collection info
@@ -31,7 +30,7 @@ interface ICollectionStructure<Record, RecordToCollection, Collection> {
      * @param recordId []
      * @param collectionId
      */
-    fun getRecordsToCollectionInfo(recordId: Int, collectionId: Int): IImageToCollectionEntity?
+    fun getRecordsToCollectionInfo(recordId: Int, collectionId: Int): RecordToCollectionEntity?
     // endregion Get
 
 
@@ -43,7 +42,7 @@ interface ICollectionStructure<Record, RecordToCollection, Collection> {
      * @return An id of newly created collection, id of image and image rank position to
      * discern image id of or null if failed to insert [record]
      */
-    fun insertNewRecord(record: Record): ImageToCollection?
+    fun insertNewRecord(record: Record): RecordToCollection?
 
     /**
      * Batch insert [records] and add a relationship between [records] and a new collection.
@@ -52,7 +51,7 @@ interface ICollectionStructure<Record, RecordToCollection, Collection> {
      * @return An id of newly created collection, ids of images and images rank position to
      * discern images ids of or null if failed to insert [records]
      */
-    fun batchInsertNewRecords(records: List<Record>): List<ImageToCollection>?
+    fun batchInsertNewRecords(records: List<Record>): List<RecordToCollection>?
 
     /**
      * Insert [record] and add a [record] to collection relationship by provided [collectionId].
@@ -62,7 +61,7 @@ interface ICollectionStructure<Record, RecordToCollection, Collection> {
      * @return Ids of record and collection and rank order to identify who's newly generated id is who's
      * or null if failed to insert [record].
      */
-    fun insertRecord(record: Record, collectionId: Int): ImageToCollection?
+    fun insertRecord(record: Record, collectionId: Int): RecordToCollection?
 
     /**
      * Batch insert [records] and add a [records] to collection relationship by provided [collectionId].
@@ -72,10 +71,12 @@ interface ICollectionStructure<Record, RecordToCollection, Collection> {
      * @return Ids of records and collection and image rank orders to identify who's newly generated id is who's
      * or null if failed to insert [records].
      */
-    fun batchInsertRecords(records: List<Record>, collectionId: Int): List<ImageToCollection>?
+    fun batchInsertRecords(records: List<Record>, collectionId: Int): List<RecordToCollection>?
 
     /**
      * Insert a new collection to associate records to.
+     *
+     * Method would have been private if it was not in [interface][ICollectionStructure].
      *
      * @return collection id
      */
