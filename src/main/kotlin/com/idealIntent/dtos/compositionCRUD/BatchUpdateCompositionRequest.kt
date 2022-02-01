@@ -1,6 +1,6 @@
 package com.idealIntent.dtos.compositionCRUD
 
-import dtos.compositions.IBatchUpdateComposition
+import dtos.compositionCRUD.IBatchUpdateComposition
 import kotlinx.serialization.Serializable
 
 @Serializable

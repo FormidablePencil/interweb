@@ -1,7 +1,7 @@
 package com.idealIntent.services
 
 import com.idealIntent.configurations.AppEnv
-import dtos.authorization.*
+import dtos.auth.*
 import dtos.failed
 import dtos.login.LoginBy
 import dtos.login.LoginRequest

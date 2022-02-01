@@ -1,7 +1,7 @@
 package com.idealIntent.managers
 
 import com.idealIntent.configurations.AppEnv
-import dtos.authorization.ResetPasswordResponse
+import dtos.auth.ResetPasswordResponse
 import dtos.succeeded
 import com.idealIntent.exceptions.ServerErrorException
 import io.ktor.http.*

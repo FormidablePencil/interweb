@@ -13,10 +13,10 @@ import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
-import dtos.authorization.LoginResponse
-import dtos.authorization.LoginResponseFailed
-import dtos.authorization.ResetPasswordResponse
-import dtos.authorization.TokensResponse
+import dtos.auth.LoginResponse
+import dtos.auth.LoginResponseFailed
+import dtos.auth.ResetPasswordResponse
+import dtos.auth.TokensResponse
 import dtos.responseData.ITokenResponseData
 import dtos.signup.SignupResponseFailed
 import dtos.succeeded

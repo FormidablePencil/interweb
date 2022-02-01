@@ -1,6 +1,6 @@
 package com.idealIntent.dtos.compositionCRUD
 
-import dtos.compositions.IUpdateColumn
+import dtos.compositionCRUD.IUpdateColumn
 import kotlinx.serialization.Serializable
 
 @Serializable

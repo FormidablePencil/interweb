@@ -1,6 +1,6 @@
 package integrationTests.auth.flows
 
-import dtos.authorization.LoginResponse
+import dtos.auth.LoginResponse
 import com.idealIntent.exceptions.ServerErrorException
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe

@@ -1,7 +1,7 @@
 package integrationTests.auth.tests
 
 import com.auth0.jwt.JWT
-import dtos.authorization.TokensResponseFailed
+import dtos.auth.TokensResponseFailed
 import dtos.responseData.ITokenResponseData
 import integrationTests.auth.flows.LoginFlow
 import integrationTests.auth.flows.SignupFlow

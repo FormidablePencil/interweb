@@ -3,8 +3,8 @@ package com.idealIntent.managers
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.idealIntent.configurations.AppEnv
-import dtos.authorization.TokensResponse
-import dtos.authorization.TokensResponseFailed
+import dtos.auth.TokensResponse
+import dtos.auth.TokensResponseFailed
 import dtos.failed
 import dtos.succeeded
 import io.ktor.http.*

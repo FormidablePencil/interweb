@@ -1,6 +1,6 @@
 package com.idealIntent.repositories.compositions.banners
 
-import dtos.compositions.banners.BannerBasic
+import com.idealIntent.dtos.compositions.banners.BannerBasic
 import com.idealIntent.repositories.RepositoryBase
 
 class BasicBannerRepository : RepositoryBase() {

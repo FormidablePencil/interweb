@@ -1,6 +1,6 @@
 package com.idealIntent.dtos.compositionCRUD
 
-import dtos.compositions.IUpdateWhereAt
+import dtos.compositionCRUD.IUpdateWhereAt
 import kotlinx.serialization.Serializable
 
 @Serializable

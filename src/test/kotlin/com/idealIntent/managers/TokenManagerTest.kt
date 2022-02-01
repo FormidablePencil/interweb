@@ -7,7 +7,7 @@ import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.auth.TokenResponseData
 import com.idealIntent.repositories.RefreshTokenRepository
 import com.typesafe.config.ConfigFactory
-import dtos.authorization.TokensResponseFailed
+import dtos.auth.TokensResponseFailed
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe

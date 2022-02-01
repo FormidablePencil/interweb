@@ -1,11 +1,11 @@
 package com.idealIntent.managers.compositions
 
 import com.google.gson.Gson
+import com.idealIntent.dtos.compositions.banners.BannerBasic
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImages
 import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.CompositionCategory
-import dtos.compositions.banners.BannerBasic
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImages
 import dtos.space.IUserComposition
 
 // todo - inserts, update and deletes in each composition manager
