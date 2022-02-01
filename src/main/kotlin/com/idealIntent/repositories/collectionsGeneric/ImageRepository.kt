@@ -43,7 +43,7 @@ class ImageRepository : RepositoryBase(),
         val itemToCol = ImageToCollectionsModel.aliased("imgToCol")
         val item = ImagesModel.aliased("img")
 
-        val images = database.from(ImageToCollectionsModel)
+        val images = database.from(itemToCol)
             .leftJoin(item, item.id eq itemToCol.imageId)
             .select(itemToCol.orderRank, itemToCol.imageId, item.url, item.description)
             .whereWithConditions {

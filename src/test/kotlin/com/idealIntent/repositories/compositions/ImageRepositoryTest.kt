@@ -4,17 +4,25 @@ import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
+import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.clearAllMocks
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
 
 class ImageRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(DIHelper.CoreModule))
+    override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
+    lateinit var imageRepository: ImageRepository
 
     init {
-        lateinit var imageRepository: ImageRepository
+        beforeEach {
+            clearAllMocks()
+            imageRepository = ImageRepository()
+        }
+
         val images = listOf(
             Image(
                 id = null,
@@ -42,10 +50,6 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
             ),
         )
 
-        beforeEach {
-            imageRepository = ImageRepository()
-        }
-
         // region Insert
         given("insertRecord") {
             And("addRecordCollection") {
@@ -63,7 +67,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                                 )
                             )
                             hasCreatedRelations shouldBe true
-                            imageRepository.getRecordOfCollection(resImage.id!!, resImage.id!!)
+                            imageRepository.getRecordOfCollection(resImage.id!!, collectionId)
                         }
                     }
                 }
@@ -71,8 +75,8 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("batchInsertRecords") {
-            then("addRecordCollection") {
-                then("createRecordToCollectionRelationship") {
+            And("addRecordCollection") {
+                And("createRecordToCollectionRelationship") {
                     then("getCollectionOfRecords") {
                         rollback {
                             val resImages = imageRepository.batchInsertRecords(images)
@@ -87,13 +91,13 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                             val res = imageRepository.getCollectionOfRecords(collectionId)
 
                             res shouldNotBe null
-                            res.images.size shouldBe images.size
                             print(res.images)
+                            res.images.size shouldBe images.size // todo - test fails because more than was given is returned
                             res.images.map {
                                 images.find { image ->
                                     image.orderRank == it.orderRank
                                             && image.description == it.description
-                                            &src/main/kotlin/models/authorization/PasswordsModel.kt& image.url == it.url
+                                            && image.url == it.url
                                 } ?: throw Exception("failed to find returned image")
                             }
                         }
@@ -101,13 +105,13 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                 }
             }
         }
-        // endregion
+        // endregion Insert
 
-        given("updateRecord") {
+        xgiven("updateRecord") {
             then("getComposition") {}
         }
 
-        given("batchUpdateRecords") {
+        xgiven("batchUpdateRecords") {
             then("getComposition") {}
         }
     }
