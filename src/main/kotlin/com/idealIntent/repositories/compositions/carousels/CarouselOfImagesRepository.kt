@@ -62,13 +62,14 @@ class CarouselOfImagesRepository(
 
     // region Insert
     override fun insertComposition(composition: CarouselBasicImages): Int? {
+        TODO()
         // region todo - could be in a caroutine
-        val imageCollectionId = imageRepository.batchInsertNewRecords(
-            composition.images
-        )
-        val navToTextCollectionId = textRepository.batchInsertNewRecords(
-            composition.navToCorrespondingImagesOrder
-        )
+//        val imageCollectionId = imageRepository.batchInsertNewRecords(
+//            composition.images
+//        )
+//        val navToTextCollectionId = textRepository.batchInsertNewRecords(
+//            composition.navToCorrespondingImagesOrder
+//        )
 //        val privilegeId = privilegeRepository.batchInsertNewRecords(
 //            composition.privilegedAuthors
 //        )
@@ -77,12 +78,12 @@ class CarouselOfImagesRepository(
         // todo - validate ids, println(ids)
 
         // todo - could be in a separate caroutine than the first in scope
-        return database.insertAndGenerateKey(ImagesCarouselsModel) {
-            set(it.imageCollectionId, imageCollectionId)
-//            set(it.navToTextCollectionId, navToTextCollectionId)
-//            set(it.privilegeId, privilegeId)
-//            set(it.title, composition.title)
-        } as Int?
+//        return database.insertAndGenerateKey(ImagesCarouselsModel) {
+//            set(it.imageCollectionId, imageCollectionId)
+////            set(it.navToTextCollectionId, navToTextCollectionId)
+////            set(it.privilegeId, privilegeId)
+////            set(it.title, composition.title)
+//        } as Int?
     }
 
     // endregion Insert

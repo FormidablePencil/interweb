@@ -1,3 +1,7 @@
+Todos in IW-data
+1. Move modules directory into interweb but keep the interface there.
+2. Don't rename dtos nor models. The project should just be known for interfaces.
+
 # Module InterWeb - Julia 
 This is the child module a
 

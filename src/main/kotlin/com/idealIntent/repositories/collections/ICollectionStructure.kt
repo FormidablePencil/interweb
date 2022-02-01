@@ -1,5 +1,6 @@
 package com.idealIntent.repositories.collections
 
+import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 
 /**
@@ -16,13 +17,26 @@ import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollection, CollectionOfRecords> {
 
     // region Get
+
+    /**
+     * Get a single record
+     *
+     * @param recordId
+     * @param collectionId Still pass id since records are constrained by privileges. Somewhere up the ladder there's a
+     * privilege to collection by [collectionId] validator.
+     * @return Single record or null if not found by [recordId]
+     */
+    fun getRecordOfCollection(recordId: Int, collectionId: Int): Record?
+
     /**
      * Get records by collection id.
      *
-     * @param id Get records under collection's id
-     * @return Records under [id] or null if failed to find by [id]
+     * @param collectionId Get records under collection's id
+     * @return Records under collection or null if failed to find by [collectionId]
      */
-    fun getCollectionOfRecords(recordId: Int, collectionId: Int): CollectionOfRecords
+    fun getCollectionOfRecords(collectionId: Int): CollectionOfRecords
+
+    fun getRecordsQuery(recordId: Int? = null, collectionId: Int): List<Record>
 
     /**
      * Get records to collection info.
@@ -30,11 +44,13 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @param recordId []
      * @param collectionId
      */
-    fun getRecordsToCollectionInfo(recordId: Int, collectionId: Int): RecordToCollectionEntity?
+    fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): RecordToCollectionEntity?
     // endregion Get
 
 
     // region Insert
+
+    // region todo - move to manager lvl
     /**
      * Insert [record] under a new collection
      *
@@ -42,7 +58,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @return An id of newly created collection, id of image and image rank position to
      * discern image id of or null if failed to insert [record]
      */
-    fun insertNewRecord(record: Record): RecordToCollection?
+//    fun insertNewRecord(record: Record): Int?
 
     /**
      * Batch insert [records] and add a relationship between [records] and a new collection.
@@ -51,27 +67,24 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @return An id of newly created collection, ids of images and images rank position to
      * discern images ids of or null if failed to insert [records]
      */
-    fun batchInsertNewRecords(records: List<Record>): List<RecordToCollection>?
+//    fun batchInsertNewRecords(records: List<Record>): List<Int>?
+    // endregion
 
     /**
-     * Insert [record] and add a [record] to collection relationship by provided [collectionId].
+     * Insert [record] and return [record] with a generated id.
      *
      * @param record
-     * @param collectionId The id of collection to associate [record] under.
-     * @return Ids of record and collection and rank order to identify who's newly generated id is who's
-     * or null if failed to insert [record].
+     * @return Add generated id to [record] and return it or null if failed.
      */
-    fun insertRecord(record: Record, collectionId: Int): RecordToCollection?
+    fun insertRecord(record: Record): Record?
 
     /**
-     * Batch insert [records] and add a [records] to collection relationship by provided [collectionId].
+     * Insert [records] and return [records] with a generated ids.
      *
      * @param records
-     * @param collectionId The id of collection to associate [records] under.
-     * @return Ids of records and collection and image rank orders to identify who's newly generated id is who's
-     * or null if failed to insert [records].
+     * @return Add generated ids corresponding to [records] and return it or null if failed.
      */
-    fun batchInsertRecords(records: List<Record>, collectionId: Int): List<RecordToCollection>?
+    fun batchInsertRecords(records: List<Record>): List<Record>
 
     /**
      * Insert a new collection to associate records to.
@@ -81,6 +94,23 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @return collection id
      */
     fun addRecordCollection(): Int
+
+    /**
+     * Batch create record to collection relationship
+     *
+     * @param images
+     * @param collectionId
+     * @return Success or fail
+     */
+    fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean
+
+    /**
+     * Create record to collection relationship
+     *
+     * @param recordToCollection record to collection association
+     * @return Success or fail
+     */
+    fun createRecordToCollectionRelationship(recordToCollection: RecordToCollection): Boolean
     // endregion Insert
 
 
@@ -139,5 +169,5 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * Method would have been private if it wasn't of [interface][ICollectionStructure].
      */
     fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
-        getRecordsToCollectionInfo(recordId, collectionId) != null
+        getRecordToCollectionInfo(recordId, collectionId) != null
 }

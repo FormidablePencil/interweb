@@ -13,7 +13,7 @@ import models.compositions.basicsCollections.images.IImage
  */
 @Serializable
 data class Image(
-    override val id: Int?,
+    override var id: Int?,
     override val orderRank: Int,
     override val url: String,
     override val description: String,

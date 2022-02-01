@@ -28,30 +28,40 @@ class ImageRepository : RepositoryBase(),
     private val Database.images get() = this.sequenceOf(ImagesModel)
 
     // region Get
-    override fun getCollectionOfRecords(recordId: Int, collectionId: Int): ImageCollection {
+    override fun getRecordOfCollection(recordId: Int, collectionId: Int): Image? {
+        val images = getRecordsQuery(recordId, collectionId)
+        return if (images.isNotEmpty()) images.first() else null
+    }
+
+    override fun getCollectionOfRecords(collectionId: Int): ImageCollection {
         // todo - check privileges if allowed for any author or whether authorId is privileged
-        val imgCol = ImageCollectionsModel.aliased("imgCol")
-        val imgToCol = ImageToCollectionsModel.aliased("imgToCol")
-        val img = ImagesModel.aliased("img")
-
-        val images = database.from(imgToCol) // should automatically join
-////            .leftJoin(img, img.collectionId eq imgToCol.id)
-////            .leftJoin(img, img.collectionId eq imgToCol.id)
-            .select(imgCol.id, imgToCol.orderRank, img.url)
-            .where { (img.id eq imgToCol.imageId) and (imgCol.id eq imgToCol.collectionId) }
-            .map { row ->
-                Image(
-                    id = row[imgToCol.imageId]!!,
-                    orderRank = row[imgToCol.orderRank]!!,
-                    description = row[img.description]!!,
-                    url = row[img.url]!!
-                )
-            }
-
+        val images = getRecordsQuery(null, collectionId)
         return ImageCollection(collectionId, images)
     }
 
-    override fun getRecordsToCollectionInfo(recordId: Int, collectionId: Int): IImageToCollectionEntity? =
+    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<Image> {
+        val itemToCol = ImageToCollectionsModel.aliased("imgToCol")
+        val item = ImagesModel.aliased("img")
+
+        val images = database.from(ImageToCollectionsModel)
+            .leftJoin(item, item.id eq itemToCol.imageId)
+            .select(itemToCol.orderRank, itemToCol.imageId, item.url, item.description)
+            .whereWithConditions {
+                (item.id eq itemToCol.imageId) and (itemToCol.collectionId eq collectionId)
+                if (recordId != null) it += (item.id eq recordId)
+            }
+            .map { row ->
+                Image(
+                    id = row[itemToCol.imageId]!!,
+                    orderRank = row[itemToCol.orderRank]!!,
+                    description = row[item.description]!!,
+                    url = row[item.url]!!
+                )
+            }
+        return images
+    }
+
+    override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): IImageToCollectionEntity? =
         database.imageToCollections.find { (it.imageId eq recordId) and (it.collectionId eq collectionId) }
 
     // todo - todo if there are multiple records under the ids
@@ -59,37 +69,48 @@ class ImageRepository : RepositoryBase(),
 
 
     // region Insert
-    override fun insertNewRecord(record: Image): ImageToCollection? =
-        insertRecord(record, addRecordCollection())
-
-    // todo = check mod privileges (maybe at manager level)
-    override fun batchInsertNewRecords(records: List<Image>): List<ImageToCollection>? =
-        batchInsertRecords(records, addRecordCollection())
-
-    override fun insertRecord(record: Image, collectionId: Int): ImageToCollection? {
-        val imageId = database.insertAndGenerateKey(ImagesModel) {
+    override fun insertRecord(record: Image): Image? {
+        val id = database.insertAndGenerateKey(ImagesModel) {
             set(it.description, record.description)
             set(it.url, record.url)
         } as Int? ?: return null
-
-        val rowOfColEffected = database.insert(ImageToCollectionsModel) {
-            set(it.collectionId, collectionId)
-            set(it.imageId, imageId)
-            set(it.orderRank, collectionId)
-        } as Int != 0
-        return if (rowOfColEffected) null  // todo - and revert image insertion
-        else ImageToCollection(orderRank = record.orderRank, collectionId = collectionId, imageId = imageId)
+        record.id = id
+        return record
     }
 
-    override fun batchInsertRecords(records: List<Image>, collectionId: Int): List<ImageToCollection>? =
+    override fun batchInsertRecords(records: List<Image>): List<Image> =
         records.map {
-            return@map insertRecord(it, collectionId)
+            return@map insertRecord(it)
                 ?: TODO("throw exception of one fails. Either one inserts or non do.")
         }
 
     override fun addRecordCollection(): Int =
         database.insertAndGenerateKey(ImageCollectionsModel) {} as Int?
             ?: throw ServerErrorException("failed to create ImageCollection (should always succeed)", this::class.java)
+
+    override fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean {
+        images.map {
+            if (it.id == null) TODO("terminate batch completely")
+            val succeed = createRecordToCollectionRelationship(
+                ImageToCollection(
+                    orderRank = it.orderRank,
+                    collectionId = collectionId,
+                    imageId = it.id!!
+                )
+            )
+            if (!succeed) TODO("terminate batch completely")
+        }
+        return true
+    }
+
+    override fun createRecordToCollectionRelationship(recordToCollection: ImageToCollection): Boolean =
+        database.insert(ImageToCollectionsModel) {
+            set(it.collectionId, recordToCollection.collectionId)
+            set(it.imageId, recordToCollection.imageId)
+            set(it.orderRank, recordToCollection.orderRank)
+        } != 0
+
+//    else ImageToCollection(orderRank = record.orderRank, collectionId = collectionId, imageId = imageId)
     // endregion Insert
 
 

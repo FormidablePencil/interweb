@@ -1,5 +1,6 @@
 package com.idealIntent.repositories.collectionsGeneric
 
+import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.privileges.AuthorToPrivilege
 import com.idealIntent.dtos.collectionsGeneric.privileges.Privilege
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
@@ -20,7 +21,7 @@ class PrivilegeRepository : RepositoryBase(),
     private val Database.authorToPrivileges get() = this.sequenceOf(AuthorToPrivilegesModel)
 
     // region Get
-    override fun getCollectionOfRecords(recordId: Int, collectionId: Int): Privilege {
+    override fun getCollectionOfRecords(collectionId: Int): Privilege {
         TODO()
 //        val privCol = Privileges.aliased("privCol")
 //        val priv = PrivilegedAuthors.aliased("priv")
@@ -40,33 +41,14 @@ class PrivilegeRepository : RepositoryBase(),
 //        return AuthorToPrivilege(privilegesTo, privilegedAuthors)
     }
 
-    override fun getRecordsToCollectionInfo(recordId: Int, collectionId: Int): IAuthorToPrivilegeEntity? {
+    override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): IAuthorToPrivilegeEntity? {
         TODO()
     }
     // endregion Get
 
 
     // region Insert
-    // todo - creates new collection. rename insertNewRecord and insertNewRecord(privilegeId: Int). Do the same for CarouselRepo, ImageRepository, TextRepository
-    override fun insertNewRecord(record: PrivilegeRecord): AuthorToPrivilege? {
-        TODO()
-//        val privilegeId = insertRecordCollection(label)
-//            ?: TODO("handle gracefully")
-//
-//        val id = insertRecord(record, privilegeId)
-    }
-
-    override fun batchInsertNewRecords(records: List<PrivilegeRecord>): List<AuthorToPrivilege>? {
-        TODO()
-//        val privilegeId = insertRecordCollection(privilegesTo)
-//            ?: TODO("handle gracefully")
-//
-//        val ids = batchInsertRecords(records, privilegeId)
-//            ?: TODO("handle gracefully. Insert all or insert non")
-//        return privilegeId
-    }
-
-    override fun insertRecord(record: PrivilegeRecord, collectionId: Int): AuthorToPrivilege? {
+    override fun insertRecord(record: PrivilegeRecord): PrivilegeRecord? {
         TODO()
 //        return database.insert(PrivilegedAuthors) { // todo - test that all have been generated
 //            set(it.privilegeId, collectionId)
@@ -75,7 +57,7 @@ class PrivilegeRepository : RepositoryBase(),
 //        } != 0
     }
 
-    override fun batchInsertRecords(records: List<PrivilegeRecord>, collectionId: Int): List<AuthorToPrivilege>? {
+    override fun batchInsertRecords(records: List<PrivilegeRecord>): List<PrivilegeRecord> {
         TODO()
 //        database.batchInsert(PrivilegedAuthors) { // todo - test that all have been generated
 //            records.map { privilegedAuthor ->
@@ -167,6 +149,22 @@ class PrivilegeRepository : RepositoryBase(),
     }
 
     override fun deleteCollectionButNotRecord() {
+        TODO("Not yet implemented")
+    }
+
+    override fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun createRecordToCollectionRelationship(recordToCollection: AuthorToPrivilege): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRecordOfCollection(recordId: Int, collectionId: Int): PrivilegeRecord? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<PrivilegeRecord> {
         TODO("Not yet implemented")
     }
     // endregion Delete

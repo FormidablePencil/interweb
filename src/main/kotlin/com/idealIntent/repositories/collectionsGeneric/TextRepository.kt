@@ -1,5 +1,6 @@
 package com.idealIntent.repositories.collectionsGeneric
 
+import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextCollection
 import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
@@ -32,7 +33,7 @@ class TextRepository : RepositoryBase(),
     private val Database.texts get() = this.sequenceOf(TextsModel)
 
     // region Get
-    override fun getCollectionOfRecords(recordId: Int, collectionId: Int): TextCollection {
+    override fun getCollectionOfRecords(collectionId: Int): TextCollection {
         val itemCol = TextCollectionsModel.aliased("textCol")
         val itemToCol = TextToCollectionsModel.aliased("textToCol")
         val item = TextsModel.aliased("text")
@@ -40,7 +41,7 @@ class TextRepository : RepositoryBase(),
         var label = ""
         val texts = database.from(itemToCol)
             .select(item.text, itemToCol.orderRank)
-            .where { (itemCol.id eq recordId) and (itemToCol.collectionId eq collectionId) }
+            .where { (itemToCol.collectionId eq collectionId) }
             .map { row ->
                 Text(
                     orderRank = row[itemToCol.orderRank]!!,
@@ -50,32 +51,14 @@ class TextRepository : RepositoryBase(),
         return TextCollection(label, texts)
     }
 
-    override fun getRecordsToCollectionInfo(recordId: Int, collectionId: Int): ITextToCollectionEntity? =
+    override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): ITextToCollectionEntity? =
         database.textToCollections.find { (it.textId eq recordId) and (it.collectionId eq collectionId) }
 
     // endregion Get
 
 
     // region Insert
-    override fun insertNewRecord(record: Text): TextToCollection? {
-        TODO()
-//        val collectionId = insertRecordCollection(record)
-//            ?: return null
-//
-//        insertRecord(record, collectionId)
-//
-//        return collectionId
-    }
-
-    override fun batchInsertNewRecords(records: List<Text>): List<TextToCollection>? {
-        TODO()
-        val collectionId = addRecordCollection()
-            ?: return null
-
-        batchInsertRecords(records, collectionId)
-    }
-
-    override fun insertRecord(record: Text, collectionId: Int): TextToCollection? {
+    override fun insertRecord(record: Text): Text? {
         TODO()
         database.insert(TextsModel) { // todo - validate idsOfTexts
 //            set(it.orderRank, record.orderRank)
@@ -84,7 +67,7 @@ class TextRepository : RepositoryBase(),
         } != 0
     }
 
-    override fun batchInsertRecords(records: List<Text>, collectionId: Int): List<TextToCollection>? {
+    override fun batchInsertRecords(records: List<Text>): List<Text> {
         TODO()
         val effectedRows = database.batchInsert(TextsModel) { // todo - validate idsOfTexts
             records.map { text ->
@@ -177,6 +160,22 @@ class TextRepository : RepositoryBase(),
     }
 
     override fun deleteCollectionButNotRecord() {
+        TODO("Not yet implemented")
+    }
+
+    override fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun createRecordToCollectionRelationship(recordToCollection: TextToCollection): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRecordOfCollection(recordId: Int, collectionId: Int): Text? {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<Text> {
         TODO("Not yet implemented")
     }
     // endregion Delete
