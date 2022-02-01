@@ -1,9 +1,13 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.dtos.compositions.RecordUpdate
+import com.idealIntent.dtos.collectionsGeneric.texts.Text
+import com.idealIntent.dtos.collectionsGeneric.texts.TextCollection
+import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
+import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.collectionsGeneric.texts.*
+import dtos.collectionsGeneric.texts.TextIdentifiableRecordByCol
+import dtos.collectionsGeneric.texts.TextsCOL
 import models.compositions.basicsCollections.texts.ITextToCollectionEntity
 import models.compositions.basicsCollections.texts.TextCollectionsModel
 import models.compositions.basicsCollections.texts.TextToCollectionsModel

@@ -1,10 +1,10 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.dtos.compositions.RecordUpdate
+import com.idealIntent.dtos.collectionsGeneric.privileges.AuthorToPrivilege
+import com.idealIntent.dtos.collectionsGeneric.privileges.Privilege
+import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.collectionsGeneric.privileges.AuthorToPrivilege
-import dtos.collectionsGeneric.privileges.Privilege
 import models.privileges.AuthorToPrivilegesModel
 import models.privileges.IAuthorToPrivilegeEntity
 import models.privileges.PrivilegesModel

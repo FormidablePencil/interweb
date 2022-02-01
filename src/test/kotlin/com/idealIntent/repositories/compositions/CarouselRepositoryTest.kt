@@ -5,10 +5,9 @@ import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
-import dtos.collectionsGeneric.images.Image
-import dtos.collectionsGeneric.privileges.AuthorToPrivilege
-import dtos.collectionsGeneric.texts.Text
-import dtos.compositions.carousels.CarouselBasicImages
+import com.idealIntent.dtos.collectionsGeneric.images.Image
+
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImages
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import shared.testUtils.BehaviorSpecUtRepo

@@ -1,6 +1,6 @@
 package com.idealIntent.repositories.collections
 
-import com.idealIntent.dtos.compositions.RecordUpdate
+import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 
 /**
  * Structure for CRUD operations on compositions' collections

@@ -1,10 +1,10 @@
 package com.idealIntent.services
 
 import com.google.gson.Gson
-import com.idealIntent.dtos.compositions.BatchUpdateCompositionRequest
-import com.idealIntent.dtos.compositions.BatchUpdateCompositionsRequest
-import com.idealIntent.dtos.compositions.SingleUpdateCompositionRequest
-import com.idealIntent.dtos.compositions.UpdateCompositionRequest
+import com.idealIntent.dtos.compositionCRUD.BatchUpdateCompositionRequest
+import com.idealIntent.dtos.compositionCRUD.BatchUpdateCompositionsRequest
+import com.idealIntent.dtos.compositionCRUD.SingleUpdateCompositionRequest
+import com.idealIntent.dtos.compositionCRUD.UpdateCompositionRequest
 import com.idealIntent.managers.CompositionManager
 import com.idealIntent.repositories.SpaceRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository

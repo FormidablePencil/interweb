@@ -1,4 +1,4 @@
-package com.idealIntent.dtos.compositions
+package com.idealIntent.dtos.compositionCRUD
 
 import kotlinx.serialization.Serializable
 

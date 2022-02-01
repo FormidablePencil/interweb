@@ -1,12 +1,12 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.dtos.compositions.RecordUpdate
+import com.idealIntent.dtos.collectionsGeneric.images.Image
+import com.idealIntent.dtos.collectionsGeneric.images.ImageCollection
+import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
+import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.ServerErrorException
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.collectionsGeneric.images.Image
-import dtos.collectionsGeneric.images.ImageCollection
-import dtos.collectionsGeneric.images.ImageToCollection
 import dtos.collectionsGeneric.images.ImagesCOL
 import models.compositions.basicsCollections.images.IImageToCollectionEntity
 import models.compositions.basicsCollections.images.ImageCollectionsModel
