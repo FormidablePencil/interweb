@@ -1,6 +1,5 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.privileges.AuthorToPrivilege
 import com.idealIntent.dtos.collectionsGeneric.privileges.Privilege
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
@@ -21,7 +20,7 @@ class PrivilegeRepository : RepositoryBase(),
     private val Database.authorToPrivileges get() = this.sequenceOf(AuthorToPrivilegesModel)
 
     // region Get
-    override fun getCollectionOfRecords(collectionId: Int): Privilege {
+    override fun getCollectionOfRecords(collectionId: Int):  Pair<List<PrivilegeRecord>, Int> {
         TODO()
 //        val privCol = Privileges.aliased("privCol")
 //        val priv = PrivilegedAuthors.aliased("priv")
@@ -152,7 +151,7 @@ class PrivilegeRepository : RepositoryBase(),
         TODO("Not yet implemented")
     }
 
-    override fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean {
+    override fun batchCreateRecordToCollectionRelationship(records: List<PrivilegeRecord>, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 

@@ -28,17 +28,6 @@ class ImageRepository : RepositoryBase(),
     private val Database.images get() = this.sequenceOf(ImagesModel)
 
     // region Get
-    override fun getRecordOfCollection(recordId: Int, collectionId: Int): Image? {
-        val images = getRecordsQuery(recordId, collectionId)
-        return if (images.isNotEmpty()) images.first() else null
-    }
-
-    override fun getCollectionOfRecords(collectionId: Int): ImageCollection {
-        // todo - check privileges if allowed for any author or whether authorId is privileged
-        val images = getRecordsQuery(null, collectionId)
-        return ImageCollection(collectionId, images)
-    }
-
     override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<Image> {
         val itemToCol = ImageToCollectionsModel.aliased("imgToCol")
         val item = ImagesModel.aliased("img")
@@ -63,8 +52,6 @@ class ImageRepository : RepositoryBase(),
 
     override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): IImageToCollectionEntity? =
         database.imageToCollections.find { (it.imageId eq recordId) and (it.collectionId eq collectionId) }
-
-    // todo - todo if there are multiple records under the ids
     // endregion Get
 
 
@@ -85,11 +72,11 @@ class ImageRepository : RepositoryBase(),
         }
 
     override fun addRecordCollection(): Int =
-        database.insertAndGenerateKey(ImageCollectionsModel) {} as Int?
+        database.insertAndGenerateKey(ImageCollectionsModel) { } as Int?
             ?: throw ServerErrorException("failed to create ImageCollection (should always succeed)", this::class.java)
 
-    override fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean {
-        images.map {
+    override fun batchCreateRecordToCollectionRelationship(records: List<Image>, collectionId: Int): Boolean {
+        records.map {
             if (it.id == null) TODO("terminate batch completely")
             val succeed = createRecordToCollectionRelationship(
                 ImageToCollection(
@@ -109,8 +96,6 @@ class ImageRepository : RepositoryBase(),
             set(it.imageId, recordToCollection.imageId)
             set(it.orderRank, recordToCollection.orderRank)
         } != 0
-
-//    else ImageToCollection(orderRank = record.orderRank, collectionId = collectionId, imageId = imageId)
     // endregion Insert
 
 

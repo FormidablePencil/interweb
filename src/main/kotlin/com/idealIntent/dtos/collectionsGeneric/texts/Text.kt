@@ -1,7 +1,12 @@
 package com.idealIntent.dtos.collectionsGeneric.texts
 
 import kotlinx.serialization.Serializable
+import models.IWithOrder
 import models.compositions.basicsCollections.texts.IText
 
 @Serializable
-data class Text(override val text: String, override val orderRank: Int) : IText
+data class Text(
+    override var id: Int?,
+    override val orderRank: Int,
+    override val text: String,
+) : IText, IWithOrder

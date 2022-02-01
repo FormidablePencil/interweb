@@ -1,6 +1,5 @@
 package com.idealIntent.repositories.collections
 
-import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 
 /**
@@ -26,7 +25,10 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * privilege to collection by [collectionId] validator.
      * @return Single record or null if not found by [recordId]
      */
-    fun getRecordOfCollection(recordId: Int, collectionId: Int): Record?
+    fun getRecordOfCollection(recordId: Int, collectionId: Int): Record? {
+        val records = getRecordsQuery(recordId, collectionId)
+        return if (records.isNotEmpty()) records.first() else null
+    }
 
     /**
      * Get records by collection id.
@@ -34,7 +36,11 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @param collectionId Get records under collection's id
      * @return Records under collection or null if failed to find by [collectionId]
      */
-    fun getCollectionOfRecords(collectionId: Int): CollectionOfRecords
+    fun getCollectionOfRecords(collectionId: Int): Pair<List<Record>, Int> {
+        // todo - check privileges if allowed for any author or whether authorId is privileged
+        val images = getRecordsQuery(null, collectionId)
+        return Pair(images, collectionId)
+    }
 
     fun getRecordsQuery(recordId: Int? = null, collectionId: Int): List<Record>
 
@@ -98,11 +104,11 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
     /**
      * Batch create record to collection relationship
      *
-     * @param images
+     * @param records
      * @param collectionId
      * @return Success or fail
      */
-    fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean
+    fun batchCreateRecordToCollectionRelationship(records: List<Record>, collectionId: Int): Boolean
 
     /**
      * Create record to collection relationship

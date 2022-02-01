@@ -25,28 +25,28 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
 
         val images = listOf(
             Image(
-                id = null,
-                orderRank = 10000,
-                description = "PAO Mnemonic System",
-                url = " https://i.ibb.co/1K7jQJw/pao.png"
+                null,
+                10000,
+                "PAO Mnemonic System",
+                " https://i.ibb.co/1K7jQJw/pao.png"
             ),
             Image(
-                id = null,
-                orderRank = 20000,
-                description = "Emoji Tack Toes",
-                url = "https://i.ibb.co/pXgcQ16/ticktacktoe.png"
+                null,
+                20000,
+                "Emoji Tack Toes",
+                "https://i.ibb.co/pXgcQ16/ticktacktoe.png"
             ),
             Image(
-                id = null,
-                orderRank = 30000,
-                description = "Crackalackin",
-                url = "https://i.ibb.co/4YP7yDb/crackalackin.png"
+                null,
+                30000,
+                "Crackalackin",
+                "https://i.ibb.co/4YP7yDb/crackalackin.png"
             ),
             Image(
-                id = null,
-                orderRank = 40000,
-                description = "Pokedex",
-                url = "https://i.ibb.co/w0m4pF3/pokedex.png"
+                null,
+                40000,
+                "Pokedex",
+                "https://i.ibb.co/w0m4pF3/pokedex.png"
             ),
         )
 
@@ -56,18 +56,18 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                 And("createRecordToCollectionRelationship") {
                     then("getRecordOfCollection") {
                         rollback {
-                            val resImage = imageRepository.insertRecord(images[0])
+                            val resRecords = imageRepository.insertRecord(images[0])
                                 ?: throw Exception("failed to insert image")
                             val collectionId = imageRepository.addRecordCollection()
                             val hasCreatedRelations = imageRepository.createRecordToCollectionRelationship(
                                 ImageToCollection(
-                                    imageId = resImage.id!!,
+                                    imageId = resRecords.id!!,
                                     collectionId = collectionId,
-                                    orderRank = resImage.orderRank
+                                    orderRank = resRecords.orderRank
                                 )
                             )
                             hasCreatedRelations shouldBe true
-                            imageRepository.getRecordOfCollection(resImage.id!!, collectionId)
+                            imageRepository.getRecordOfCollection(resRecords.id!!, collectionId)
                         }
                     }
                 }
@@ -79,25 +79,25 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                 And("createRecordToCollectionRelationship") {
                     then("getCollectionOfRecords") {
                         rollback {
-                            val resImages = imageRepository.batchInsertRecords(images)
-                            resImages.map { it.id shouldNotBe null }
+                            val resRecords = imageRepository.batchInsertRecords(images)
+                            resRecords.map { it.id shouldNotBe null }
 
                             val collectionId = imageRepository.addRecordCollection()
 
                             val hasCreatedRelations =
-                                imageRepository.batchCreateRecordToCollectionRelationship(resImages, collectionId)
+                                imageRepository.batchCreateRecordToCollectionRelationship(resRecords, collectionId)
                             hasCreatedRelations shouldBe true
 
-                            val res = imageRepository.getCollectionOfRecords(collectionId)
+                            val (aResRecords, id) = imageRepository.getCollectionOfRecords(collectionId)
 
-                            res shouldNotBe null
-                            print(res.images)
-                            res.images.size shouldBe images.size // todo - test fails because more than was given is returned
-                            res.images.map {
-                                images.find { image ->
-                                    image.orderRank == it.orderRank
-                                            && image.description == it.description
-                                            && image.url == it.url
+                            aResRecords shouldNotBe null
+                            print(aResRecords)
+                            aResRecords.size shouldBe images.size // todo - test fails because more than was given is returned
+                            aResRecords.map {
+                                images.find { record ->
+                                    record.orderRank == it.orderRank
+                                            && record.description == it.description
+                                            && record.url == it.url
                                 } ?: throw Exception("failed to find returned image")
                             }
                         }

@@ -1,10 +1,10 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextCollection
 import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.exceptions.ServerErrorException
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
 import dtos.collectionsGeneric.texts.TextIdentifiableRecordByCol
@@ -33,58 +33,72 @@ class TextRepository : RepositoryBase(),
     private val Database.texts get() = this.sequenceOf(TextsModel)
 
     // region Get
-    override fun getCollectionOfRecords(collectionId: Int): TextCollection {
-        val itemCol = TextCollectionsModel.aliased("textCol")
+    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<Text> {
         val itemToCol = TextToCollectionsModel.aliased("textToCol")
         val item = TextsModel.aliased("text")
 
-        var label = ""
-        val texts = database.from(itemToCol)
-            .select(item.text, itemToCol.orderRank)
-            .where { (itemToCol.collectionId eq collectionId) }
+        val images = database.from(itemToCol)
+            .leftJoin(item, item.id eq itemToCol.textId)
+            .select(itemToCol.textId, itemToCol.orderRank, item.text)
+            .whereWithConditions {
+                (item.id eq itemToCol.textId) and (itemToCol.collectionId eq collectionId)
+                if (recordId != null) it += (item.id eq recordId)
+            }
             .map { row ->
                 Text(
+                    id = row[itemToCol.textId]!!,
                     orderRank = row[itemToCol.orderRank]!!,
-                    text = row[item.text]!!
+                    text = row[item.text]!!,
                 )
             }
-        return TextCollection(label, texts)
+        return images
     }
 
     override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): ITextToCollectionEntity? =
         database.textToCollections.find { (it.textId eq recordId) and (it.collectionId eq collectionId) }
-
     // endregion Get
 
 
     // region Insert
     override fun insertRecord(record: Text): Text? {
-        TODO()
-        database.insert(TextsModel) { // todo - validate idsOfTexts
-//            set(it.orderRank, record.orderRank)
+        val id = database.insertAndGenerateKey(TextsModel) {
             set(it.text, record.text)
-//            set(it.collectionId, collectionId)
-        } != 0
+        } as Int? ?: return null
+        record.id = id
+        return record
     }
 
-    override fun batchInsertRecords(records: List<Text>): List<Text> {
-        TODO()
-        val effectedRows = database.batchInsert(TextsModel) { // todo - validate idsOfTexts
-            records.map { text ->
-                item {
-//                    set(it.orderRank, text.orderRank)
-                    set(it.text, text.text)
-//                    set(it.collectionId, collectionId)
-                }
-            }
+    override fun batchInsertRecords(records: List<Text>): List<Text> =
+        records.map {
+            return@map insertRecord(it)
+                ?: TODO("throw exception of one fails. Either one inserts or non do.")
         }
-        effectedRows // todo - handle create all or create non here
-
-    }
 
     override fun addRecordCollection(): Int =
         database.insertAndGenerateKey(TextCollectionsModel) { } as Int?
-            ?: TODO("no reason to fail, therefore return Int or throw ServerError and log Exception")
+            ?: throw ServerErrorException("failed to create ImageCollection (should always succeed)", this::class.java)
+
+    override fun batchCreateRecordToCollectionRelationship(records: List<Text>, collectionId: Int): Boolean {
+        records.map {
+            if (it.id == null) TODO("terminate batch completely")
+            val succeed = createRecordToCollectionRelationship(
+                TextToCollection(
+                    orderRank = it.orderRank,
+                    collectionId = collectionId,
+                    textId = it.id!!
+                )
+            )
+            if (!succeed) TODO("terminate batch completely")
+        }
+        return true
+    }
+
+    override fun createRecordToCollectionRelationship(recordToCollection: TextToCollection): Boolean =
+        database.insert(TextToCollectionsModel) {
+            set(it.collectionId, recordToCollection.collectionId)
+            set(it.textId, recordToCollection.textId)
+            set(it.orderRank, recordToCollection.orderRank)
+        } != 0
     // endregion Insert
 
 
@@ -160,22 +174,6 @@ class TextRepository : RepositoryBase(),
     }
 
     override fun deleteCollectionButNotRecord() {
-        TODO("Not yet implemented")
-    }
-
-    override fun batchCreateRecordToCollectionRelationship(images: List<Image>, collectionId: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun createRecordToCollectionRelationship(recordToCollection: TextToCollection): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun getRecordOfCollection(recordId: Int, collectionId: Int): Text? {
-        TODO("Not yet implemented")
-    }
-
-    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<Text> {
         TODO("Not yet implemented")
     }
     // endregion Delete
