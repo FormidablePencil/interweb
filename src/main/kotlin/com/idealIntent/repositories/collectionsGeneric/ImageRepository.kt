@@ -8,10 +8,10 @@ import com.idealIntent.exceptions.ServerErrorException
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
 import dtos.collectionsGeneric.images.ImagesCOL
-import models.compositions.basicsCollections.images.IImageToCollectionEntity
-import models.compositions.basicsCollections.images.ImageCollectionsModel
-import models.compositions.basicsCollections.images.ImageToCollectionsModel
-import models.compositions.basicsCollections.images.ImagesModel
+import com.idealIntent.models.compositions.basicCollections.images.IImageToCollectionEntity
+import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find

@@ -9,7 +9,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.http.*
 import io.mockk.*
-import models.authorization.IPasswordEntity
+import com.idealIntent.models.auth.IPasswordEntity
 import org.mindrot.jbcrypt.BCrypt
 import shared.appEnvMockHelper
 

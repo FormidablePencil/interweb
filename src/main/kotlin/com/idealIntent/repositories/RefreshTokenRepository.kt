@@ -1,7 +1,7 @@
 package com.idealIntent.repositories
 
-import models.authorization.ITokenEntity
-import models.authorization.TokensModel
+import com.idealIntent.models.auth.ITokenEntity
+import com.idealIntent.models.auth.TokensModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq

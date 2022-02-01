@@ -1,7 +1,7 @@
 package com.idealIntent.repositories
 
-import models.authorization.IPasswordEntity
-import models.authorization.PasswordsModel
+import com.idealIntent.models.auth.IPasswordEntity
+import com.idealIntent.models.auth.PasswordsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq

@@ -1,8 +1,8 @@
 package com.idealIntent.repositories.codes
 
 import com.idealIntent.repositories.RepositoryBase
-import models.codes.EmailVerificationCodesModel
-import models.codes.IEmailVerificationCodeEntity
+import com.idealIntent.models.codes.EmailVerificationCodesModel
+import com.idealIntent.models.codes.IEmailVerificationCodeEntity
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq

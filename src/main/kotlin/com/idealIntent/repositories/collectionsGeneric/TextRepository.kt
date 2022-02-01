@@ -9,10 +9,10 @@ import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
 import dtos.collectionsGeneric.texts.TextIdentifiableRecordByCol
 import dtos.collectionsGeneric.texts.TextsCOL
-import models.compositions.basicsCollections.texts.ITextToCollectionEntity
-import models.compositions.basicsCollections.texts.TextCollectionsModel
-import models.compositions.basicsCollections.texts.TextToCollectionsModel
-import models.compositions.basicsCollections.texts.TextsModel
+import com.idealIntent.models.compositions.basicCollections.texts.ITextToCollectionEntity
+import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find

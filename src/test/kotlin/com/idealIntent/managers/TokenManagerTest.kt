@@ -14,7 +14,7 @@ import io.kotest.matchers.shouldBe
 import io.ktor.config.*
 import io.ktor.http.*
 import io.mockk.*
-import models.authorization.ITokenEntity
+import com.idealIntent.models.auth.ITokenEntity
 import shared.appEnvMockHelper
 
 class TokenManagerTest : BehaviorSpec({

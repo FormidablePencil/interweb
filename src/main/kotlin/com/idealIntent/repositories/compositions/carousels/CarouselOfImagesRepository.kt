@@ -1,20 +1,23 @@
 package com.idealIntent.repositories.compositions.carousels
 
+import com.idealIntent.dtos.collectionsGeneric.images.Image
+import com.idealIntent.dtos.collectionsGeneric.privileges.AuthorToPrivilege
+import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImages
+import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
+import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionStructure
-import com.idealIntent.dtos.collectionsGeneric.images.Image
-import com.idealIntent.dtos.collectionsGeneric.privileges.AuthorToPrivilege
-import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import dtos.compositions.carousels.CarouselOfImagesTABLE
-import models.compositions.carousels.IImagesCarouselEntity
-import models.compositions.carousels.ImagesCarouselsModel
 import org.ktorm.database.Database
-import org.ktorm.dsl.*
+import org.ktorm.dsl.eq
+import org.ktorm.dsl.from
+import org.ktorm.dsl.select
+import org.ktorm.dsl.where
 import org.ktorm.entity.removeIf
 import org.ktorm.entity.sequenceOf
 

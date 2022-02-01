@@ -1,8 +1,8 @@
 package com.idealIntent.repositories.codes
 
 import com.idealIntent.repositories.RepositoryBase
-import models.codes.IResetPasswordCodeEntity
-import models.codes.ResetPasswordCodesModel
+import com.idealIntent.models.codes.IResetPasswordCodeEntity
+import com.idealIntent.models.codes.ResetPasswordCodesModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq
