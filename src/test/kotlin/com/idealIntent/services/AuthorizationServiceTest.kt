@@ -88,13 +88,13 @@ class AuthorizationServiceTest : BehaviorSpec({
             val result = authorizationService.signup(genCreateAuthorRequest(aPassword = "password"))
 
             result.statusCode() shouldBe HttpStatusCode.BadRequest
-            result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.WeakPassword)
+            result.message() shouldBe SignupResponseFailed.getClientMsg(SignupResponseFailed.WeakPassword)
         }
         then("incorrectly format email") {
             val result = authorizationService.signup(genCreateAuthorRequest(aEmail = "email"))
 
             result.statusCode() shouldBe HttpStatusCode.BadRequest
-            result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.InvalidEmailFormat)
+            result.message() shouldBe SignupResponseFailed.getClientMsg(SignupResponseFailed.InvalidEmailFormat)
         }
         then("taken email") {
             every { accountRepository.getByEmail(email) } returns account
@@ -102,7 +102,7 @@ class AuthorizationServiceTest : BehaviorSpec({
             val result = authorizationService.signup(genCreateAuthorRequest())
 
             result.statusCode() shouldBe HttpStatusCode.BadRequest
-            result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.EmailTaken)
+            result.message() shouldBe SignupResponseFailed.getClientMsg(SignupResponseFailed.EmailTaken)
         }
         then("taken username") {
             every { accountRepository.getByEmail(email) } returns null
@@ -111,7 +111,7 @@ class AuthorizationServiceTest : BehaviorSpec({
             val result = authorizationService.signup(genCreateAuthorRequest())
 
             result.statusCode() shouldBe HttpStatusCode.BadRequest
-            result.message() shouldBe SignupResponseFailed.getMsg(SignupResponseFailed.UsernameTaken)
+            result.message() shouldBe SignupResponseFailed.getClientMsg(SignupResponseFailed.UsernameTaken)
         }
         then("provided with valid credentials") {
             val request = genCreateAuthorRequest()
@@ -152,7 +152,7 @@ class AuthorizationServiceTest : BehaviorSpec({
         }
         and("invalid identification (email or username)") {
             fun invalidIdentificationValidation(result: LoginResponse) {
-                result.message() shouldBe LoginResponseFailed.getMsg(LoginResponseFailed.InvalidEmail)
+                result.message() shouldBe LoginResponseFailed.getClientMsg(LoginResponseFailed.InvalidEmail)
                 result.statusCode() shouldBe HttpStatusCode.BadRequest
             }
             then("when attempting to login by email") {
@@ -172,7 +172,7 @@ class AuthorizationServiceTest : BehaviorSpec({
 
             val result = login(false)
 
-            result.message() shouldBe LoginResponseFailed.getMsg(LoginResponseFailed.InvalidPassword)
+            result.message() shouldBe LoginResponseFailed.getClientMsg(LoginResponseFailed.InvalidPassword)
             result.statusCode() shouldBe HttpStatusCode.BadRequest
         }
         then("valid credentials") {

@@ -1,14 +1,13 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
-import com.idealIntent.dtos.collectionsGeneric.images.Image
-import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
-import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthorsToComposition
-import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.exceptions.CompositionCodeReport
+import com.idealIntent.exceptions.CompositionException
+import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
-import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.CompositionsGenericPrivileges
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
@@ -18,9 +17,11 @@ import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesCompo
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import com.idealIntent.repositories.profile.AuthorRepository
 import dtos.compositions.carousels.CarouselOfImagesTABLE
+import dtos.failed
+import dtos.succeeded
+import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.ktorm.dsl.*
 
 class CarouselOfImagesManager(
     private val textRepository: TextRepository,
@@ -29,7 +30,7 @@ class CarouselOfImagesManager(
     private val authorRepository: AuthorRepository,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
 ) : ICompositionManagerStructure<CarouselBasicImagesReq, IImagesCarouselEntity,
-        CarouselBasicImagesReq, CarouselOfImagesComposePrepared>, KoinComponent {
+        CarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
     val appEnv: AppEnv by inject()
     // todo - there will be multiple kinds of carousels thus will be a component of a component some day
 
@@ -40,37 +41,47 @@ class CarouselOfImagesManager(
     // endregion Get
 
     // region Insert
-    override fun createComposition(createRequest: CarouselBasicImagesReq): Int? {
-        appEnv.database.useTransaction { // todo - handle transaction throw exception
-            val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
-                ?: TODO("failed")
-            val (_, redirectsCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
-                ?: TODO("failed")
+    override fun createComposition(createRequest: CarouselBasicImagesReq): CompositionResponse {
+        try {
+            appEnv.database.useTransaction { // todo - handle transaction throw exception
+                val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
+                    ?: throw CompositionException(CompositionCodeReport.FailedToInsertRecord, "images.")
 
-            val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
-            createRequest.privilegedAuthors.map {
-                val author = authorRepository.getByUsername(it.username)
-                    ?: TODO("Throw a pretty exception")
+                val (_, redirectsCollectionId) = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
+                    ?: throw CompositionException(CompositionCodeReport.FailedToInsertRecord, "redirects.")
 
-                compositionPrivilegesRepository.giveAnAuthorPrivilege(
-                    privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
-                    authorId = author.id,
-                    privilegeId = privilegeSourceId
-                )
+                val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+                createRequest.privilegedAuthors.map {
+                    val author = authorRepository.getByUsername(it.username)
+                        ?: throw CompositionException(CompositionCodeReport.FailedToFindAuthor, it.username)
+
+                    compositionPrivilegesRepository.giveAnAuthorPrivilege(
+                        privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
+                        authorId = author.id,
+                        privilegeId = privilegeSourceId
+                    )
+                }
+
+                val compositionId = carouselOfImagesRepository.compose(
+                    CarouselOfImagesComposePrepared(
+                        name = createRequest.name,
+                        imageCollectionId = imageCollectionId,
+                        redirectTextCollectionId = redirectsCollectionId,
+                        privilegeId = privilegeSourceId,
+                    )
+                ) ?: throw CompositionExceptionReport(CompositionCodeReport.FailedToCompose, this::class.java)
+                return CompositionResponse().succeeded(HttpStatusCode.Created, compositionId)
             }
-
-            return carouselOfImagesRepository.compose(
-                CarouselOfImagesComposePrepared(
-                    name = createRequest.name,
-                    imageCollectionId = imageCollectionId,
-                    redirectTextCollectionId = redirectsCollectionId,
-                    privilegeId = privilegeSourceId,
-                )
-            )
+        } catch (ex: CompositionException) {
+            ex.message
+            return when (ex.code) {
+                CompositionCodeReport.FailedToInsertRecord -> CompositionResponse().failed(CompositionCodeReport.FailedToInsertRecord)
+                CompositionCodeReport.FailedToFindAuthor -> CompositionResponse().failed(CompositionCodeReport.FailedToFindAuthor)
+                else -> throw CompositionExceptionReport(CompositionCodeReport.ServerError, this::class.java)
+            }
         }
     }
     // endregion Insert
-
 
     // region Delete
 

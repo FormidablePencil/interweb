@@ -5,6 +5,7 @@ import com.idealIntent.dtos.collectionsGeneric.texts.TextCollection
 import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.exceptions.TempException
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
 import dtos.collectionsGeneric.texts.TextIdentifiableRecordByCol
@@ -76,7 +77,7 @@ class TextRepository : RepositoryBase(),
 
     override fun addRecordCollection(): Int =
         database.insertAndGenerateKey(TextCollectionsModel) { } as Int?
-            ?: throw ServerErrorException("failed to create ImageCollection (should always succeed)", this::class.java)
+            ?: throw TempException("failed to create ImageCollection (should always succeed)", this::class.java)
 
     override fun batchAssociateRecordsToCollection(records: List<Text>, collectionId: Int): Boolean {
         records.map {

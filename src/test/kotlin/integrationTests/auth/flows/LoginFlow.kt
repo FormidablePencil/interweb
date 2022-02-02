@@ -10,6 +10,7 @@ import org.opentest4j.AssertionFailedError
 import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.dtos.auth.LoginByEmailRequest
 import com.idealIntent.dtos.auth.LoginByUsernameRequest
+import com.idealIntent.exceptions.TempException
 import com.idealIntent.services.AuthorizationService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
@@ -36,7 +37,7 @@ class LoginFlow : BehaviorSpecFlow() {
     private fun validateLoginResponse(result: LoginResponse) {
         result.statusCode() shouldBe HttpStatusCode.OK
         val data = result.data
-            ?: throw ServerErrorException("Nothing returned after successful login", this::class.java)
+            ?: throw TempException("Nothing returned after successful login", this::class.java)
         data.refreshToken.length.shouldBeGreaterThan(0)
         data.accessToken.length.shouldBeGreaterThan(0)
     }

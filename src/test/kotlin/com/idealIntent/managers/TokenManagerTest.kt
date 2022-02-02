@@ -49,7 +49,7 @@ class TokenManagerTest : BehaviorSpec({
             val res = tokenManager.refreshAccessToken("invalid token", authorId)
 
             res.statusCode() shouldBe HttpStatusCode.BadRequest
-            res.message() shouldBe TokensResponseFailed.getMsg(TokensResponseFailed.InvalidRefreshToken)
+            res.message() shouldBe TokensResponseFailed.getClientMsg(TokensResponseFailed.InvalidRefreshToken)
         }
         then("valid refresh token") {
             val res = tokenManager.refreshAccessToken(tokens.refreshToken, authorId)

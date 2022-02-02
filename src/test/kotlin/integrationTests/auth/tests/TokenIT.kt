@@ -76,7 +76,7 @@ class TokenIT : BehaviorSpecIT({
                     authorizationService.refreshAccessToken(InvalidRefreshToken, authorId)
 
                 attemptWithInitialTokenAgain.statusCode() shouldBe HttpStatusCode.BadRequest
-                attemptWithInitialTokenAgain.message() shouldBe TokensResponseFailed.getMsg(TokensResponseFailed.InvalidRefreshToken)
+                attemptWithInitialTokenAgain.message() shouldBe TokensResponseFailed.getClientMsg(TokensResponseFailed.InvalidRefreshToken)
 
                 val attemptWithNewToken = authorizationService.refreshAccessToken(newRefreshToken, authorId)
 

@@ -3,6 +3,8 @@ package com.idealIntent.routes
 import dtos.ApiDataResponse
 import com.idealIntent.exceptions.GenericError
 import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.exceptions.TempException
+import com.idealIntent.exceptions.logError
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.response.*
@@ -15,13 +17,15 @@ suspend inline fun <reified Data, Enum, ClassExtendedFrom> routeRespond(
     try {
         val result = code()
         when (result.isSuccess) {
-            null -> throw ServerErrorException("Response was not returned with a success nor failure.", "routeRespond")
+//            null -> throw TempException("Response was not returned with a success nor failure.", "routeRespond")
             false -> call.respond(result.statusCode()!!, result.message())
             true -> call.respond(result.data!!)
         }
+    } catch (ex: ServerErrorException) {
+        ex.clientMsg
     } catch (ex: Exception) {
         println(ex.message)
-        ServerErrorException.logError(ex.message ?: "no message", "routeRespond")
+        logError(ex.message ?: "no message", "routeRespond")
         call.respond(HttpStatusCode.InternalServerError, GenericError.ServerError)
     }
 }

@@ -5,6 +5,7 @@ import com.idealIntent.dtos.collectionsGeneric.images.ImageCollection
 import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.exceptions.TempException
 import com.idealIntent.models.compositions.basicCollections.images.IImageToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
@@ -73,7 +74,7 @@ class ImageRepository() : RepositoryBase(),
 
     override fun addRecordCollection(): Int =
         database.insertAndGenerateKey(ImageCollectionsModel) { } as Int?
-            ?: throw ServerErrorException("failed to create ImageCollection (should always succeed)", this::class.java)
+            ?: throw TempException("failed to create ImageCollection (should always succeed)", this::class.java)
 
     override fun batchAssociateRecordsToCollection(records: List<Image>, collectionId: Int): Boolean {
         records.map {

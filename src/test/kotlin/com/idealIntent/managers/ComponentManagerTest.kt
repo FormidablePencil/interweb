@@ -1,7 +1,7 @@
 import com.idealIntent.managers.CompositionManager
 import com.idealIntent.repositories.SpaceRepository
+import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
-import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
@@ -15,7 +15,7 @@ class CompositionManagerTest : BehaviorSpec({
     val imageRepository: ImageRepository = mockk()
     val carouselRepository: CarouselOfImagesRepository = mockk()
     val textRepository: TextRepository = mockk()
-    val privilegeRepository: PrivilegeRepository = mockk()
+    val privilegeRepository: CompositionPrivilegesRepository = mockk()
 
     val componentManager = spyk(
         CompositionManager(

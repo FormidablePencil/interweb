@@ -100,11 +100,11 @@ class CmsService(
         when (CompositionCategory.fromInt(request.compositionType)) {
             // region Carousels
             CompositionCategory.Carousel -> {
-                carouselOfImagesRepository.update(
-                    componentId = request.id,
-                    column = CarouselOfImagesTABLE.fromInt(request.where[0].table),
-                    updateToData = request.updateToData
-                )
+//                carouselOfImagesRepository.update(
+//                    componentId = request.id,
+//                    column = CarouselOfImagesTABLE.fromInt(request.where[0].table),
+//                    updateToData = request.updateToData
+//                )
             }
             // endregion
 
@@ -140,11 +140,11 @@ class CmsService(
         when (CompositionCategory.fromInt(request.compositionType)) {
             // region Carousels
             CompositionCategory.Carousel -> {
-                carouselOfImagesRepository.batchUpdate(
-                    componentId = request.id,
-                    table = CarouselOfImagesTABLE.fromInt(request.where[0].table),
-                    updateToData = request.updateToData
-                )
+//                carouselOfImagesRepository.batchUpdate(
+//                    componentId = request.id,
+//                    table = CarouselOfImagesTABLE.fromInt(request.where[0].table),
+//                    updateToData = request.updateToData
+//                )
             }
             // endregion
 

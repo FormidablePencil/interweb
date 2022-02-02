@@ -20,7 +20,7 @@ enum class SampleResponseFailed {
     UsernameTaken;
 
     companion object : IApiResponseEnum<E> {
-        override fun getMsg(code: E): String {
+        override fun getClientMsg(code: E): String {
             return when (code) {
                 WeakPassword -> "Not a strong enough password."
                 InvalidEmailFormat -> "Email provided is not formatted as such."
@@ -29,7 +29,7 @@ enum class SampleResponseFailed {
             }
         }
 
-        override fun getStatusCode(code: E): HttpStatusCode {
+        override fun getHttpCode(code: E): HttpStatusCode {
             return when (code) {
                 WeakPassword,
                 InvalidEmailFormat,
@@ -43,8 +43,8 @@ enum class SampleResponseFailed {
 class ApiResponseKtTest : BehaviorSpec({
 
     given("ResponseFailed enum class") {
-        SampleResponseFailed.getMsg(SampleResponseFailed.WeakPassword) shouldBe "Not a strong enough password."
-        SampleResponseFailed.getStatusCode(SampleResponseFailed.WeakPassword) shouldBe HttpStatusCode.BadRequest
+        SampleResponseFailed.getClientMsg(SampleResponseFailed.WeakPassword) shouldBe "Not a strong enough password."
+        SampleResponseFailed.getHttpCode(SampleResponseFailed.WeakPassword) shouldBe HttpStatusCode.BadRequest
     }
 
     given("ApiResponse") {
@@ -61,8 +61,8 @@ class ApiResponseKtTest : BehaviorSpec({
             val result = ExampleApiResponse().failed(enumCode)
 
             result.code shouldBe enumCode
-            result.statusCode() shouldBe SampleResponseFailed.getStatusCode(enumCode)
-            result.message() shouldBe SampleResponseFailed.getMsg(enumCode)
+            result.statusCode() shouldBe SampleResponseFailed.getHttpCode(enumCode)
+            result.message() shouldBe SampleResponseFailed.getClientMsg(enumCode)
         }
     }
 
@@ -86,8 +86,8 @@ class ApiResponseKtTest : BehaviorSpec({
             val result = ExampleDataApiResponse().failed(enumCode)
 
             result.code shouldBe enumCode
-            result.statusCode() shouldBe SampleResponseFailed.getStatusCode(enumCode)
-            result.message() shouldBe SampleResponseFailed.getMsg(enumCode)
+            result.statusCode() shouldBe SampleResponseFailed.getHttpCode(enumCode)
+            result.message() shouldBe SampleResponseFailed.getClientMsg(enumCode)
 
             result.data shouldBe null
         }

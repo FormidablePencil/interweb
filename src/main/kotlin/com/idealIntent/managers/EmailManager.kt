@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.exceptions.TempException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.apache.commons.mail.DefaultAuthenticator
@@ -47,7 +48,7 @@ class EmailManager(
 
     fun welcomeNewAuthor(authorId: Int) {
         val author = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorId)
-            ?: throw ServerErrorException("Resource not found.", this::class.java)
+            ?: throw TempException("Resource not found.", this::class.java)
         val welcomeMsg = EmailMessages.WelcomeMsg(firstname = author.firstname)
 
         eMailer.setFrom(emailConfig("from"))
@@ -60,7 +61,7 @@ class EmailManager(
 
     suspend fun sendResetPasswordLink(authorId: Int): Unit = coroutineScope {
         val author = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorId)
-            ?: throw ServerErrorException("Resource not found", this::class.java)
+            ?: throw TempException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.PasswordResetMsg(username = author.username)
 
         launch {
@@ -77,7 +78,7 @@ class EmailManager(
 
     suspend fun sendValidateEmail(authorId: Int): Unit = coroutineScope {
         val author = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorId)
-            ?: throw ServerErrorException("Resource not found", this::class.java)
+            ?: throw TempException("Resource not found", this::class.java)
         val passwordResetMsg = EmailMessages.ValidateEmailMsg(username = author.username)
 
         launch {

@@ -4,6 +4,7 @@ import com.idealIntent.configurations.AppEnv
 import dtos.auth.ResetPasswordResponse
 import dtos.succeeded
 import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.exceptions.TempException
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -33,7 +34,7 @@ class PasswordManager(
 
     fun validatePassword(password: String, authorId: Int): Boolean {
         val passwordRecord = passwordRepository.get(authorId)
-            ?: throw ServerErrorException("Failed to retrieve password.", this::class.java)
+            ?: throw TempException("Failed to retrieve password.", this::class.java)
 
         return BCrypt.checkpw(password, passwordRecord.passwordHash)
     }
@@ -41,6 +42,6 @@ class PasswordManager(
     fun setNewPassword(password: String, authorId: Int) {
         val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())
         if (!passwordRepository.insert(passwordHash, authorId))
-            throw ServerErrorException("Server code. Saving password failed.", this::class.java)
+            throw TempException("Server code. Saving password failed.", this::class.java)
     }
 }

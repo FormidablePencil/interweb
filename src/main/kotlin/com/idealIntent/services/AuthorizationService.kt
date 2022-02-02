@@ -30,6 +30,7 @@ import com.idealIntent.repositories.profile.AuthorRepository
 import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.dtos.auth.LoginByEmailRequest
 import com.idealIntent.dtos.auth.LoginByUsernameRequest
+import com.idealIntent.exceptions.TempException
 
 fun main() {
     runBlocking {
@@ -58,7 +59,7 @@ class AuthorizationService(
 
         appEnv.database.useTransaction {
             val authorId = authorProfileRelatedRepository.createNewAuthor(request)
-            authorId ?: throw ServerErrorException("Failed to create author", this::class.java)
+            authorId ?: throw TempException("Failed to create author", this::class.java)
             passwordManager.setNewPassword(request.password, authorId)
             emailManager.welcomeNewAuthor(authorId)
             val tokens = tokenManager.generateAuthTokens(authorId)
@@ -139,7 +140,7 @@ class AuthorizationService(
 
     fun requestPasswordResetThroughVerifiedEmail(authorId: Int): RequestPasswordResetResponse = runBlocking {
         val email = accountRepository.getById(authorId)?.email
-            ?: throw ServerErrorException("author must exist but doesn't.", this::class.java)
+            ?: throw TempException("author must exist but doesn't.", this::class.java)
 
         launch {
             emailManager.sendResetPasswordLink(authorId)
@@ -168,7 +169,7 @@ class AuthorizationService(
 
         return ResetPasswordThroughEmailResponse().succeeded(HttpStatusCode.Created)
 
-        // get authorId base off of emailCode - I wonder if the email getStatusCode is a jwt token??? - It could work
+        // get authorId base off of emailCode - I wonder if the email getHttpCode is a jwt token??? - It could work
 //        val authorId = 1
 
 //        return passwordManager.changePassword(oldPassword, newPassword, authorId)

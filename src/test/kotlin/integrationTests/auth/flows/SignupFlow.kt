@@ -7,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import org.koin.test.inject
 import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.exceptions.TempException
 import com.idealIntent.services.AuthorizationService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
@@ -22,7 +23,7 @@ class SignupFlow : BehaviorSpecFlow() {
 
             result.statusCode() shouldBe HttpStatusCode.Created
             val data =
-                result.data ?: throw ServerErrorException("Nothing in data after successful signup", this::class.java)
+                result.data ?: throw TempException("Nothing in data after successful signup", this::class.java)
             data.refreshToken.length.shouldBeGreaterThan(0)
             data.accessToken.length.shouldBeGreaterThan(0)
 

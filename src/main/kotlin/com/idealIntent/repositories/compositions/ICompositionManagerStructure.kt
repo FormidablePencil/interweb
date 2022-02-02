@@ -13,7 +13,7 @@ import com.idealIntent.dtos.compositionCRUD.RecordUpdate
  * @param CreateRequest Ids of compositions and collections to compose and raw data to save before composition.
  * @param ComposePrepared Ids of composition and collections to created beforehand.
  */
-interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared> {
+interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response> {
 
     // region Insert
     /**
@@ -22,7 +22,7 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
      * @param composition Composition to insert
      * @return CollectionId or null if failed to insert [composition]
      */
-    fun createComposition(createRequest: CreateRequest): Int?
+    fun createComposition(createRequest: CreateRequest): Response
     // endregion Insert
 
 

@@ -61,8 +61,8 @@ class CompositionPrivilegesRepository : RepositoryBase() {
     // region Insert
     fun giveAnAuthorPrivilege(privileges: CompositionsGenericPrivileges, authorId: Int, privilegeId: Int): Boolean {
         return database.insert(PrivilegedAuthorsToCompositionsModel) {
-            set(it.canModify, privileges.modify)
-            set(it.canView, privileges.view)
+            set(it.modify, privileges.modify)
+            set(it.view, privileges.view)
             set(it.privilegeId, privilegeId)
             set(it.authorId, authorId)
         } != 0
@@ -82,7 +82,7 @@ class CompositionPrivilegesRepository : RepositoryBase() {
 
 
     // region Update
-    override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
+     fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
         TODO()
 //        val collection =
 //            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
@@ -105,7 +105,7 @@ class CompositionPrivilegesRepository : RepositoryBase() {
 //        }
     }
 
-    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
+     fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
         TODO()
 //        val collection =
 //            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
@@ -134,42 +134,42 @@ class CompositionPrivilegesRepository : RepositoryBase() {
 
 
     // region Delete
-    override fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
+     fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
+     fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun deleteAllRecordsInCollection(collectionId: Int) {
+     fun deleteAllRecordsInCollection(collectionId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
+     fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun deleteCollectionButNotRecord() {
+     fun deleteCollectionButNotRecord() {
         TODO("Not yet implemented")
     }
 
-    override fun batchCreateRecordToCollectionRelationship(
+     fun batchCreateRecordToCollectionRelationship(
         records: List<PrivilegeRecord>,
         collectionId: Int
     ): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun createRecordToCollectionRelationship(recordToCollection: PrivilegedAuthorsToComposition): Boolean {
+     fun createRecordToCollectionRelationship(recordToCollection: PrivilegedAuthorsToComposition): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun getRecordOfCollection(recordId: Int, collectionId: Int): PrivilegeRecord? {
+     fun getRecordOfCollection(recordId: Int, collectionId: Int): PrivilegeRecord? {
         TODO("Not yet implemented")
     }
 
-    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<PrivilegeRecord> {
+     fun getRecordsQuery(recordId: Int?, collectionId: Int): List<PrivilegeRecord> {
         TODO("Not yet implemented")
     }
     // endregion Delete
