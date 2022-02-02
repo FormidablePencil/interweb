@@ -1,6 +1,7 @@
 package com.idealIntent.repositories.collections
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import org.ktorm.database.Database
 
 /**
  * Structure for CRUD operations on compositions' collections
@@ -14,9 +15,8 @@ import com.idealIntent.dtos.compositionCRUD.RecordUpdate
  * @constructor Create empty structure for collections
  */
 interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollection, CollectionOfRecords> {
-
+    val database: Database
     // region Get
-
     /**
      * Get a single record
      *
@@ -76,6 +76,16 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
 //    fun batchInsertNewRecords(records: List<Record>): List<Int>?
     // endregion
 
+    fun batchInsertRecordsToNewCollection(records: List<Record>): Pair<List<Record>, Int>? {
+        database.useTransaction { // todo - handle transaction throw exception
+            val aRecords = batchInsertRecords(records)
+            val collectionId = addRecordCollection()
+            if (!batchAssociateRecordsToCollection(aRecords, collectionId))
+                TODO("Throw a pretty exception")
+            return Pair(aRecords, collectionId)
+        }
+    }
+
     /**
      * Insert [record] and return [record] with a generated id.
      *
@@ -108,7 +118,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @param collectionId
      * @return Success or fail
      */
-    fun batchCreateRecordToCollectionRelationship(records: List<Record>, collectionId: Int): Boolean
+    fun batchAssociateRecordsToCollection(records: List<Record>, collectionId: Int): Boolean
 
     /**
      * Create record to collection relationship
@@ -116,7 +126,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @param recordToCollection record to collection association
      * @return Success or fail
      */
-    fun createRecordToCollectionRelationship(recordToCollection: RecordToCollection): Boolean
+    fun associateRecordToCollection(recordToCollection: RecordToCollection): Boolean
     // endregion Insert
 
 

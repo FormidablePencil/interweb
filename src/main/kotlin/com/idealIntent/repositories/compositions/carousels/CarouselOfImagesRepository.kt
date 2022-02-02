@@ -1,152 +1,122 @@
 package com.idealIntent.repositories.compositions.carousels
 
 import com.idealIntent.dtos.collectionsGeneric.images.Image
-import com.idealIntent.dtos.collectionsGeneric.privileges.AuthorToPrivilege
+import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
-import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImages
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
+import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
+import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
+import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
-import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.ICompositionStructure
-import dtos.compositions.carousels.CarouselOfImagesTABLE
+import com.idealIntent.repositories.compositions.ICompositionRepoStructure
+import models.profile.AuthorsModel
 import org.ktorm.database.Database
-import org.ktorm.dsl.eq
-import org.ktorm.dsl.from
-import org.ktorm.dsl.select
-import org.ktorm.dsl.where
-import org.ktorm.entity.removeIf
+import org.ktorm.dsl.*
 import org.ktorm.entity.sequenceOf
+
+data class CarouselOfImagesComposePrepared(
+    val imageCollectionId: Int,
+    val redirectTextCollectionId: Int,
+    val privilegeId: Int,
+    val name: String,
+)
 
 // todo - get ICollectionStructure implemented or create a new one just for Composition lvl repositories
 class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
-    private val privilegeRepository: PrivilegeRepository
     // todo replace Image
-) : RepositoryBase(), ICompositionStructure<IImagesCarouselEntity, CarouselBasicImages> {
+) : RepositoryBase(), ICompositionRepoStructure<CarouselBasicImagesReq, IImagesCarouselEntity,
+        CarouselBasicImagesReq, CarouselOfImagesComposePrepared> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
-    // todo - there will be multiple kinds of carousels thus will be a component of a component some day
 
     // region Get
-    override fun getComposition(id: Int): CarouselBasicImages {
-        var title = ""
-        var images = listOf<Image>()
-        var navTos = listOf<Text>()
-        var privilegedAuthors = listOf<AuthorToPrivilege>()
+    override fun getComposition(id: Int): CarouselBasicImagesReq? {
+        val comp = ImagesCarouselsModel.aliased("comp")
+        val prvAth = PrivilegedAuthorsToCompositionsModel("prvAuthorsComp")
+        val author = AuthorsModel.aliased("author")
 
-        val crslImg = ImagesCarouselsModel.aliased("crlsImg")
+        val img2Col = ImageToCollectionsModel.aliased("img2Col")
+        val img = ImagesModel.aliased("img")
 
-        for (row in database.from(crslImg)
-            .select(crslImg.imageCollectionId, crslImg.redirectTextCollectionId, crslImg.privilegeId)
-            .where { crslImg.id eq id }) {
-//            title = row[crslImg.title]!!
-//            images = imageRepository.getCollectionOfRecords(row[crslImg.imageCollectionId]!!, ).images
-//            navTos = textRepository.getCollectionOfRecords(row[crslImg.redirectTextCollectionId]!!).texts
-//            privilegedAuthors = privilegeRepository.getCollectionOfRecords(row[crslImg.privilegeId]!!).privilegedAuthors
-        }
+        val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
+        val text = TextsModel.aliased("textRedirect")
 
-        return CarouselBasicImages(
-            title = title, // todo - may not work
+        var name = ""
+        val images = mutableListOf<Image>()
+        val imgOnclickRedirects = mutableListOf<Text>()
+        val privilegedAuthors = mutableListOf<PrivilegedAuthor>()
+
+        database.from(comp)
+            .leftJoin(img2Col, img2Col.collectionId eq comp.imageCollectionId)
+            .leftJoin(img, img.id eq img2Col.collectionId)
+
+            .leftJoin(text2Col, text2Col.collectionId eq comp.redirectTextCollectionId)
+            .leftJoin(text, text.id eq comp.redirectTextCollectionId)
+
+            .leftJoin(prvAth, prvAth.privilegeId eq comp.privilegeId)
+            .leftJoin(author, author.id eq prvAth.authorId)
+
+            .select(comp.name,
+                img2Col.orderRank, img.id, img.url, img.description,
+                text2Col.orderRank, text.text,
+                prvAth.modify, prvAth.view,
+                author.username)
+            .where { comp.id eq id }
+            .map {
+                name = it[comp.name]!!
+                images.add(
+                    Image(
+                        id = it[img.id],
+                        orderRank = it[img2Col.orderRank]!!,
+                        url = it[img.url]!!,
+                        description = it[img.description]!!
+                    )
+                )
+                imgOnclickRedirects.add(
+                    Text(id = it[img.id]!!, orderRank = it[text2Col.orderRank]!!, text = it[text.text]!!)
+                )
+                privilegedAuthors.add(
+                    PrivilegedAuthor(
+                        username = it[author.username]!!,
+                        modify = it[prvAth.modify]!!,
+                        view = it[prvAth.view]!!
+                    )
+                )
+            }
+
+        return CarouselBasicImagesReq(
+            name = name,
             images = images,
-            navToCorrespondingImagesOrder = navTos,
+            imgOnclickRedirects = imgOnclickRedirects,
             privilegedAuthors = privilegedAuthors
         )
     }
 
-    override fun getMetadataOfComposition(id: Int): IImagesCarouselEntity {
-        TODO()
-    }
     // endregion Get
 
-
     // region Insert
-    override fun insertComposition(composition: CarouselBasicImages): Int? {
-        TODO()
-        // region todo - could be in a caroutine
-//        val imageCollectionId = imageRepository.batchInsertNewRecords(
-//            composition.images
-//        )
-//        val navToTextCollectionId = textRepository.batchInsertNewRecords(
-//            composition.navToCorrespondingImagesOrder
-//        )
-//        val privilegeId = privilegeRepository.batchInsertNewRecords(
-//            composition.privilegedAuthors
-//        )
-        // endregion
-
-        // todo - validate ids, println(ids)
-
-        // todo - could be in a separate caroutine than the first in scope
-//        return database.insertAndGenerateKey(ImagesCarouselsModel) {
-//            set(it.imageCollectionId, imageCollectionId)
-////            set(it.navToTextCollectionId, navToTextCollectionId)
-////            set(it.privilegeId, privilegeId)
-////            set(it.title, composition.title)
-//        } as Int?
+    override fun compose(composePrepared: CarouselOfImagesComposePrepared): Int? {
+        return database.insertAndGenerateKey(ImagesCarouselsModel) {
+            set(it.name, composePrepared.name)
+            set(it.imageCollectionId, composePrepared.imageCollectionId)
+            set(it.redirectTextCollectionId, composePrepared.redirectTextCollectionId)
+            set(it.privilegeId, composePrepared.privilegeId)
+        } as Int?
     }
-
     // endregion Insert
 
+    override fun getMetadataOfComposition(id: Int): IImagesCarouselEntity? {
+        TODO("Not yet implemented")
+    }
 
-    // region Delete
-
-    // endregion Delete
-
-
-    // region CarouselOfImages
-
-    // todo - if multiple comps in one repository then which one to delete?
-    // CarouselOfImagesRepository only for sql queries concerning all carousel components
-    // Everything else will be extracted into managers. A manager for each component of category (e.g. carousel.CarouselBasicImages)
     override fun deleteComposition(id: Int): Boolean {
-        return database.imagesCarousels.removeIf { it.id eq id } != 0
-    }
-
-    // region update
-    // endregion update
-
-    fun batchUpdate(componentId: Int, table: CarouselOfImagesTABLE, updateToData: List<RecordUpdate>) {
-        when (table) {
-            CarouselOfImagesTABLE.Images ->
-                imageRepository.batchUpdateRecords(updateToData, componentId)
-            CarouselOfImagesTABLE.NavTos ->
-                textRepository.batchUpdateRecords(updateToData, componentId)
-            CarouselOfImagesTABLE.Privileges ->
-                privilegeRepository.batchUpdateRecords(updateToData, componentId)
-        }
-    }
-
-    fun update(componentId: Int, column: CarouselOfImagesTABLE, updateToData: RecordUpdate) {
-        TODO()
-//        when (column) {
-//            CarouselOfImagesTABLE.Images ->
-//                imageRepository.updateRecord(updateToData,, componentId)
-//            CarouselOfImagesTABLE.NavTos ->
-//                textRepository.updateRecord(updateToData,, componentId)
-//            CarouselOfImagesTABLE.Privileges ->
-//                privilegeRepository.updateRecord(updateToData,, componentId)
-//        }
-    }
-
-
-    override fun insertCompositions(components: List<CarouselBasicImages>, label: String): Int? {
         TODO("Not yet implemented")
     }
-
-    override fun updateComposition(id: Int, record: RecordUpdate): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun batchUpdateCompositions(id: Int, records: List<RecordUpdate>): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun batchDeleteCompositions(id: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-    // endregion
 }

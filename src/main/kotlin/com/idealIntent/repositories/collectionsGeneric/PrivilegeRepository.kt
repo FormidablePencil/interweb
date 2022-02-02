@@ -1,26 +1,38 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.dtos.collectionsGeneric.privileges.AuthorToPrivilege
-import com.idealIntent.dtos.collectionsGeneric.privileges.Privilege
+import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthorsToComposition
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.models.privileges.IPrivilegedAuthorsToCompositionEntity
+import com.idealIntent.models.privileges.PrivilegeSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
 import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.repositories.collections.ICollectionStructure
-import models.privileges.AuthorToPrivilegesModel
-import models.privileges.IAuthorToPrivilegeEntity
-import models.privileges.PrivilegesModel
+import models.privileges.ICompositionsGenericPrivileges
 import org.ktorm.database.Database
+import org.ktorm.dsl.insert
+import org.ktorm.dsl.insertAndGenerateKey
 import org.ktorm.entity.sequenceOf
 
 data class PrivilegeRecord(val id: Int)
 
+// privilege source
+// privileged authors
+// what are authors privileged
+// author_to_compositional_privilege could hold the privileges -
+// can modify: bool, can view: bool. author_to_compositional_privilege will be a general purpose
+
+data class CompositionsGenericPrivileges(
+    override val modify: Boolean,
+    override val view: Boolean
+) : ICompositionsGenericPrivileges
+
 // todo privilege and privileges are used interchangeably. Fix this typo
-class PrivilegeRepository : RepositoryBase(),
-    ICollectionStructure<PrivilegeRecord, IAuthorToPrivilegeEntity, AuthorToPrivilege, Privilege> {
-    private val Database.privileges get() = this.sequenceOf(PrivilegesModel)
-    private val Database.authorToPrivileges get() = this.sequenceOf(AuthorToPrivilegesModel)
+class CompositionPrivilegesRepository : RepositoryBase() {
+    private val Database.privilegeSource get() = this.sequenceOf(PrivilegeSourcesModel)
+    private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionsModel)
 
     // region Get
-    override fun getCollectionOfRecords(collectionId: Int):  Pair<List<PrivilegeRecord>, Int> {
+    // get all who is privileged... No.
+    fun getPrivilegesByAuthorId(getPrivilegesOfAuthorId: Int): Pair<List<PrivilegeRecord>, Int> {
         TODO()
 //        val privCol = Privileges.aliased("privCol")
 //        val priv = PrivilegedAuthors.aliased("priv")
@@ -37,44 +49,35 @@ class PrivilegeRepository : RepositoryBase(),
 //                    modLvl = row[priv.modLvl]!! // todo - might fail. error handling
 //                )
 //            }
-//        return AuthorToPrivilege(privilegesTo, privilegedAuthors)
+//        return PrivilegedAuthorsToComposition(privilegesTo, privilegedAuthors)
     }
 
-    override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): IAuthorToPrivilegeEntity? {
+    fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): IPrivilegedAuthorsToCompositionEntity? {
         TODO()
     }
     // endregion Get
 
 
     // region Insert
-    override fun insertRecord(record: PrivilegeRecord): PrivilegeRecord? {
-        TODO()
-//        return database.insert(PrivilegedAuthors) { // todo - test that all have been generated
-//            set(it.privilegeId, collectionId)
-//            set(it.authorId, record.authorId)
-//            set(it.modLvl, record.modLvl)
-//        } != 0
+    fun giveAnAuthorPrivilege(privileges: CompositionsGenericPrivileges, authorId: Int, privilegeId: Int): Boolean {
+        return database.insert(PrivilegedAuthorsToCompositionsModel) {
+            set(it.canModify, privileges.modify)
+            set(it.canView, privileges.view)
+            set(it.privilegeId, privilegeId)
+            set(it.authorId, authorId)
+        } != 0
     }
 
-    override fun batchInsertRecords(records: List<PrivilegeRecord>): List<PrivilegeRecord> {
-        TODO()
-//        database.batchInsert(PrivilegedAuthors) { // todo - test that all have been generated
-//            records.map { privilegedAuthor ->
-//                item {
-//                    set(it.privilegeId, collectionId)
-//                    set(it.authorId, privilegedAuthor.authorId)
-//                    set(it.modLvl, privilegedAuthor.modLvl)
-//                }
-//            }
-//        }
-    }
-
-    override fun addRecordCollection(): Int {
-        TODO()
-//        return database.insertAndGenerateKey(Privileges) {
-//            set(it.privilegesTo, privilegesTo)
-//        } as Int? ?: TODO("shouldn't ever fail, so throw a server error exception")
-    }
+    /**
+     * Add [privilege source][models.privileges.IPrivilegeSource] which is a table to for compositions to key off of,
+     * making the privileges unique to every kind of compositional record that's references it.
+     *
+     * @return Id to privilege source.
+     */
+    fun addPrivilegeSource(privilegeLevel: Int = 0): Int =
+        database.insertAndGenerateKey(PrivilegeSourcesModel) {
+            set(it.privilegeLevel, privilegeLevel)
+        } as Int
     // endregion Insert
 
 
@@ -151,11 +154,14 @@ class PrivilegeRepository : RepositoryBase(),
         TODO("Not yet implemented")
     }
 
-    override fun batchCreateRecordToCollectionRelationship(records: List<PrivilegeRecord>, collectionId: Int): Boolean {
+    override fun batchCreateRecordToCollectionRelationship(
+        records: List<PrivilegeRecord>,
+        collectionId: Int
+    ): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun createRecordToCollectionRelationship(recordToCollection: AuthorToPrivilege): Boolean {
+    override fun createRecordToCollectionRelationship(recordToCollection: PrivilegedAuthorsToComposition): Boolean {
         TODO("Not yet implemented")
     }
 

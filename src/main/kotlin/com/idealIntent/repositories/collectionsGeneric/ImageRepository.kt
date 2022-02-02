@@ -5,13 +5,13 @@ import com.idealIntent.dtos.collectionsGeneric.images.ImageCollection
 import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.ServerErrorException
-import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.collectionsGeneric.images.ImagesCOL
 import com.idealIntent.models.compositions.basicCollections.images.IImageToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
+import com.idealIntent.repositories.RepositoryBase
+import com.idealIntent.repositories.collections.ICollectionStructure
+import dtos.collectionsGeneric.images.ImagesCOL
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
@@ -21,7 +21,7 @@ import org.ktorm.entity.sequenceOf
 /**
  * Responsible for image_collections and images table
  */
-class ImageRepository : RepositoryBase(),
+class ImageRepository() : RepositoryBase(),
     ICollectionStructure<Image, IImageToCollectionEntity, ImageToCollection, ImageCollection> {
     private val Database.imageCollections get() = this.sequenceOf(ImageCollectionsModel)
     private val Database.imageToCollections get() = this.sequenceOf(ImageToCollectionsModel)
@@ -75,10 +75,10 @@ class ImageRepository : RepositoryBase(),
         database.insertAndGenerateKey(ImageCollectionsModel) { } as Int?
             ?: throw ServerErrorException("failed to create ImageCollection (should always succeed)", this::class.java)
 
-    override fun batchCreateRecordToCollectionRelationship(records: List<Image>, collectionId: Int): Boolean {
+    override fun batchAssociateRecordsToCollection(records: List<Image>, collectionId: Int): Boolean {
         records.map {
             if (it.id == null) TODO("terminate batch completely")
-            val succeed = createRecordToCollectionRelationship(
+            val succeed = associateRecordToCollection(
                 ImageToCollection(
                     orderRank = it.orderRank,
                     collectionId = collectionId,
@@ -90,7 +90,7 @@ class ImageRepository : RepositoryBase(),
         return true
     }
 
-    override fun createRecordToCollectionRelationship(recordToCollection: ImageToCollection): Boolean =
+    override fun associateRecordToCollection(recordToCollection: ImageToCollection): Boolean =
         database.insert(ImageToCollectionsModel) {
             set(it.collectionId, recordToCollection.collectionId)
             set(it.imageId, recordToCollection.imageId)

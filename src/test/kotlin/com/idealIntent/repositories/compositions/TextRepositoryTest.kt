@@ -37,7 +37,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                             val resRecords = textRepository.insertRecord(texts[0])
                                 ?: throw Exception("failed to insert image")
                             val collectionId = textRepository.addRecordCollection()
-                            val hasCreatedRelations = textRepository.createRecordToCollectionRelationship(
+                            val hasCreatedRelations = textRepository.associateRecordToCollection(
                                 TextToCollection(
                                     textId = resRecords.id!!,
                                     collectionId = collectionId,
@@ -63,7 +63,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                             val collectionId = textRepository.addRecordCollection()
 
                             val hasCreatedRelations =
-                                textRepository.batchCreateRecordToCollectionRelationship(resRecords, collectionId)
+                                textRepository.batchAssociateRecordsToCollection(resRecords, collectionId)
                             hasCreatedRelations shouldBe true
 
                             val (aResRecords, id) = textRepository.getCollectionOfRecords(collectionId)

@@ -78,10 +78,10 @@ class TextRepository : RepositoryBase(),
         database.insertAndGenerateKey(TextCollectionsModel) { } as Int?
             ?: throw ServerErrorException("failed to create ImageCollection (should always succeed)", this::class.java)
 
-    override fun batchCreateRecordToCollectionRelationship(records: List<Text>, collectionId: Int): Boolean {
+    override fun batchAssociateRecordsToCollection(records: List<Text>, collectionId: Int): Boolean {
         records.map {
             if (it.id == null) TODO("terminate batch completely")
-            val succeed = createRecordToCollectionRelationship(
+            val succeed = associateRecordToCollection(
                 TextToCollection(
                     orderRank = it.orderRank,
                     collectionId = collectionId,
@@ -93,7 +93,7 @@ class TextRepository : RepositoryBase(),
         return true
     }
 
-    override fun createRecordToCollectionRelationship(recordToCollection: TextToCollection): Boolean =
+    override fun associateRecordToCollection(recordToCollection: TextToCollection): Boolean =
         database.insert(TextToCollectionsModel) {
             set(it.collectionId, recordToCollection.collectionId)
             set(it.textId, recordToCollection.textId)

@@ -15,6 +15,6 @@ interface IVideoEntity : Entity<IVideoEntity>, IVideo {
 object VideosModel : Table<IVideoEntity>("videos") {
     val id = int("id").primaryKey().bindTo { it.id }
     val url = varchar("url").bindTo { it.url }
-    val title = varchar("title").bindTo { it.title }
+    val title = varchar("name").bindTo { it.title }
     val description = varchar("description").bindTo { it.description }
 }

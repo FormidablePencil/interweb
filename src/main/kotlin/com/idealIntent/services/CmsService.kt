@@ -41,7 +41,7 @@ class CmsService(
         // todo - revert if some component fails to save. Save all or save non
         TODO()
 //        request.map {
-//            compositionManager.insertComposition(it.compositionType)
+//            compositionManager.createComposition(it.compositionType)
 //        }
     }
 

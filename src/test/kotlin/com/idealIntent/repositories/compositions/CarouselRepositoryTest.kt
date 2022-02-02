@@ -1,17 +1,9 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import com.idealIntent.repositories.collectionsGeneric.ImageRepository
-import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
-import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
-import com.idealIntent.dtos.collectionsGeneric.images.Image
 
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImages
 import io.kotest.koin.KoinListener
-import io.kotest.matchers.shouldBe
 import shared.testUtils.BehaviorSpecUtRepo
-import shared.testUtils.rollback
 
 // NOTE: could be just a BehaviorSpec
 class CarouselRepositoryTest : BehaviorSpecUtRepo() {
@@ -21,7 +13,7 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
 //        lateinit var carouselRepository: CarouselOfImagesRepository
 //
 //        val carouselBasicImages = CarouselBasicImages(
-//            title = "Pet Projects",
+//            name = "Pet Projects",
 //            images = listOf(
 //                Image(
 //                    id = null,
@@ -55,8 +47,8 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
 //                Text(orderRank = 40000, text = "/pokedex"),
 //            ),
 //            privilegedAuthors = listOf(
-//                AuthorToPrivilege(modLvl = 1, authorId = 84),
-//                AuthorToPrivilege(modLvl = 1, authorId = 2)
+//                PrivilegedAuthorsToComposition(modLvl = 1, authorId = 84),
+//                PrivilegedAuthorsToComposition(modLvl = 1, authorId = 2)
 //            )
 //        )
 //
@@ -64,15 +56,15 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
 //            carouselRepository = CarouselOfImagesRepository(TextRepository(), ImageRepository(), PrivilegeRepository())
 //        }
 //
-//        given("insertComposition && getComposition") {
+//        given("createComposition && getComposition") {
 //            then("should have been created") {
 //                rollback {
-//                    val savedDataId = carouselRepository.insertComposition(carouselBasicImages)
+//                    val savedDataId = carouselRepository.createComposition(carouselBasicImages)
 //                        ?: throw Exception("failed to save data")
 //
 //                    val carouselOfImages = carouselRepository.getComposition(savedDataId)
 //
-//                    carouselOfImages.title shouldBe carouselBasicImages.title
+//                    carouselOfImages.name shouldBe carouselBasicImages.name
 //
 //                    // region asserting images
 //                    carouselOfImages.images.size shouldBe carouselBasicImages.images.size

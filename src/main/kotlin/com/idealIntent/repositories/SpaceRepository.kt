@@ -1,8 +1,8 @@
 package com.idealIntent.repositories
 
 import com.idealIntent.dtos.space.CreateSpaceRequest
-import models.space.ISpaceEntity
-import models.space.SpacesModel
+import com.idealIntent.models.space.ISpaceEntity
+import com.idealIntent.models.space.SpacesModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.insert

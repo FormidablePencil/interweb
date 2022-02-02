@@ -2,8 +2,8 @@ package com.idealIntent.managers
 
 import com.google.gson.Gson
 import com.idealIntent.repositories.SpaceRepository
+import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
-import com.idealIntent.repositories.collectionsGeneric.PrivilegeRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
@@ -17,7 +17,7 @@ class CompositionManager(
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
     private val imageRepository: ImageRepository,
     private val textRepository: TextRepository,
-    private val privilegeRepository: PrivilegeRepository,
+    private val compositionPrivilegesRepository: CompositionPrivilegesRepository,
 ) {
     fun getComposition() {
         // given some identifiers
@@ -36,7 +36,7 @@ class CompositionManager(
             CompositionCarousel.CarouselMagnifying -> TODO()
             CompositionCarousel.BasicImages ->
                 TODO()
-//                carouselOfImagesRepository.insertComposition(
+//                carouselOfImagesRepository.createComposition(
 //                    gson.fromJson(request.jsonData, CarouselBasicImages::class.java),
 //                )
         }

@@ -35,7 +35,7 @@ class CompositionManagerTest : BehaviorSpec({
 //
 //        val image = Image(description = "image description", url = "image url", orderRank = 1, id = 1)
 //        val navTo = Text(orderRank = 10000, text = "some link")
-//        val privilegedAuthors = PrivilegesModel(authorId = 1, modLvl = 2)
+//        val privilegedAuthors = PrivilegeSourcesModel(authorId = 1, modLvl = 2)
 //
 //        val req = CreateCompositionRequest(
 //            spaceAddress = "SDLFJEI",
@@ -43,7 +43,7 @@ class CompositionManagerTest : BehaviorSpec({
 //                compositionType = CompositionCategory.Carousel,
 //                jsonData = gson.toJson(
 //                    CarouselBasicImages(
-//                        title = "project images",
+//                        name = "project images",
 //                        images = listOf(image),
 //                        navToCorrespondingImagesOrder = listOf(navTo),
 //                        privilegedAuthors = listOf(privilegedAuthors)

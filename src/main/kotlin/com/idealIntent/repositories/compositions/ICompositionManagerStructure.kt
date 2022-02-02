@@ -8,30 +8,12 @@ import com.idealIntent.dtos.compositionCRUD.RecordUpdate
  * A CMS requires CRUD operations on compositions. This is an interface for all CRUD operational repositories of compositions
  * to adhere to for structure and CRUD operation requirements.
  *
- * @param MetadataOfComposition Metadata of collection such as ImagesCarousels
- * @param Composition Generic for compositions DTOs
- * @constructor Create empty structure for compositions
+ * @param Composition Records of composition.
+ * @param CompositionMetadata Composition information, ids, ect.
+ * @param CreateRequest Ids of compositions and collections to compose and raw data to save before composition.
+ * @param ComposePrepared Ids of composition and collections to created beforehand.
  */
-interface ICompositionStructure<MetadataOfComposition, Composition> {
-
-    // region Get
-    /**
-     * Get composition records by collection id
-     *
-     * @param id Get composition records under composition's id
-     * @return Composition records under [id] or null if failed to find by [id]
-     */
-    fun getComposition(id: Int): Composition
-
-    /**
-     * Get only composition's metadata and not it's associated records
-     *
-     * @param id ID of composition
-     * @return Composition's metadata and not associated records or null if failed to find by [id]
-     */
-    fun getMetadataOfComposition(id: Int): MetadataOfComposition?
-    // endregion Get
-
+interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared> {
 
     // region Insert
     /**
@@ -40,17 +22,9 @@ interface ICompositionStructure<MetadataOfComposition, Composition> {
      * @param composition Composition to insert
      * @return CollectionId or null if failed to insert [composition]
      */
-    fun insertComposition(composition: Composition): Int?
-
-    /**
-     * Batch insert [compositions] under a new collection
-     *
-     * @param compositions Compositions to insert
-     * @param label Name the collection
-     * @return CollectionId or null if failed to insert [compositions]
-     */
-    fun insertCompositions(compositions: List<Composition>, label: String): Int?
+    fun createComposition(createRequest: CreateRequest): Int?
     // endregion Insert
+
 
     // region Update
     /**
@@ -77,7 +51,5 @@ interface ICompositionStructure<MetadataOfComposition, Composition> {
 
     // todo deletes
     // region Delete
-    fun deleteComposition(id: Int): Boolean
-    fun batchDeleteCompositions(id: Int): Boolean
     // endregion Delete
 }
