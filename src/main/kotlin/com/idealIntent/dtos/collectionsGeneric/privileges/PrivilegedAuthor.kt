@@ -6,6 +6,6 @@ import models.privileges.IPrivilegedAuthor
 @Serializable
 data class PrivilegedAuthor(
     override val username: String,
-    override val modify: Boolean,
-    override val view: Boolean,
+    override val modify: Int,
+    override val view: Int,
 ) : IPrivilegedAuthor

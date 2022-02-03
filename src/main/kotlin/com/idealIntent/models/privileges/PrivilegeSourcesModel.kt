@@ -15,5 +15,5 @@ open class PrivilegeSourcesModel(alias: String?) : Table<IPrivilegeSourceEntity>
     override fun aliased(alias: String) = PrivilegeSourcesModel(alias)
 
     val id = int("id").primaryKey().bindTo { it.id }
-    val privilegeLevel = int("mod_lvl").bindTo { it.privilegeLevel }
+    val privilegeLevel = int("privilege_level").bindTo { it.privilegeLevel }
 }

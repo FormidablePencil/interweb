@@ -1,5 +1,5 @@
 package com.idealIntent.helpers
 
-enum class Reply {
-    Success, Failure
+enum class Reply(val bool: Boolean) {
+    Success(true), Failure(false)
 }

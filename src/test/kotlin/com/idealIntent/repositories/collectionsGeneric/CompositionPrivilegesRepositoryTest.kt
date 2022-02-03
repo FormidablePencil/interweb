@@ -1,46 +1,140 @@
 package com.idealIntent.repositories.collectionsGeneric
 
+import com.idealIntent.configurations.DIHelper
+import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.repositories.profile.AuthorRepository
-import io.kotest.core.spec.style.BehaviorSpec
+import integrationTests.auth.flows.SignupFlow
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.IsolationMode
+import io.kotest.koin.KoinListener
 import io.mockk.mockk
+import org.koin.test.inject
+import shared.DITestHelper
+import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.privilegedAuthors
+import shared.testUtils.rollback
+import java.sql.SQLIntegrityConstraintViolationException
 
-class CompositionPrivilegesRepositoryTest : BehaviorSpec() {
+class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
+    override fun listeners() = listOf(KoinListener(listOf(DIHelper.CoreModule, DITestHelper.FlowModule)))
+    override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
+
     private val authorRepository: AuthorRepository = mockk()
-    private val compositionPrivilegesRepository: CompositionPrivilegesRepository = mockk()
+    private val compositionPrivilegesRepository: CompositionPrivilegesRepository by inject()
+    private val signupFlow: SignupFlow by inject()
 
-    init {
-        val privilegedAuthors = privilegedAuthors
-
-        given("getPrivilegesByAuthorId") { }
-
-        given("getRecordToCollectionInfo") { }
-
-        given("giveAnAuthorPrivilege") {
+    suspend fun createAuthorsAndGivePrivileges(): List<Triple<PrivilegedAuthor, Int, CreateAuthorRequest>> =
+        privilegedAuthors.map {
+            val createAuthorRequest = CreateAuthorRequest(
+                email = it.username + "@gmail.com",
+                firstname = it.username,
+                lastname = it.username,
+                password = it.username + "Q123!",
+                username = it.username
+            )
+            return@map Triple(it, signupFlow.signupReturnId(createAuthorRequest), createAuthorRequest)
         }
 
-        given("giveMultipleAuthorsPrivilegesByUsername") { }
+    init {
+        beforeEach {
+            // create authors first
+        }
 
-        given("addPrivilegeSource") { }
+        xgiven("getPrivilegesByAuthorId") {
 
-        given("updateRecord") { }
+        }
 
-        given("batchUpdateRecords") { }
+        xgiven("getRecordToCollectionInfo") { }
 
-        given("deleteRecord") { }
+        given("giveAnAuthorPrivilege") {
+            then("should fail on not valid author ids") {
+                rollback {
+                    // region setup
+                    val randomIdOfUserThatDoesNotExist = 99999999
+                    val compositionsGenericPrivileges = CompositionsGenericPrivileges(
+                        modify = privilegedAuthors[0].modify,
+                        view = privilegedAuthors[0].view,
+                    )
+                    val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+                    // endregion
 
-        given("deleteAllRecordsInCollection") { }
+                    shouldThrow<SQLIntegrityConstraintViolationException> {
+                        compositionPrivilegesRepository.giveAnAuthorPrivilege(
+                            compositionsGenericPrivileges,
+                            authorId = randomIdOfUserThatDoesNotExist,
+                            privilegeId = privilegeSourceId
+                        )
+                    }
+                }
+            }
 
-        given("disassociateRecordFromCollection") { }
+            then("provide existing author ids but an invalid privilege source") {
+                rollback {
+                    // region setup - Create accounts
+                    val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
+                    val compositionsGenericPrivileges = CompositionsGenericPrivileges(
+                        modify = privilegedAuthor.modify,
+                        view = privilegedAuthor.view,
+                    )
+                    val randomIdOfPrivilegeSourceThatDoesNotExist = 99999999
+                    // endregion
 
-        given("deleteCollectionButNotRecord") { }
+                    shouldThrow<SQLIntegrityConstraintViolationException> {
+                        compositionPrivilegesRepository.giveAnAuthorPrivilege(
+                            compositionsGenericPrivileges,
+                            authorId = authorId,
+                            privilegeId = randomIdOfPrivilegeSourceThatDoesNotExist
+                        )
+                    }
+                }
+            }
 
-        given("batchCreateRecordToCollectionRelationship") { }
+            then("provide existing author ids and a privilege source") {
+                rollback {
+                    // region setup - Create accounts and create a privilege source
+                    val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
+                    val compositionsGenericPrivileges = CompositionsGenericPrivileges(
+                        modify = privilegedAuthor.modify,
+                        view = privilegedAuthor.view,
+                    )
+                    val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+                    // endregion
 
-        given("createRecordToCollectionRelationship") { }
+                    compositionPrivilegesRepository.giveAnAuthorPrivilege(
+                        compositionsGenericPrivileges,
+                        authorId = authorId,
+                        privilegeId = privilegeSourceId
+                    )
+                    compositionPrivilegesRepository.checkIfPrivileged(authorId, privilegeSourceId)
+                }
+            }
+        }
 
-        given("getRecordOfCollection") { }
+        xgiven("giveMultipleAuthorsPrivilegesByUsername") {
 
-        given("getRecordsQuery") { }
+        }
+
+        xgiven("addPrivilegeSource") { }
+
+        xgiven("updateRecord") { }
+
+        xgiven("batchUpdateRecords") { }
+
+        xgiven("deleteRecord") { }
+
+        xgiven("deleteAllRecordsInCollection") { }
+
+        xgiven("disassociateRecordFromCollection") { }
+
+        xgiven("deleteCollectionButNotRecord") { }
+
+        xgiven("batchCreateRecordToCollectionRelationship") { }
+
+        xgiven("createRecordToCollectionRelationship") { }
+
+        xgiven("getRecordOfCollection") { }
+
+        xgiven("getRecordsQuery") { }
     }
 }

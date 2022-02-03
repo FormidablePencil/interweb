@@ -21,8 +21,8 @@ open class PrivilegedAuthorsToCompositionsModel(alias: String?) :
 
     override fun aliased(alias: String) = PrivilegedAuthorsToCompositionsModel(alias)
 
-    val view = boolean("can_view").bindTo { it.view }
-    val modify = boolean("can_modify").bindTo { it.modify }
+    val view = int("view").bindTo { it.view }
+    val modify = int("modify").bindTo { it.modify }
 //    val authorId = int("author_id").bindTo { it.authorId }
     val authorId = int("author_id").references(AuthorsModel) { it.author }
     val privilegeId = int("privilege_id").bindTo { it.privilegeId }

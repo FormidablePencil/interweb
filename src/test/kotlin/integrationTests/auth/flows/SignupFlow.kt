@@ -1,5 +1,6 @@
 package integrationTests.auth.flows
 
+import com.auth0.jwt.JWT
 import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.dtos.auth.SignupResponse
 import com.idealIntent.exceptions.TempException
@@ -30,5 +31,13 @@ class SignupFlow : BehaviorSpecFlow() {
         }
     }
 
-
+    /**
+     * Create account and return author id
+     *
+     * @return Id of newly created author
+     */
+    suspend fun signupReturnId(request: CreateAuthorRequest = createAuthorRequest, cleanup: Boolean = false): Int {
+        val accessToken = signup(request, cleanup).data?.accessToken
+        return JWT().decodeJwt(accessToken).getClaim("authorId").asInt()
+    }
 }

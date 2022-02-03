@@ -12,6 +12,7 @@ import com.idealIntent.repositories.PasswordRepository
 import com.idealIntent.repositories.RefreshTokenRepository
 import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
 import com.idealIntent.repositories.codes.ResetPasswordCodeRepository
+import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
@@ -43,6 +44,7 @@ object DIHelper {
         single { ResetPasswordCodeRepository() }
         single { AccountRepository() }
         single { AuthorProfileRelatedRepository() }
+        single { CompositionPrivilegesRepository(get()) }
         // env com.idealIntent.configurations
         val dbConnection = Properties()
         dbConnection.load(FileInputStream("local.datasource.properties"))

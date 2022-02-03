@@ -42,10 +42,10 @@ val texts = listOf(
 )
 
 val privilegedAuthors = listOf(
-    PrivilegedAuthor("billy", modify = true, view = false),
-    PrivilegedAuthor("bob", modify = false, view = true),
-    PrivilegedAuthor("lex", modify = true, view = true),
-    PrivilegedAuthor("freya", modify = false, view = false),
+    PrivilegedAuthor("billy", modify = 1, view = 0),
+    PrivilegedAuthor("bob", modify = 0, view = 1),
+    PrivilegedAuthor("lex", modify = 1, view = 1),
+    PrivilegedAuthor("freya", modify = 0, view = 0),
 )
 // endregion compositions and collections
 

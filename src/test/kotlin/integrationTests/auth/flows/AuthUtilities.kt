@@ -1,6 +1,7 @@
 package integrationTests.auth.flows
 
 import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.dtos.auth.LoginByUsernameRequest
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorRepository
 import models.profile.IAccountEntity
@@ -31,6 +32,9 @@ class AuthUtilities : BehaviorSpecFlow() {
         val createAuthorRequest = CreateAuthorRequest(
             "6saberryyTest1235@gmail.com9", "CherryCas6as", "Alex", "Formidable!56", "Martini9"
         )
-
+        val loginByUsernameRequest = LoginByUsernameRequest(
+            username = createAuthorRequest.username,
+            password = createAuthorRequest.password,
+        )
     }
 }

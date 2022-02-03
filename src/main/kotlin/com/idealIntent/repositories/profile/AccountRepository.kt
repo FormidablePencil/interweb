@@ -9,6 +9,7 @@ import org.ktorm.dsl.eq
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 
+// todo - move AccountRepository and AuthorRepository to profile
 class AccountRepository : RepositoryBase() {
     private val Database.accounts get() = this.sequenceOf(AccountsModel)
 

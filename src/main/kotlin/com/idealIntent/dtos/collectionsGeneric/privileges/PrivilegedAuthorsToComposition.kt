@@ -8,6 +8,6 @@ import models.privileges.IPrivilegedAuthorsToComposition
 data class PrivilegedAuthorsToComposition(
     override val privilegeId: Int,
     override val authorId: Int,
-    override val modify: Boolean,
-    override val view: Boolean
+    override val modify: Int,
+    override val view: Int
 ) : IPrivilegedAuthorsToComposition

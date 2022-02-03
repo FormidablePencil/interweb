@@ -9,10 +9,51 @@ import models.profile.IAuthorEntity
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.add
+import org.ktorm.entity.removeIf
 import org.ktorm.entity.sequenceOf
 
-class AuthorProfileRelatedRepository : RepositoryBase() {
+// todo - rename to ProfileRepository or something like that
+class AuthorProfileRelatedRepository() : RepositoryBase() {
     private val Database.authors get() = this.sequenceOf(AuthorsModel)
+
+    fun getAuthorWithDetail(authorId: Int): AuthorWithDetail =
+        database.from(AuthorsModel)
+            .leftJoin(AuthorDetails, AuthorsModel.id eq AuthorDetails.authorId)
+            .select(
+                AuthorsModel.id,
+                AuthorsModel.username,
+                AuthorDetails.firstname,
+                AuthorDetails.lastname,
+            ).where(AuthorsModel.id eq authorId).map { row ->
+                AuthorWithDetail(
+                    authorId = row[AuthorsModel.id],
+                    username = row[AuthorsModel.username],
+                    firstname = row[AuthorDetails.firstname],
+                    lastname = row[AuthorDetails.lastname]
+                )
+            }.first()
+
+    fun getAuthorWithDetailAndAccount(authorId: Int): AuthorWithDetailAndAccount? =
+        database.from(AuthorsModel)
+            .leftJoin(AuthorDetails, AuthorsModel.id eq AuthorDetails.authorId)
+            .leftJoin(AccountsModel, AuthorsModel.id eq AccountsModel.authorId)
+            .select(
+                AuthorsModel.id,
+                AuthorsModel.username,
+                AuthorDetails.firstname,
+                AuthorDetails.lastname,
+                AccountsModel.email,
+            ).where(AuthorsModel.id eq authorId).map { row ->
+                if (row[AuthorsModel.id] == null) return null
+                AuthorWithDetailAndAccount(
+                    authorId = row[AuthorsModel.id]!!,
+                    username = row[AuthorsModel.username]!!,
+                    firstname = row[AuthorDetails.firstname],
+                    lastname = row[AuthorDetails.lastname],
+                    email = row[AccountsModel.email]
+                )
+            }.first()
+
 
     fun createNewAuthor(request: CreateAuthorRequest): Int? {
         val author = IAuthorEntity {
@@ -33,46 +74,6 @@ class AuthorProfileRelatedRepository : RepositoryBase() {
         }
 
         return author.id
-    }
-
-    fun getAuthorWithDetail(authorId: Int): AuthorWithDetail {
-        return database.from(AuthorsModel)
-            .leftJoin(AuthorDetails, AuthorsModel.id eq AuthorDetails.authorId)
-            .select(
-                AuthorsModel.id,
-                AuthorsModel.username,
-                AuthorDetails.firstname,
-                AuthorDetails.lastname,
-            ).where(AuthorsModel.id eq authorId).map { row ->
-                AuthorWithDetail(
-                    authorId = row[AuthorsModel.id],
-                    username = row[AuthorsModel.username],
-                    firstname = row[AuthorDetails.firstname],
-                    lastname = row[AuthorDetails.lastname]
-                )
-            }.first()
-    }
-
-    fun getAuthorWithDetailAndAccount(authorId: Int): AuthorWithDetailAndAccount? {
-        return database.from(AuthorsModel)
-            .leftJoin(AuthorDetails, AuthorsModel.id eq AuthorDetails.authorId)
-            .leftJoin(AccountsModel, AuthorsModel.id eq AccountsModel.authorId)
-            .select(
-                AuthorsModel.id,
-                AuthorsModel.username,
-                AuthorDetails.firstname,
-                AuthorDetails.lastname,
-                AccountsModel.email,
-            ).where(AuthorsModel.id eq authorId).map { row ->
-                if (row[AuthorsModel.id] == null) return null
-                AuthorWithDetailAndAccount(
-                    authorId = row[AuthorsModel.id]!!,
-                    username = row[AuthorsModel.username]!!,
-                    firstname = row[AuthorDetails.firstname],
-                    lastname = row[AuthorDetails.lastname],
-                    email = row[AccountsModel.email]
-                )
-            }.first()
     }
 }
 
