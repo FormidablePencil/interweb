@@ -30,9 +30,7 @@ class CarouselOfImagesManager(
     val appEnv: AppEnv by inject()
 
     // region Get
-    fun getMetadataOfComposition(id: Int): IImagesCarouselEntity {
-        TODO()
-    }
+
     // endregion Get
 
     // region Insert
@@ -48,21 +46,18 @@ class CarouselOfImagesManager(
      * @see ICompositionManagerStructure.createComposition
      * @return Id of the newly created composition
      */
-    override fun createComposition(createRequest: CarouselBasicImagesReq): CompositionResponse {
+    override fun createComposition(createRequest: CarouselBasicImagesReq): CompositionResponse =
         appEnv.database.useTransaction {
             val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
             val (_, redirectsCollectionId) = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
             val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
-
-            val (hasFailed, hasFailedAtAuthorLookup, username) = compositionPrivilegesRepository.giveMultipleAuthorsPrivilegesByUsername(
+            val (gaveAuthorsPrivileges, username) = compositionPrivilegesRepository.giveMultipleAuthorsPrivilegesByUsername(
                 createRequest.privilegedAuthors, privilegeSourceId
             )
-            if (hasFailed) {
+            if (!gaveAuthorsPrivileges) {
                 it.rollback()
-                return if (hasFailedAtAuthorLookup)
-                    CompositionResponse().failed(CompositionCode.FailedToGivePrivilege, username)
-                else CompositionResponse().failed(CompositionCode.FailedAtAuthorLookup, username)
+                return CompositionResponse().failed(CompositionCode.FailedAtAuthorLookup, username)
             }
 
             val compositionId = carouselOfImagesRepository.compose(
@@ -76,7 +71,6 @@ class CarouselOfImagesManager(
 
             return CompositionResponse().succeeded(HttpStatusCode.Created, compositionId)
         }
-    }
     // endregion Insert
 
     // region Delete

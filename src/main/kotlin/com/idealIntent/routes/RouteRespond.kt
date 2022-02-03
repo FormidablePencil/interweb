@@ -17,7 +17,7 @@ suspend inline fun <reified Data, Enum, ClassExtendedFrom> routeRespond(
         val result = code()
         when (result.isSuccess) {
 //            null -> throw TempException("Response was not returned with a success nor failure.", "routeRespond")
-            false -> call.respond(result.statusCode()!!, result.message())
+//            false -> call.respond(result.statusCode()!!, result.message())
             true -> call.respond(result.data!!)
         }
     } catch (ex: ServerErrorException) {

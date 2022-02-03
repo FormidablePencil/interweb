@@ -11,6 +11,7 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.clearAllMocks
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.rollback
+import shared.testUtils.texts
 
 class TextRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(DIHelper.CoreModule))
@@ -23,12 +24,6 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
             textRepository = TextRepository()
         }
 
-        val texts = listOf(
-            Text(null, 10000, "first"),
-            Text(null, 20000, "second"),
-            Text(null, 30000, "third"),
-            Text(null, 40000, "fourth"),
-        )
         given("insertRecord") {
             And("addRecordCollection") {
                 And("createRecordToCollectionRelationship") {

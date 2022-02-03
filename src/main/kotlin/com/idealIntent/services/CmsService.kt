@@ -5,21 +5,22 @@ import com.idealIntent.dtos.compositionCRUD.BatchUpdateCompositionRequest
 import com.idealIntent.dtos.compositionCRUD.BatchUpdateCompositionsRequest
 import com.idealIntent.dtos.compositionCRUD.SingleUpdateCompositionRequest
 import com.idealIntent.dtos.compositionCRUD.UpdateCompositionRequest
-import com.idealIntent.managers.CompositionManager
-import com.idealIntent.repositories.SpaceRepository
-import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.managers.compositions.carousels.CarouselsManager
 import dtos.compositions.CompositionCategory
-import dtos.compositions.carousels.CarouselOfImagesTABLE
 import dtos.space.IUserComposition
 
+/**
+ * Cms service.
+ *
+ * There are 5 levels of depth to composition logic.
+ * [cms server][CmsService],
+ * [composition of category manager][com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure],
+ * [composition of category repository][com.idealIntent.repositories.compositions.ICompositionRepoStructure],
+ * [collection repositories][com.idealIntent.repositories.collections.ICollectionStructure].
+ */
 class CmsService(
-    private val spaceRepository: SpaceRepository,
-    private val compositionManager: CompositionManager,
-    private val carouselOfImagesRepository: CarouselOfImagesRepository,
-    private val textRepository: TextRepository,
-    private val bannerRepository: BasicBannerRepository,
+    private val carouselsManager: CarouselsManager,
 ) {
 
     fun getAuthorsCompositions(authorId: Int) {
@@ -28,7 +29,20 @@ class CmsService(
 
     fun getCompositionOfSpace(spaceAddress: String) {
         // spaces table should hold a collection of all components, id of components and what component (whatComponent: Enum(value: Int))
-        compositionManager.getCompositionOfSpace(spaceAddress)
+//        compositionManager.getCompositionOfSpace(spaceAddress)
+    }
+
+
+    fun createComposition(compositionCategory: Int, jsonData: String): CompositionResponse {
+        return when (CompositionCategory.fromInt(compositionCategory)) {
+            CompositionCategory.Text -> TODO()
+            CompositionCategory.Markdown -> TODO()
+            CompositionCategory.Banner -> TODO()
+            CompositionCategory.OneOffGrid -> TODO()
+            CompositionCategory.Divider -> TODO()
+            CompositionCategory.LineDivider -> TODO()
+            CompositionCategory.Carousel -> carouselsManager.createCompositionOfCategory(compositionCategory, jsonData)
+        }
     }
 
     /**
@@ -151,10 +165,11 @@ class CmsService(
             // region Just texts
             CompositionCategory.Markdown,
             CompositionCategory.Text ->
-                textRepository.batchUpdateRecords(
-                    records = request.updateToData,
-                    collectionId = request.id
-                )
+                TODO()
+//                textRepository.batchUpdateRecords(
+//                    records = request.updateToData,
+//                    collectionId = request.id
+//                )
             // endregion
 
             // region Banners

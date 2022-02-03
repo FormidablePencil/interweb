@@ -3,6 +3,8 @@ package com.idealIntent.repositories.collectionsGeneric
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthorsToComposition
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.privileges.IPrivilegedAuthorsToCompositionEntity
 import com.idealIntent.models.privileges.PrivilegeSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
@@ -68,32 +70,31 @@ class CompositionPrivilegesRepository(
     /**
      * Give multiple authors privileges by username
      *
-     * @param privilegedAuthors
-     * @param privilegeId
-     * @return Pair(has succeeded, has failed at author look up, username)
+     * @return [Success or failure reply][com.idealIntent.helpers.Reply], username that failed to find
      */
     fun giveMultipleAuthorsPrivilegesByUsername(
-        privilegedAuthors: List<PrivilegedAuthor>, privilegeId: Int,
-    ): Triple<Boolean, Boolean, String> = database.useTransaction { transaction ->
-        privilegedAuthors.forEach {
-            val author = authorRepository.getByUsername(it.username)
-            if (author == null) {
-                transaction.rollback()
-                return Triple(false, true, it.username)
-            }
+        privilegedAuthors: List<PrivilegedAuthor>,
+        privilegeId: Int
+    ): Pair<Boolean, String?> =
+        database.useTransaction { transaction ->
+            privilegedAuthors.forEach {
+                val author = authorRepository.getByUsername(it.username)
+                if (author == null) {
+                    transaction.rollback()
+                    return Pair(false, it.username)
+                }
 
-            val gavePrivileges = giveAnAuthorPrivilege(
-                privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
-                authorId = author.id,
-                privilegeId = privilegeId
-            )
-            if (!gavePrivileges) {
-                transaction.rollback()
-                return Triple(false, false, it.username)
+                val gavePrivileges = giveAnAuthorPrivilege(
+                    privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
+                    authorId = author.id,
+                    privilegeId = privilegeId
+                )
+                if (!gavePrivileges) {
+                    throw CompositionExceptionReport(CompositionCode.FailedToGivePrivilege, this::class.java)
+                }
             }
+            return Pair(true, null) // todo - create a generic return Enum of Success and Failure and use that all over.
         }
-        return Triple(true, false, "")
-    }
 
 
     /**

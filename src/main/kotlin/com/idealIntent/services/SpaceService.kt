@@ -7,7 +7,6 @@ import com.idealIntent.dtos.space.GetSpaceRequest
 import com.idealIntent.dtos.space.GetSpaceResponse
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.helpers.RandomStringGenerator
-import com.idealIntent.managers.CompositionManager
 import com.idealIntent.repositories.SpaceRepository
 import dtos.space.CreateSpaceResponseFailed
 import dtos.space.SpaceResponseFailed
@@ -69,7 +68,6 @@ import io.ktor.http.*
 
 class SpaceService(
     private val spaceRepository: SpaceRepository,
-    private val componentManager: CompositionManager,
 ) {
 
     fun getSpaceByAddress(request: GetSpaceRequest): GetSpaceResponse {

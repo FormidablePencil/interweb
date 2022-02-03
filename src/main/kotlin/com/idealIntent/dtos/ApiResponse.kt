@@ -49,8 +49,8 @@ abstract class BaseApiResponse<Enum, ClassExtendedFrom>(
 
     var code: Enum? = null
 
-    fun message(): String {
-        return if (code == null) ""
+    fun message(): String? {
+        return if (code == null) null
         else enum.getClientMsg(code!!)
     }
 

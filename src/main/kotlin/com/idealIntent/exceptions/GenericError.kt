@@ -19,7 +19,7 @@ enum class GenericError {
          */
         fun getMsg(enum: GenericError): String {
             return when (enum) {
-                ServerError -> "Sorry something wrong."
+                ServerError -> "Sorry, something went wrong."
             }
         }
 

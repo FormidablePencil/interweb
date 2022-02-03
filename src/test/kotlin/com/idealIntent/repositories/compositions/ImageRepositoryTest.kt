@@ -10,6 +10,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.clearAllMocks
 import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.images
 import shared.testUtils.rollback
 
 class ImageRepositoryTest : BehaviorSpecUtRepo() {
@@ -23,32 +24,6 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
             imageRepository = ImageRepository()
         }
 
-        val images = listOf(
-            Image(
-                null,
-                10000,
-                "PAO Mnemonic System",
-                " https://i.ibb.co/1K7jQJw/pao.png"
-            ),
-            Image(
-                null,
-                20000,
-                "Emoji Tack Toes",
-                "https://i.ibb.co/pXgcQ16/ticktacktoe.png"
-            ),
-            Image(
-                null,
-                30000,
-                "Crackalackin",
-                "https://i.ibb.co/4YP7yDb/crackalackin.png"
-            ),
-            Image(
-                null,
-                40000,
-                "Pokedex",
-                "https://i.ibb.co/w0m4pF3/pokedex.png"
-            ),
-        )
 
         // region Insert
         given("insertRecord") {
