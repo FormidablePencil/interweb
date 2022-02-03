@@ -1,8 +1,8 @@
 package com.idealIntent.repositories.collections
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionExceptionReport
 import org.ktorm.database.Database
 
 /**
@@ -78,17 +78,13 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
 //    fun batchInsertNewRecords(records: List<Record>): List<Int>?
     // endregion
 
-    fun batchInsertRecordsToNewCollection(records: List<Record>): Pair<List<Record>, Int>? {
-        try {
-            database.useTransaction {
-                val aRecords = batchInsertRecords(records)
-                val collectionId = addRecordCollection()
-                if (!batchAssociateRecordsToCollection(aRecords, collectionId))
-                    throw CompositionException(CompositionCode.FailedToInsertRecord)
-                return Pair(aRecords, collectionId)
-            }
-        } catch (ex: CompositionException) {
-            return null
+    fun batchInsertRecordsToNewCollection(records: List<Record>): Pair<List<Record>, Int> {
+        database.useTransaction {
+            val aRecords = batchInsertRecords(records)
+            val collectionId = addRecordCollection()
+            if (!batchAssociateRecordsToCollection(aRecords, collectionId)) {
+                throw CompositionExceptionReport(CompositionCode.FailedToInsertRecord, this::class.java)
+            } else return Pair(aRecords, collectionId)
         }
     }
 

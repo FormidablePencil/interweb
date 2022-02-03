@@ -16,12 +16,6 @@ import org.ktorm.entity.sequenceOf
 
 data class PrivilegeRecord(val id: Int)
 
-// privilege source
-// privileged authors
-// what are authors privileged
-// author_to_compositional_privilege could hold the privileges -
-// can modify: bool, can view: bool. author_to_compositional_privilege will be a general purpose
-
 data class CompositionsGenericPrivileges(
     override val modify: Boolean,
     override val view: Boolean,
@@ -35,7 +29,6 @@ class CompositionPrivilegesRepository(
     private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionsModel)
 
     // region Get
-    // get all who is privileged... No.
     fun getPrivilegesByAuthorId(getPrivilegesOfAuthorId: Int): Pair<List<PrivilegeRecord>, Int> {
         TODO()
 //        val privCol = Privileges.aliased("privCol")

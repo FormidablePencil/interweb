@@ -17,6 +17,12 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
 
     // region Insert
     /**
+     * Firstly creates composition's collections and compositions (side note - some compositions are nested in one another),
+     * inserts the records and creates a record to collection relationship.
+     * Then creates privileges for the composition and assigns them to author by specified authorIds their privileges.
+     * Then takes the collection and composition ids and sends them off to compose. If everything went
+     * well the user will get the id of the newly composed composition.
+     *
      * Insert [composition] under a new collection
      *
      * @param composition Composition to insert

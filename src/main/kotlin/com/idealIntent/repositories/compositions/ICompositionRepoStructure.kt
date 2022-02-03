@@ -2,10 +2,10 @@ package com.idealIntent.repositories.compositions
 
 interface ICompositionRepoStructure<Composition, CompositionMetadata, CreateComposition, ComposePrepared> {
     /**
-     * Get composition records by collection id
+     * Get composition.
      *
-     * @param id Get composition records under composition's id
-     * @return Composition records under [id] or null if failed to find by [id]
+     * @param id Id of composition to get by.
+     * @return All records of composition.
      */
     fun getComposition(id: Int): Composition?
 
@@ -22,12 +22,9 @@ interface ICompositionRepoStructure<Composition, CompositionMetadata, CreateComp
 
     // region Insert
     /**
-     * Composes compositions and collections.
+     * Take ids of collections, compositions and privilege source and insert them into composition's foreign key columns.
      *
-     * Would have been a private method if it wasn't for this interface. We opted for structure.
-     *
-     * @param composePrepared Ids of composition and collections to compose.
-     * @return
+     * @return Id of the newly created composition.
      */
     fun compose(composePrepared: ComposePrepared): Int?
     // endregion Insert

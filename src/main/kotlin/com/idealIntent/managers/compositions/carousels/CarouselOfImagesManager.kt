@@ -7,7 +7,6 @@ import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
@@ -29,7 +28,6 @@ class CarouselOfImagesManager(
 ) : ICompositionManagerStructure<CarouselBasicImagesReq, IImagesCarouselEntity,
         CarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
     val appEnv: AppEnv by inject()
-    // todo - there will be multiple kinds of carousels thus will be a component of a component some day
 
     // region Get
     fun getMetadataOfComposition(id: Int): IImagesCarouselEntity {
@@ -38,52 +36,45 @@ class CarouselOfImagesManager(
     // endregion Get
 
     // region Insert
+    /**
+     * Insert images and redirection texts, create a collection for each, create an association between image and
+     * assign privileges compositions to specified authors. If either looking up author by id or assigning privileges to
+     * authors fails then return a response a fail response to client with the author's username that failed.
+     * Otherwise, if all went well, pass ids of image's and redirection text's collections to
+     * [compose][CarouselOfImagesRepository.compose]. Then return id of the newly created composition.
+     *
+     * @exception CompositionExceptionReport Edge case if fails to compose collections.
+     *
+     * @see ICompositionManagerStructure.createComposition
+     * @return Id of the newly created composition
+     */
     override fun createComposition(createRequest: CarouselBasicImagesReq): CompositionResponse {
-        try {
-            appEnv.database.useTransaction {
-                // todo - handle transaction throw exception
-                val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
-                    ?: run {
-                        it.rollback();
-                        return CompositionResponse().failed(CompositionCode.FailedToInsertRecord, "images.")
-                    }
+        appEnv.database.useTransaction {
+            val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
+            val (_, redirectsCollectionId) = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
-                val (_, redirectsCollectionId) = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
-                    ?: run {
-                        it.rollback();
-                        return CompositionResponse().failed(CompositionCode.FailedToInsertRecord, "redirects.")
-                    }
+            val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
 
-                val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+            val (hasFailed, hasFailedAtAuthorLookup, username) = compositionPrivilegesRepository.giveMultipleAuthorsPrivilegesByUsername(
+                createRequest.privilegedAuthors, privilegeSourceId
+            )
+            if (hasFailed) {
+                it.rollback()
+                return if (hasFailedAtAuthorLookup)
+                    CompositionResponse().failed(CompositionCode.FailedToGivePrivilege, username)
+                else CompositionResponse().failed(CompositionCode.FailedAtAuthorLookup, username)
+            }
 
-                val (hasFailed, hasFailedAtAuthorLookup, username) = compositionPrivilegesRepository.giveMultipleAuthorsPrivilegesByUsername(
-                    createRequest.privilegedAuthors, privilegeSourceId
+            val compositionId = carouselOfImagesRepository.compose(
+                CarouselOfImagesComposePrepared(
+                    name = createRequest.name,
+                    imageCollectionId = imageCollectionId,
+                    redirectTextCollectionId = redirectsCollectionId,
+                    privilegeId = privilegeSourceId,
                 )
-                if (hasFailed) {
-                    it.rollback()
-                    return if (hasFailedAtAuthorLookup)
-                        CompositionResponse().failed(CompositionCode.FailedToGivePrivilege, username)
-                    else CompositionResponse().failed(CompositionCode.FailedAtAuthorLookup, username)
-                }
+            ) ?: throw CompositionExceptionReport(CompositionCode.FailedToCompose, this::class.java)
 
-                val compositionId = carouselOfImagesRepository.compose(
-                    CarouselOfImagesComposePrepared(
-                        name = createRequest.name,
-                        imageCollectionId = imageCollectionId,
-                        redirectTextCollectionId = redirectsCollectionId,
-                        privilegeId = privilegeSourceId,
-                    )
-                ) ?: throw CompositionExceptionReport(CompositionCode.FailedToCompose, this::class.java)
-
-                return CompositionResponse().succeeded(HttpStatusCode.Created, compositionId)
-            }
-        } catch (ex: CompositionException) {
-            ex.message
-            return when (ex.code) {
-                CompositionCode.FailedToInsertRecord -> CompositionResponse().failed(CompositionCode.FailedToInsertRecord)
-                CompositionCode.FailedToFindAuthor -> CompositionResponse().failed(CompositionCode.FailedToFindAuthor)
-                else -> throw CompositionExceptionReport(CompositionCode.ServerError, this::class.java)
-            }
+            return CompositionResponse().succeeded(HttpStatusCode.Created, compositionId)
         }
     }
     // endregion Insert
@@ -95,8 +86,6 @@ class CarouselOfImagesManager(
 
     // region CarouselOfImages
 
-    // todo - if multiple comps in one repository then which one to delete?
-    // CarouselOfImagesRepository only for sql queries concerning all carousel components
     // Everything else will be extracted into managers. SpaceResponseFailed manager for each component of category (e.g. carousel.CarouselBasicImages)
     fun deleteComposition(id: Int): Boolean {
         TODO()

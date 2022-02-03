@@ -27,7 +27,11 @@ data class CarouselOfImagesComposePrepared(
     val name: String,
 )
 
-// todo - get ICollectionStructure implemented or create a new one just for Composition lvl repositories
+/**
+ * Carousel of images repository - responsible for carousel_of_images CRUD actions.
+ *
+ * Check out [getComposition] to see what the composition consists of.
+ */
 class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
@@ -98,7 +102,6 @@ class CarouselOfImagesRepository(
             privilegedAuthors = privilegedAuthors
         )
     }
-
     // endregion Get
 
     // region Insert

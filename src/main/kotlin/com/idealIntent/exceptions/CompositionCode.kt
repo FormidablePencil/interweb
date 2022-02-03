@@ -28,9 +28,9 @@ enum class CompositionCode {
             return when (code) {
                 FailedToGivePrivilege -> "Failed give user privileges."
                 FailedToCompose -> "Failed to compose."
+                FailedToInsertRecord -> "Failed to insert records."
 
                 ServerError -> genericServerError
-                FailedToInsertRecord,
                 FailedToFindAuthor,
                 FailedAtAuthorLookup,
                 -> {
@@ -42,13 +42,13 @@ enum class CompositionCode {
 
         override fun getClientMsg(code: CompositionCode): String {
             return when (code) {
-                FailedToInsertRecord -> "Failed to insert records."
                 FailedToFindAuthor -> "Failed to find an author to give privileges to."
                 FailedAtAuthorLookup -> "Author by id does not exist."
 
                 FailedToGivePrivilege,
                 ServerError -> genericServerError
 
+                FailedToInsertRecord,
                 FailedToCompose -> contextualServerErrorResponse(code)
             }
         }
