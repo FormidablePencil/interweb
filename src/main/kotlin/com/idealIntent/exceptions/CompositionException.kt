@@ -9,18 +9,18 @@ package com.idealIntent.exceptions
  * to given enum. moreDetails is passed in constructor, message of moreDetails gets appended[] to client-friendly message.
  */
 class CompositionException : Exception {
-    val code: CompositionCodeReport
+    val code: CompositionCode
 
     constructor(
-        code: CompositionCodeReport,
-    ) : super(CompositionCodeReport.getClientMsg(code)) {
+        code: CompositionCode,
+    ) : super(CompositionCode.getClientMsg(code)) {
         this.code = code
     }
 
     constructor(
-        code: CompositionCodeReport,
+        code: CompositionCode,
         moreDetails: String,
-    ) : super(CompositionCodeReport.getClientMsg(code) + appendMoreDetails(moreDetails)) {
+    ) : super(CompositionCode.getClientMsg(code) + appendMoreDetails(moreDetails)) {
         this.code = code
     }
 }

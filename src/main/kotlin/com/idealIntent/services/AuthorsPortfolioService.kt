@@ -1,8 +1,8 @@
 package com.idealIntent.services
 
+import com.idealIntent.dtos.space.GetLayoutResultResponse
 import com.idealIntent.managers.AuthorsPortfolioManager
 import com.idealIntent.repositories.profile.AuthorRepository
-import dtos.portfolio.GetLayoutResult
 import models.portfolio.LayoutComponent
 import models.profile.IAuthorEntity
 
@@ -10,11 +10,11 @@ class AuthorsPortfolioService(
     private val authorRepository: AuthorRepository,
     private val authorsPortfolioManager: AuthorsPortfolioManager,
 ) {
-    fun GetLayout(authorId: Int, layoutId: Int): GetLayoutResult {
+    fun GetLayout(authorId: Int, layoutId: Int): GetLayoutResultResponse {
         authorsPortfolioManager.GetLayout(layoutId)
         val listOfComponents = listOf(LayoutComponent(1))
         val componentArrangement = listOf(1, 2)
-        return GetLayoutResult(listOfComponents, componentArrangement)
+        return GetLayoutResultResponse(listOfComponents, componentArrangement)
     }
 
     fun GetAuthorsLayouts(authorId: Int): List<Int> {

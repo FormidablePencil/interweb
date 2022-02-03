@@ -1,17 +1,16 @@
 package integrationTests.auth.flows
 
-import dtos.auth.LoginResponse
-import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.dtos.CreateAuthorRequest
+import com.idealIntent.dtos.auth.LoginByEmailRequest
+import com.idealIntent.dtos.auth.LoginByUsernameRequest
+import com.idealIntent.dtos.auth.LoginResponse
+import com.idealIntent.exceptions.TempException
+import com.idealIntent.services.AuthorizationService
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
 import org.koin.test.inject
 import org.opentest4j.AssertionFailedError
-import com.idealIntent.dtos.CreateAuthorRequest
-import com.idealIntent.dtos.auth.LoginByEmailRequest
-import com.idealIntent.dtos.auth.LoginByUsernameRequest
-import com.idealIntent.exceptions.TempException
-import com.idealIntent.services.AuthorizationService
 import shared.testUtils.BehaviorSpecFlow
 import shared.testUtils.rollback
 

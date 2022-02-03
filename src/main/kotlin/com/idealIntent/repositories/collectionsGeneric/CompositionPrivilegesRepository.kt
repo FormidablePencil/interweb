@@ -1,11 +1,13 @@
 package com.idealIntent.repositories.collectionsGeneric
 
+import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthorsToComposition
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.models.privileges.IPrivilegedAuthorsToCompositionEntity
 import com.idealIntent.models.privileges.PrivilegeSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
 import com.idealIntent.repositories.RepositoryBase
+import com.idealIntent.repositories.profile.AuthorRepository
 import models.privileges.ICompositionsGenericPrivileges
 import org.ktorm.database.Database
 import org.ktorm.dsl.insert
@@ -22,11 +24,13 @@ data class PrivilegeRecord(val id: Int)
 
 data class CompositionsGenericPrivileges(
     override val modify: Boolean,
-    override val view: Boolean
+    override val view: Boolean,
 ) : ICompositionsGenericPrivileges
 
 // todo privilege and privileges are used interchangeably. Fix this typo
-class CompositionPrivilegesRepository : RepositoryBase() {
+class CompositionPrivilegesRepository(
+    private val authorRepository: AuthorRepository,
+) : RepositoryBase() {
     private val Database.privilegeSource get() = this.sequenceOf(PrivilegeSourcesModel)
     private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionsModel)
 
@@ -69,6 +73,37 @@ class CompositionPrivilegesRepository : RepositoryBase() {
     }
 
     /**
+     * Give multiple authors privileges by username
+     *
+     * @param privilegedAuthors
+     * @param privilegeId
+     * @return Pair(has succeeded, has failed at author look up, username)
+     */
+    fun giveMultipleAuthorsPrivilegesByUsername(
+        privilegedAuthors: List<PrivilegedAuthor>, privilegeId: Int,
+    ): Triple<Boolean, Boolean, String> = database.useTransaction { transaction ->
+        privilegedAuthors.forEach {
+            val author = authorRepository.getByUsername(it.username)
+            if (author == null) {
+                transaction.rollback()
+                return Triple(false, true, it.username)
+            }
+
+            val gavePrivileges = giveAnAuthorPrivilege(
+                privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
+                authorId = author.id,
+                privilegeId = privilegeId
+            )
+            if (!gavePrivileges) {
+                transaction.rollback()
+                return Triple(false, false, it.username)
+            }
+        }
+        return Triple(true, false, "")
+    }
+
+
+    /**
      * Add [privilege source][models.privileges.IPrivilegeSource] which is a table to for compositions to key off of,
      * making the privileges unique to every kind of compositional record that's references it.
      *
@@ -78,11 +113,11 @@ class CompositionPrivilegesRepository : RepositoryBase() {
         database.insertAndGenerateKey(PrivilegeSourcesModel) {
             set(it.privilegeLevel, privilegeLevel)
         } as Int
-    // endregion Insert
+// endregion Insert
 
 
     // region Update
-     fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
+    fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
         TODO()
 //        val collection =
 //            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
@@ -105,7 +140,7 @@ class CompositionPrivilegesRepository : RepositoryBase() {
 //        }
     }
 
-     fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
+    fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
         TODO()
 //        val collection =
 //            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
@@ -130,47 +165,47 @@ class CompositionPrivilegesRepository : RepositoryBase() {
 //            }
 //        }
     }
-    // endregion Update
+// endregion Update
 
 
     // region Delete
-     fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
+    fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 
-     fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
+    fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 
-     fun deleteAllRecordsInCollection(collectionId: Int) {
+    fun deleteAllRecordsInCollection(collectionId: Int) {
         TODO("Not yet implemented")
     }
 
-     fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
+    fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
         TODO("Not yet implemented")
     }
 
-     fun deleteCollectionButNotRecord() {
+    fun deleteCollectionButNotRecord() {
         TODO("Not yet implemented")
     }
 
-     fun batchCreateRecordToCollectionRelationship(
+    fun batchCreateRecordToCollectionRelationship(
         records: List<PrivilegeRecord>,
-        collectionId: Int
+        collectionId: Int,
     ): Boolean {
         TODO("Not yet implemented")
     }
 
-     fun createRecordToCollectionRelationship(recordToCollection: PrivilegedAuthorsToComposition): Boolean {
+    fun createRecordToCollectionRelationship(recordToCollection: PrivilegedAuthorsToComposition): Boolean {
         TODO("Not yet implemented")
     }
 
-     fun getRecordOfCollection(recordId: Int, collectionId: Int): PrivilegeRecord? {
+    fun getRecordOfCollection(recordId: Int, collectionId: Int): PrivilegeRecord? {
         TODO("Not yet implemented")
     }
 
-     fun getRecordsQuery(recordId: Int?, collectionId: Int): List<PrivilegeRecord> {
+    fun getRecordsQuery(recordId: Int?, collectionId: Int): List<PrivilegeRecord> {
         TODO("Not yet implemented")
     }
-    // endregion Delete
+// endregion Delete
 }

@@ -2,7 +2,7 @@ package com.idealIntent.repositories.collections
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.exceptions.CompositionCodeReport
+import com.idealIntent.exceptions.CompositionCode
 import org.ktorm.database.Database
 
 /**
@@ -84,7 +84,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
                 val aRecords = batchInsertRecords(records)
                 val collectionId = addRecordCollection()
                 if (!batchAssociateRecordsToCollection(aRecords, collectionId))
-                    throw CompositionException(CompositionCodeReport.FailedToInsertRecord)
+                    throw CompositionException(CompositionCode.FailedToInsertRecord)
                 return Pair(aRecords, collectionId)
             }
         } catch (ex: CompositionException) {

@@ -12,7 +12,7 @@ import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 
 /**
- * A carousel composition. Composes of a collection of images and a collection of redirect links which is
+ * SpaceResponseFailed carousel composition. Composes of a collection of images and a collection of redirect links which is
  * mapped over images. When an image of carousel is click the user will be redirected to another site.
  */
 interface IImagesCarouselEntity : Entity<IImagesCarouselEntity> {

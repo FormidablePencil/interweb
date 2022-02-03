@@ -2,9 +2,8 @@ package com.idealIntent.services
 
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.CreateAuthorRequest
-import com.idealIntent.dtos.auth.LoginByEmailRequest
-import com.idealIntent.dtos.auth.LoginByUsernameRequest
-import com.idealIntent.dtos.auth.TokenResponseData
+import com.idealIntent.dtos.auth.*
+import com.idealIntent.dtos.succeeded
 import com.idealIntent.helpers.maskEmail
 import com.idealIntent.managers.EmailManager
 import com.idealIntent.managers.PasswordManager
@@ -13,13 +12,9 @@ import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
-import dtos.auth.LoginResponse
 import dtos.auth.LoginResponseFailed
-import dtos.auth.ResetPasswordResponse
-import dtos.auth.TokensResponse
 import dtos.responseData.ITokenResponseData
 import dtos.signup.SignupResponseFailed
-import dtos.succeeded
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe

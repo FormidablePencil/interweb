@@ -5,7 +5,7 @@ import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 /**
  * Structure for CRUD operations on compositions
  *
- * A CMS requires CRUD operations on compositions. This is an interface for all CRUD operational repositories of compositions
+ * SpaceResponseFailed CMS requires CRUD operations on compositions. This is an interface for all CRUD operational repositories of compositions
  * to adhere to for structure and CRUD operation requirements.
  *
  * @param Composition Records of composition.

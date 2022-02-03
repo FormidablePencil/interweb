@@ -1,16 +1,15 @@
 package com.idealIntent.managers
 
 import com.idealIntent.configurations.AppEnv
-import dtos.auth.ResetPasswordResponse
-import dtos.succeeded
-import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.dtos.auth.ResetPasswordResponse
+import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.TempException
+import com.idealIntent.repositories.PasswordRepository
+import com.idealIntent.repositories.RefreshTokenRepository
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.mindrot.jbcrypt.BCrypt
-import com.idealIntent.repositories.PasswordRepository
-import com.idealIntent.repositories.RefreshTokenRepository
 
 // todo - comments
 class PasswordManager(

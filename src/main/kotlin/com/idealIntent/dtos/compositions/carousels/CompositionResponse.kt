@@ -1,6 +1,6 @@
 package com.idealIntent.dtos.compositions.carousels
 
-import com.idealIntent.exceptions.CompositionCodeReport
-import dtos.ApiDataResponse
+import com.idealIntent.dtos.ApiDataResponse
+import com.idealIntent.exceptions.CompositionCode
 
-class CompositionResponse : ApiDataResponse<Int, CompositionCodeReport, CompositionResponse>(CompositionCodeReport)
+class CompositionResponse : ApiDataResponse<Int, CompositionCode, CompositionResponse>(CompositionCode)

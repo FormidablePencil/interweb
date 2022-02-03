@@ -10,20 +10,20 @@ package com.idealIntent.exceptions
  */
 class CompositionExceptionReport : ServerErrorException {
     constructor(
-        code: CompositionCodeReport, happenedWhere: Class<*>,
-    ) : super(CompositionCodeReport.getLogMsg(code), CompositionCodeReport.getClientMsg(code), happenedWhere)
+        code: CompositionCode, happenedWhere: Class<*>,
+    ) : super(CompositionCode.getLogMsg(code), CompositionCode.getClientMsg(code), happenedWhere)
 
     constructor(
-        code: CompositionCodeReport, happenedWhere: Class<*>, cause: Exception,
-    ) : super(CompositionCodeReport.getLogMsg(code), CompositionCodeReport.getClientMsg(code), happenedWhere, cause)
+        code: CompositionCode, happenedWhere: Class<*>, cause: Exception,
+    ) : super(CompositionCode.getLogMsg(code), CompositionCode.getClientMsg(code), happenedWhere, cause)
 
     constructor(
-        code: CompositionCodeReport, moreDetails: String, happenedWhere: Class<*>,
-    ) : super(CompositionCodeReport.getLogMsg(code), CompositionCodeReport.getClientMsg(code) + appendMoreDetails(moreDetails),
+        code: CompositionCode, moreDetails: String, happenedWhere: Class<*>,
+    ) : super(CompositionCode.getLogMsg(code), CompositionCode.getClientMsg(code) + appendMoreDetails(moreDetails),
         happenedWhere)
 
     constructor(
-        code: CompositionCodeReport, moreDetails: String, happenedWhere: Class<*>, cause: Exception,
-    ) : super(CompositionCodeReport.getLogMsg(code), CompositionCodeReport.getClientMsg(code) + appendMoreDetails(moreDetails),
+        code: CompositionCode, moreDetails: String, happenedWhere: Class<*>, cause: Exception,
+    ) : super(CompositionCode.getLogMsg(code), CompositionCode.getClientMsg(code) + appendMoreDetails(moreDetails),
         happenedWhere, cause)
 }

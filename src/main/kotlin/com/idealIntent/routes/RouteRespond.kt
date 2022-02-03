@@ -1,9 +1,8 @@
 package com.idealIntent.routes
 
-import dtos.ApiDataResponse
+import com.idealIntent.dtos.ApiDataResponse
 import com.idealIntent.exceptions.GenericError
 import com.idealIntent.exceptions.ServerErrorException
-import com.idealIntent.exceptions.TempException
 import com.idealIntent.exceptions.logError
 import io.ktor.application.*
 import io.ktor.http.*

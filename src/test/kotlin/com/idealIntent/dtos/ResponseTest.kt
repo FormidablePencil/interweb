@@ -1,9 +1,5 @@
 package com.idealIntent.dtos
 
-import com.idealIntent.dtos.SampleResponseFailed
-import dtos.Response
-import dtos.failed
-import dtos.succeeded
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 

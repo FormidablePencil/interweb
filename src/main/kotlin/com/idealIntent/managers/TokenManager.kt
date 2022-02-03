@@ -3,15 +3,15 @@ package com.idealIntent.managers
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.idealIntent.configurations.AppEnv
-import dtos.auth.TokensResponse
+import com.idealIntent.dtos.auth.TokenResponseData
+import com.idealIntent.dtos.auth.TokensResponse
+import com.idealIntent.dtos.failed
+import com.idealIntent.dtos.succeeded
+import com.idealIntent.repositories.RefreshTokenRepository
 import dtos.auth.TokensResponseFailed
-import dtos.failed
-import dtos.succeeded
 import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import com.idealIntent.repositories.RefreshTokenRepository
-import com.idealIntent.dtos.auth.TokenResponseData
 import java.util.*
 
 enum class KindOfTokens { AccessToken, RefreshToken }

@@ -1,13 +1,17 @@
 package com.idealIntent.services
 
-import dtos.failed
-import dtos.space.*
-import dtos.succeeded
+import com.idealIntent.dtos.failed
+import com.idealIntent.dtos.space.CreateSpaceRequest
+import com.idealIntent.dtos.space.CreateSpaceResponse
+import com.idealIntent.dtos.space.GetSpaceRequest
+import com.idealIntent.dtos.space.GetSpaceResponse
+import com.idealIntent.dtos.succeeded
 import com.idealIntent.helpers.RandomStringGenerator
-import io.ktor.http.*
 import com.idealIntent.managers.CompositionManager
 import com.idealIntent.repositories.SpaceRepository
-import com.idealIntent.dtos.space.*
+import dtos.space.CreateSpaceResponseFailed
+import dtos.space.SpaceResponseFailed
+import io.ktor.http.*
 
 // spaces (table) have components (table)
 

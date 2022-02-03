@@ -12,19 +12,19 @@ enum class GenericError {
 
     companion object {
         /**
-         * Get message from enum
+         * Get corresponding message of error code.
          *
          * @param enum GenericError enum
          * @return Message corresponding to enum
          */
         fun getMsg(enum: GenericError): String {
             return when (enum) {
-                ServerError -> "Server code."
+                ServerError -> "Sorry something wrong."
             }
         }
 
         /**
-         * Get http code
+         * Get corresponding http code of enum code.
          *
          * @param enum GenericError enum
          * @return Http status code corresponding to enum

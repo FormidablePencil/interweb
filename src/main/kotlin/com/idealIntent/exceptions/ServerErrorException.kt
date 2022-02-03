@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
  *
  * @property message Message is always a client-friendly response.
  * @property Throwable.message Message is always a client-friendly response.
- * @property clientMsg A client-friendly response message. E.g. [CompositionCodeReport.getClientMsg].
+ * @property clientMsg SpaceResponseFailed client-friendly response message. E.g. [CompositionCode.getClientMsg].
  * @constructor logs and throws exception.
  */
 open class ServerErrorException : Exception {
@@ -38,7 +38,7 @@ open class ServerErrorException : Exception {
      * @param happenedWhere this::class.java. Used to trace log.
      * @param cause Propagate exception thrown.
      */
-    constructor(logMsg: String, clientMsg: String, happenedWhere: Class<*>, cause: Exception) {
+    constructor(logMsg: String, clientMsg: String, happenedWhere: Class<*>, cause: Exception): super(null, cause) {
         this.clientMsg = clientMsg
         logError(logMsg, happenedWhere)
     }
@@ -64,7 +64,7 @@ open class ServerErrorException : Exception {
      * @param nameLocation When exception is thrown in a function rather than a class where "this::class.java" is available.
      * @param cause Propagate exception thrown.
      */
-    constructor(logMsg: String, clientMsg: String, nameLocation: String, cause: Exception) {
+    constructor(logMsg: String, clientMsg: String, nameLocation: String, cause: Exception): super(null, cause) {
         this.clientMsg = clientMsg
         logErrorName(logMsg, nameLocation)
     }

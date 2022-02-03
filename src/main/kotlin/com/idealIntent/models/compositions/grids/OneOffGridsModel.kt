@@ -11,7 +11,7 @@ import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 
 /**
- * A Grid composition. Composes of 2 dimensional array of images [(collection of image collections)][models.generic.ID2ImageCollectionEntity].
+ * SpaceResponseFailed Grid composition. Composes of 2 dimensional array of images [(collection of image collections)][models.generic.ID2ImageCollectionEntity].
  *
  * @property id Primary key. Referenced by [id][models.compositions.ICompositionLayoutEntity.id] of [layout][models.compositions.ICompositionLayoutEntity].
  */

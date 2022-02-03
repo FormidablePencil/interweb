@@ -6,10 +6,9 @@ import org.koin.test.inject
 import shared.testUtils.BehaviorSpecIT
 
 class SpaceIT : BehaviorSpecIT({
-    val spaceFlow: SpaceFlow by inject()
+//    val spaceFlow: SpaceFlow by inject()
 
     Given("create") {
-        spaceFlow
 
     }
 
