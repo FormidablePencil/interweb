@@ -44,7 +44,7 @@ object DIHelper {
         single { ResetPasswordCodeRepository() }
         single { AccountRepository() }
         single { AuthorProfileRelatedRepository() }
-        single { CompositionPrivilegesRepository(get()) }
+        single { CompositionPrivilegesRepository() }
         // env com.idealIntent.configurations
         val dbConnection = Properties()
         dbConnection.load(FileInputStream("local.datasource.properties"))

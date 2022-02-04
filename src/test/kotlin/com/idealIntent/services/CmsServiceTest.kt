@@ -17,7 +17,8 @@ import shared.testUtils.carouselBasicImagesReqStingified
 
 class CmsServiceTest : BehaviorSpec({
     val carouselsManager: CarouselsManager = mockk()
-//
+    val userId = 0
+
     val componentManager = CmsService(carouselsManager)
 
     beforeEach {
@@ -34,14 +35,15 @@ class CmsServiceTest : BehaviorSpec({
                         val httpStatus = HttpStatusCode.Created
                         every {
                             carouselsManager.createCompositionOfCategory(
-                                BasicImages.value,
-                                carouselBasicImagesReqStingified
+                                BasicImages.value, carouselBasicImagesReqStingified, userId
                             )
                         } returns CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
                         // endregion setup
 
                         val res =
-                            componentManager.createComposition(BasicImages.value, carouselBasicImagesReqStingified)
+                            componentManager.createComposition(
+                                BasicImages.value, carouselBasicImagesReqStingified, userId
+                            )
 
                         res.isSuccess shouldBe true
                         res.data shouldBe idOfNewlyCreatedComposition
@@ -52,14 +54,12 @@ class CmsServiceTest : BehaviorSpec({
                         // region setup
                         every {
                             carouselsManager.createCompositionOfCategory(
-                                BasicImages.value,
-                                carouselBasicImagesReqStingified
-                            )
+                                BasicImages.value, carouselBasicImagesReqStingified, userId)
                         } returns CompositionResponse().failed(CompositionCode.FailedToInsertRecord)
                         // endregion setup
 
                         val res =
-                            componentManager.createComposition(BasicImages.value, carouselBasicImagesReqStingified)
+                            componentManager.createComposition(BasicImages.value, carouselBasicImagesReqStingified, userId)
 
                         res.isSuccess shouldBe false
                         res.data shouldBe null

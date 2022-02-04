@@ -21,6 +21,7 @@ class CarouselsManagerTest : BehaviorSpec({
     val carouselOfImagesManager: CarouselOfImagesManager = mockk()
     val carouselOfImagesRepository: CarouselOfImagesRepository = mockk()
     val compositionId = 1
+    val userId = 1
     val gson = Gson()
 
     val carouselsManager = CarouselsManager(carouselOfImagesManager, carouselOfImagesRepository)
@@ -55,14 +56,13 @@ class CarouselsManagerTest : BehaviorSpec({
                         // region setup
                         val idOfNewlyCreatedComposition = 123
                         val httpStatus = HttpStatusCode.Created
-                        every { carouselOfImagesManager.createComposition(carouselBasicImagesReq) } returns
+                        every { carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId) } returns
                                 CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
                         // endregion setup
 
                         val res =
                             carouselsManager.createCompositionOfCategory(
-                                BasicImages.value,
-                                carouselBasicImagesReqStingified
+                                BasicImages.value, carouselBasicImagesReqStingified, userId
                             )
 
                         res.isSuccess shouldBe true
@@ -71,13 +71,12 @@ class CarouselsManagerTest : BehaviorSpec({
                     }
                     then("failed") {
                         // region setup
-                        every { carouselOfImagesManager.createComposition(carouselBasicImagesReq) } returns
+                        every { carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId) } returns
                                 CompositionResponse().failed(CompositionCode.FailedToGivePrivilege)
                         // endregion setup
 
                         val res = carouselsManager.createCompositionOfCategory(
-                            BasicImages.value,
-                            carouselBasicImagesReqStingified
+                            BasicImages.value, carouselBasicImagesReqStingified, userId
                         )
 
                         res.data shouldBe null

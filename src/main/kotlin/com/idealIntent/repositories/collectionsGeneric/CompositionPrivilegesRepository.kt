@@ -1,8 +1,6 @@
 package com.idealIntent.repositories.collectionsGeneric
 
-import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthorsToComposition
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.models.privileges.IPrivilegedAuthorsToCompositionEntity
 import com.idealIntent.models.privileges.PrivilegeSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
 import com.idealIntent.repositories.RepositoryBase
@@ -22,7 +20,6 @@ data class CompositionsGenericPrivileges(
     override val view: Int,
 ) : ICompositionsGenericPrivileges
 
-// todo privilege and privileges are used interchangeably. Fix this typo
 class CompositionPrivilegesRepository() : RepositoryBase() {
     private val Database.privilegeSource get() = this.sequenceOf(PrivilegeSourcesModel)
     private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionsModel)
@@ -48,14 +45,20 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
 //        return PrivilegedAuthorsToComposition(privilegesTo, privilegedAuthors)
     }
 
-    fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): IPrivilegedAuthorsToCompositionEntity? {
-        TODO()
-    }
+    /**
+     * get privilege lvl if user is assigned to it.
+     *
+     * @param privilegeId
+     * @param userId For privilege sources that are restricted lvl 2 restricted.
+     */
+//    fun getPrivilegeLvl(privilegeId: Int, userId: Int? = null) = database.privilegedAuthorsToCompositions.find {
+//        (it.privilegeId eq privilegeId) and (it.authorId eq userId)
+//    } !== null
 
     // todo check if privileged and what level...
-    fun checkIfPrivileged(privilegeId: Int, authorId: Int) = database.privilegedAuthorsToCompositions.find {
-            (it.privilegeId eq privilegeId) and (it.authorId eq authorId)
-        } !== null
+    fun isUserPrivileged(privilegeId: Int, userId: Int) = database.privilegedAuthorsToCompositions.find {
+        (it.privilegeId eq privilegeId) and (it.authorId eq userId) and (it.modify eq 1)
+    } !== null
     // endregion Get
 
 
@@ -84,7 +87,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
         database.insertAndGenerateKey(PrivilegeSourcesModel) {
             set(it.privilegeLevel, privilegeLevel)
         } as Int
-// endregion Insert
+    // endregion Insert
 
 
     // region Update
@@ -136,47 +139,5 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
 //            }
 //        }
     }
-// endregion Update
-
-
-    // region Delete
-    fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    fun deleteAllRecordsInCollection(collectionId: Int) {
-        TODO("Not yet implemented")
-    }
-
-    fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
-        TODO("Not yet implemented")
-    }
-
-    fun deleteCollectionButNotRecord() {
-        TODO("Not yet implemented")
-    }
-
-    fun batchCreateRecordToCollectionRelationship(
-        records: List<PrivilegeRecord>,
-        collectionId: Int,
-    ): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    fun createRecordToCollectionRelationship(recordToCollection: PrivilegedAuthorsToComposition): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    fun getRecordOfCollection(recordId: Int, collectionId: Int): PrivilegeRecord? {
-        TODO("Not yet implemented")
-    }
-
-    fun getRecordsQuery(recordId: Int?, collectionId: Int): List<PrivilegeRecord> {
-        TODO("Not yet implemented")
-    }
-// endregion Delete
+    // endregion Update
 }

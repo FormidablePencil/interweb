@@ -3,11 +3,14 @@ package com.idealIntent.repositories.collectionsGeneric
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
+import com.idealIntent.models.privileges.PrivilegeSourcesModel
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
+import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
+import org.ktorm.dsl.*
 import shared.DITestHelper
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.privilegedAuthors
@@ -21,7 +24,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository by inject()
     private val signupFlow: SignupFlow by inject()
 
-    suspend fun createAuthorsAndGivePrivileges(): List<Triple<PrivilegedAuthor, Int, CreateAuthorRequest>> =
+    private suspend fun createAuthorsAndGivePrivileges(): List<Triple<PrivilegedAuthor, Int, CreateAuthorRequest>> =
         privilegedAuthors.map {
             val createAuthorRequest = CreateAuthorRequest(
                 email = it.username + "@gmail.com",
@@ -38,10 +41,34 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
             // create authors first
         }
 
-        xgiven("getRecordToCollectionInfo") { }
+        given("isUserPrivileged") {
+            then("provided a non existing user id") {
+                rollback {
+                    val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+                    compositionPrivilegesRepository.isUserPrivileged(99999999, privilegeSourceId)
+                }
+            }
+
+            then("provided a non existing privilege source id") {
+                rollback {
+                    val authorId = createAuthorsAndGivePrivileges()[0].second
+                    compositionPrivilegesRepository.isUserPrivileged(authorId, 99999999)
+                }
+            }
+
+            then("success") {
+                rollback {
+                    // todo - privilege level
+                    val authorId = createAuthorsAndGivePrivileges()[0].second
+                    val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+                    compositionPrivilegesRepository.isUserPrivileged(authorId, privilegeSourceId)
+                }
+            }
+        }
 
         given("giveAnAuthorPrivilege") {
-            then("not valid author ids should throw") {
+
+            then("provided a not valid author id should throw") {
                 rollback {
                     // region setup
                     val randomIdOfUserThatDoesNotExist = 99999999
@@ -62,7 +89,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                 }
             }
 
-            then("provided existing author ids but an invalid privilege source should throw") {
+            then("provided a privilege source id non existent in db, should throw") {
                 rollback {
                     // region setup - Create accounts
                     val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
@@ -83,7 +110,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                 }
             }
 
-            then("provided existing author ids and a privilege source") {
+            then("success") {
                 rollback {
                     // region setup - Create accounts and create a privilege source
                     val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
@@ -99,31 +126,31 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                         privilegeId = privilegeSourceId,
                         authorId = authorId
                     )
-                    compositionPrivilegesRepository.checkIfPrivileged(privilegeSourceId, authorId)
+                    compositionPrivilegesRepository.isUserPrivileged(privilegeSourceId, authorId)
                 }
             }
         }
 
-        xgiven("addPrivilegeSource") { }
+        given("addPrivilegeSource") {
 
-        xgiven("updateRecord") { }
+            then("set privilege level to 3") {
+                val privilegeLvl = 3
+                val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource(privilegeLvl)
+                appEnv.database.from(PrivilegeSourcesModel)
+                    .select()
+                    .where { (PrivilegeSourcesModel.id eq privilegeSourceId) and (PrivilegeSourcesModel.privilegeLevel eq privilegeLvl) }
+                    .map { it[PrivilegeSourcesModel.id] }
+                    .first() shouldNotBe null
+            }
 
-        xgiven("batchUpdateRecords") { }
-
-        xgiven("deleteRecord") { }
-
-        xgiven("deleteAllRecordsInCollection") { }
-
-        xgiven("disassociateRecordFromCollection") { }
-
-        xgiven("deleteCollectionButNotRecord") { }
-
-        xgiven("batchCreateRecordToCollectionRelationship") { }
-
-        xgiven("createRecordToCollectionRelationship") { }
-
-        xgiven("getRecordOfCollection") { }
-
-        xgiven("getRecordsQuery") { }
+            then("default privilege lvl to 0") {
+                compositionPrivilegesRepository.addPrivilegeSource()
+                appEnv.database.from(PrivilegeSourcesModel)
+                    .select()
+                    .where { PrivilegeSourcesModel.privilegeLevel eq 0 }
+                    .map { it[PrivilegeSourcesModel.id] }
+                    .first() shouldNotBe null
+            }
+        }
     }
 }

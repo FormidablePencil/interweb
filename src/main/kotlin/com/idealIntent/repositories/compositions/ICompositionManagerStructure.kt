@@ -28,7 +28,7 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
      * @param composition Composition to insert
      * @return CollectionId or null if failed to insert [composition]
      */
-    fun createComposition(createRequest: CreateRequest): Response
+    fun createComposition(createRequest: CreateRequest, userId: Int): Response
     // endregion Insert
 
 

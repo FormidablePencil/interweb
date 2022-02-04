@@ -1,7 +1,6 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import io.kotest.core.spec.IsolationMode
@@ -24,6 +23,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
             textRepository = TextRepository()
         }
 
+        // TODO("Exceptions implemented at low level, now need to be handled")
         given("insertRecord") {
             And("addRecordCollection") {
                 And("createRecordToCollectionRelationship") {

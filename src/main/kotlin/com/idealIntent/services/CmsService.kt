@@ -33,7 +33,7 @@ class CmsService(
     }
 
 
-    fun createComposition(compositionCategory: Int, jsonData: String): CompositionResponse {
+    fun createComposition(compositionCategory: Int, jsonData: String, userId: Int): CompositionResponse {
         return when (CompositionCategory.fromInt(compositionCategory)) {
             CompositionCategory.Text -> TODO()
             CompositionCategory.Markdown -> TODO()
@@ -41,7 +41,8 @@ class CmsService(
             CompositionCategory.OneOffGrid -> TODO()
             CompositionCategory.Divider -> TODO()
             CompositionCategory.LineDivider -> TODO()
-            CompositionCategory.Carousel -> carouselsManager.createCompositionOfCategory(compositionCategory, jsonData)
+            CompositionCategory.Carousel ->
+                carouselsManager.createCompositionOfCategory(compositionCategory, jsonData, userId)
         }
     }
 

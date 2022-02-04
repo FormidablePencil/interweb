@@ -10,17 +10,38 @@ package com.idealIntent.exceptions
  */
 class CompositionException : Exception {
     val code: CompositionCode
+    var moreDetails: String? = null
 
     constructor(
-        code: CompositionCode,
+        code: CompositionCode
     ) : super(CompositionCode.getClientMsg(code)) {
         this.code = code
     }
 
     constructor(
-        code: CompositionCode,
-        moreDetails: String,
+        code: CompositionCode, cause: Exception
+    ) : super(CompositionCode.getClientMsg(code), cause) {
+        this.code = code
+    }
+
+    constructor(
+        code: CompositionCode, cause: CompositionException
+    ) : super(CompositionCode.getClientMsg(code), cause) {
+        this.code = code
+        this.moreDetails = cause.moreDetails
+    }
+
+    constructor(
+        code: CompositionCode, moreDetails: String?
     ) : super(CompositionCode.getClientMsg(code) + appendMoreDetails(moreDetails)) {
         this.code = code
+        this.moreDetails = moreDetails
+    }
+
+    constructor(
+        code: CompositionCode, moreDetails: String?, cause: Exception
+    ) : super(CompositionCode.getClientMsg(code) + appendMoreDetails(moreDetails), cause) {
+        this.code = code
+        this.moreDetails = moreDetails
     }
 }

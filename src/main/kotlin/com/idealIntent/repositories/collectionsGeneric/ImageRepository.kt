@@ -4,7 +4,6 @@ import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.images.ImageCollection
 import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.exceptions.ServerErrorException
 import com.idealIntent.exceptions.TempException
 import com.idealIntent.models.compositions.basicCollections.images.IImageToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
@@ -76,7 +75,7 @@ class ImageRepository() : RepositoryBase(),
         database.insertAndGenerateKey(ImageCollectionsModel) { } as Int?
             ?: throw TempException("failed to create ImageCollection (should always succeed)", this::class.java)
 
-    override fun batchAssociateRecordsToCollection(records: List<Image>, collectionId: Int): Boolean {
+    override fun batchAssociateRecordsToCollection(records: List<Image>, collectionId: Int) {
         records.map {
             if (it.id == null) TODO("terminate batch completely")
             val succeed = associateRecordToCollection(
@@ -88,7 +87,6 @@ class ImageRepository() : RepositoryBase(),
             )
             if (!succeed) TODO("terminate batch completely")
         }
-        return true
     }
 
     override fun associateRecordToCollection(recordToCollection: ImageToCollection): Boolean =

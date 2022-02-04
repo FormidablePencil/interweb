@@ -6,4 +6,4 @@ package com.idealIntent.exceptions
  *
  * @param moreDetails More details to append onto [exception message][Throwable.message].
  */
-internal fun appendMoreDetails(moreDetails: String) = " More details: $moreDetails."
+internal fun appendMoreDetails(moreDetails: String?) = " More details: $moreDetails."

@@ -6,8 +6,10 @@ import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
-import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionCode.*
+import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
+import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
@@ -21,6 +23,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class CarouselOfImagesManager(
+    private val compositionPrivilegesManager: CompositionPrivilegesManager,
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository,
@@ -41,36 +44,45 @@ class CarouselOfImagesManager(
      * Otherwise, if all went well, pass ids of image's and redirection text's collections to
      * [compose][CarouselOfImagesRepository.compose]. Then return id of the newly created composition.
      *
-     * @exception CompositionExceptionReport Edge case if fails to compose collections.
+     * @exception CompositionExceptionReport [FailedToCompose] edge case if fails to compose collections for debugging purposes.
      *
      * @see ICompositionManagerStructure.createComposition
      * @return Id of the newly created composition
      */
-    override fun createComposition(createRequest: CarouselBasicImagesReq): CompositionResponse =
-        appEnv.database.useTransaction {
-            val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
-            val (_, redirectsCollectionId) = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
+    override fun createComposition(createRequest: CarouselBasicImagesReq, userId: Int): CompositionResponse {
+        try {
+            appEnv.database.useTransaction {
+                val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
+                val (_, redirectsCollectionId) = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
-            val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
-            val (gaveAuthorsPrivileges, username) = compositionPrivilegesRepository.giveMultipleAuthorsPrivilegesByUsername(
-                createRequest.privilegedAuthors, privilegeSourceId
-            )
-            if (!gaveAuthorsPrivileges) {
-                it.rollback()
-                return CompositionResponse().failed(CompositionCode.FailedAtAuthorLookup, username)
-            }
-
-            val compositionId = carouselOfImagesRepository.compose(
-                CarouselOfImagesComposePrepared(
-                    name = createRequest.name,
-                    imageCollectionId = imageCollectionId,
-                    redirectTextCollectionId = redirectsCollectionId,
-                    privilegeId = privilegeSourceId,
+                val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+                compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
+                    createRequest.privilegedAuthors, privilegeSourceId, userId
                 )
-            ) ?: throw CompositionExceptionReport(CompositionCode.FailedToCompose, this::class.java)
 
-            return CompositionResponse().succeeded(HttpStatusCode.Created, compositionId)
+                val compositionId = carouselOfImagesRepository.compose(
+                    CarouselOfImagesComposePrepared(
+                        name = createRequest.name,
+                        imageCollectionId = imageCollectionId,
+                        redirectTextCollectionId = redirectsCollectionId,
+                        privilegeId = privilegeSourceId,
+                    )
+                ) ?: throw CompositionExceptionReport(FailedToCompose, this::class.java)
+
+                return CompositionResponse().succeeded(HttpStatusCode.Created, compositionId)
+            }
+        } catch (ex: CompositionException) {
+            when (ex.code) {
+                UserNotPrivileged,
+                FailedToFindAuthorByUsername,
+                FailedToCompose ->
+                    return CompositionResponse().failed(ex.code, ex.moreDetails)
+                else ->
+                    throw CompositionExceptionReport(ServerError, this::class.java, ex)
+
+            }
         }
+    }
     // endregion Insert
 
     // region Delete

@@ -4,16 +4,19 @@ import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextCollection
 import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.exceptions.ServerErrorException
+import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionCode.ServerError
+import com.idealIntent.exceptions.CompositionException
+import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.exceptions.TempException
-import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.collectionsGeneric.texts.TextIdentifiableRecordByCol
-import dtos.collectionsGeneric.texts.TextsCOL
 import com.idealIntent.models.compositions.basicCollections.texts.ITextToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
+import com.idealIntent.repositories.RepositoryBase
+import com.idealIntent.repositories.collections.ICollectionStructure
+import dtos.collectionsGeneric.texts.TextIdentifiableRecordByCol
+import dtos.collectionsGeneric.texts.TextsCOL
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
@@ -79,19 +82,30 @@ class TextRepository : RepositoryBase(),
         database.insertAndGenerateKey(TextCollectionsModel) { } as Int?
             ?: throw TempException("failed to create ImageCollection (should always succeed)", this::class.java)
 
-    override fun batchAssociateRecordsToCollection(records: List<Text>, collectionId: Int): Boolean {
-        records.map {
-            if (it.id == null) TODO("terminate batch completely")
-            val succeed = associateRecordToCollection(
-                TextToCollection(
-                    orderRank = it.orderRank,
-                    collectionId = collectionId,
-                    textId = it.id!!
-                )
-            )
-            if (!succeed) TODO("terminate batch completely")
+    @Throws(CompositionException::class, CompositionExceptionReport::class)
+    override fun batchAssociateRecordsToCollection(records: List<Text>, collectionId: Int) {
+        try {
+            database.useTransaction {
+                records.map {
+                    if (it.id == null) TODO("terminate batch completely")
+//                    throw CompositionExceptionReport(CompositionCode.InvalidIdOfRecord, this::class.java)
+                    val succeed = associateRecordToCollection(
+                        TextToCollection(
+                            orderRank = it.orderRank,
+                            collectionId = collectionId,
+                            textId = it.id!!
+                        )
+                    )
+                    if (!succeed) TODO("terminate batch completely")
+//                    throw CompositionExceptionReport(CompositionCode.FailedToInsertRecord, this::class.java)
+                }
+            }
+        } catch (ex: CompositionException) {
+            when (ex.code) {
+                // todo
+                else -> throw CompositionExceptionReport(ServerError, this::class.java, ex)
+            }
         }
-        return true
     }
 
     override fun associateRecordToCollection(recordToCollection: TextToCollection): Boolean =

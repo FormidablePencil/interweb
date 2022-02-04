@@ -3,7 +3,6 @@ package com.idealIntent.managers
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.idealIntent.configurations.AppEnv
-import com.idealIntent.exceptions.ServerErrorException
 import com.idealIntent.exceptions.TempException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch

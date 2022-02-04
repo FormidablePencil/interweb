@@ -1,7 +1,6 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import io.kotest.core.spec.IsolationMode
@@ -25,6 +24,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
         }
 
 
+        // TODO("Exceptions implemented at low level, now need to be handled")
         // region Insert
         given("insertRecord") {
             And("addRecordCollection") {

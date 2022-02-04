@@ -14,14 +14,14 @@ class CarouselManager(
     private val carouselOfImagesManager: CarouselOfImagesManager,
 ) {
 
-    fun insertComposition(request: IUserComposition, spaceAddress: String): Boolean {
+    fun insertComposition(request: IUserComposition, spaceAddress: String, userId: Int): Boolean {
         val gson = Gson()
         return when (request.compositionType) {
             // region Carousels
             CompositionCategory.Carousel -> {
                 // todo - accesses carouselCompositions.composition directly
                 return carouselOfImagesManager.createComposition(
-                    gson.fromJson(request.jsonData, CarouselBasicImagesReq::class.java)
+                    gson.fromJson(request.jsonData, CarouselBasicImagesReq::class.java), userId
                 ) != null
             }
             // endregion

@@ -10,10 +10,6 @@ import io.ktor.http.*
  *
  * Used with [CompositionExceptionReport] and [CompositionException] to throw an exception and respond to client with
  * a http status code and a user-friendly message.
- *
- * @property FailedToFindAuthor response data type string - username
- * @property FailedToGivePrivilege response data type string - username
- * @property FailedAtAuthorLookup response data type string - username
  */
 enum class CompositionCode {
     ServerError,
@@ -21,7 +17,8 @@ enum class CompositionCode {
     FailedToFindAuthor,
     FailedToCompose,
     FailedToGivePrivilege,
-    FailedAtAuthorLookup;
+    UserNotPrivileged,
+    FailedToFindAuthorByUsername;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
         override fun getLogMsg(code: CompositionCode): String {
@@ -31,8 +28,10 @@ enum class CompositionCode {
                 FailedToInsertRecord -> "Failed to insert records."
 
                 ServerError -> genericServerError
+
                 FailedToFindAuthor,
-                FailedAtAuthorLookup,
+                UserNotPrivileged,
+                FailedToFindAuthorByUsername,
                 -> {
                     logError(logAttemptToLogClientAsServerError(code), this::class.java)
                     return "Not an internal error."
@@ -43,7 +42,8 @@ enum class CompositionCode {
         override fun getClientMsg(code: CompositionCode): String {
             return when (code) {
                 FailedToFindAuthor -> "Failed to find an author to give privileges to."
-                FailedAtAuthorLookup -> "Author by id does not exist."
+                UserNotPrivileged -> "Do not have privileges."
+                FailedToFindAuthorByUsername -> "Failed to find author by username."
 
                 FailedToGivePrivilege,
                 ServerError -> genericServerError
@@ -55,13 +55,15 @@ enum class CompositionCode {
 
         override fun getHttpCode(code: CompositionCode): HttpStatusCode {
             return when (code) {
-                FailedToInsertRecord,
                 FailedToFindAuthor,
-                FailedAtAuthorLookup,
+                UserNotPrivileged,
+                FailedToFindAuthorByUsername,
                 -> HttpStatusCode.BadRequest
+
                 ServerError,
                 FailedToCompose,
                 FailedToGivePrivilege,
+                FailedToInsertRecord,
                 -> HttpStatusCode.InternalServerError
             }
         }

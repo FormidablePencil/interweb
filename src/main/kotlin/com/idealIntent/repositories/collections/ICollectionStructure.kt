@@ -1,9 +1,9 @@
 package com.idealIntent.repositories.collections
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.exceptions.CompositionExceptionReport
+import com.idealIntent.exceptions.CompositionException
 import org.ktorm.database.Database
+import kotlin.jvm.Throws
 
 /**
  * Structure for CRUD operations on compositions' collections
@@ -78,13 +78,13 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
 //    fun batchInsertNewRecords(records: List<Record>): List<Int>?
     // endregion
 
+    @Throws(CompositionException::class)
     fun batchInsertRecordsToNewCollection(records: List<Record>): Pair<List<Record>, Int> {
         database.useTransaction {
             val aRecords = batchInsertRecords(records)
             val collectionId = addRecordCollection()
-            if (!batchAssociateRecordsToCollection(aRecords, collectionId)) {
-                throw CompositionExceptionReport(CompositionCode.FailedToInsertRecord, this::class.java)
-            } else return Pair(aRecords, collectionId)
+            batchAssociateRecordsToCollection(aRecords, collectionId)
+            return Pair(aRecords, collectionId)
         }
     }
 
@@ -102,6 +102,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @param records
      * @return Add generated ids corresponding to [records] and return it or null if failed.
      */
+    @Throws(CompositionException::class)
     fun batchInsertRecords(records: List<Record>): List<Record>
 
     /**
@@ -120,7 +121,7 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
      * @param collectionId
      * @return Success or fail
      */
-    fun batchAssociateRecordsToCollection(records: List<Record>, collectionId: Int): Boolean
+    fun batchAssociateRecordsToCollection(records: List<Record>, collectionId: Int)
 
     /**
      * Create record to collection relationship

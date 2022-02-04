@@ -22,12 +22,12 @@ class CarouselsManager(
                 carouselOfImagesRepository.getComposition(id)
         }
 
-    override fun createCompositionOfCategory(compositionType: Int, jsonData: String): CompositionResponse =
+    override fun createCompositionOfCategory(compositionType: Int, jsonData: String, userId: Int): CompositionResponse =
         when (CompositionCarousel.fromInt(compositionType)) {
             CarouselBlurredOverlay -> TODO()
             CarouselMagnifying -> TODO()
             BasicImages ->
-                carouselOfImagesManager.createComposition(gson.fromJson(jsonData, CarouselBasicImagesReq::class.java))
+                carouselOfImagesManager.createComposition(gson.fromJson(jsonData, CarouselBasicImagesReq::class.java), userId)
         }
 
     override fun updateComposition() {
