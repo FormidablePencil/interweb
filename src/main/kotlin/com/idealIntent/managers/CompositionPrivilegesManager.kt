@@ -1,22 +1,25 @@
 package com.idealIntent.managers
 
+import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
-import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.CompositionsGenericPrivileges
 import com.idealIntent.repositories.profile.AuthorRepository
 
-// todo - rename RepositoryBase to database holder name
 class CompositionPrivilegesManager(
+    private val appEnv: AppEnv,
     private val authorRepository: AuthorRepository,
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository,
-) : RepositoryBase() {
+) {
 
     /**
      * Give multiple authors privileges by username
+     *
+     * Checks whether userId has privilege over privilegeId then loops over [authors to give privileges to][privilegedAuthors]
+     * and gives authors privileges.
      *
      * @throws CompositionException [UserNotPrivileged], [FailedToFindAuthorByUsername]
      */
@@ -26,10 +29,21 @@ class CompositionPrivilegesManager(
     ) {
         var iteration = 0
         try {
-            database.useTransaction {
+            appEnv.database.useTransaction {
+                if (!compositionPrivilegesRepository.isUserPrivileged(privilegeId, userId))
+                    throw CompositionException(UserNotPrivileged)
+
                 privilegedAuthors.forEach {
                     iteration++
-                    giveAnAuthorPrivilegesByUsername(it, privilegeId, userId)
+
+                    val author = authorRepository.getByUsername(it.username)
+                        ?: throw CompositionException(FailedToFindAuthorByUsername)
+
+                    compositionPrivilegesRepository.giveAnAuthorPrivilege(
+                        privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
+                        privilegeId = privilegeId,
+                        authorId = author.id
+                    )
                 }
             }
         } catch (ex: CompositionException) {
@@ -37,7 +51,9 @@ class CompositionPrivilegesManager(
                 UserNotPrivileged ->
                     throw CompositionException(UserNotPrivileged, ex)
                 FailedToFindAuthorByUsername ->
-                    throw CompositionException(FailedToFindAuthorByUsername, privilegedAuthors[iteration].username, ex)
+                    throw CompositionException(
+                        FailedToFindAuthorByUsername, privilegedAuthors[iteration - 1].username, ex
+                    )
                 else ->
                     throw CompositionExceptionReport(ServerError, this::class.java, ex)
             }

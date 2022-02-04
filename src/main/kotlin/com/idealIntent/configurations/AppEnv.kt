@@ -12,7 +12,7 @@ import java.util.*
  * @property database Access to database
  */
 data class AppEnv(
-    private val appConfig: ApplicationConfig, // todo - should deprecate public in place of private
+    private val appConfig: ApplicationConfig,
     private val dbConnection: Properties,
 ) {
     val database: Database = Database.connect(
