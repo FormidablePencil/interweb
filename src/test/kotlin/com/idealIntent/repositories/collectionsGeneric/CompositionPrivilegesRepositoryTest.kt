@@ -3,12 +3,10 @@ package com.idealIntent.repositories.collectionsGeneric
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
-import com.idealIntent.repositories.profile.AuthorRepository
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
-import io.mockk.mockk
 import org.koin.test.inject
 import shared.DITestHelper
 import shared.testUtils.BehaviorSpecUtRepo
@@ -20,7 +18,6 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(listOf(DIHelper.CoreModule, DITestHelper.FlowModule)))
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
-    private val authorRepository: AuthorRepository = mockk()
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository by inject()
     private val signupFlow: SignupFlow by inject()
 
@@ -41,14 +38,10 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
             // create authors first
         }
 
-        xgiven("getPrivilegesByAuthorId") {
-
-        }
-
         xgiven("getRecordToCollectionInfo") { }
 
         given("giveAnAuthorPrivilege") {
-            then("should fail on not valid author ids") {
+            then("not valid author ids should throw") {
                 rollback {
                     // region setup
                     val randomIdOfUserThatDoesNotExist = 99999999
@@ -62,14 +55,14 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                     shouldThrow<SQLIntegrityConstraintViolationException> {
                         compositionPrivilegesRepository.giveAnAuthorPrivilege(
                             compositionsGenericPrivileges,
-                            authorId = randomIdOfUserThatDoesNotExist,
-                            privilegeId = privilegeSourceId
+                            privilegeId = privilegeSourceId,
+                            authorId = randomIdOfUserThatDoesNotExist
                         )
                     }
                 }
             }
 
-            then("provide existing author ids but an invalid privilege source") {
+            then("provided existing author ids but an invalid privilege source should throw") {
                 rollback {
                     // region setup - Create accounts
                     val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
@@ -83,14 +76,14 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                     shouldThrow<SQLIntegrityConstraintViolationException> {
                         compositionPrivilegesRepository.giveAnAuthorPrivilege(
                             compositionsGenericPrivileges,
-                            authorId = authorId,
-                            privilegeId = randomIdOfPrivilegeSourceThatDoesNotExist
+                            privilegeId = randomIdOfPrivilegeSourceThatDoesNotExist,
+                            authorId = authorId
                         )
                     }
                 }
             }
 
-            then("provide existing author ids and a privilege source") {
+            then("provided existing author ids and a privilege source") {
                 rollback {
                     // region setup - Create accounts and create a privilege source
                     val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
@@ -103,16 +96,12 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
 
                     compositionPrivilegesRepository.giveAnAuthorPrivilege(
                         compositionsGenericPrivileges,
-                        authorId = authorId,
-                        privilegeId = privilegeSourceId
+                        privilegeId = privilegeSourceId,
+                        authorId = authorId
                     )
-                    compositionPrivilegesRepository.checkIfPrivileged(authorId, privilegeSourceId)
+                    compositionPrivilegesRepository.checkIfPrivileged(privilegeSourceId, authorId)
                 }
             }
-        }
-
-        xgiven("giveMultipleAuthorsPrivilegesByUsername") {
-
         }
 
         xgiven("addPrivilegeSource") { }
