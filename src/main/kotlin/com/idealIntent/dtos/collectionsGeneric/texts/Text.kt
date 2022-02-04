@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import models.IWithOrder
 import models.compositions.basicsCollections.texts.IText
 
+// todo - null or int
 @Serializable
 data class Text(
     override var id: Int?,

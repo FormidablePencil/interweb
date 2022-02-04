@@ -7,6 +7,7 @@ import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
 
 // region compositions and collections
+// todo - put in an companion object
 val images = listOf(
     Image(
         null,

@@ -50,7 +50,7 @@ class TextRepository : RepositoryBase(),
             }
             .map { row ->
                 Text(
-                    id = row[itemToCol.textId]!!,
+                    id = row[itemToCol.textId],
                     orderRank = row[itemToCol.orderRank]!!,
                     text = row[item.text]!!,
                 )
