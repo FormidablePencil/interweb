@@ -8,7 +8,9 @@ import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.clearAllMocks
 import org.koin.test.inject
 import org.ktorm.dsl.*
 import shared.DITestHelper
@@ -24,7 +26,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository by inject()
     private val signupFlow: SignupFlow by inject()
 
-    private suspend fun createAuthorsAndGivePrivileges(): List<Triple<PrivilegedAuthor, Int, CreateAuthorRequest>> =
+    private suspend fun createAuthors(): List<Triple<PrivilegedAuthor, Int, CreateAuthorRequest>> =
         privilegedAuthors.map {
             val createAuthorRequest = CreateAuthorRequest(
                 email = it.username + "@gmail.com",
@@ -37,31 +39,44 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
         }
 
     init {
+        val privileges = CompositionsGenericPrivileges(
+            modify = privilegedAuthors[0].modify,
+            view = privilegedAuthors[0].view,
+        )
+
         beforeEach {
-            // create authors first
+            clearAllMocks()
         }
 
         given("isUserPrivileged") {
             then("provided a non existing user id") {
                 rollback {
                     val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
-                    compositionPrivilegesRepository.isUserPrivileged(99999999, privilegeSourceId)
+                    val privileged = compositionPrivilegesRepository.isUserPrivileged(99999999, privilegeSourceId)
+                    privileged shouldBe false
                 }
             }
 
             then("provided a non existing privilege source id") {
                 rollback {
-                    val authorId = createAuthorsAndGivePrivileges()[0].second
-                    compositionPrivilegesRepository.isUserPrivileged(authorId, 99999999)
+                    val authorId = createAuthors()[0].second
+                    val privileged = compositionPrivilegesRepository.isUserPrivileged(authorId, 99999999)
+                    privileged shouldBe false
+
                 }
             }
 
             then("success") {
                 rollback {
                     // todo - privilege level
-                    val authorId = createAuthorsAndGivePrivileges()[0].second
+                    // region setup
+                    val authorId = createAuthors()[0].second
                     val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
-                    compositionPrivilegesRepository.isUserPrivileged(authorId, privilegeSourceId)
+                    compositionPrivilegesRepository.giveAnAuthorPrivilege(privileges, privilegeSourceId, authorId)
+                    // endregion setup
+
+                    val privileged = compositionPrivilegesRepository.isUserPrivileged(privilegeSourceId, authorId)
+                    privileged shouldBe true
                 }
             }
         }
@@ -72,18 +87,12 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                 rollback {
                     // region setup
                     val randomIdOfUserThatDoesNotExist = 99999999
-                    val compositionsGenericPrivileges = CompositionsGenericPrivileges(
-                        modify = privilegedAuthors[0].modify,
-                        view = privilegedAuthors[0].view,
-                    )
                     val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
                     // endregion
 
                     shouldThrow<SQLIntegrityConstraintViolationException> {
                         compositionPrivilegesRepository.giveAnAuthorPrivilege(
-                            compositionsGenericPrivileges,
-                            privilegeId = privilegeSourceId,
-                            authorId = randomIdOfUserThatDoesNotExist
+                            privileges, privilegeSourceId, randomIdOfUserThatDoesNotExist
                         )
                     }
                 }
@@ -92,19 +101,13 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
             then("provided a privilege source id non existent in db, should throw") {
                 rollback {
                     // region setup - Create accounts
-                    val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
-                    val compositionsGenericPrivileges = CompositionsGenericPrivileges(
-                        modify = privilegedAuthor.modify,
-                        view = privilegedAuthor.view,
-                    )
+                    val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthors()[0]
                     val randomIdOfPrivilegeSourceThatDoesNotExist = 99999999
                     // endregion
 
                     shouldThrow<SQLIntegrityConstraintViolationException> {
                         compositionPrivilegesRepository.giveAnAuthorPrivilege(
-                            compositionsGenericPrivileges,
-                            privilegeId = randomIdOfPrivilegeSourceThatDoesNotExist,
-                            authorId = authorId
+                            privileges, randomIdOfPrivilegeSourceThatDoesNotExist, authorId
                         )
                     }
                 }
@@ -113,43 +116,44 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
             then("success") {
                 rollback {
                     // region setup - Create accounts and create a privilege source
-                    val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthorsAndGivePrivileges()[0]
-                    val compositionsGenericPrivileges = CompositionsGenericPrivileges(
-                        modify = privilegedAuthor.modify,
-                        view = privilegedAuthor.view,
-                    )
+                    val (privilegedAuthor: PrivilegedAuthor, authorId, authorData: CreateAuthorRequest) = createAuthors()[0]
                     val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
                     // endregion
 
-                    compositionPrivilegesRepository.giveAnAuthorPrivilege(
-                        compositionsGenericPrivileges,
-                        privilegeId = privilegeSourceId,
-                        authorId = authorId
-                    )
+                    compositionPrivilegesRepository.giveAnAuthorPrivilege(privileges, privilegeSourceId, authorId)
                     compositionPrivilegesRepository.isUserPrivileged(privilegeSourceId, authorId)
                 }
             }
         }
 
         given("addPrivilegeSource") {
-
             then("set privilege level to 3") {
-                val privilegeLvl = 3
-                val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource(privilegeLvl)
-                appEnv.database.from(PrivilegeSourcesModel)
-                    .select()
-                    .where { (PrivilegeSourcesModel.id eq privilegeSourceId) and (PrivilegeSourcesModel.privilegeLevel eq privilegeLvl) }
-                    .map { it[PrivilegeSourcesModel.id] }
-                    .first() shouldNotBe null
+                rollback {
+                    // region setup
+                    val privilegeLvl = 3
+                    val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource(privilegeLvl)
+                    // endregion setup
+
+                    appEnv.database.from(PrivilegeSourcesModel)
+                        .select()
+                        .where { (PrivilegeSourcesModel.id eq privilegeSourceId) and (PrivilegeSourcesModel.privilegeLevel eq privilegeLvl) }
+                        .map { it[PrivilegeSourcesModel.id] }
+                        .first() shouldNotBe null
+                }
             }
 
             then("default privilege lvl to 0") {
-                compositionPrivilegesRepository.addPrivilegeSource()
-                appEnv.database.from(PrivilegeSourcesModel)
-                    .select()
-                    .where { PrivilegeSourcesModel.privilegeLevel eq 0 }
-                    .map { it[PrivilegeSourcesModel.id] }
-                    .first() shouldNotBe null
+                rollback {
+                    // region setup
+                    compositionPrivilegesRepository.addPrivilegeSource()
+                    // endregion setup
+
+                    appEnv.database.from(PrivilegeSourcesModel)
+                        .select()
+                        .where { PrivilegeSourcesModel.privilegeLevel eq 0 }
+                        .map { it[PrivilegeSourcesModel.id] }
+                        .first() shouldNotBe null
+                }
             }
         }
     }

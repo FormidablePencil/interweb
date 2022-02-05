@@ -57,10 +57,10 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
 //        (it.privilegeId eq privilegeId) and (it.authorId eq userId)
 //    } !== null
 
-    // todo check if privileged and what level...
+    // todo - add give privileges to option
     fun isUserPrivileged(privilegeId: Int, userId: Int) = database.privilegedAuthorsToCompositions.find {
         (it.privilegeId eq privilegeId) and (it.authorId eq userId) and (it.modify eq 1)
-    } !== null
+    } != null
     // endregion Get
 
 

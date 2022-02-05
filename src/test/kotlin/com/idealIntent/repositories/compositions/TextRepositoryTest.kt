@@ -31,13 +31,12 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
 
         // region Get
         given("getSingleRecordOfCollection") {
-
             then("success") {
                 rollback {
                     val collectionId = textRepository.insertRecordToNewCollection(texts[0])
                     val records = textRepository.getAllRecordsOfCollection(collectionId)
                         ?: throw failure("failed to find collection by id")
-                    val record = records.find { it.text == texts[0].text }
+                    val record = records.find { it.orderRank == texts[0].orderRank }
                         ?: throw failure("failed to retrieve saved record")
                     val res = textRepository.getSingleRecordOfCollection(record.id, collectionId)
                         ?: throw failure("failed to retrieve single record")

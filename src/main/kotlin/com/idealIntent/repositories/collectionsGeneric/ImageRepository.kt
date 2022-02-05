@@ -81,7 +81,7 @@ class ImageRepository() : RepositoryBase(),
 
     override fun batchInsertRecordsToCollection(records: List<Image>, collectionId: Int): Boolean {
         records.forEach {
-            if (insertRecordToCollection(it, collectionId))
+            if (!insertRecordToCollection(it, collectionId))
                 return@batchInsertRecordsToCollection false
         }
         return true
@@ -108,12 +108,17 @@ class ImageRepository() : RepositoryBase(),
         database.useTransaction {
             if (records.isEmpty()) throw CompositionException(CompositionCode.NoRecordsProvided)
             records.forEach {
-                val succeed = associateRecordToCollection(
-                    orderRank = it.orderRank,
-                    collectionId = collectionId,
-                    recordId = it.id
-                )
-                if (!succeed) throw CompositionException(CompositionCode.FailedToAssociateRecordToCollection)
+                try {
+                    associateRecordToCollection(
+                        orderRank = it.orderRank,
+                        collectionId = collectionId,
+                        recordId = it.id
+                    )
+                } catch (ex: Exception) {
+                    throw CompositionException(
+                        CompositionCode.FailedToAssociateRecordToCollection, it.orderRank.toString(), ex
+                    )
+                }
             }
         }
     }
