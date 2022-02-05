@@ -16,7 +16,7 @@ import dtos.space.IUserComposition
  * There are 5 levels of depth to composition logic.
  * [cms server][CmsService],
  * [composition of category manager][com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure],
- * [composition of category repository][com.idealIntent.repositories.compositions.ICompositionRepoStructure],
+ * [composition of category repository][com.idealIntent.repositories.compositions.ICompositionRepositoryStructure],
  * [collection repositories][com.idealIntent.repositories.collections.ICollectionStructure].
  */
 class CmsService(

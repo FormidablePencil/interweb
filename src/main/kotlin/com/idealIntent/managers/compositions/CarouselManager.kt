@@ -2,7 +2,7 @@ package com.idealIntent.managers.compositions
 
 import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.banners.BannerBasic
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
 import dtos.compositions.CompositionCategory
@@ -21,7 +21,7 @@ class CarouselManager(
             CompositionCategory.Carousel -> {
                 // todo - accesses carouselCompositions.composition directly
                 return carouselOfImagesManager.createComposition(
-                    gson.fromJson(request.jsonData, CarouselBasicImagesReq::class.java), userId
+                    gson.fromJson(request.jsonData, CreateCarouselBasicImagesReq::class.java), userId
                 ) != null
             }
             // endregion

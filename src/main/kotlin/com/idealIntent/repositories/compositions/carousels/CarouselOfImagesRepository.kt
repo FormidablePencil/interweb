@@ -1,9 +1,9 @@
 package com.idealIntent.repositories.compositions.carousels
 
-import com.idealIntent.dtos.collectionsGeneric.images.Image
+import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
-import com.idealIntent.dtos.collectionsGeneric.texts.Text
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
+import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
@@ -14,7 +14,7 @@ import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.ICompositionRepoStructure
+import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
 import models.profile.AuthorsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
@@ -36,12 +36,12 @@ class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
     // todo replace Image
-) : RepositoryBase(), ICompositionRepoStructure<CarouselBasicImagesReq, IImagesCarouselEntity,
-        CarouselBasicImagesReq, CarouselOfImagesComposePrepared> {
+) : RepositoryBase(), ICompositionRepositoryStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
+        CarouselBasicImagesRes, CarouselOfImagesComposePrepared> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
 
     // region Get
-    override fun getComposition(id: Int): CarouselBasicImagesReq? {
+    override fun getComposition(id: Int): CarouselBasicImagesRes? {
         val comp = ImagesCarouselsModel.aliased("comp")
         val prvAth = PrivilegedAuthorsToCompositionsModel("prvAuthorsComp")
         val author = AuthorsModel.aliased("author")
@@ -53,8 +53,8 @@ class CarouselOfImagesRepository(
         val text = TextsModel.aliased("textRedirect")
 
         var name = ""
-        val images = mutableListOf<Image>()
-        val imgOnclickRedirects = mutableListOf<Text>()
+        val images = mutableListOf<ImagePK>()
+        val imgOnclickRedirects = mutableListOf<TextPK>()
         val privilegedAuthors = mutableListOf<PrivilegedAuthor>()
 
         database.from(comp)
@@ -67,24 +67,26 @@ class CarouselOfImagesRepository(
             .leftJoin(prvAth, prvAth.privilegeId eq comp.privilegeId)
             .leftJoin(author, author.id eq prvAth.authorId)
 
-            .select(comp.name,
+            .select(
+                comp.name,
                 img2Col.orderRank, img.id, img.url, img.description,
                 text2Col.orderRank, text.text,
                 prvAth.modify, prvAth.view,
-                author.username)
+                author.username
+            )
             .where { comp.id eq id }
             .map {
                 name = it[comp.name]!!
                 images.add(
-                    Image(
-                        id = it[img.id],
+                    ImagePK(
+                        id = it[img.id]!!,
                         orderRank = it[img2Col.orderRank]!!,
                         url = it[img.url]!!,
                         description = it[img.description]!!
                     )
                 )
                 imgOnclickRedirects.add(
-                    Text(id = it[img.id]!!, orderRank = it[text2Col.orderRank]!!, text = it[text.text]!!)
+                    TextPK(id = it[img.id]!!, orderRank = it[text2Col.orderRank]!!, text = it[text.text]!!)
                 )
                 privilegedAuthors.add(
                     PrivilegedAuthor(
@@ -95,7 +97,9 @@ class CarouselOfImagesRepository(
                 )
             }
 
-        return CarouselBasicImagesReq(
+        if (name.isEmpty()) return null
+
+        return CarouselBasicImagesRes(
             name = name,
             images = images,
             imgOnclickRedirects = imgOnclickRedirects,

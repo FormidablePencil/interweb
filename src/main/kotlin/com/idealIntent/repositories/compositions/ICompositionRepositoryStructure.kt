@@ -1,13 +1,13 @@
 package com.idealIntent.repositories.compositions
 
-interface ICompositionRepoStructure<Composition, CompositionMetadata, CreateComposition, ComposePrepared> {
+interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, CreateComposition, ComposePrepared> {
     /**
      * Get composition.
      *
      * @param id Id of composition to get by.
      * @return All records of composition.
      */
-    fun getComposition(id: Int): Composition?
+    fun getComposition(id: Int): ResponseOfComposition?
 
     // region Get
     /**

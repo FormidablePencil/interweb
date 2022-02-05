@@ -1,12 +1,13 @@
 package com.idealIntent.models.compositions.basicCollections.images
 
+import models.IWithPK
 import models.compositions.basicsCollections.images.IImage
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 
-interface IImageEntity : Entity<IImageEntity>, IImage {
+interface IImageEntity : Entity<IImageEntity>, IImage, IWithPK {
     companion object : Entity.Factory<IImageEntity>()
 
     val imageCollection: IImageCollectionEntity

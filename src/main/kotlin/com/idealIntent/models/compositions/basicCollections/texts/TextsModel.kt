@@ -1,12 +1,13 @@
 package com.idealIntent.models.compositions.basicCollections.texts
 
+import models.IWithPK
 import models.compositions.basicsCollections.texts.IText
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
 import org.ktorm.schema.varchar
 
-interface ITextEntity : Entity<ITextEntity>, IText {
+interface ITextEntity : Entity<ITextEntity>, IText, IWithPK {
     companion object : Entity.Factory<ITextEntity>()
 }
 

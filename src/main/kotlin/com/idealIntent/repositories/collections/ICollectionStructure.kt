@@ -1,85 +1,81 @@
 package com.idealIntent.repositories.collections
 
+import com.google.gson.Gson
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import org.ktorm.database.Database
-import kotlin.jvm.Throws
 
 /**
  * Structure for CRUD operations on compositions' collections
  *
  * Methods of this interface is applicable only to low level specific such as ImageCollection, TextCollection and PrivilegesCollection
  *
+ * [Record] has no primary key [RecordPK], out has a primary key.
+ *
  * @param Record DTO for Generic type for data such as Image, Text, PrivilegedAuthor, etc.
+ * @param RecordPK DTO for Generic type for data such as Image, Text, PrivilegedAuthor, etc. but with a primary key.
  * @param RecordToCollectionEntity Entity of collection table that hold the relationship between a record and collection by their ids.
  * @param RecordToCollection DTO for [RecordToCollectionEntity].
  * @param CollectionOfRecords DTO of [Record]s.
  * @constructor Create empty structure for collections
  */
-interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollection, CollectionOfRecords> {
+interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, RecordToCollection, CollectionOfRecords> {
     val database: Database
     // region Get
     /**
-     * Get a single record
+     * Get a single record.
      *
-     * @param recordId
-     * @param collectionId Still pass id since records are constrained by privileges. Somewhere up the ladder there's a
-     * privilege to collection by [collectionId] validator.
-     * @return Single record or null if not found by [recordId]
+     * @param recordId id of record.
+     * @param collectionId id of collection.
+     * @return Single record or null if not found.
      */
-    fun getRecordOfCollection(recordId: Int, collectionId: Int): Record? {
-        val records = getRecordsQuery(recordId, collectionId)
-        return if (records.isNotEmpty()) records.first() else null
-    }
+    fun getRecordOfCollection(recordId: Int, collectionId: Int): RecordPK? =
+        getRecordsQuery(recordId, collectionId)?.first()
 
     /**
      * Get records by collection id.
      *
      * @param collectionId Get records under collection's id
-     * @return Records under collection or null if failed to find by [collectionId]
+     * @return A list of records under collection of [collectionId] or null if non found
      */
-    fun getCollectionOfRecords(collectionId: Int): Pair<List<Record>, Int> {
-        // todo - check privileges if allowed for any author or whether authorId is privileged
-        val images = getRecordsQuery(null, collectionId)
-        return Pair(images, collectionId)
-    }
+    fun getCollectionOfRecords(collectionId: Int): List<RecordPK>? = getRecordsQuery(null, collectionId)
 
-    fun getRecordsQuery(recordId: Int? = null, collectionId: Int): List<Record>
+    /**
+     * Get records query. Not used directly but by [getRecordOfCollection] and [getCollectionOfRecords]
+     *
+     * @param recordId Id of record to look up null for returning only record
+     * @param collectionId Get records under collection's id
+     * @return A list of records under collection of [collectionId] or null if non found
+     */
+    fun getRecordsQuery(recordId: Int? = null, collectionId: Int): List<RecordPK>?
 
     /**
      * Get records to collection info.
      *
-     * @param recordId []
+     * @param recordId Id of record.
      * @param collectionId
      */
-    fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): RecordToCollectionEntity?
+    fun getRecordToCollectionRelationship(recordId: Int, collectionId: Int): RecordToCollectionEntity?
+
+    /**
+     * validate image to collection relationship.
+     */
+    fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
+        getRecordToCollectionRelationship(recordId, collectionId) != null
     // endregion Get
 
 
     // region Insert
-
-    // region todo - move to manager lvl
     /**
-     * Insert [record] under a new collection
+     * Batch insert records to new collection
      *
-     * @param record Record to insert
-     * @return An id of newly created collection, id of image and image rank position to
-     * discern image id of or null if failed to insert [record]
+     * @param records Records to insert.
+     * @return Records with a primary key and id of collection.
+     * @throws batchInsertRecords [failed to insert a record][CompositionCode.FailedToInsertRecord]
      */
-//    fun insertNewRecord(record: Record): Int?
-
-    /**
-     * Batch insert [records] and add a relationship between [records] and a new collection.
-     *
-     * @param records List of records to insert.
-     * @return An id of newly created collection, ids of images and images rank position to
-     * discern images ids of or null if failed to insert [records]
-     */
-//    fun batchInsertNewRecords(records: List<Record>): List<Int>?
-    // endregion
-
     @Throws(CompositionException::class)
-    fun batchInsertRecordsToNewCollection(records: List<Record>): Pair<List<Record>, Int> {
+    fun batchInsertRecordsToNewCollection(records: List<Record>): Pair<List<RecordPK>, Int> {
         database.useTransaction {
             val aRecords = batchInsertRecords(records)
             val collectionId = addRecordCollection()
@@ -91,37 +87,49 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
     /**
      * Insert [record] and return [record] with a generated id.
      *
-     * @param record
-     * @return Add generated id to [record] and return it or null if failed.
+     * @param record record to insert.
+     * @return Returns record with generated id or null if failed.
      */
-    fun insertRecord(record: Record): Record?
+    fun insertRecord(record: Record): RecordPK?
 
     /**
-     * Insert [records] and return [records] with a generated ids.
+     * Batch insert records.
      *
-     * @param records
-     * @return Add generated ids corresponding to [records] and return it or null if failed.
+     * @param records Records to insert.
+     * @return Insert [records] and return [records] with a generated ids. If failed then revert changes and return null.
+     * @exception CompositionException [failed to insert a record][CompositionCode.FailedToInsertRecord].
      */
     @Throws(CompositionException::class)
-    fun batchInsertRecords(records: List<Record>): List<Record>
+    fun batchInsertRecords(records: List<Record>): List<RecordPK> {
+        val gson = Gson()
+        database.useTransaction {
+            return records.map {
+                val res: RecordPK? = insertRecord(it)
+                if (res == null) {
+                    throw CompositionException(CompositionCode.FailedToInsertRecord, gson.toJson(it))
+                } else return@map res
+            }
+        }
+    }
 
     /**
-     * Insert a new collection to associate records to.
-     *
-     * Method would have been private if it was not of [interface][ICollectionStructure].
+     * Insert a new collection.
      *
      * @return collection id
      */
     fun addRecordCollection(): Int
 
     /**
-     * Batch create record to collection relationship
+     * Associate multiple records to collection
      *
-     * @param records
-     * @param collectionId
-     * @return Success or fail
+     * @param records Associate record by id to collection of [collectionId].
+     * @param collectionId Id of collection.
+     *
+     * @exception CompositionCode [No records provided][CompositionCode.NoRecordsProvided],
+     * [failed to associate record to collection][CompositionCode.FailedToAssociateRecordToCollection]
      */
-    fun batchAssociateRecordsToCollection(records: List<Record>, collectionId: Int)
+    @Throws(CompositionException::class)
+    fun batchAssociateRecordsToCollection(records: List<RecordPK>, collectionId: Int)
 
     /**
      * Create record to collection relationship
@@ -146,8 +154,8 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
     /**
      * Batch update records
      *
-     * @param collectionId ID to identify under what collection [records] are under
-     * @param records Update to
+     * @param collectionId Id of collection
+     * @param records records to update to
      */
     fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean
     // endregion Update
@@ -181,12 +189,4 @@ interface ICollectionStructure<Record, RecordToCollectionEntity, RecordToCollect
     fun deleteCollectionButNotRecord()
 
     // endregion Delete
-
-    /**
-     * validate image to collection relationship.
-     *
-     * Method would have been private if it wasn't of [interface][ICollectionStructure].
-     */
-    fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
-        getRecordToCollectionInfo(recordId, collectionId) != null
 }

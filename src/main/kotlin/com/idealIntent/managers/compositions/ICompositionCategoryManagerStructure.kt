@@ -1,8 +1,5 @@
 package com.idealIntent.managers.compositions
 
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
-import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-
 // todo - will create CompositionCategoryManager for each category and move related logic there such as createComposition[Category], updateComposition[Category], deleteComposition[Category], getComposition[Category]
 //  once the library of compositions get too vast for one file to contain
 

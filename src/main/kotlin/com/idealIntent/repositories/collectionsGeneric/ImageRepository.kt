@@ -2,9 +2,11 @@ package com.idealIntent.repositories.collectionsGeneric
 
 import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.images.ImageCollection
+import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.exceptions.TempException
+import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.models.compositions.basicCollections.images.IImageToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
@@ -22,17 +24,17 @@ import org.ktorm.entity.sequenceOf
  * Responsible for image_collections and images table
  */
 class ImageRepository() : RepositoryBase(),
-    ICollectionStructure<Image, IImageToCollectionEntity, ImageToCollection, ImageCollection> {
+    ICollectionStructure<Image, ImagePK, IImageToCollectionEntity, ImageToCollection, ImageCollection> {
     private val Database.imageCollections get() = this.sequenceOf(ImageCollectionsModel)
     private val Database.imageToCollections get() = this.sequenceOf(ImageToCollectionsModel)
     private val Database.images get() = this.sequenceOf(ImagesModel)
 
     // region Get
-    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<Image> {
+    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<ImagePK>? {
         val itemToCol = ImageToCollectionsModel.aliased("imgToCol")
         val item = ImagesModel.aliased("img")
 
-        val images = database.from(itemToCol)
+        val records = database.from(itemToCol)
             .leftJoin(item, item.id eq itemToCol.imageId)
             .select(itemToCol.orderRank, itemToCol.imageId, item.url, item.description)
             .whereWithConditions {
@@ -40,52 +42,47 @@ class ImageRepository() : RepositoryBase(),
                 if (recordId != null) it += (item.id eq recordId)
             }
             .map { row ->
-                Image(
+                ImagePK(
                     id = row[itemToCol.imageId]!!,
                     orderRank = row[itemToCol.orderRank]!!,
                     description = row[item.description]!!,
                     url = row[item.url]!!
                 )
             }
-        return images
+
+        return records.ifEmpty { null }
     }
 
-    override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): IImageToCollectionEntity? =
+    override fun getRecordToCollectionRelationship(recordId: Int, collectionId: Int): IImageToCollectionEntity? =
         database.imageToCollections.find { (it.imageId eq recordId) and (it.collectionId eq collectionId) }
     // endregion Get
 
 
     // region Insert
-    override fun insertRecord(record: Image): Image? {
+    override fun insertRecord(record: Image): ImagePK? {
         val id = database.insertAndGenerateKey(ImagesModel) {
             set(it.description, record.description)
             set(it.url, record.url)
         } as Int? ?: return null
-        record.id = id
-        return record
+        return ImagePK(id = id, orderRank = record.orderRank, url = record.url, description = record.description)
     }
 
-    override fun batchInsertRecords(records: List<Image>): List<Image> =
-        records.map {
-            return@map insertRecord(it)
-                ?: TODO("throw exception of one fails. Either one inserts or non do.")
-        }
-
     override fun addRecordCollection(): Int =
-        database.insertAndGenerateKey(ImageCollectionsModel) { } as Int?
-            ?: throw TempException("failed to create ImageCollection (should always succeed)", this::class.java)
+        database.insertAndGenerateKey(ImageCollectionsModel) { } as Int
 
-    override fun batchAssociateRecordsToCollection(records: List<Image>, collectionId: Int) {
-        records.map {
-            if (it.id == null) TODO("terminate batch completely")
-            val succeed = associateRecordToCollection(
-                ImageToCollection(
-                    orderRank = it.orderRank,
-                    collectionId = collectionId,
-                    imageId = it.id!!
+    override fun batchAssociateRecordsToCollection(records: List<ImagePK>, collectionId: Int) {
+        database.useTransaction {
+            if (records.isEmpty()) throw CompositionException(CompositionCode.NoRecordsProvided)
+            records.forEach {
+                val succeed = associateRecordToCollection(
+                    ImageToCollection(
+                        orderRank = it.orderRank,
+                        collectionId = collectionId,
+                        imageId = it.id
+                    )
                 )
-            )
-            if (!succeed) TODO("terminate batch completely")
+                if (!succeed) throw CompositionException(CompositionCode.FailedToAssociateRecordToCollection)
+            }
         }
     }
 
@@ -94,7 +91,7 @@ class ImageRepository() : RepositoryBase(),
             set(it.collectionId, recordToCollection.collectionId)
             set(it.imageId, recordToCollection.imageId)
             set(it.orderRank, recordToCollection.orderRank)
-        } != 0
+        } == 1
     // endregion Insert
 
 

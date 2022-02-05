@@ -2,13 +2,11 @@ package com.idealIntent.repositories.collectionsGeneric
 
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextCollection
+import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.exceptions.CompositionCode.ServerError
 import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.exceptions.CompositionExceptionReport
-import com.idealIntent.exceptions.TempException
 import com.idealIntent.models.compositions.basicCollections.texts.ITextToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
@@ -31,17 +29,22 @@ import org.ktorm.entity.sequenceOf
  * [text collection][models.compositions.basicsCollections.texts.ITextCollection].
  */
 class TextRepository : RepositoryBase(),
-    ICollectionStructure<Text, ITextToCollectionEntity, TextToCollection, TextCollection> {
+    ICollectionStructure<Text, TextPK, ITextToCollectionEntity, TextToCollection, TextCollection> {
     private val Database.textCollections get() = this.sequenceOf(TextCollectionsModel)
     private val Database.textToCollections get() = this.sequenceOf(TextToCollectionsModel)
     private val Database.texts get() = this.sequenceOf(TextsModel)
 
     // region Get
-    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<Text> {
+    override fun getRecordOfCollection(recordId: Int, collectionId: Int): TextPK? =
+        super.getRecordOfCollection(recordId, collectionId)
+
+    override fun getCollectionOfRecords(collectionId: Int): List<TextPK>? = super.getCollectionOfRecords(collectionId)
+
+    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<TextPK>? {
         val itemToCol = TextToCollectionsModel.aliased("textToCol")
         val item = TextsModel.aliased("text")
 
-        val images = database.from(itemToCol)
+        val records = database.from(itemToCol)
             .leftJoin(item, item.id eq itemToCol.textId)
             .select(itemToCol.textId, itemToCol.orderRank, item.text)
             .whereWithConditions {
@@ -49,61 +52,52 @@ class TextRepository : RepositoryBase(),
                 if (recordId != null) it += (item.id eq recordId)
             }
             .map { row ->
-                Text(
-                    id = row[itemToCol.textId],
+                TextPK(
+                    id = row[itemToCol.textId]!!,
                     orderRank = row[itemToCol.orderRank]!!,
                     text = row[item.text]!!,
                 )
             }
-        return images
+
+        return records.ifEmpty { null }
     }
 
-    override fun getRecordToCollectionInfo(recordId: Int, collectionId: Int): ITextToCollectionEntity? =
+    override fun getRecordToCollectionRelationship(recordId: Int, collectionId: Int): ITextToCollectionEntity? =
         database.textToCollections.find { (it.textId eq recordId) and (it.collectionId eq collectionId) }
+
+    override fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
+        super.validateRecordToCollectionRelationship(recordId, collectionId)
     // endregion Get
 
 
     // region Insert
-    override fun insertRecord(record: Text): Text? {
+    override fun batchInsertRecordsToNewCollection(records: List<Text>): Pair<List<TextPK>, Int> =
+        super.batchInsertRecordsToNewCollection(records)
+
+    override fun insertRecord(record: Text): TextPK? {
         val id = database.insertAndGenerateKey(TextsModel) {
             set(it.text, record.text)
         } as Int? ?: return null
-        record.id = id
-        return record
+        return TextPK(id = id, orderRank = record.orderRank, text = record.text)
     }
 
-    override fun batchInsertRecords(records: List<Text>): List<Text> =
-        records.map {
-            return@map insertRecord(it)
-                ?: TODO("throw exception of one fails. Either one inserts or non do.")
-        }
+    override fun batchInsertRecords(records: List<Text>): List<TextPK> = super.batchInsertRecords(records)
 
     override fun addRecordCollection(): Int =
-        database.insertAndGenerateKey(TextCollectionsModel) { } as Int?
-            ?: throw TempException("failed to create ImageCollection (should always succeed)", this::class.java)
+        database.insertAndGenerateKey(TextCollectionsModel) { } as Int
 
-    @Throws(CompositionException::class, CompositionExceptionReport::class)
-    override fun batchAssociateRecordsToCollection(records: List<Text>, collectionId: Int) {
-        try {
-            database.useTransaction {
-                records.map {
-                    if (it.id == null) TODO("terminate batch completely")
-//                    throw CompositionExceptionReport(CompositionCode.InvalidIdOfRecord, this::class.java)
-                    val succeed = associateRecordToCollection(
-                        TextToCollection(
-                            orderRank = it.orderRank,
-                            collectionId = collectionId,
-                            textId = it.id!!
-                        )
+    override fun batchAssociateRecordsToCollection(records: List<TextPK>, collectionId: Int) {
+        database.useTransaction {
+            if (records.isEmpty()) throw CompositionException(CompositionCode.NoRecordsProvided)
+            records.forEach {
+                val succeed = associateRecordToCollection(
+                    TextToCollection(
+                        orderRank = it.orderRank,
+                        collectionId = collectionId,
+                        textId = it.id
                     )
-                    if (!succeed) TODO("terminate batch completely")
-//                    throw CompositionExceptionReport(CompositionCode.FailedToInsertRecord, this::class.java)
-                }
-            }
-        } catch (ex: CompositionException) {
-            when (ex.code) {
-                // todo
-                else -> throw CompositionExceptionReport(ServerError, this::class.java, ex)
+                )
+                if (!succeed) throw CompositionException(CompositionCode.FailedToAssociateRecordToCollection)
             }
         }
     }
@@ -113,7 +107,7 @@ class TextRepository : RepositoryBase(),
             set(it.collectionId, recordToCollection.collectionId)
             set(it.textId, recordToCollection.textId)
             set(it.orderRank, recordToCollection.orderRank)
-        } != 0
+        } == 1
     // endregion Insert
 
 
@@ -167,7 +161,7 @@ class TextRepository : RepositoryBase(),
         }
         TODO("validate if successful")
     }
-    // endregion Update
+// endregion Update
 
 
     // region Delete
@@ -191,5 +185,5 @@ class TextRepository : RepositoryBase(),
     override fun deleteCollectionButNotRecord() {
         TODO("Not yet implemented")
     }
-    // endregion Delete
+// endregion Delete
 }

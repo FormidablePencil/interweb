@@ -1,6 +1,5 @@
 package com.idealIntent.exceptions
 
-import com.idealIntent.exceptions.CompositionCode.*
 import dtos.IApiResponseEnum
 import io.ktor.http.*
 
@@ -18,7 +17,9 @@ enum class CompositionCode {
     FailedToCompose,
     FailedToGivePrivilege,
     UserNotPrivileged,
-    FailedToFindAuthorByUsername;
+    FailedToFindAuthorByUsername,
+    FailedToAssociateRecordToCollection,
+    NoRecordsProvided;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
         override fun getLogMsg(code: CompositionCode): String {
@@ -29,6 +30,8 @@ enum class CompositionCode {
 
                 ServerError -> genericServerError
 
+                NoRecordsProvided,
+                FailedToAssociateRecordToCollection,
                 FailedToFindAuthor,
                 UserNotPrivileged,
                 FailedToFindAuthorByUsername,
@@ -44,6 +47,8 @@ enum class CompositionCode {
                 FailedToFindAuthor -> "Failed to find an author to give privileges to."
                 UserNotPrivileged -> "Do not have privileges."
                 FailedToFindAuthorByUsername -> "Failed to find author by username."
+                FailedToAssociateRecordToCollection -> "Failed to associateRecordToCollection."
+                NoRecordsProvided -> "No records provided."
 
                 FailedToGivePrivilege,
                 ServerError -> genericServerError
@@ -58,6 +63,8 @@ enum class CompositionCode {
                 FailedToFindAuthor,
                 UserNotPrivileged,
                 FailedToFindAuthorByUsername,
+                FailedToAssociateRecordToCollection,
+                NoRecordsProvided
                 -> HttpStatusCode.BadRequest
 
                 ServerError,

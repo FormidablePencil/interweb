@@ -1,7 +1,7 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import com.idealIntent.dtos.collectionsGeneric.texts.Text
+import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import io.kotest.assertions.failure
@@ -25,6 +25,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
             clearAllMocks()
         }
 
+        // region Get
         given("getRecordOfCollection") {
             then("collection by id not found") {
                 rollback {
@@ -36,7 +37,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                 rollback {
                     val collectionId = textRepository.addRecordCollection()
 
-                    val record: Text? = textRepository.getRecordOfCollection(93434433, collectionId)
+                    val record: TextPK? = textRepository.getRecordOfCollection(93434433, collectionId)
                     record shouldBe null
                 }
             }
@@ -46,7 +47,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                     val record = textRepository.insertRecord(texts[0])
                         ?: throw failure("record insertion")
 
-                    val records: Text? = textRepository.getRecordOfCollection(record.id!!, collectionId)
+                    val records: TextPK? = textRepository.getRecordOfCollection(record.id, collectionId)
                     records shouldBe null
                 }
             }
@@ -56,20 +57,29 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                     val record = textRepository.insertRecord(texts[0])
                         ?: throw failure("record insertion")
                     textRepository.associateRecordToCollection(
-                        TextToCollection(orderRank = record.orderRank, collectionId = collectionId, textId = record.id!!)
+                        TextToCollection(orderRank = record.orderRank, collectionId = collectionId, textId = record.id)
                     )
 
-                    val records: Text? = textRepository.getRecordOfCollection(record.id!!, collectionId)
+                    val records: TextPK? = textRepository.getRecordOfCollection(record.id, collectionId)
                     records shouldNotBe null
                 }
             }
         }
 
-        given("getCollectionOfRecords") {
+        given("getCollectionOfRecords") {}
 
+        given("getRecordsQuery") {
+            // Not meant to be tested. This method would have been private
+            // if it wasn't in ICollectionStructure protocol.
         }
 
-        // TODO("Exceptions implemented at low level, now need to be handled")
+        given("getRecordToCollectionRelationship") {}
+        // endregion Get
+
+
+        // region Insert
+        given("batchInsertRecordsToNewCollection") {}
+
         given("insertRecord") {
             And("addRecordCollection") {
                 And("createRecordToCollectionRelationship") {
@@ -80,13 +90,13 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                             val collectionId = textRepository.addRecordCollection()
                             val hasCreatedRelations = textRepository.associateRecordToCollection(
                                 TextToCollection(
-                                    textId = resRecords.id!!,
+                                    textId = resRecords.id,
                                     collectionId = collectionId,
                                     orderRank = resRecords.orderRank
                                 )
                             )
                             hasCreatedRelations shouldBe true
-                            textRepository.getRecordOfCollection(resRecords.id!!, collectionId)
+                            textRepository.getRecordOfCollection(resRecords.id, collectionId)
                         }
                     }
                 }
@@ -107,7 +117,8 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                                 textRepository.batchAssociateRecordsToCollection(resRecords, collectionId)
                             hasCreatedRelations shouldBe true
 
-                            val (aResRecords, id) = textRepository.getCollectionOfRecords(collectionId)
+                            val aResRecords = textRepository.getCollectionOfRecords(collectionId)
+                                ?: throw failure("should have returned records")
 
                             aResRecords shouldNotBe null
                             print(aResRecords)
@@ -123,12 +134,19 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                 }
             }
         }
-//        given("updateTo") {
-//            then("getComposition") {}
-//        }
-//
-//        given("batchUpdateRecords") {
-//            then("getComposition") {}
-//        }
+
+        given("addRecordCollection") {}
+
+        given("batchAssociateRecordsToCollection") {}
+
+        given("associateRecordToCollection") {}
+        // endregion Insert
+
+
+        // region Update
+        // endregion Update
+
+        // region Delete
+        // endregion Delete
     }
 }

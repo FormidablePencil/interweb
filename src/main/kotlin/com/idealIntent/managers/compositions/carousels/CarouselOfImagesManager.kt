@@ -2,7 +2,7 @@ package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
@@ -28,8 +28,8 @@ class CarouselOfImagesManager(
     private val imageRepository: ImageRepository,
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
-) : ICompositionManagerStructure<CarouselBasicImagesReq, IImagesCarouselEntity,
-        CarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
+) : ICompositionManagerStructure<CreateCarouselBasicImagesReq, IImagesCarouselEntity,
+        CreateCarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
     val appEnv: AppEnv by inject()
 
     // region Get
@@ -44,12 +44,10 @@ class CarouselOfImagesManager(
      * Otherwise, if all went well, pass ids of image's and redirection text's collections to
      * [compose][CarouselOfImagesRepository.compose]. Then return id of the newly created composition.
      *
-     * @exception CompositionExceptionReport [FailedToCompose] edge case if fails to compose collections for debugging purposes.
-     *
      * @see ICompositionManagerStructure.createComposition
-     * @return Id of the newly created composition
+     * @return Response of id of the newly created composition.
      */
-    override fun createComposition(createRequest: CarouselBasicImagesReq, userId: Int): CompositionResponse {
+    override fun createComposition(createRequest: CreateCarouselBasicImagesReq, userId: Int): CompositionResponse {
         try {
             appEnv.database.useTransaction {
                 val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
@@ -73,6 +71,7 @@ class CarouselOfImagesManager(
             }
         } catch (ex: CompositionException) {
             when (ex.code) {
+                FailedToInsertRecord,
                 UserNotPrivileged,
                 FailedToFindAuthorByUsername,
                 FailedToCompose ->
@@ -125,7 +124,7 @@ class CarouselOfImagesManager(
     }
 
 
-    fun insertCompositions(components: List<CarouselBasicImagesReq>, label: String): Int? {
+    fun insertCompositions(components: List<CreateCarouselBasicImagesReq>, label: String): Int? {
         TODO("Not yet implemented")
     }
 

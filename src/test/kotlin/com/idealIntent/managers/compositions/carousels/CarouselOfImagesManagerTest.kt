@@ -1,6 +1,7 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
+import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
@@ -17,7 +18,9 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import shared.appEnvMockHelper
-import shared.testUtils.carouselBasicImagesReq
+import shared.testUtils.createCarouselBasicImagesReq
+import shared.testUtils.giveIdsToImages
+import shared.testUtils.giveIdsToTexts
 import shared.testUtils.privilegedAuthors
 
 class CarouselOfImagesManagerTest : BehaviorSpec({
@@ -36,7 +39,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
         imageCollectionId = idOfNewlyCreatedImageCollection,
         redirectTextCollectionId = idOfNewlyCreatedTextCollection,
         privilegeId = privilegeSourceId,
-        name = carouselBasicImagesReq.name,
+        name = createCarouselBasicImagesReq.name,
     )
     val idOfNewlyCreatedCarouselOfImages = 12
 
@@ -61,10 +64,10 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
     given("createComposition") {
         beforeEach {
             // region setup
-            every { imageRepository.batchInsertRecordsToNewCollection(carouselBasicImagesReq.images) } returns
-                    Pair(carouselBasicImagesReq.images, idOfNewlyCreatedImageCollection)
-            every { textRepository.batchInsertRecordsToNewCollection(carouselBasicImagesReq.imgOnclickRedirects) } returns
-                    Pair(carouselBasicImagesReq.imgOnclickRedirects, idOfNewlyCreatedTextCollection)
+            every { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) } returns
+                    Pair(giveIdsToImages(), idOfNewlyCreatedImageCollection)
+            every { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) } returns
+                    Pair(giveIdsToTexts(), idOfNewlyCreatedTextCollection)
             every { compositionPrivilegesRepository.addPrivilegeSource() } returns privilegeSourceId
             justRun {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
@@ -82,12 +85,12 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
 
         then("") {
             // region setup
-            every { imageRepository.batchInsertRecordsToNewCollection(carouselBasicImagesReq.images) } throws
+            every { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) } throws
                     CompositionExceptionReport(FailedToInsertRecord, this::class.java)
             // endregion
 
             val ex = shouldThrow<CompositionExceptionReport> {
-                carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId)
+                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
             }
             ex.clientMsg shouldBe CompositionCode.getClientMsg(FailedToInsertRecord)
         }
@@ -115,7 +118,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             justRun { appEnv.database.useTransaction { it.rollback() } }
 
             val ex = shouldThrowExactly<CompositionException> {
-                carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId)
+                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
             }
 
             ex.code shouldBe UserNotPrivileged
@@ -127,7 +130,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             // endregion
 
             val ex = shouldThrow<CompositionExceptionReport> {
-                carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId)
+                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
             }
 
             verify {
@@ -143,7 +146,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             // region setup
             // endregion
 
-            val res = carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId)
+            val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
 
             res.isSuccess shouldBe true
             res.message() shouldBe null

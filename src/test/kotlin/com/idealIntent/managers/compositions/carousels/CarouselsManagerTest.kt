@@ -14,8 +14,9 @@ import io.ktor.http.*
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
-import shared.testUtils.carouselBasicImagesReq
 import shared.testUtils.carouselBasicImagesReqStingified
+import shared.testUtils.carouselBasicImagesRes
+import shared.testUtils.createCarouselBasicImagesReq
 
 class CarouselsManagerTest : BehaviorSpec({
     val carouselOfImagesManager: CarouselOfImagesManager = mockk()
@@ -35,13 +36,15 @@ class CarouselsManagerTest : BehaviorSpec({
         when (it) {
             BasicImages -> {
                 given("getComposition") {
-                    then("provided id of composition that does") {
-                        every { carouselOfImagesRepository.getComposition(compositionId) } returns carouselBasicImagesReq
-                        carouselsManager.getComposition(it.value, compositionId) shouldBe carouselBasicImagesReq
-                    }
+
                     then("provided id of composition that does NOT exist") {
                         every { carouselOfImagesRepository.getComposition(compositionId) } returns null
                         carouselsManager.getComposition(it.value, compositionId) shouldBe null
+                    }
+
+                    then("provided id of composition that does") {
+                        every { carouselOfImagesRepository.getComposition(compositionId) } returns carouselBasicImagesRes
+                        carouselsManager.getComposition(it.value, compositionId) shouldBe carouselBasicImagesRes
                     }
                 }
             }
@@ -56,7 +59,12 @@ class CarouselsManagerTest : BehaviorSpec({
                         // region setup
                         val idOfNewlyCreatedComposition = 123
                         val httpStatus = HttpStatusCode.Created
-                        every { carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId) } returns
+                        every {
+                            carouselOfImagesManager.createComposition(
+                                createCarouselBasicImagesReq,
+                                userId
+                            )
+                        } returns
                                 CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
                         // endregion setup
 
@@ -71,7 +79,12 @@ class CarouselsManagerTest : BehaviorSpec({
                     }
                     then("failed") {
                         // region setup
-                        every { carouselOfImagesManager.createComposition(carouselBasicImagesReq, userId) } returns
+                        every {
+                            carouselOfImagesManager.createComposition(
+                                createCarouselBasicImagesReq,
+                                userId
+                            )
+                        } returns
                                 CompositionResponse().failed(CompositionCode.FailedToGivePrivilege)
                         // endregion setup
 

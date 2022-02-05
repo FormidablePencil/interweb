@@ -1,8 +1,9 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.google.gson.Gson
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.carousels.CompositionCarousel
@@ -11,10 +12,10 @@ import dtos.compositions.carousels.CompositionCarousel.*
 class CarouselsManager(
     private val carouselOfImagesManager: CarouselOfImagesManager,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
-) : ICompositionCategoryManagerStructure<CarouselBasicImagesReq, CompositionResponse> {
+) : ICompositionCategoryManagerStructure<CarouselBasicImagesRes, CompositionResponse> {
     private val gson = Gson()
 
-    override fun getComposition(compositionType: Int, id: Int): CarouselBasicImagesReq? =
+    override fun getComposition(compositionType: Int, id: Int): CarouselBasicImagesRes? =
         when (CompositionCarousel.fromInt(compositionType)) {
             CarouselBlurredOverlay -> TODO()
             CarouselMagnifying -> TODO()
@@ -27,7 +28,7 @@ class CarouselsManager(
             CarouselBlurredOverlay -> TODO()
             CarouselMagnifying -> TODO()
             BasicImages ->
-                carouselOfImagesManager.createComposition(gson.fromJson(jsonData, CarouselBasicImagesReq::class.java), userId)
+                carouselOfImagesManager.createComposition(gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java), userId)
         }
 
     override fun updateComposition() {
