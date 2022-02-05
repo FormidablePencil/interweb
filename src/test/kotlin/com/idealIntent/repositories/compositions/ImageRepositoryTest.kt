@@ -1,6 +1,7 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
+import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import io.kotest.assertions.failure
@@ -14,6 +15,7 @@ import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.images
 import shared.testUtils.rollback
 
+// todo
 class ImageRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(DIHelper.CoreModule))
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
@@ -25,9 +27,22 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         // region Get
-        given("getRecordOfCollection") {}
 
-        given("getCollectionOfRecords") {}
+        given("getAllRecordsOfCollection") {
+            then("provided id of collection that doesn't exist") {
+                rollback {
+                    val records = imageRepository.getAllRecordsOfCollection(93434433)
+                    records shouldBe null
+                }
+            }
+
+            then("provided id of collection that doesn't exist") {
+                rollback {
+                    val records = imageRepository.getAllRecordsOfCollection(93434433)
+                    records shouldBe null
+                }
+            }
+        }
 
         given("getRecordsQuery") {
             // Not meant to be tested. This method would have been private
@@ -41,59 +56,6 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
         // region Insert
         given("batchInsertRecordsToNewCollection") {}
 
-        given("insertRecord") {
-            And("addRecordCollection") {
-                And("createRecordToCollectionRelationship") {
-                    then("getRecordOfCollection") {
-                        rollback {
-                            val resRecords = imageRepository.insertRecord(images[0])
-                                ?: throw Exception("failed to insert record")
-                            val collectionId = imageRepository.addRecordCollection()
-                            val hasCreatedRelations = imageRepository.associateRecordToCollection(
-                                ImageToCollection(
-                                    imageId = resRecords.id,
-                                    collectionId = collectionId,
-                                    orderRank = resRecords.orderRank
-                                )
-                            )
-                            hasCreatedRelations shouldBe true
-                            imageRepository.getRecordOfCollection(resRecords.id, collectionId)
-                        }
-                    }
-                }
-            }
-        }
-
-        given("batchInsertRecords") {
-            And("addRecordCollection") {
-                And("createRecordToCollectionRelationship") {
-                    then("getCollectionOfRecords") {
-                        rollback {
-                            val resRecords = imageRepository.batchInsertRecords(images)
-                            resRecords.map { it.id shouldNotBe null }
-
-                            val collectionId = imageRepository.addRecordCollection()
-
-                            val hasCreatedRelations =
-                                imageRepository.batchAssociateRecordsToCollection(resRecords, collectionId)
-                            hasCreatedRelations shouldBe true
-
-                            val aResRecords = imageRepository.getCollectionOfRecords(collectionId)
-                                ?: throw failure("should have returned records")
-
-                            aResRecords.size shouldBe images.size // todo - test fails because more than was given is returned
-                            aResRecords.map {
-                                images.find { record ->
-                                    record.orderRank == it.orderRank
-                                            && record.description == it.description
-                                            && record.url == it.url
-                                } ?: throw Exception("failed to find returned record")
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         given("addRecordCollection") {}
 

@@ -1,10 +1,12 @@
 package com.idealIntent.repositories.collections
 
-import com.google.gson.Gson
+import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import org.ktorm.database.Database
+
+// todo - rename collection to collection_source
 
 /**
  * Structure for CRUD operations on compositions' collections
@@ -12,6 +14,8 @@ import org.ktorm.database.Database
  * Methods of this interface is applicable only to low level specific such as ImageCollection, TextCollection and PrivilegesCollection
  *
  * [Record] has no primary key [RecordPK], out has a primary key.
+ *
+ * Records cannot be standalone, they must be associated to a collection.
  *
  * @param Record DTO for Generic type for data such as Image, Text, PrivilegedAuthor, etc.
  * @param RecordPK DTO for Generic type for data such as Image, Text, PrivilegedAuthor, etc. but with a primary key.
@@ -30,8 +34,7 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * @param collectionId id of collection.
      * @return Single record or null if not found.
      */
-    fun getRecordOfCollection(recordId: Int, collectionId: Int): RecordPK? =
-        getRecordsQuery(recordId, collectionId)?.first()
+    fun getSingleRecordOfCollection(recordId: Int, collectionId: Int): RecordPK?
 
     /**
      * Get records by collection id.
@@ -39,10 +42,10 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * @param collectionId Get records under collection's id
      * @return A list of records under collection of [collectionId] or null if non found
      */
-    fun getCollectionOfRecords(collectionId: Int): List<RecordPK>? = getRecordsQuery(null, collectionId)
+    fun getAllRecordsOfCollection(collectionId: Int): List<RecordPK>?
 
     /**
-     * Get records query. Not used directly but by [getRecordOfCollection] and [getCollectionOfRecords]
+     * Get records query. Not used directly but by [getSingleRecordOfCollection] and [getAllRecordsOfCollection]
      *
      * @param recordId Id of record to look up null for returning only record
      * @param collectionId Get records under collection's id
@@ -51,18 +54,10 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
     fun getRecordsQuery(recordId: Int? = null, collectionId: Int): List<RecordPK>?
 
     /**
-     * Get records to collection info.
-     *
-     * @param recordId Id of record.
-     * @param collectionId
-     */
-    fun getRecordToCollectionRelationship(recordId: Int, collectionId: Int): RecordToCollectionEntity?
-
-    /**
      * validate image to collection relationship.
      */
-    fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
-        getRecordToCollectionRelationship(recordId, collectionId) != null
+    // todo - no use for it yet. Maybe deleted
+    fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean
     // endregion Get
 
 
@@ -71,56 +66,42 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * Batch insert records to new collection
      *
      * @param records Records to insert.
-     * @return Records with a primary key and id of collection.
-     * @throws batchInsertRecords [failed to insert a record][CompositionCode.FailedToInsertRecord]
+     * @return collectionId. Should never fail because it's creating a new collection and inserting new records.
      */
-    @Throws(CompositionException::class)
-    fun batchInsertRecordsToNewCollection(records: List<Record>): Pair<List<RecordPK>, Int> {
-        database.useTransaction {
-            val aRecords = batchInsertRecords(records)
-            val collectionId = addRecordCollection()
-            batchAssociateRecordsToCollection(aRecords, collectionId)
-            return Pair(aRecords, collectionId)
-        }
-    }
+    fun batchInsertRecordsToNewCollection(records: List<Record>): Int?
 
     /**
      * Insert [record] and return [record] with a generated id.
      *
      * @param record record to insert.
-     * @return Returns record with generated id or null if failed.
+     * @return Returns record with generated id.
      */
-    fun insertRecord(record: Record): RecordPK?
+    fun insertRecordToCollection(record: Record, collectionId: Int): Boolean
 
     /**
      * Batch insert records.
      *
      * @param records Records to insert.
      * @return Insert [records] and return [records] with a generated ids. If failed then revert changes and return null.
-     * @exception CompositionException [failed to insert a record][CompositionCode.FailedToInsertRecord].
      */
-    @Throws(CompositionException::class)
-    fun batchInsertRecords(records: List<Record>): List<RecordPK> {
-        val gson = Gson()
-        database.useTransaction {
-            return records.map {
-                val res: RecordPK? = insertRecord(it)
-                if (res == null) {
-                    throw CompositionException(CompositionCode.FailedToInsertRecord, gson.toJson(it))
-                } else return@map res
-            }
-        }
-    }
+    fun batchInsertRecordsToCollection(records: List<Record>, collectionId: Int): Boolean
 
     /**
-     * Insert a new collection.
+     * Insert record to new collection.
      *
      * @return collection id
+     */
+    fun insertRecordToNewCollection(record: Record): Int
+
+    /**
+     * Add a new collection for records
+     *
+     * @return id of collection
      */
     fun addRecordCollection(): Int
 
     /**
-     * Associate multiple records to collection
+     * Associate multiple records to collection. Used for when you want records to belong to multiple collections.
      *
      * @param records Associate record by id to collection of [collectionId].
      * @param collectionId Id of collection.
@@ -137,7 +118,7 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * @param recordToCollection record to collection association
      * @return Success or fail
      */
-    fun associateRecordToCollection(recordToCollection: RecordToCollection): Boolean
+    fun associateRecordToCollection(orderRank: Int, recordId: Int, collectionId: Int): Boolean
     // endregion Insert
 
 

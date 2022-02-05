@@ -21,7 +21,15 @@ import org.ktorm.entity.removeIf
 import org.ktorm.entity.sequenceOf
 
 /**
- * Responsible for image_collections and images table
+ * Responsible for collections of images.
+ *
+ * Overriding functions that call the inherited functions from [ICollectionStructure] are there for structure.
+ * Having them in this way makes for easier unit testing.
+ *
+ * Responsible for -
+ * [image][models.compositions.basicsCollections.images.IImage],
+ * [image to collections][models.compositions.basicsCollections.images.IImageToCollection],
+ * [image collection][models.compositions.basicsCollections.images.IImageCollection].
  */
 class ImageRepository() : RepositoryBase(),
     ICollectionStructure<Image, ImagePK, IImageToCollectionEntity, ImageToCollection, ImageCollection> {
@@ -30,6 +38,12 @@ class ImageRepository() : RepositoryBase(),
     private val Database.images get() = this.sequenceOf(ImagesModel)
 
     // region Get
+    override fun getSingleRecordOfCollection(recordId: Int, collectionId: Int): ImagePK? =
+        getRecordsQuery(recordId, collectionId)?.first()
+
+    override fun getAllRecordsOfCollection(collectionId: Int): List<ImagePK>? =
+        getRecordsQuery(null, collectionId)
+
     override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<ImagePK>? {
         val itemToCol = ImageToCollectionsModel.aliased("imgToCol")
         val item = ImagesModel.aliased("img")
@@ -38,7 +52,7 @@ class ImageRepository() : RepositoryBase(),
             .leftJoin(item, item.id eq itemToCol.imageId)
             .select(itemToCol.orderRank, itemToCol.imageId, item.url, item.description)
             .whereWithConditions {
-                (item.id eq itemToCol.imageId) and (itemToCol.collectionId eq collectionId)
+                it += (item.id eq itemToCol.imageId) and (itemToCol.collectionId eq collectionId)
                 if (recordId != null) it += (item.id eq recordId)
             }
             .map { row ->
@@ -53,18 +67,38 @@ class ImageRepository() : RepositoryBase(),
         return records.ifEmpty { null }
     }
 
-    override fun getRecordToCollectionRelationship(recordId: Int, collectionId: Int): IImageToCollectionEntity? =
-        database.imageToCollections.find { (it.imageId eq recordId) and (it.collectionId eq collectionId) }
+    override fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
+        database.imageToCollections.find { (it.imageId eq recordId) and (it.collectionId eq collectionId) } != null
     // endregion Get
 
 
     // region Insert
-    override fun insertRecord(record: Image): ImagePK? {
+    override fun batchInsertRecordsToNewCollection(records: List<Image>): Int {
+        val collectionId = addRecordCollection()
+        batchInsertRecordsToCollection(records, collectionId)
+        return collectionId
+    }
+
+    override fun batchInsertRecordsToCollection(records: List<Image>, collectionId: Int): Boolean {
+        records.forEach {
+            if (insertRecordToCollection(it, collectionId))
+                return@batchInsertRecordsToCollection false
+        }
+        return true
+    }
+
+    override fun insertRecordToNewCollection(record: Image): Int {
+        val collectionId = addRecordCollection()
+        insertRecordToCollection(record, collectionId)
+        return collectionId
+    }
+
+    override fun insertRecordToCollection(record: Image, collectionId: Int): Boolean {
         val id = database.insertAndGenerateKey(ImagesModel) {
             set(it.description, record.description)
             set(it.url, record.url)
-        } as Int? ?: return null
-        return ImagePK(id = id, orderRank = record.orderRank, url = record.url, description = record.description)
+        } as Int
+        return associateRecordToCollection(orderRank = record.orderRank, recordId = id, collectionId = collectionId)
     }
 
     override fun addRecordCollection(): Int =
@@ -75,22 +109,20 @@ class ImageRepository() : RepositoryBase(),
             if (records.isEmpty()) throw CompositionException(CompositionCode.NoRecordsProvided)
             records.forEach {
                 val succeed = associateRecordToCollection(
-                    ImageToCollection(
-                        orderRank = it.orderRank,
-                        collectionId = collectionId,
-                        imageId = it.id
-                    )
+                    orderRank = it.orderRank,
+                    collectionId = collectionId,
+                    recordId = it.id
                 )
                 if (!succeed) throw CompositionException(CompositionCode.FailedToAssociateRecordToCollection)
             }
         }
     }
 
-    override fun associateRecordToCollection(recordToCollection: ImageToCollection): Boolean =
+    override fun associateRecordToCollection(orderRank: Int, recordId: Int, collectionId: Int): Boolean =
         database.insert(ImageToCollectionsModel) {
-            set(it.collectionId, recordToCollection.collectionId)
-            set(it.imageId, recordToCollection.imageId)
-            set(it.orderRank, recordToCollection.orderRank)
+            set(it.collectionId, collectionId)
+            set(it.imageId, recordId)
+            set(it.orderRank, orderRank)
         } == 1
     // endregion Insert
 

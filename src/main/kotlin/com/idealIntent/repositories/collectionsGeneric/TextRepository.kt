@@ -23,7 +23,10 @@ import org.ktorm.entity.sequenceOf
 /**
  * Responsible for collections of texts.
  *
- * Related -
+ * Overriding functions that call the inherited functions from [ICollectionStructure] are there for structure.
+ * Having them in this way makes for easier unit testing.
+ *
+ * Responsible for -
  * [text][models.compositions.basicsCollections.texts.IText],
  * [text to collections][models.compositions.basicsCollections.texts.ITextToCollection],
  * [text collection][models.compositions.basicsCollections.texts.ITextCollection].
@@ -35,10 +38,11 @@ class TextRepository : RepositoryBase(),
     private val Database.texts get() = this.sequenceOf(TextsModel)
 
     // region Get
-    override fun getRecordOfCollection(recordId: Int, collectionId: Int): TextPK? =
-        super.getRecordOfCollection(recordId, collectionId)
+    override fun getSingleRecordOfCollection(recordId: Int, collectionId: Int): TextPK? =
+        getRecordsQuery(recordId, collectionId)?.first()
 
-    override fun getCollectionOfRecords(collectionId: Int): List<TextPK>? = super.getCollectionOfRecords(collectionId)
+    override fun getAllRecordsOfCollection(collectionId: Int): List<TextPK>? =
+        getRecordsQuery(null, collectionId)
 
     override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<TextPK>? {
         val itemToCol = TextToCollectionsModel.aliased("textToCol")
@@ -48,7 +52,7 @@ class TextRepository : RepositoryBase(),
             .leftJoin(item, item.id eq itemToCol.textId)
             .select(itemToCol.textId, itemToCol.orderRank, item.text)
             .whereWithConditions {
-                (item.id eq itemToCol.textId) and (itemToCol.collectionId eq collectionId)
+                it += (item.id eq itemToCol.textId) and (itemToCol.collectionId eq collectionId)
                 if (recordId != null) it += (item.id eq recordId)
             }
             .map { row ->
@@ -62,26 +66,38 @@ class TextRepository : RepositoryBase(),
         return records.ifEmpty { null }
     }
 
-    override fun getRecordToCollectionRelationship(recordId: Int, collectionId: Int): ITextToCollectionEntity? =
-        database.textToCollections.find { (it.textId eq recordId) and (it.collectionId eq collectionId) }
-
     override fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
-        super.validateRecordToCollectionRelationship(recordId, collectionId)
+        database.textToCollections.find { (it.textId eq recordId) and (it.collectionId eq collectionId) } != null
     // endregion Get
 
 
     // region Insert
-    override fun batchInsertRecordsToNewCollection(records: List<Text>): Pair<List<TextPK>, Int> =
-        super.batchInsertRecordsToNewCollection(records)
-
-    override fun insertRecord(record: Text): TextPK? {
-        val id = database.insertAndGenerateKey(TextsModel) {
-            set(it.text, record.text)
-        } as Int? ?: return null
-        return TextPK(id = id, orderRank = record.orderRank, text = record.text)
+    override fun batchInsertRecordsToNewCollection(records: List<Text>): Int {
+        val collectionId = addRecordCollection()
+        batchInsertRecordsToCollection(records, collectionId)
+        return collectionId
     }
 
-    override fun batchInsertRecords(records: List<Text>): List<TextPK> = super.batchInsertRecords(records)
+    override fun batchInsertRecordsToCollection(records: List<Text>, collectionId: Int): Boolean {
+        records.forEach {
+            if (!insertRecordToCollection(it, collectionId))
+                return@batchInsertRecordsToCollection false
+        }
+        return true
+    }
+
+    override fun insertRecordToNewCollection(record: Text): Int {
+        val collectionId = addRecordCollection()
+        insertRecordToCollection(record, collectionId)
+        return collectionId
+    }
+
+    override fun insertRecordToCollection(record: Text, collectionId: Int): Boolean {
+        val id = database.insertAndGenerateKey(TextsModel) {
+            set(it.text, record.text)
+        } as Int
+        return associateRecordToCollection(orderRank = record.orderRank, recordId = id, collectionId = collectionId)
+    }
 
     override fun addRecordCollection(): Int =
         database.insertAndGenerateKey(TextCollectionsModel) { } as Int
@@ -90,23 +106,26 @@ class TextRepository : RepositoryBase(),
         database.useTransaction {
             if (records.isEmpty()) throw CompositionException(CompositionCode.NoRecordsProvided)
             records.forEach {
-                val succeed = associateRecordToCollection(
-                    TextToCollection(
+                try {
+                    associateRecordToCollection(
                         orderRank = it.orderRank,
                         collectionId = collectionId,
-                        textId = it.id
+                        recordId = it.id
                     )
-                )
-                if (!succeed) throw CompositionException(CompositionCode.FailedToAssociateRecordToCollection)
+                } catch (ex: Exception) {
+                    throw CompositionException(
+                        CompositionCode.FailedToAssociateRecordToCollection, it.orderRank.toString(), ex
+                    )
+                }
             }
         }
     }
 
-    override fun associateRecordToCollection(recordToCollection: TextToCollection): Boolean =
+    override fun associateRecordToCollection(orderRank: Int, recordId: Int, collectionId: Int): Boolean =
         database.insert(TextToCollectionsModel) {
-            set(it.collectionId, recordToCollection.collectionId)
-            set(it.textId, recordToCollection.textId)
-            set(it.orderRank, recordToCollection.orderRank)
+            set(it.collectionId, collectionId)
+            set(it.textId, recordId)
+            set(it.orderRank, orderRank)
         } == 1
     // endregion Insert
 

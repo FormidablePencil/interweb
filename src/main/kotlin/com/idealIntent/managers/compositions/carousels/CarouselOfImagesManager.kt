@@ -50,8 +50,8 @@ class CarouselOfImagesManager(
     override fun createComposition(createRequest: CreateCarouselBasicImagesReq, userId: Int): CompositionResponse {
         try {
             appEnv.database.useTransaction {
-                val (_, imageCollectionId) = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
-                val (_, redirectsCollectionId) = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
+                val imageCollectionId = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
+                val redirectsCollectionId = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
                 val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(

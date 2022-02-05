@@ -24,6 +24,8 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
     private val Database.privilegeSource get() = this.sequenceOf(PrivilegeSourcesModel)
     private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionsModel)
 
+    // todo - validate privilege to record - collectionSource.privilegeId -> privilegeSource.id -> composition_privileged_authors.authorId
+
     // region Get
     fun getPrivilegesByAuthorId(getPrivilegesOfAuthorId: Int): Pair<List<PrivilegeRecord>, Int> {
         TODO()

@@ -65,9 +65,9 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
         beforeEach {
             // region setup
             every { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) } returns
-                    Pair(giveIdsToImages(), idOfNewlyCreatedImageCollection)
+                    giveIdsToImages()[0].id
             every { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) } returns
-                    Pair(giveIdsToTexts(), idOfNewlyCreatedTextCollection)
+                    giveIdsToTexts()[0].id
             every { compositionPrivilegesRepository.addPrivilegeSource() } returns privilegeSourceId
             justRun {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
