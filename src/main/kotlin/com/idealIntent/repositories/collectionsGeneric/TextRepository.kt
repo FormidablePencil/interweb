@@ -104,7 +104,7 @@ class TextRepository : RepositoryBase(),
 
     override fun batchAssociateRecordsToCollection(records: List<TextPK>, collectionId: Int) {
         database.useTransaction {
-            if (records.isEmpty()) throw CompositionException(CompositionCode.NoRecordsProvided)
+            if (records.isEmpty()) throw CompositionException(CompositionCode.EmptyListOfRecordsProvided)
             records.forEach {
                 try {
                     associateRecordToCollection(

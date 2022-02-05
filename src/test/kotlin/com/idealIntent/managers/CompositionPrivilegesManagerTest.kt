@@ -66,7 +66,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             ex.code shouldBe UserNotPrivileged
         }
 
-        then("provided a username that does not exist in db. Throw UserNotPrivileged and with it the username failed on") {
+        then("provided a username that does not exist in db. Throws UserNotPrivileged and with it the username failed on") {
             // region setup
             every { authorRepository.getByUsername(any()) } returns null
             // endregion
@@ -77,7 +77,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
                 )
             }
 
-            verify(exactly = 1) { appEnv.database.useTransaction {} }
+            verify(exactly = 1) { appEnv.database.useTransaction {} } // verify it is wrapped in a useTransaction
             ex.code shouldBe FailedToFindAuthorByUsername
             ex.moreDetails shouldBe privilegedAuthor.username
         }
@@ -86,6 +86,15 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
                 privilegedAuthors, privilegeId, userId
             )
+
+            verify(exactly = 1) { appEnv.database.useTransaction {} } // verify it is wrapped in a useTransaction
+            verify { compositionPrivilegesRepository.isUserPrivileged(privilegeId, userId) }
+            verify { authorRepository.getByUsername(any()) }
+            verify {
+                compositionPrivilegesRepository.giveAnAuthorPrivilege(
+                    privileges = any(), privilegeId = privilegeId, authorId = any()
+                )
+            }
         }
     }
 
@@ -129,10 +138,12 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             ex.code shouldBe FailedToFindAuthorByUsername
         }
 
-        then("successfully gave author privileges") {
+        then("success") {
             compositionPrivilegesManager.giveAnAuthorPrivilegesByUsername(privilegedAuthor, privilegeId, userId)
 
-            verify(exactly = 1) {
+            verify { compositionPrivilegesRepository.isUserPrivileged(privilegeId, userId) }
+            verify { authorRepository.getByUsername(privilegedAuthor.username) }
+            verify {
                 compositionPrivilegesRepository.giveAnAuthorPrivilege(
                     CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
                     privilegeId = privilegeId,

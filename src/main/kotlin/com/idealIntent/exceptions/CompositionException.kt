@@ -3,8 +3,12 @@ package com.idealIntent.exceptions
 /**
  * When thrown, the exception must be caught and handled in code.
  *
+ * thrown with and with data if provided when exception was thrown.
+ *
  * @property message Message is always a client friendly-response.
  * @property code Used in a switch in catch statement to handle exception appropriately.
+ * @property moreDetails either json data or a string to response to client with which typically gives more context of
+ * why failed to fulfill request.
  * @constructor Saves to [code] to received enum and passes to [Throwable.message] a client-friendly message corresponding
  * to given enum. moreDetails is passed in constructor, message of moreDetails gets appended[] to client-friendly message.
  */

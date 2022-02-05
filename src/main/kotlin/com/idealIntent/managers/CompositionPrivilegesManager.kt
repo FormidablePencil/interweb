@@ -65,7 +65,7 @@ class CompositionPrivilegesManager(
      *
      * Check if requester is privileged to privilege source. Then get the ids of usernames provided to give privileges to.
      *
-     * @exception [CompositionException] [UserNotPrivileged], [FailedToFindAuthorByUsername]
+     * @throws CompositionException [UserNotPrivileged], [FailedToFindAuthorByUsername]
      *
      * @return True for success or false for failure to get by author by username.
      */

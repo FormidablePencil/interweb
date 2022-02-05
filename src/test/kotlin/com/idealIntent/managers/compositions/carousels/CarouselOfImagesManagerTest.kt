@@ -1,7 +1,6 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
-import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
@@ -78,50 +77,35 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             // endregion
         }
 
-        then("transaction rollback on throw") {
-
-        }
-
-
-        then("") {
-            // region setup
-            every { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) } throws
-                    CompositionExceptionReport(FailedToInsertRecord, this::class.java)
-            // endregion
-
-            val ex = shouldThrow<CompositionExceptionReport> {
-                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
-            }
-            ex.clientMsg shouldBe CompositionCode.getClientMsg(FailedToInsertRecord)
-        }
-
-        then("UserNotPrivileged exception") {
+        then("user not privileged to privilege source") {
             // region setup
             every {
-                compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
-                    privilegedAuthors, privilegeSourceId, userId
-                )
+                compositionPrivilegesRepository.isUserPrivileged(privilegeSourceId, userId)
             } throws CompositionException(UserNotPrivileged)
-            // endregion
-
-        }
-
-        then("FailedToGetAuthorByUsername exception") {
-            // region setup
-            every {
-                compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
-                    privilegedAuthors, privilegeSourceId, userId
-                )
-            } throws CompositionException(FailedToFindAuthorByUsername)
-            // endregion
-
-            justRun { appEnv.database.useTransaction { it.rollback() } }
+            // endregion setup
 
             val ex = shouldThrowExactly<CompositionException> {
                 carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
             }
 
             ex.code shouldBe UserNotPrivileged
+        }
+
+        then("failed to find author by username provided to give privileges to") {
+            // region setup
+            every {
+                compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
+                    privilegedAuthors, privilegeSourceId, userId
+                )
+            } throws CompositionException(FailedToFindAuthorByUsername)
+            justRun { appEnv.database.useTransaction { it.rollback() } } // todo - verify that it was run
+            // endregion
+
+            val ex = shouldThrowExactly<CompositionException> {
+                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
+            }
+
+            ex.code shouldBe FailedToFindAuthorByUsername
         }
 
         then("fails compose edge case") {

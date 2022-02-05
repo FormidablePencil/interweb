@@ -13,13 +13,12 @@ import io.ktor.http.*
 enum class CompositionCode {
     ServerError,
     FailedToInsertRecord,
-    FailedToFindAuthor,
     FailedToCompose,
     FailedToGivePrivilege,
     UserNotPrivileged,
     FailedToFindAuthorByUsername,
     FailedToAssociateRecordToCollection,
-    NoRecordsProvided;
+    EmptyListOfRecordsProvided;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
         override fun getLogMsg(code: CompositionCode): String {
@@ -30,9 +29,8 @@ enum class CompositionCode {
 
                 ServerError -> genericServerError
 
-                NoRecordsProvided,
+                EmptyListOfRecordsProvided,
                 FailedToAssociateRecordToCollection,
-                FailedToFindAuthor,
                 UserNotPrivileged,
                 FailedToFindAuthorByUsername,
                 -> {
@@ -44,11 +42,10 @@ enum class CompositionCode {
 
         override fun getClientMsg(code: CompositionCode): String {
             return when (code) {
-                FailedToFindAuthor -> "Failed to find an author to give privileges to."
                 UserNotPrivileged -> "Do not have privileges."
                 FailedToFindAuthorByUsername -> "Failed to find author by username."
                 FailedToAssociateRecordToCollection -> "Failed to associateRecordToCollection."
-                NoRecordsProvided -> "No records provided."
+                EmptyListOfRecordsProvided -> "Provided an empty list of records."
 
                 FailedToGivePrivilege,
                 ServerError -> genericServerError
@@ -60,11 +57,10 @@ enum class CompositionCode {
 
         override fun getHttpCode(code: CompositionCode): HttpStatusCode {
             return when (code) {
-                FailedToFindAuthor,
                 UserNotPrivileged,
                 FailedToFindAuthorByUsername,
                 FailedToAssociateRecordToCollection,
-                NoRecordsProvided
+                EmptyListOfRecordsProvided
                 -> HttpStatusCode.BadRequest
 
                 ServerError,

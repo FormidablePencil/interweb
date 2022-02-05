@@ -3,7 +3,7 @@ package com.idealIntent.repositories.compositions
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.exceptions.CompositionCode.FailedToAssociateRecordToCollection
-import com.idealIntent.exceptions.CompositionCode.NoRecordsProvided
+import com.idealIntent.exceptions.CompositionCode.EmptyListOfRecordsProvided
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import io.kotest.assertions.failure
@@ -136,7 +136,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                     val ex = shouldThrowExactly<CompositionException> {
                         textRepository.batchAssociateRecordsToCollection(emptyList, collectionId)
                     }
-                    ex.code shouldBe NoRecordsProvided
+                    ex.code shouldBe EmptyListOfRecordsProvided
                 }
             }
 

@@ -106,7 +106,7 @@ class ImageRepository() : RepositoryBase(),
 
     override fun batchAssociateRecordsToCollection(records: List<ImagePK>, collectionId: Int) {
         database.useTransaction {
-            if (records.isEmpty()) throw CompositionException(CompositionCode.NoRecordsProvided)
+            if (records.isEmpty()) throw CompositionException(CompositionCode.EmptyListOfRecordsProvided)
             records.forEach {
                 try {
                     associateRecordToCollection(

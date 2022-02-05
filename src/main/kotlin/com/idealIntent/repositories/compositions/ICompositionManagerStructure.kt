@@ -23,9 +23,8 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
      * Then takes the collection and composition ids and sends them off to compose. If everything went
      * well the user will get the id of the newly composed composition.
      *
-     * Insert [composition] under a new collection
-     *
-     * @param composition Composition to insert
+     * @param createRequest Composition of records.
+     * @param userId Id of user to validate.
      * @return CollectionId or null if failed to insert [composition]
      */
     fun createComposition(createRequest: CreateRequest, userId: Int): Response

@@ -2,8 +2,8 @@ package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode.*
@@ -45,13 +45,14 @@ class CarouselOfImagesManager(
      * [compose][CarouselOfImagesRepository.compose]. Then return id of the newly created composition.
      *
      * @see ICompositionManagerStructure.createComposition
-     * @return Response of id of the newly created composition.
+     * @return Response of id of the newly created composition or failed response of either [UserNotPrivileged] or [FailedToFindAuthorByUsername].
      */
     override fun createComposition(createRequest: CreateCarouselBasicImagesReq, userId: Int): CompositionResponse {
         try {
             appEnv.database.useTransaction {
                 val imageCollectionId = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
-                val redirectsCollectionId = textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
+                val redirectsCollectionId =
+                    textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
                 val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
@@ -71,10 +72,8 @@ class CarouselOfImagesManager(
             }
         } catch (ex: CompositionException) {
             when (ex.code) {
-                FailedToInsertRecord,
                 UserNotPrivileged,
-                FailedToFindAuthorByUsername,
-                FailedToCompose ->
+                FailedToFindAuthorByUsername ->
                     return CompositionResponse().failed(ex.code, ex.moreDetails)
                 else ->
                     throw CompositionExceptionReport(ServerError, this::class.java, ex)

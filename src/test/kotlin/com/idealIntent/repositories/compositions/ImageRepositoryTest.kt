@@ -137,7 +137,7 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
                     val ex = shouldThrowExactly<CompositionException> {
                         imageRepository.batchAssociateRecordsToCollection(emptyList, collectionId)
                     }
-                    ex.code shouldBe CompositionCode.NoRecordsProvided
+                    ex.code shouldBe CompositionCode.EmptyListOfRecordsProvided
                 }
             }
 

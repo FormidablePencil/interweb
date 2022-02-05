@@ -1,6 +1,5 @@
 package com.idealIntent.repositories.collections
 
-import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
@@ -66,7 +65,7 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * Batch insert records to new collection
      *
      * @param records Records to insert.
-     * @return collectionId. Should never fail because it's creating a new collection and inserting new records.
+     * @return collectionId. Should never fail because it is creating a new collection and inserting new records.
      */
     fun batchInsertRecordsToNewCollection(records: List<Record>): Int?
 
@@ -106,7 +105,7 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * @param records Associate record by id to collection of [collectionId].
      * @param collectionId Id of collection.
      *
-     * @exception CompositionCode [No records provided][CompositionCode.NoRecordsProvided],
+     * @exception CompositionCode [No records provided][CompositionCode.EmptyListOfRecordsProvided],
      * [failed to associate record to collection][CompositionCode.FailedToAssociateRecordToCollection]
      */
     @Throws(CompositionException::class)
