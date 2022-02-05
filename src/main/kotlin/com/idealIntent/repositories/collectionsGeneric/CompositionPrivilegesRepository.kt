@@ -83,12 +83,14 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
      * Add privilege source which is a record for compositions to key off of as a source of truth for privileges,
      * making the privileges unique to every kind of compositional record that references it.
      *
+     * @param privilegeLevel level of privileges such as whether it is a viewable for everyone or private.
      * @return Id to privilege source.
      */
-    fun addPrivilegeSource(privilegeLevel: Int = 0): Int =
-        database.insertAndGenerateKey(PrivilegeSourcesModel) {
+    fun addPrivilegeSource(privilegeLevel: Int = 0): Int {
+        return database.insertAndGenerateKey(PrivilegeSourcesModel) {
             set(it.privilegeLevel, privilegeLevel)
         } as Int
+    }
     // endregion Insert
 
 

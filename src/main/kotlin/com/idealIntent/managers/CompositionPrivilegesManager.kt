@@ -16,6 +16,21 @@ class CompositionPrivilegesManager(
 ) {
 
     /**
+     * Create privileges and assign absolute privileges to creator.
+     *
+     * @param authorId Id of the creator who will get absolute privileges.
+     *
+     * @return adds a privilege source and associates to creator's id to it.
+     */
+    fun createPrivileges(authorId: Int): Int {
+        val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+        compositionPrivilegesRepository.giveAnAuthorPrivilege(
+            CompositionsGenericPrivileges(modify = 1, view = 1), privilegeSourceId, authorId
+        )
+        return privilegeSourceId
+    }
+
+    /**
      * Give multiple authors privileges by username
      *
      * Checks whether userId has privilege over privilegeId then loops over [authors to give privileges to][privilegedAuthors]

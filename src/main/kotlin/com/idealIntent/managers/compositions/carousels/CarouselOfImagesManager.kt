@@ -45,7 +45,7 @@ class CarouselOfImagesManager(
      * [compose][CarouselOfImagesRepository.compose]. Then return id of the newly created composition.
      *
      * @see ICompositionManagerStructure.createComposition
-     * @return Response of id of the newly created composition or failed response of either [UserNotPrivileged] or [FailedToFindAuthorByUsername].
+     * @return Response of id of the newly created composition or failed response of [FailedToFindAuthorByUsername].
      */
     override fun createComposition(createRequest: CreateCarouselBasicImagesReq, userId: Int): CompositionResponse {
         try {
@@ -54,7 +54,7 @@ class CarouselOfImagesManager(
                 val redirectsCollectionId =
                     textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
-                val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource()
+                val privilegeSourceId = compositionPrivilegesManager.createPrivileges(userId)
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
                     createRequest.privilegedAuthors, privilegeSourceId, userId
                 )
@@ -72,7 +72,6 @@ class CarouselOfImagesManager(
             }
         } catch (ex: CompositionException) {
             when (ex.code) {
-                UserNotPrivileged,
                 FailedToFindAuthorByUsername ->
                     return CompositionResponse().failed(ex.code, ex.moreDetails)
                 else ->

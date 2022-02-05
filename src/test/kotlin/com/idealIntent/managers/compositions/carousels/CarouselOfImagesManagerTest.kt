@@ -2,7 +2,8 @@ package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.exceptions.CompositionCode.*
+import com.idealIntent.exceptions.CompositionCode.FailedToCompose
+import com.idealIntent.exceptions.CompositionCode.FailedToFindAuthorByUsername
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.CompositionPrivilegesManager
@@ -12,14 +13,12 @@ import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.ktor.http.*
 import io.mockk.*
 import shared.appEnvMockHelper
 import shared.testUtils.createCarouselBasicImagesReq
-import shared.testUtils.giveIdsToImages
-import shared.testUtils.giveIdsToTexts
 import shared.testUtils.privilegedAuthors
 
 class CarouselOfImagesManagerTest : BehaviorSpec({
@@ -55,19 +54,17 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
     beforeEach {
         clearAllMocks()
         appEnvMockHelper(appEnv, carouselOfImagesManager)
-        println("test that each then statement is executes beforeEach beforehand")
     }
-
-    // TODO("Exceptions implemented at low level, now need to be handled")
 
     given("createComposition") {
         beforeEach {
             // region setup
             every { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) } returns
-                    giveIdsToImages()[0].id
+                    carouselOfImagesComposePrepared.imageCollectionId
             every { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) } returns
-                    giveIdsToTexts()[0].id
-            every { compositionPrivilegesRepository.addPrivilegeSource() } returns privilegeSourceId
+                    carouselOfImagesComposePrepared.redirectTextCollectionId
+            every { compositionPrivilegesManager.createPrivileges(userId) } returns
+                    carouselOfImagesComposePrepared.privilegeId
             justRun {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
                     privilegedAuthors, privilegeSourceId, userId
@@ -77,60 +74,35 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             // endregion
         }
 
-        then("user not privileged to privilege source") {
-            // region setup
-            every {
-                compositionPrivilegesRepository.isUserPrivileged(privilegeSourceId, userId)
-            } throws CompositionException(UserNotPrivileged)
-            // endregion setup
-
-            val ex = shouldThrowExactly<CompositionException> {
-                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
-            }
-
-            ex.code shouldBe UserNotPrivileged
-        }
-
-        then("failed to find author by username provided to give privileges to") {
+        then("provided a username that could not find author by") {
             // region setup
             every {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
                     privilegedAuthors, privilegeSourceId, userId
                 )
             } throws CompositionException(FailedToFindAuthorByUsername)
-            justRun { appEnv.database.useTransaction { it.rollback() } } // todo - verify that it was run
             // endregion
 
-            val ex = shouldThrowExactly<CompositionException> {
-                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
-            }
+            val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
 
-            ex.code shouldBe FailedToFindAuthorByUsername
+            verify { appEnv.database.useTransaction { } }
+            res.code shouldBe FailedToFindAuthorByUsername
+            res.message() shouldBe CompositionCode.getClientMsg(FailedToFindAuthorByUsername)
+            res.statusCode() shouldBe HttpStatusCode.BadRequest
         }
 
-        then("fails compose edge case") {
-            // region setup
-            every { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared) } returns null
-            // endregion
+        then("success") {
+            val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
 
-            val ex = shouldThrow<CompositionExceptionReport> {
-                carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
-            }
-
+            verify { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) }
+            verify { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) }
+            verify { compositionPrivilegesManager.createPrivileges(userId) }
             verify {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
                     privilegedAuthors, privilegeSourceId, userId
                 )
             }
-
-            ex.clientMsg shouldBe CompositionCode.getClientMsg(FailedToCompose)
-        }
-
-        then("success") {
-            // region setup
-            // endregion
-
-            val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, userId)
+            verify { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared) }
 
             res.isSuccess shouldBe true
             res.message() shouldBe null

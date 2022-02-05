@@ -24,8 +24,8 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
      * well the user will get the id of the newly composed composition.
      *
      * @param createRequest Composition of records.
-     * @param userId Id of user to validate.
-     * @return CollectionId or null if failed to insert [composition]
+     * @param userId Id of user to validate that they are privileged.
+     * @return CollectionId or null if failed.
      */
     fun createComposition(createRequest: CreateRequest, userId: Int): Response
     // endregion Insert
@@ -35,7 +35,7 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
     /**
      * Update composition
      *
-     * @param id ID to identify under what collection [record] is under
+     * @param id Id to identify under what collection [record] is under
      * @param record Update to
      * @return Success or fail in updating [record]
      */
