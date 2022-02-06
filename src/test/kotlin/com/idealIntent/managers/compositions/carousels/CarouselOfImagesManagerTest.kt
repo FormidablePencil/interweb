@@ -2,17 +2,14 @@ package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.exceptions.CompositionCode.FailedToCompose
 import com.idealIntent.exceptions.CompositionCode.FailedToFindAuthorByUsername
 import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*

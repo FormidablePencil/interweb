@@ -1,21 +1,12 @@
 package com.idealIntent.repositories.compositions.carousels
 
-import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
-import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
-import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
-import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
-import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
-import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
-import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
-import models.profile.AuthorsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.sequenceOf
@@ -30,7 +21,7 @@ data class CarouselOfImagesComposePrepared(
 /**
  * Carousel of images repository - responsible for carousel_of_images CRUD actions.
  *
- * Check out [getComposition] to see what the composition consists of.
+ * Check out [getSingleCompositionOfPrivilegedAuthor] to see what the composition consists of.
  */
 class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
@@ -41,71 +32,34 @@ class CarouselOfImagesRepository(
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
 
     // region Get
-    override fun getComposition(id: Int): CarouselBasicImagesRes? {
-        val comp = ImagesCarouselsModel.aliased("comp")
-        val prvAth = PrivilegedAuthorsToCompositionsModel("prvAuthorsComp")
-        val author = AuthorsModel.aliased("author")
+    fun getLayout() {
 
-        val img2Col = ImageToCollectionsModel.aliased("img2Col")
-        val img = ImagesModel.aliased("img")
-
-        val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
-        val text = TextsModel.aliased("textRedirect")
-
-        var name = ""
-        val images = mutableListOf<ImagePK>()
-        val imgOnclickRedirects = mutableListOf<TextPK>()
-        val privilegedAuthors = mutableListOf<PrivilegedAuthor>()
-
-        database.from(comp)
-            .leftJoin(img2Col, img2Col.collectionId eq comp.imageCollectionId)
-            .leftJoin(img, img.id eq img2Col.collectionId)
-
-            .leftJoin(text2Col, text2Col.collectionId eq comp.redirectTextCollectionId)
-            .leftJoin(text, text.id eq comp.redirectTextCollectionId)
-
-            .leftJoin(prvAth, prvAth.privilegeId eq comp.privilegeId)
-            .leftJoin(author, author.id eq prvAth.authorId)
-
-            .select(
-                comp.name,
-                img2Col.orderRank, img.id, img.url, img.description,
-                text2Col.orderRank, text.text,
-                prvAth.modify, prvAth.view,
-                author.username
-            )
-            .where { comp.id eq id }
-            .map {
-                name = it[comp.name]!!
-                images.add(
-                    ImagePK(
-                        id = it[img.id]!!,
-                        orderRank = it[img2Col.orderRank]!!,
-                        url = it[img.url]!!,
-                        description = it[img.description]!!
-                    )
-                )
-                imgOnclickRedirects.add(
-                    TextPK(id = it[img.id]!!, orderRank = it[text2Col.orderRank]!!, text = it[text.text]!!)
-                )
-                privilegedAuthors.add(
-                    PrivilegedAuthor(
-                        username = it[author.username]!!,
-                        modify = it[prvAth.modify]!!,
-                        view = it[prvAth.view]!!
-                    )
-                )
-            }
-
-        if (name.isEmpty()) return null
-
-        return CarouselBasicImagesRes(
-            name = name,
-            images = images,
-            imgOnclickRedirects = imgOnclickRedirects,
-            privilegedAuthors = privilegedAuthors
-        )
     }
+
+    /**
+     * Get single composition of privileged author. Used for testing purposes.
+     */
+    override fun getSingleCompositionOfPrivilegedAuthor(
+        compositionId: Int,
+        authorId: Int
+    ): List<CarouselBasicImagesRes> = listOf()
+
+    /**
+     * Used for testing purposes.
+     */
+    override fun getAllCompositionsAssociatedOfAuthor(
+        authorId: Int
+    ): List<CarouselBasicImagesRes> = listOf()
+
+    /**
+     * Get all records by criteria query.
+     *
+     * @param editable Editable by author compositions.
+     * @param deletable Deletable by author compositions.
+     * @param compositionId Query by composition's unique id.
+     * @param authorId Query all compositions associated to author's id.
+     */
+
     // endregion Get
 
     // region Insert
@@ -117,7 +71,7 @@ class CarouselOfImagesRepository(
             set(it.privilegeId, composePrepared.privilegeId)
         } as Int?
     }
-    // endregion Insert
+// endregion Insert
 
     override fun getMetadataOfComposition(id: Int): IImagesCarouselEntity? {
         TODO("Not yet implemented")

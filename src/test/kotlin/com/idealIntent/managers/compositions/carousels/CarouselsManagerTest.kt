@@ -22,29 +22,30 @@ class CarouselsManagerTest : BehaviorSpec({
     val carouselOfImagesManager: CarouselOfImagesManager = mockk()
     val carouselOfImagesRepository: CarouselOfImagesRepository = mockk()
     val compositionId = 1
-    val userId = 1
+    val authorId = 1
     val gson = Gson()
 
     val carouselsManager = CarouselsManager(carouselOfImagesManager, carouselOfImagesRepository)
 
     beforeEach {
         clearAllMocks()
-        println("test that getComposition cleans before each test")
     }
 
     values().map {
         when (it) {
             BasicImages -> {
-                given("getComposition") {
+                given("getPublicComposition") {
 
                     then("provided id of composition that does NOT exist") {
-                        every { carouselOfImagesRepository.getComposition(compositionId) } returns null
-                        carouselsManager.getComposition(it.value, compositionId) shouldBe null
+                        every { carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(compositionId, authorId) } returns listOf()
+
+                        carouselsManager.getComposition(it, compositionId, authorId) shouldBe null
                     }
 
-                    then("provided id of composition that does") {
-                        every { carouselOfImagesRepository.getComposition(compositionId) } returns carouselBasicImagesRes
-                        carouselsManager.getComposition(it.value, compositionId) shouldBe carouselBasicImagesRes
+                    then("success") {
+                        every { carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(compositionId, authorId) } returns listOf()
+
+                        carouselsManager.getComposition(it, compositionId, authorId) shouldBe carouselBasicImagesRes
                     }
                 }
             }
@@ -55,44 +56,35 @@ class CarouselsManagerTest : BehaviorSpec({
         when (it) {
             BasicImages -> {
                 given("createCompositionOfCategory - BasicImages") {
-                    then("success") {
+                    then("failed response") {
+                        // region setup
+                        every {
+                            carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, authorId)
+                        } returns CompositionResponse().failed(CompositionCode.FailedToGivePrivilege)
+                        // endregion setup
+
+                        val res = carouselsManager.createCompositionOfCategory(
+                            BasicImages, carouselBasicImagesReqStingified, authorId
+                        )
+
+                        res.data shouldBe null
+                    }
+                    then("success response") {
                         // region setup
                         val idOfNewlyCreatedComposition = 123
                         val httpStatus = HttpStatusCode.Created
                         every {
-                            carouselOfImagesManager.createComposition(
-                                createCarouselBasicImagesReq,
-                                userId
-                            )
-                        } returns
-                                CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
+                            carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, authorId)
+                        } returns CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
                         // endregion setup
 
-                        val res =
-                            carouselsManager.createCompositionOfCategory(
-                                BasicImages.value, carouselBasicImagesReqStingified, userId
-                            )
+                        val res = carouselsManager.createCompositionOfCategory(
+                            BasicImages, carouselBasicImagesReqStingified, authorId
+                        )
 
                         res.isSuccess shouldBe true
                         res.data shouldBe idOfNewlyCreatedComposition
                         res.successHttpStatusCode shouldBe httpStatus
-                    }
-                    then("failed") {
-                        // region setup
-                        every {
-                            carouselOfImagesManager.createComposition(
-                                createCarouselBasicImagesReq,
-                                userId
-                            )
-                        } returns
-                                CompositionResponse().failed(CompositionCode.FailedToGivePrivilege)
-                        // endregion setup
-
-                        val res = carouselsManager.createCompositionOfCategory(
-                            BasicImages.value, carouselBasicImagesReqStingified, userId
-                        )
-
-                        res.data shouldBe null
                     }
                 }
             }

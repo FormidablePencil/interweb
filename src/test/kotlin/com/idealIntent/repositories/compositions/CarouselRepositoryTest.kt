@@ -56,13 +56,13 @@ class CarouselRepositoryTest : BehaviorSpecUtRepo() {
 //            carouselRepository = CarouselOfImagesRepository(TextRepository(), ImageRepository(), PrivilegeRepository())
 //        }
 //
-//        given("createComposition && getComposition") {
+//        given("createComposition && getSingleCompositionOfPrivilegedAuthor") {
 //            then("should have been created") {
 //                rollback {
 //                    val savedDataId = carouselRepository.createComposition(carouselBasicImages)
 //                        ?: throw Exception("failed to save data")
 //
-//                    val carouselOfImages = carouselRepository.getComposition(savedDataId)
+//                    val carouselOfImages = carouselRepository.getSingleCompositionOfPrivilegedAuthor(savedDataId)
 //
 //                    carouselOfImages.name shouldBe carouselBasicImages.name
 //

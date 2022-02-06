@@ -5,6 +5,7 @@ import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
+import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel.BasicImages
 import dtos.compositions.carousels.CompositionCarousel.values
 import io.kotest.core.spec.style.BehaviorSpec
@@ -35,14 +36,15 @@ class CmsServiceTest : BehaviorSpec({
                         val httpStatus = HttpStatusCode.Created
                         every {
                             carouselsManager.createCompositionOfCategory(
-                                BasicImages.value, carouselBasicImagesReqStingified, userId
+                                BasicImages, carouselBasicImagesReqStingified, userId
                             )
                         } returns CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
                         // endregion setup
 
                         val res =
                             componentManager.createComposition(
-                                BasicImages.value, carouselBasicImagesReqStingified, userId
+                                CompositionCategory.Carousel,
+                                BasicImages, carouselBasicImagesReqStingified, userId
                             )
 
                         res.isSuccess shouldBe true
@@ -54,12 +56,15 @@ class CmsServiceTest : BehaviorSpec({
                         // region setup
                         every {
                             carouselsManager.createCompositionOfCategory(
-                                BasicImages.value, carouselBasicImagesReqStingified, userId)
+                                BasicImages, carouselBasicImagesReqStingified, userId
+                            )
                         } returns CompositionResponse().failed(CompositionCode.FailedToInsertRecord)
                         // endregion setup
 
                         val res =
-                            componentManager.createComposition(BasicImages.value, carouselBasicImagesReqStingified, userId)
+                            componentManager.createComposition(
+                                CompositionCategory.Carousel,
+                                BasicImages, carouselBasicImagesReqStingified, userId)
 
                         res.isSuccess shouldBe false
                         res.data shouldBe null

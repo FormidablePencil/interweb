@@ -52,7 +52,7 @@ val privilegedAuthors = listOf(
 // region categories of compositions
 val createCarouselBasicImagesReq = CreateCarouselBasicImagesReq("Projects", images, texts, privilegedAuthors)
 val carouselBasicImagesRes =
-    CarouselBasicImagesRes("Projects", giveIdsToImages(images), giveIdsToTexts(texts), privilegedAuthors)
+    CarouselBasicImagesRes(99999999, 88888888, "Projects", giveIdsToImages(images), giveIdsToTexts(texts), privilegedAuthors)
 
 fun giveIdsToImages(records: List<Image> = images): List<ImagePK> =
     records.mapIndexed { idx, it ->

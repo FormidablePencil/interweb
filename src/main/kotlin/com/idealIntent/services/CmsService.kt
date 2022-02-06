@@ -8,6 +8,7 @@ import com.idealIntent.dtos.compositionCRUD.UpdateCompositionRequest
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
 import dtos.compositions.CompositionCategory
+import dtos.compositions.carousels.CompositionCarousel
 import dtos.space.IUserComposition
 
 /**
@@ -23,7 +24,8 @@ class CmsService(
     private val carouselsManager: CarouselsManager,
 ) {
 
-    fun getAuthorsCompositions(authorId: Int) {
+    fun getAuthorsCompositions(userId: Int) {
+
 
     }
 
@@ -33,8 +35,22 @@ class CmsService(
     }
 
 
-    fun createComposition(compositionCategory: Int, jsonData: String, userId: Int): CompositionResponse {
-        return when (CompositionCategory.fromInt(compositionCategory)) {
+    /**
+     * Create composition
+     *
+     * @param compositionCategory
+     * @param compositionOfCategory
+     * @param jsonData
+     * @param userId
+     * @return Id of created composition.
+     */
+    fun createComposition(
+        compositionCategory: CompositionCategory,
+        compositionOfCategory: CompositionCarousel,
+        jsonData: String,
+        userId: Int
+    ): CompositionResponse {
+        return when (compositionCategory) {
             CompositionCategory.Text -> TODO()
             CompositionCategory.Markdown -> TODO()
             CompositionCategory.Banner -> TODO()
@@ -42,7 +58,7 @@ class CmsService(
             CompositionCategory.Divider -> TODO()
             CompositionCategory.LineDivider -> TODO()
             CompositionCategory.Carousel ->
-                carouselsManager.createCompositionOfCategory(compositionCategory, jsonData, userId)
+                carouselsManager.createCompositionOfCategory(compositionOfCategory, jsonData, userId)
         }
     }
 

@@ -33,6 +33,11 @@ class CarouselOfImagesManager(
     val appEnv: AppEnv by inject()
 
     // region Get
+    /**
+     * Get composition
+     *
+     * Validate that user is privileged first returning composition.
+     */
 
     // endregion Get
 
@@ -47,16 +52,16 @@ class CarouselOfImagesManager(
      * @see ICompositionManagerStructure.createComposition
      * @return Response of id of the newly created composition or failed response of [FailedToFindAuthorByUsername].
      */
-    override fun createComposition(createRequest: CreateCarouselBasicImagesReq, userId: Int): CompositionResponse {
+    override fun createComposition(createRequest: CreateCarouselBasicImagesReq, authorId: Int): CompositionResponse {
         try {
             appEnv.database.useTransaction {
                 val imageCollectionId = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
                 val redirectsCollectionId =
                     textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
-                val privilegeSourceId = compositionPrivilegesManager.createPrivileges(userId)
+                val privilegeSourceId = compositionPrivilegesManager.createPrivileges(authorId)
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
-                    createRequest.privilegedAuthors, privilegeSourceId, userId
+                    createRequest.privilegedAuthors, privilegeSourceId, authorId
                 )
 
                 val compositionId = carouselOfImagesRepository.compose(

@@ -1,6 +1,8 @@
 package com.idealIntent.managers.compositions
 
-// todo - will create CompositionCategoryManager for each category and move related logic there such as createComposition[Category], updateComposition[Category], deleteComposition[Category], getComposition[Category]
+import dtos.compositions.carousels.CompositionCarousel
+
+// todo - will create CompositionCategoryManager for each category and move related logic there such as createComposition[Category], updateComposition[Category], deleteComposition[Category], getSingleCompositionOfPrivilegedAuthor[Category]
 //  once the library of compositions get too vast for one file to contain
 
 /**
@@ -10,13 +12,13 @@ package com.idealIntent.managers.compositions
 interface ICompositionCategoryManagerStructure<Composition, Response> {
 
     /**
-     * Find the composition to of compositionType and sends the composition id to composition's manager to get composition.
+     * Find the composition to of compositionType and sends the composition compositionId to composition's manager to get composition.
      *
      * @param compositionType
      * @param jsonData
      * @return
      */
-    fun getComposition(compositionType: Int, id: Int): Composition?
+    fun getComposition(compositionType: CompositionCarousel, compositionId: Int, authorId: Int): Composition?
 
     /**
      * Find the composition to of compositionType and sends the json data off to the composition's manager to create composition.
@@ -25,7 +27,7 @@ interface ICompositionCategoryManagerStructure<Composition, Response> {
      * @param jsonData
      * @return
      */
-    fun createCompositionOfCategory(compositionType: Int, jsonData: String, userId: Int): Response
+    fun createCompositionOfCategory(compositionType: CompositionCarousel, jsonData: String, userId: Int): Response
 
     fun updateComposition()
 

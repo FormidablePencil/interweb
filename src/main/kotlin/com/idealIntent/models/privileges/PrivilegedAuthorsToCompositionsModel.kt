@@ -21,7 +21,9 @@ open class PrivilegedAuthorsToCompositionsModel(alias: String?) :
 
     override fun aliased(alias: String) = PrivilegedAuthorsToCompositionsModel(alias)
 
-    val view = int("view").bindTo { it.view }
+    val view = int("view").bindTo { it.view } // todo swap out for delete
+    // todo - pointless because who ever is associated to record is whoever has privileges to view. Disassociated them
+    //  by deleting the record from this table to remove them from viewing
     val modify = int("modify").bindTo { it.modify }
 //    val authorId = int("author_id").bindTo { it.authorId }
     val authorId = int("author_id").references(AuthorsModel) { it.author }

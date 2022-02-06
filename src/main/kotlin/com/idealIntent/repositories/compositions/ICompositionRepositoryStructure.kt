@@ -1,13 +1,18 @@
 package com.idealIntent.repositories.compositions
 
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+
 interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, CreateComposition, ComposePrepared> {
     /**
-     * Get composition.
+     * Get composition by its id and privileged author.
      *
-     * @param id Id of composition to get by.
-     * @return All records of composition.
+     * @param compositionId id of composition.
+     * @param authorId Id of author privileged to view.
+     * @return Records of composition. Returns null if not found or author not privileged to view.
      */
-    fun getComposition(id: Int): ResponseOfComposition?
+    fun getSingleCompositionOfPrivilegedAuthor(compositionId: Int, authorId: Int): List<CarouselBasicImagesRes>
+
+    fun getAllCompositionsAssociatedOfAuthor(authorId: Int): List<CarouselBasicImagesRes>
 
     // region Get
     /**

@@ -47,7 +47,7 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
 //        }
 //
 //        given("batchInsertNewRecords") {
-//            then("getComposition") {
+//            then("getSingleCompositionOfPrivilegedAuthor") {
 //                rollback {
 //                    val privilegesTo = "some libOfComp"
 //                    val privilegedAuthors = generatePrivilegedAuthorsToConsume()
@@ -68,10 +68,10 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
 //                }
 //            }
 //            given("updateRecord") {
-//                then("getComposition") {}
+//                then("getSingleCompositionOfPrivilegedAuthor") {}
 //            }
 //            given("batchUpdateRecords") {
-//                then("getComposition") {}
+//                then("getSingleCompositionOfPrivilegedAuthor") {}
 //            }
 //        }
 //    }

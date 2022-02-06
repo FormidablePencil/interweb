@@ -7,6 +7,8 @@ import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import dtos.compositions.carousels.ICarouselBasicImages
 import kotlinx.serialization.Serializable
+import models.IWithPK
+import models.IWithPrivilegeSourcePK
 
 // todo - 2 are extra. Required a Refactor.
 
@@ -31,12 +33,14 @@ data class CreateCarouselBasicImagesReq(
 
 @Serializable
 data class CarouselBasicImagesRes(
+    override val id: Int,
+    val privilegeSourceId: Int,
     override val name: String,
     override val images: List<ImagePK>,
     override val imgOnclickRedirects: List<TextPK>,
     override val privilegedAuthors: List<PrivilegedAuthor>,
 //    val clickable: boolean,
-) : ICarouselBasicImages
+) : ICarouselBasicImages, IWithPK, IWithPrivilegeSourcePK
 
 //data class CarouselItem( // todo - delete
 //    val name: String,

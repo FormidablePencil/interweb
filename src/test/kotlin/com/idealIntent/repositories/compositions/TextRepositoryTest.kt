@@ -25,9 +25,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
     private val textRepository: TextRepository by inject()
 
     init {
-        beforeEach {
-            clearAllMocks()
-        }
+        beforeEach { clearAllMocks() }
 
         // region Get
         given("getSingleRecordOfCollection") {

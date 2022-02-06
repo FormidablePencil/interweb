@@ -5,7 +5,7 @@ import shared.testUtils.rollback
 
 class AccountRepositoryTest : BehaviorSpecUtRepo({
 
-    given("getComposition") { }
+    given("getSingleCompositionOfPrivilegedAuthor") { }
 
     given("getByEmail") {
         then("get by email") {
