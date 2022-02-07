@@ -86,8 +86,9 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
      * @param privilegeLevel level of privileges such as whether it is a viewable for everyone or private.
      * @return Id to privilege source.
      */
-    fun addCompositionSource(privilegeLevel: Int = 0, compositionType: Int): Int {
+    fun addCompositionSource(privilegeLevel: Int = 0, name: String, compositionType: Int): Int {
         return database.insertAndGenerateKey(CompositionSourcesModel) {
+            set(it.name, name)
             set(it.compositionType, compositionType)
             set(it.privilegeLevel, privilegeLevel)
         } as Int

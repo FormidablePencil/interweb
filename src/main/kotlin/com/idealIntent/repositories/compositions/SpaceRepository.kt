@@ -33,7 +33,11 @@ class SpaceRepository(
     // endregion
 
     // region Get
-    fun getLayoutOfCompositions(layoutId: Int, authorId: Int) {
+    fun getPublicLayoutOfCompositions(layoutId: Int) {
+        TODO()
+    }
+
+    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionBuilder {
         val layoutMetadata = getLayoutMetadata(
             spaceAddress = null,
             layoutId = layoutId,
@@ -126,17 +130,27 @@ class SpaceRepository(
      * @param layoutMetadata List of composition source to layout info to query compositions and specify what
      * composition category and composition type to query from.
      */
-    private fun getCompositionsOfLayout(layoutMetadata: Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>>) {
+    private fun getCompositionsOfLayout(
+        layoutMetadata: Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>>
+    ): CompositionBuilder {
         val (compositionSourceToLayout, compCategoryAndType) = layoutMetadata
         val select = mutableSetOf<Column<out Any>>()
-        val query = compositionsSelectAndLeftJoinBuilder(select, database.from(compSource), compCategoryAndType)
         val compositionBuilder = CompositionBuilder()
 
-        query.select(select)
-            .whereWithConditions { compositionWhereClauseBuilder(it, compCategoryAndType) }
-            .map { compositionMapBuilder(it, compCategoryAndType, compositionBuilder) }
+        select += carouselOfImagesRepository.selectCarouselOfImages
 
-        compositionBuilder.getCompositionsOfLayouts()
+        database.from(compSource)
+            .compositionsSelectAndLeftJoinBuilder(compCategoryAndType)
+            .select(select)
+            .whereWithConditions {
+                compositionSourceToLayout.forEach { item -> it += compSource.id eq item.sourceId }
+                compositionWhereClauseBuilder(it, compCategoryAndType)
+            }.map {
+                println(it) // row should tell you what composition type and
+                compositionMapBuilder(it, compCategoryAndType, compositionBuilder)
+            }
+
+        return compositionBuilder
     }
 
 
@@ -151,22 +165,19 @@ class SpaceRepository(
      * @param compCategoryAndType
      * @return
      */
-    private fun compositionsSelectAndLeftJoinBuilder(
-        select: MutableSet<Column<out Any>>,
-        query: QuerySource,
+    private fun QuerySource.compositionsSelectAndLeftJoinBuilder(
         compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
     ): QuerySource {
-        var queryChain = query
+        var res: QuerySource? = null
         compCategoryAndType.forEach {
             when (it.first) {
                 CompositionCategory.Carousel -> {
                     when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay -> {
-                            select += carouselOfImagesRepository.selectCarouselOfImages
-                            queryChain = carouselOfImagesRepository.leftJoinCarouselBasicImages(query)
-                        }
+                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
                         CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages -> TODO()
+                        CompositionCarousel.BasicImages -> {
+                            res = carouselOfImagesRepository.leftJoinCarouselBasicImages(this)
+                        }
                     }
 //                kcarouselOfImagesRepository.selectCarouselOfImages
                 }
@@ -178,7 +189,7 @@ class SpaceRepository(
                 CompositionCategory.LineDivider -> TODO()
             }
         }
-        return queryChain
+        return res ?: this
     }
 
     private fun compositionWhereClauseBuilder(
@@ -189,10 +200,10 @@ class SpaceRepository(
             when (it.first) {
                 CompositionCategory.Carousel -> {
                     when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay ->
-                            carouselOfImagesRepository.whereClauseCarouselOfImages(mutableList)
+                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
                         CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages -> TODO()
+                        CompositionCarousel.BasicImages ->
+                            carouselOfImagesRepository.whereClauseCarouselOfImages(mutableList)
                     }
 //                kcarouselOfImagesRepository.selectCarouselOfImages
                 }
@@ -215,10 +226,13 @@ class SpaceRepository(
             when (it.first) {
                 CompositionCategory.Carousel -> {
                     when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay ->
-                            carouselOfImagesRepository.mapClauseBuilderCarouselOfImages(compositionBuilder.carouselOfImagesData)
+                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
                         CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages -> TODO()
+                        CompositionCarousel.BasicImages ->
+                            carouselOfImagesRepository.mapClauseBuilderCarouselOfImages(
+                                queryRowSet,
+                                compositionBuilder.carouselOfImagesData
+                            )
                     }
                 }
                 CompositionCategory.Text -> TODO()

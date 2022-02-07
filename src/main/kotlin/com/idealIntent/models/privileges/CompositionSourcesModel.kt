@@ -5,6 +5,7 @@ import models.privileges.IPrivilegeSource
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
+import org.ktorm.schema.varchar
 
 data class CompositionSourceToLayout(
     override val sourceId: Int,
@@ -17,6 +18,8 @@ data class CompositionSourceToLayout(
 
 interface ICompositionSourceEntity : Entity<ICompositionSourceEntity>, IPrivilegeSource {
     companion object : Entity.Factory<ICompositionSourceEntity>()
+
+    val name: String
 }
 
 open class CompositionSourcesModel(alias: String?) : Table<ICompositionSourceEntity>("composition_sources", alias) {
@@ -24,6 +27,7 @@ open class CompositionSourcesModel(alias: String?) : Table<ICompositionSourceEnt
 
     override fun aliased(alias: String) = CompositionSourcesModel(alias)
 
+    val name = varchar("name").bindTo { it.name }
     val id = int("id").primaryKey().bindTo { it.id }
     val privilegeLevel = int("privilege_level").bindTo { it.privilegeLevel }
     val compositionType = int("composition_type").bindTo { it.compositionType }

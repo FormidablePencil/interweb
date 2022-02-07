@@ -24,8 +24,8 @@ class CompositionIT : BehaviorSpecIT({
 
     val createCarouselBasicImagesReq = CreateCarouselBasicImagesReq("Projects", images, texts, listOf())
 
-    given("create a composition for layout") {
-        then("get composition of layout") {
+    given("create a private layout and then create a few compositions for the layout") {
+        then("get private layout of compositions") {
             rollback {
                 // region setup
                 val userId = signupFlow.signupReturnId()
@@ -41,14 +41,11 @@ class CompositionIT : BehaviorSpecIT({
                     userId
                 )
 
-                // region validate
                 res.isSuccess shouldBe true
                 res.data shouldNotBe null
-                val compositionSourceId = res.data
 
-                val layoutOfCompositions = cmsService.getCompositionsOfLayout(layoutId)
-
-                // endregion
+                val compositionBuilder = cmsService.getPrivateLayoutOfCompositions(layoutId, userId)
+                compositionBuilder.getCompositionsOfLayouts()
             }
         }
     }

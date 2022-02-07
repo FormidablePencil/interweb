@@ -19,7 +19,7 @@ interface IImagesCarouselEntity : Entity<IImagesCarouselEntity> {
     companion object : Entity.Factory<IImagesCarouselEntity>()
 
     val id: Int
-    val name: String
+    val name: String // todo remove
     val compositionType: Int // todo - add this to interface
     val privilege: ICompositionSourceEntity
     val imageCollection: IImageCollectionEntity
@@ -32,7 +32,6 @@ open class ImagesCarouselsModel(alias: String?) : Table<IImagesCarouselEntity>("
     override fun aliased(alias: String) = ImagesCarouselsModel(alias)
 
     val id = int("id").primaryKey().bindTo { it.id }
-    val name = varchar("name").bindTo { it.name }
     val imageCollectionId = int("image_collection_id").references(ImageCollectionsModel) { it.imageCollection }
     val redirectTextCollectionId =
         int("redirect_text_collection_id").references(TextCollectionsModel) { it.redirectTextCollection }

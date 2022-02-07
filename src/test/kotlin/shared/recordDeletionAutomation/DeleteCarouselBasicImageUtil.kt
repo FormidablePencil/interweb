@@ -55,7 +55,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
     /**
      * Get carousel basic images query
      *
-    SELECT comp.name AS comp_name, comp.source_id AS comp_source_id, comp.id AS comp_id, img.id AS img_id, textRedirect.id AS textRedirect_id, author.username AS author_username
+    SELECT compSource.name AS comp_name, comp.source_id AS comp_source_id, comp.id AS comp_id, img.id AS img_id, textRedirect.id AS textRedirect_id, author.username AS author_username
     FROM privilege_sources prvSource
     LEFT JOIN image_carousels comp ON comp.source_id = prvSource.id
     LEFT JOIN privileged_authors_to_compositions prvAuthorsComp ON prvAuthorsComp.source_id = prvSource.id
@@ -89,11 +89,11 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         val author = AuthorsModel.aliased("author")
 
         val selectOnlyIds = listOf(
-            comp.name, compSource.id, compInstance2compSource.sourceId,
+            compSource.name, compSource.id, compInstance2compSource.sourceId,
             comp.id, img.id, text.id, author.username
         )
         val select = listOf(
-            comp.name, comp.id,
+            compSource.name, comp.id,
             img2Col.orderRank, img.id, img.url, img.description,
             text2Col.orderRank, text.id, text.text,
             prvAth.modify, prvAth.view,
@@ -127,7 +127,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
             }
             .map {
                 println(
-                    "${it[comp.name]}," +
+                    "${it[compSource.name]}," +
                             " ${it[img.id]}," +
                             " ${it[img2Col.orderRank]}," +
                             " ${it[img.url]}," +
@@ -139,7 +139,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                     idAndNameOfCompositions += Triple(
                         if (it[comp.id] == null) defaultIdValue else it[comp.id]!!,
                         if (it[compSource.id] == null) defaultIdValue else it[compSource.id]!!,
-                        if (it[comp.name] == null) "" else it[comp.name]!!
+                        if (it[compSource.name] == null) "" else it[compSource.name]!!
                     )
                     images.add(
                         Pair(
@@ -176,7 +176,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                     idAndNameOfCompositions += Triple(
                         it[comp.id]!!,
                         it[compInstance2compSource.sourceId]!!,
-                        it[comp.name]!!
+                        it[compSource.name]!!
                     )
                     images.add(
                         Pair(

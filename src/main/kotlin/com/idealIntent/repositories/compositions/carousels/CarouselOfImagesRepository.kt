@@ -39,6 +39,11 @@ data class CarouselOfImagesComposePrepared(
     val name: String,
 )
 
+/**
+ * Carousel of images data
+ *
+ * @property idAndNameOfCompositions composition instance id, source id, name of composition
+ */
 class CarouselOfImagesData {
     val idAndNameOfCompositions = mutableSetOf<Triple<Int, Int, String>>()
     val images = mutableListOf<Pair<Int, ImagePK>>()
@@ -81,7 +86,9 @@ class CarouselOfImagesRepository(
     // endregion
 
     val selectCarouselOfImages = listOf<Column<out Any>>(
-        compInstance.name, compInstance.id,
+        compSource.name, compSource.id,
+        compInstance.id,
+        compInstance2compSource.sourceId,
         img2Col.orderRank, img.id, img.url, img.description,
         text2Col.orderRank, text.id, text.text,
         prvAth2CompSource.modify, prvAth2CompSource.view,
@@ -93,58 +100,52 @@ class CarouselOfImagesRepository(
 //        it += (compInstance.id eq compositionId)
     }
 
-    fun mapClauseBuilderCarouselOfImages(dto: CarouselOfImagesData): (QueryRowSet) -> Boolean {
-        val queryMap = {
-                row: QueryRowSet,
-            ->
-            println(
-                "${row[compInstance.name]}," +
-                        " ${row[img.id]}," +
-                        " ${row[img2Col.orderRank]}," +
-                        " ${row[img.url]}," +
-                        " ${row[img.description]}," +
-                        " ${row[author.username]}, ${row[compSource.id]}"
-            )
+    fun mapClauseBuilderCarouselOfImages(row: QueryRowSet, dto: CarouselOfImagesData) {
+        println(
+            "${row[compSource.name]}," +
+                    " ${row[img.id]}," +
+                    " ${row[img2Col.orderRank]}," +
+                    " ${row[img.url]}," +
+                    " ${row[img.description]}," +
+                    " ${row[author.username]}, ${row[compSource.id]}"
+        )
 
-            dto.idAndNameOfCompositions += Triple(
+        dto.idAndNameOfCompositions += Triple(
+            row[compInstance.id]!!,
+            row[compSource.id]!!,
+            row[compSource.name]!!
+        )
+        dto.images.add(
+            Pair(
                 row[compInstance.id]!!,
-                row[compInstance2compSource.sourceId]!!,
-                row[compInstance.name]!!
-            )
-            dto.images.add(
-                Pair(
-                    row[compInstance.id]!!,
-                    ImagePK(
-                        id = row[text.id]!!,
-                        orderRank = row[img2Col.orderRank]!!,
-                        url = row[img.url]!!,
-                        description = row[img.description]!!
-                    )
+                ImagePK(
+                    id = row[text.id]!!,
+                    orderRank = row[img2Col.orderRank]!!,
+                    url = row[img.url]!!,
+                    description = row[img.description]!!
                 )
             )
-            dto.imgOnclickRedirects.add(
-                Pair(
-                    row[compInstance.id]!!,
-                    TextPK(
-                        id = row[text.id]!!,
-                        orderRank = row[text2Col.orderRank]!!,
-                        text = row[text.text]!!
-                    )
+        )
+        dto.imgOnclickRedirects.add(
+            Pair(
+                row[compInstance.id]!!,
+                TextPK(
+                    id = row[text.id]!!,
+                    orderRank = row[text2Col.orderRank]!!,
+                    text = row[text.text]!!
                 )
             )
-            dto.privilegedAuthors.add(
-                Pair(
-                    row[compInstance.id]!!,
-                    PrivilegedAuthor(
-                        username = row[author.username]!!,
-                        modify = row[prvAth2CompSource.modify]!!,
-                        view = row[prvAth2CompSource.view]!!,
-                    )
+        )
+        dto.privilegedAuthors.add(
+            Pair(
+                row[compInstance.id]!!,
+                PrivilegedAuthor(
+                    username = row[author.username]!!,
+                    modify = row[prvAth2CompSource.modify]!!,
+                    view = row[prvAth2CompSource.view]!!,
                 )
             )
-        }
-
-        return queryMap
+        )
     }
 
     // region Get
@@ -228,7 +229,9 @@ class CarouselOfImagesRepository(
     }
 
     fun leftJoinCarouselBasicImages(querySource: QuerySource): QuerySource {
-        querySource.leftJoin(compInstance, compInstance2compSource.sourceId eq compSource.id)
+        return querySource
+            .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
+            .leftJoin(compInstance, compInstance2compSource.sourceId eq compSource.id)
 
             .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
             .leftJoin(author, author.id eq prvAth2CompSource.authorId)
@@ -238,7 +241,6 @@ class CarouselOfImagesRepository(
 
             .leftJoin(text2Col, text2Col.collectionId eq compInstance.redirectTextCollectionId)
             .leftJoin(text, text.id eq text2Col.textId)
-        return querySource
     }
 
     /**
@@ -279,7 +281,7 @@ class CarouselOfImagesRepository(
     // todo - no need to return Int if compositionSourceId is returned instead I believe
     override fun compose(composePrepared: CarouselOfImagesComposePrepared): Int? {
         val compositionId = database.insertAndGenerateKey(ImagesCarouselsModel) {
-            set(it.name, composePrepared.name)
+//            set(it.name, composePrepared.name) // todo moved name to compSource
             set(it.imageCollectionId, composePrepared.imageCollectionId)
             set(it.redirectTextCollectionId, composePrepared.redirectTextCollectionId)
         } as Int?

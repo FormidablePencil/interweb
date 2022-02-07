@@ -7,6 +7,7 @@ import com.idealIntent.dtos.compositionCRUD.SingleUpdateCompositionRequest
 import com.idealIntent.dtos.compositionCRUD.UpdateCompositionRequest
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
+import com.idealIntent.repositories.compositions.CompositionBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel
@@ -33,10 +34,10 @@ class CmsService(
 
     fun getCompositionOfSpace(spaceAddress: String) {
         // spaces table should hold a collection of all components, id of components and what component (whatComponent: Enum(value: Int))
-//        compositionManager.getCompositionOfSpace(spaceAddress)
     }
 
-    fun getCompositionsOfLayout(layoutId: Int) {
+    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionBuilder {
+        return spaceRepository.getPrivateLayoutOfCompositions(layoutId, authorId)
     }
 
 
