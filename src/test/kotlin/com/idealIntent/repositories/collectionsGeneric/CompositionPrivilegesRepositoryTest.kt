@@ -3,7 +3,7 @@ package com.idealIntent.repositories.collectionsGeneric
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.CreateAuthorRequest
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
-import com.idealIntent.models.privileges.PrivilegeSourcesModel
+import com.idealIntent.models.privileges.CompositionSourcesModel
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.IsolationMode
@@ -134,10 +134,10 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                     val privilegeSourceId = compositionPrivilegesRepository.addPrivilegeSource(privilegeLvl)
                     // endregion setup
 
-                    appEnv.database.from(PrivilegeSourcesModel)
+                    appEnv.database.from(CompositionSourcesModel)
                         .select()
-                        .where { (PrivilegeSourcesModel.id eq privilegeSourceId) and (PrivilegeSourcesModel.privilegeLevel eq privilegeLvl) }
-                        .map { it[PrivilegeSourcesModel.id] }
+                        .where { (CompositionSourcesModel.id eq privilegeSourceId) and (CompositionSourcesModel.privilegeLevel eq privilegeLvl) }
+                        .map { it[CompositionSourcesModel.id] }
                         .first() shouldNotBe null
                 }
             }
@@ -148,10 +148,10 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                     compositionPrivilegesRepository.addPrivilegeSource()
                     // endregion setup
 
-                    appEnv.database.from(PrivilegeSourcesModel)
+                    appEnv.database.from(CompositionSourcesModel)
                         .select()
-                        .where { PrivilegeSourcesModel.privilegeLevel eq 0 }
-                        .map { it[PrivilegeSourcesModel.id] }
+                        .where { CompositionSourcesModel.privilegeLevel eq 0 }
+                        .map { it[CompositionSourcesModel.id] }
                         .first() shouldNotBe null
                 }
             }

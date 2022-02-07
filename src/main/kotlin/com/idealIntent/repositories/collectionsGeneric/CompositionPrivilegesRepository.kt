@@ -1,8 +1,8 @@
 package com.idealIntent.repositories.collectionsGeneric
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
-import com.idealIntent.models.privileges.PrivilegeSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
+import com.idealIntent.models.privileges.CompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
 import com.idealIntent.repositories.RepositoryBase
 import models.privileges.ICompositionsGenericPrivileges
 import org.ktorm.database.Database
@@ -21,10 +21,10 @@ data class CompositionsGenericPrivileges(
 ) : ICompositionsGenericPrivileges
 
 class CompositionPrivilegesRepository() : RepositoryBase() {
-    private val Database.privilegeSource get() = this.sequenceOf(PrivilegeSourcesModel)
-    private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionsModel)
+    private val Database.privilegeSource get() = this.sequenceOf(CompositionSourcesModel)
+    private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionSourcesModel)
 
-    // todo - validate privilege to record - collectionSource.privilegeId -> privilegeSource.id -> composition_privileged_authors.authorId
+    // todo - validate privilege to record - collectionSource.sourceId -> privilegeSource.id -> composition_privileged_authors.authorId
 
     // region Get
     fun getPrivilegesByAuthorId(getPrivilegesOfAuthorId: Int): Pair<List<PrivilegeRecord>, Int> {
@@ -34,7 +34,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
 //
 //        var privilegesTo = ""
 //        val privilegedAuthors = database.from(privCol)
-//            .rightJoin(priv, priv.privilegeId eq privCol.id)
+//            .rightJoin(priv, priv.sourceId eq privCol.id)
 //            .select(privCol.privilegesTo, priv.modLvl, priv.authorId)
 //            .where { privCol.id eq id }
 //            .map { row ->
@@ -50,16 +50,16 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
     /**
      * get privilege lvl if user is assigned to it.
      *
-     * @param privilegeId
+     * @param sourceId
      * @param userId For privilege sources that are restricted lvl 2 restricted.
      */
-//    fun getPrivilegeLvl(privilegeId: Int, userId: Int? = null) = database.privilegedAuthorsToCompositions.find {
-//        (it.privilegeId eq privilegeId) and (it.authorId eq userId)
+//    fun getPrivilegeLvl(sourceId: Int, userId: Int? = null) = database.privilegedAuthorsToCompositions.find {
+//        (it.sourceId eq sourceId) and (it.authorId eq userId)
 //    } !== null
 
     // todo - add give privileges to option
-    fun isUserPrivileged(privilegeId: Int, userId: Int) = database.privilegedAuthorsToCompositions.find {
-        (it.privilegeId eq privilegeId) and (it.authorId eq userId) and (it.modify eq 1)
+    fun isUserPrivileged(sourceId: Int, userId: Int) = database.privilegedAuthorsToCompositions.find {
+        (it.sourceId eq sourceId) and (it.authorId eq userId) and (it.modify eq 1)
     } != null
     // endregion Get
 
@@ -70,11 +70,11 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
      *
      * @param privileges What kind of privileges, view mod, etc.
      */
-    fun giveAnAuthorPrivilege(privileges: CompositionsGenericPrivileges, privilegeId: Int, authorId: Int) {
-        database.insert(PrivilegedAuthorsToCompositionsModel) {
+    fun giveAnAuthorPrivilege(privileges: CompositionsGenericPrivileges, sourceId: Int, authorId: Int) {
+        database.insert(PrivilegedAuthorsToCompositionSourcesModel) {
             set(it.modify, privileges.modify)
             set(it.view, privileges.view)
-            set(it.privilegeId, privilegeId)
+            set(it.sourceId, sourceId)
             set(it.authorId, authorId)
         }
     }
@@ -87,7 +87,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
      * @return Id to privilege source.
      */
     fun addPrivilegeSource(privilegeLevel: Int = 0): Int {
-        return database.insertAndGenerateKey(PrivilegeSourcesModel) {
+        return database.insertAndGenerateKey(CompositionSourcesModel) {
             set(it.privilegeLevel, privilegeLevel)
         } as Int
     }
@@ -112,7 +112,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
 //            where {
 //                when (PrivilegedAuthorIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
 //                    PrivilegedAuthorIdentifiableRecordByCol.AuthorId ->
-//                        (it.privilegeId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
+//                        (it.sourceId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
 //                } // todo - handle incorrect recordIdentifiableByCol gracefully
 //            }
 //        }
@@ -135,7 +135,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
 //                        where {
 //                            when (PrivilegedAuthorIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
 //                                PrivilegedAuthorIdentifiableRecordByCol.AuthorId ->
-//                                    (it.privilegeId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
+//                                    (it.sourceId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
 //                            } // todo - handle incorrect recordIdentifiableByCol gracefully
 //                        }
 //                    }

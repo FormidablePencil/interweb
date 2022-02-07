@@ -4,8 +4,8 @@ import com.idealIntent.models.compositions.basicCollections.images.IImageCollect
 import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.ITextCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
-import com.idealIntent.models.privileges.IPrivilegeSourceEntity
-import com.idealIntent.models.privileges.PrivilegeSourcesModel
+import com.idealIntent.models.privileges.ICompositionSourceEntity
+import com.idealIntent.models.privileges.CompositionSourcesModel
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
@@ -20,7 +20,8 @@ interface IImagesCarouselEntity : Entity<IImagesCarouselEntity> {
 
     val id: Int
     val name: String
-    val privilege: IPrivilegeSourceEntity
+    val compositionType: Int // todo - add this to interface
+    val privilege: ICompositionSourceEntity
     val imageCollection: IImageCollectionEntity
     val redirectTextCollection: ITextCollectionEntity
 }
@@ -35,5 +36,5 @@ open class ImagesCarouselsModel(alias: String?) : Table<IImagesCarouselEntity>("
     val imageCollectionId = int("image_collection_id").references(ImageCollectionsModel) { it.imageCollection }
     val redirectTextCollectionId =
         int("redirect_text_collection_id").references(TextCollectionsModel) { it.redirectTextCollection }
-    val privilegeId = int("privilege_id").references(PrivilegeSourcesModel) { it.privilege }
+    val sourceId = int("source_id").references(CompositionSourcesModel) { it.privilege } // compositionToPrivilege
 }

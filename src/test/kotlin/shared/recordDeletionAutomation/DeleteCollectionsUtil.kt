@@ -7,7 +7,7 @@ import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
+import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.ktorm.dsl.*
@@ -16,7 +16,7 @@ class DeleteCollectionsUtil: KoinTest {
     private val appEnv: AppEnv by inject()
 
     fun deleteTextRecords(collectionId: Int) {
-        // get record ids before deleting
+        // get record ids of collection
         val textIds = appEnv.database.from(TextToCollectionsModel)
             .select(TextToCollectionsModel.textId)
             .where { TextToCollectionsModel.collectionId eq collectionId }
@@ -29,7 +29,7 @@ class DeleteCollectionsUtil: KoinTest {
     }
 
     fun deleteImageRecords(collectionId: Int) {
-        // get record ids before deleting
+        // get record ids of collection
         val imageIds = appEnv.database.from(ImageToCollectionsModel)
             .select(ImageToCollectionsModel.imageId)
             .where { ImageToCollectionsModel.collectionId eq collectionId }
@@ -42,6 +42,6 @@ class DeleteCollectionsUtil: KoinTest {
     }
 
     fun deletePrivilegedAuthors(authorId: Int) {
-        appEnv.database.delete(PrivilegedAuthorsToCompositionsModel) { it.authorId eq authorId }
+        appEnv.database.delete(PrivilegedAuthorsToCompositionSourcesModel) { it.authorId eq authorId }
     }
 }

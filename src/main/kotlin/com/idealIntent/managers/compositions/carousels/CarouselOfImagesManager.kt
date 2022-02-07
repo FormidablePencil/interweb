@@ -69,7 +69,7 @@ class CarouselOfImagesManager(
                         name = createRequest.name,
                         imageCollectionId = imageCollectionId,
                         redirectTextCollectionId = redirectsCollectionId,
-                        privilegeId = privilegeSourceId,
+                        sourceId = privilegeSourceId,
                     )
                 ) ?: throw CompositionExceptionReport(FailedToCompose, this::class.java)
 

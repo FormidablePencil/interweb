@@ -10,8 +10,8 @@ import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
-import com.idealIntent.models.privileges.PrivilegeSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionsModel
+import com.idealIntent.models.privileges.CompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
 import com.idealIntent.repositories.profile.AuthorRepository
 import models.profile.AuthorsModel
 import org.koin.test.KoinTest
@@ -47,31 +47,23 @@ class DeleteCarouselBasicImageUtil : KoinTest {
 
                 deleteCollectionsUtil.deletePrivilegedAuthors(authorId)
             }
-            appEnv.database.delete(PrivilegeSourcesModel) { record -> record.id eq record.privilegeLevel }
+            appEnv.database.delete(CompositionSourcesModel) { record -> record.id eq record.privilegeLevel }
         }
     }
 
     /**
      * Get carousel basic images query
      *
-    SELECT comp.name AS comp_name, comp.privilege_id AS comp_privilege_id, comp.id AS comp_id, img.id AS img_id, textRedirect.id AS textRedirect_id, author.username AS author_username
+    SELECT comp.name AS comp_name, comp.source_id AS comp_source_id, comp.id AS comp_id, img.id AS img_id, textRedirect.id AS textRedirect_id, author.username AS author_username
     FROM privilege_sources prvSource
-    LEFT JOIN image_carousels comp ON comp.privilege_id = prvSource.id
-    LEFT JOIN privileged_authors_to_compositions prvAuthorsComp ON prvAuthorsComp.privilege_id = prvSource.id
+    LEFT JOIN image_carousels comp ON comp.source_id = prvSource.id
+    LEFT JOIN privileged_authors_to_compositions prvAuthorsComp ON prvAuthorsComp.source_id = prvSource.id
     LEFT JOIN authors author ON author.id = prvAuthorsComp.author_id
     LEFT JOIN image_to_collections img2Col ON img2Col.collection_id = comp.image_collection_id
     LEFT JOIN images img ON img.id = img2Col.image_id
     LEFT JOIN text_to_collections textRedirect2Col ON textRedirect2Col.collection_id = comp.redirect_text_collection_id
     LEFT JOIN texts textRedirect ON textRedirect.id = textRedirect2Col.text_id
     WHERE prvAuthorsComp.author_id = ?;
-     *
-     * @param onlyIds
-     * @param layoutId
-     * @param editable
-     * @param deletable
-     * @param compositionId
-     * @param authorId
-     * @return
      */
     private fun getCarouselBasicImagesQuery(
         onlyIds: Boolean = true,
@@ -81,7 +73,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         compositionId: Int? = null,
         authorId: Int? = null,
     ): List<CarouselBasicImagesRes> {
-        val prvSource = PrivilegeSourcesModel.aliased("prvSource")
+        val prvSource = CompositionSourcesModel.aliased("prvSource")
 
         val comp = ImagesCarouselsModel.aliased("comp")
 
@@ -91,7 +83,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
         val text = TextsModel.aliased("textRedirect")
 
-        val prvAth = PrivilegedAuthorsToCompositionsModel("prvAuthorsComp")
+        val prvAth = PrivilegedAuthorsToCompositionSourcesModel("prvAuthorsComp")
         val author = AuthorsModel.aliased("author")
 
         val selectOnlyIds = listOf(comp.name, prvSource.id, comp.id, img.id, text.id, author.username)
@@ -109,8 +101,8 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         val privilegedAuthors = mutableListOf<Pair<Int, PrivilegedAuthor>>()
 
         appEnv.database.from(prvSource)
-            .leftJoin(comp, comp.privilegeId eq prvSource.id)
-            .leftJoin(prvAth, prvAth.privilegeId eq prvSource.id)
+            .leftJoin(comp, comp.sourceId eq prvSource.id)
+            .leftJoin(prvAth, prvAth.sourceId eq prvSource.id)
             .leftJoin(author, author.id eq prvAth.authorId)
 
             .leftJoin(img2Col, img2Col.collectionId eq comp.imageCollectionId)
@@ -177,7 +169,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                 } else {
                     idAndNameOfCompositions += Triple(
                         it[comp.id]!!,
-                        it[comp.privilegeId]!!,
+                        it[comp.sourceId]!!,
                         it[comp.name]!!
                     )
                     images.add(

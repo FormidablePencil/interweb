@@ -33,19 +33,19 @@ class CompositionPrivilegesManager(
     /**
      * Give multiple authors privileges by username
      *
-     * Checks whether userId has privilege over privilegeId then loops over [authors to give privileges to][privilegedAuthors]
+     * Checks whether userId has privilege over sourceId then loops over [authors to give privileges to][privilegedAuthors]
      * and gives authors privileges.
      *
      * @throws CompositionException [UserNotPrivileged], [FailedToFindAuthorByUsername]
      */
     @Throws(CompositionException::class)
     fun giveMultipleAuthorsPrivilegesByUsername(
-        privilegedAuthors: List<PrivilegedAuthor>, privilegeId: Int, userId: Int
+        privilegedAuthors: List<PrivilegedAuthor>, sourceId: Int, userId: Int
     ) {
         var iteration = 0
         try {
             appEnv.database.useTransaction {
-                if (!compositionPrivilegesRepository.isUserPrivileged(privilegeId, userId))
+                if (!compositionPrivilegesRepository.isUserPrivileged(sourceId, userId))
                     throw CompositionException(UserNotPrivileged)
 
                 privilegedAuthors.forEach {
@@ -56,7 +56,7 @@ class CompositionPrivilegesManager(
 
                     compositionPrivilegesRepository.giveAnAuthorPrivilege(
                         privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
-                        privilegeId = privilegeId,
+                        sourceId = sourceId,
                         authorId = author.id
                     )
                 }
@@ -85,8 +85,8 @@ class CompositionPrivilegesManager(
      * @return True for success or false for failure to get by author by username.
      */
     @Throws(CompositionException::class)
-    fun giveAnAuthorPrivilegesByUsername(privilegedAuthor: PrivilegedAuthor, privilegeId: Int, userId: Int) {
-        if (!compositionPrivilegesRepository.isUserPrivileged(privilegeId, userId))
+    fun giveAnAuthorPrivilegesByUsername(privilegedAuthor: PrivilegedAuthor, sourceId: Int, userId: Int) {
+        if (!compositionPrivilegesRepository.isUserPrivileged(sourceId, userId))
             throw CompositionException(UserNotPrivileged)
 
         val author = authorRepository.getByUsername(privilegedAuthor.username)
@@ -94,7 +94,7 @@ class CompositionPrivilegesManager(
 
         compositionPrivilegesRepository.giveAnAuthorPrivilege(
             privileges = CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
-            privilegeId = privilegeId,
+            sourceId = sourceId,
             authorId = author.id
         )
     }

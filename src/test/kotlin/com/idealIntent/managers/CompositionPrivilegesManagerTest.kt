@@ -66,7 +66,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             justRun {
                 compositionPrivilegesRepository.giveAnAuthorPrivilege(
                     privileges = any(),
-                    privilegeId = privilegeSourceId,
+                    sourceId = privilegeSourceId,
                     authorId = any()
                 )
             }
@@ -114,7 +114,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             verify { authorRepository.getByUsername(any()) }
             verify {
                 compositionPrivilegesRepository.giveAnAuthorPrivilege(
-                    privileges = any(), privilegeId = privilegeSourceId, authorId = any()
+                    privileges = any(), sourceId = privilegeSourceId, authorId = any()
                 )
             }
         }
@@ -129,7 +129,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             justRun {
                 compositionPrivilegesRepository.giveAnAuthorPrivilege(
                     CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
-                    privilegeId = privilegeSourceId,
+                    sourceId = privilegeSourceId,
                     authorId = author.id
                 )
             }
@@ -176,7 +176,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             verify {
                 compositionPrivilegesRepository.giveAnAuthorPrivilege(
                     CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
-                    privilegeId = privilegeSourceId,
+                    sourceId = privilegeSourceId,
                     authorId = author.id
                 )
             }

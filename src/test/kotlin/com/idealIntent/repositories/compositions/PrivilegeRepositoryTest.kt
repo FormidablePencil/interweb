@@ -41,7 +41,7 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
 //                    val privilegesTo = "some libOfComp"
 //                    val privilegedAuthor = generatePrivilegedAuthorsToConsume().first()
 //
-//                    val privilegeId = privilegeRepository.insertNewRecord(privilegedAuthor, privilegesTo)
+//                    val sourceId = privilegeRepository.insertNewRecord(privilegedAuthor, privilegesTo)
 //                }
 //            }
 //        }
@@ -52,10 +52,10 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
 //                    val privilegesTo = "some libOfComp"
 //                    val privilegedAuthors = generatePrivilegedAuthorsToConsume()
 //
-//                    val privilegeId =
+//                    val sourceId =
 //                        privilegeRepository.batchInsertNewRecords(privilegedAuthors)
 //                            ?: throw Exception("failed to get id")
-//                    val res = privilegeRepository.getCollectionOfRecords(privilegeId)
+//                    val res = privilegeRepository.getCollectionOfRecords(sourceId)
 //
 //                    res.privilegeTo shouldBe privilegesTo // todo - typo
 //                    res.privilegedAuthors.size shouldBe privilegedAuthors.size // todo

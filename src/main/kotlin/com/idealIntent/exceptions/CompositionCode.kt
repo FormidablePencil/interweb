@@ -18,7 +18,9 @@ enum class CompositionCode {
     UserNotPrivileged,
     FailedToFindAuthorByUsername,
     FailedToAssociateRecordToCollection,
-    EmptyListOfRecordsProvided;
+    EmptyListOfRecordsProvided,
+    NoAuthorIdProvidedToRestrictedResource,
+    ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
         override fun getLogMsg(code: CompositionCode): String {
@@ -26,6 +28,7 @@ enum class CompositionCode {
                 FailedToGivePrivilege -> "Failed give user privileges."
                 FailedToCompose -> "Failed to compose."
                 FailedToInsertRecord -> "Failed to insert records."
+                NoAuthorIdProvidedToRestrictedResource -> "No id of author provided to restricted resource for validation of privileges."
 
                 ServerError -> genericServerError
 
@@ -47,6 +50,7 @@ enum class CompositionCode {
                 FailedToAssociateRecordToCollection -> "Failed to associateRecordToCollection."
                 EmptyListOfRecordsProvided -> "Provided an empty list of records."
 
+                NoAuthorIdProvidedToRestrictedResource,
                 FailedToGivePrivilege,
                 ServerError -> genericServerError
 
@@ -67,6 +71,7 @@ enum class CompositionCode {
                 FailedToCompose,
                 FailedToGivePrivilege,
                 FailedToInsertRecord,
+                NoAuthorIdProvidedToRestrictedResource
                 -> HttpStatusCode.InternalServerError
             }
         }

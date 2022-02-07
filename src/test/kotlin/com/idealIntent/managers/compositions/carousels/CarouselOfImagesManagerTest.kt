@@ -33,7 +33,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
     val carouselOfImagesComposePrepared = CarouselOfImagesComposePrepared(
         imageCollectionId = idOfNewlyCreatedImageCollection,
         redirectTextCollectionId = idOfNewlyCreatedTextCollection,
-        privilegeId = privilegeSourceId,
+        sourceId = privilegeSourceId,
         name = createCarouselBasicImagesReq.name,
     )
     val idOfNewlyCreatedCarouselOfImages = 12
@@ -61,7 +61,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             every { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) } returns
                     carouselOfImagesComposePrepared.redirectTextCollectionId
             every { compositionPrivilegesManager.createPrivileges(userId) } returns
-                    carouselOfImagesComposePrepared.privilegeId
+                    carouselOfImagesComposePrepared.sourceId
             justRun {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
                     privilegedAuthors, privilegeSourceId, userId

@@ -80,7 +80,7 @@ class CmsServiceTest : BehaviorSpec({
 //
 //        val image = Image(description = "image description", url = "image url", orderRank = 1, id = 1)
 //        val navTo = Text(orderRank = 10000, text = "some link")
-//        val privilegedAuthors = PrivilegeSourcesModel(authorId = 1, modLvl = 2)
+//        val privilegedAuthors = CompositionSourcesModel(authorId = 1, modLvl = 2)
 //
 //        val req = CreateCompositionRequest(
 //            spaceAddress = "SDLFJEI",
