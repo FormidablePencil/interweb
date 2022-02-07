@@ -13,6 +13,8 @@ data class CompositionSourceToLayout(
     override val orderRank: Int
 ): ICompositionSourceToLayout
 
+
+
 interface ICompositionSourceEntity : Entity<ICompositionSourceEntity>, IPrivilegeSource {
     companion object : Entity.Factory<ICompositionSourceEntity>()
 }
@@ -24,4 +26,5 @@ open class CompositionSourcesModel(alias: String?) : Table<ICompositionSourceEnt
 
     val id = int("id").primaryKey().bindTo { it.id }
     val privilegeLevel = int("privilege_level").bindTo { it.privilegeLevel }
+    val compositionType = int("composition_type").bindTo { it.compositionType }
 }

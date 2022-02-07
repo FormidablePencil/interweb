@@ -22,8 +22,10 @@ class CompositionPrivilegesManager(
      *
      * @return adds a privilege source and associates to creator's id to it.
      */
-    fun createCompositionSource(authorId: Int): Int {
-        val sourceId = compositionPrivilegesRepository.addCompositionSource()
+    fun createCompositionSource(compositionType: Int, authorId: Int): Int {
+        val sourceId = compositionPrivilegesRepository.addCompositionSource(
+            privilegeLevel = 0, compositionType = compositionType
+        )
         compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
             CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, authorId
         )

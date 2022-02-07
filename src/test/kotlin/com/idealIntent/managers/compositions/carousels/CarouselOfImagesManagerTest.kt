@@ -63,7 +63,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
                     carouselOfImagesComposePrepared.imageCollectionId
             every { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) } returns
                     carouselOfImagesComposePrepared.redirectTextCollectionId
-            every { compositionPrivilegesManager.createCompositionSource(authorId) } returns
+            every { compositionPrivilegesManager.createCompositionSource(compositionType = 0, authorId) } returns
                     carouselOfImagesComposePrepared.sourceId
             justRun {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesToCompositionByUsername(
@@ -73,7 +73,9 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             every { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared) } returns compositionSourceId
             every {
                 spaceRepository.associateCompositionToLayout(
-                    compositionSourceId = compositionSourceId, layoutId = layoutId
+                    orderRank = 0,
+                    compositionSourceId = compositionSourceId,
+                    layoutId = layoutId
                 )
             } returns true
             // endregion
@@ -109,7 +111,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
 
             verify { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) }
             verify { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) }
-            verify { compositionPrivilegesManager.createCompositionSource(authorId) }
+            verify { compositionPrivilegesManager.createCompositionSource(compositionType = 0, authorId) }
             verify {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesToCompositionByUsername(
                     privilegedAuthors, compositionSourceId, authorId

@@ -36,6 +36,9 @@ class CmsService(
 //        compositionManager.getCompositionOfSpace(spaceAddress)
     }
 
+    fun getCompositionsOfLayout(layoutId: Int) {
+    }
+
 
     /**
      * Create composition

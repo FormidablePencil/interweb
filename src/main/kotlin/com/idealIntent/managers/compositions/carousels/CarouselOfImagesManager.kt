@@ -66,11 +66,14 @@ class CarouselOfImagesManager(
                 val redirectsCollectionId =
                     textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
-                val compositionSourceId = compositionPrivilegesManager.createCompositionSource(authorId)
+                val compositionSourceId =
+                    compositionPrivilegesManager.createCompositionSource(compositionType = 0, authorId)
 
                 // todo wrap in a try catch and response to user that layout by id does not exist
                 spaceRepository.associateCompositionToLayout(
-                    compositionSourceId = compositionSourceId, layoutId = layoutId
+                    orderRank = 0,
+                    compositionSourceId = compositionSourceId,
+                    layoutId = layoutId
                 )
 
                 carouselOfImagesRepository.compose(

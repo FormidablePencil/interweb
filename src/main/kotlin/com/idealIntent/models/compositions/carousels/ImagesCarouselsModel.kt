@@ -36,5 +36,4 @@ open class ImagesCarouselsModel(alias: String?) : Table<IImagesCarouselEntity>("
     val imageCollectionId = int("image_collection_id").references(ImageCollectionsModel) { it.imageCollection }
     val redirectTextCollectionId =
         int("redirect_text_collection_id").references(TextCollectionsModel) { it.redirectTextCollection }
-    val sourceId = int("source_id").references(CompositionSourcesModel) { it.privilege } // compositionToPrivilege
 }

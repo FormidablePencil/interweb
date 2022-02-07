@@ -10,6 +10,7 @@ import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
+import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
 import com.idealIntent.repositories.profile.AuthorRepository
@@ -73,7 +74,8 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         compositionId: Int? = null,
         authorId: Int? = null,
     ): List<CarouselBasicImagesRes> {
-        val prvSource = CompositionSourcesModel.aliased("prvSource")
+        val compSource = CompositionSourcesModel.aliased("compSource")
+        val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
 
         val comp = ImagesCarouselsModel.aliased("comp")
 
@@ -86,7 +88,10 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         val prvAth = PrivilegedAuthorsToCompositionSourcesModel("prvAuthorsComp")
         val author = AuthorsModel.aliased("author")
 
-        val selectOnlyIds = listOf(comp.name, prvSource.id, comp.id, img.id, text.id, author.username)
+        val selectOnlyIds = listOf(
+            comp.name, compSource.id, compInstance2compSource.sourceId,
+            comp.id, img.id, text.id, author.username
+        )
         val select = listOf(
             comp.name, comp.id,
             img2Col.orderRank, img.id, img.url, img.description,
@@ -100,9 +105,10 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         val imgOnclickRedirects = mutableListOf<Pair<Int, TextPK>>()
         val privilegedAuthors = mutableListOf<Pair<Int, PrivilegedAuthor>>()
 
-        appEnv.database.from(prvSource)
-            .leftJoin(comp, comp.sourceId eq prvSource.id)
-            .leftJoin(prvAth, prvAth.sourceId eq prvSource.id)
+        appEnv.database.from(compSource)
+            .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
+            .leftJoin(comp, comp.id eq compInstance2compSource.compositionId)
+            .leftJoin(prvAth, prvAth.sourceId eq compSource.id)
             .leftJoin(author, author.id eq prvAth.authorId)
 
             .leftJoin(img2Col, img2Col.collectionId eq comp.imageCollectionId)
@@ -126,13 +132,13 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                             " ${it[img2Col.orderRank]}," +
                             " ${it[img.url]}," +
                             " ${it[img.description]}," +
-                            " ${it[author.username]}, ${it[prvSource.id]}"
+                            " ${it[author.username]}, ${it[compSource.id]}"
                 )
 
                 if (onlyIds) {
                     idAndNameOfCompositions += Triple(
                         if (it[comp.id] == null) defaultIdValue else it[comp.id]!!,
-                        if (it[prvSource.id] == null) defaultIdValue else it[prvSource.id]!!,
+                        if (it[compSource.id] == null) defaultIdValue else it[compSource.id]!!,
                         if (it[comp.name] == null) "" else it[comp.name]!!
                     )
                     images.add(
@@ -169,7 +175,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                 } else {
                     idAndNameOfCompositions += Triple(
                         it[comp.id]!!,
-                        it[comp.sourceId]!!,
+                        it[compInstance2compSource.sourceId]!!,
                         it[comp.name]!!
                     )
                     images.add(

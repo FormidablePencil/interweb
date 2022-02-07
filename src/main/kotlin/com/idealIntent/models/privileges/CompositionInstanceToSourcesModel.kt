@@ -18,11 +18,11 @@ interface ICompositionInstanceToSourceEntity : Entity<ICompositionInstanceToSour
     companion object : Entity.Factory<ICompositionInstanceToSourceEntity>()
 }
 
-open class CompositionInstanceToSourcesTable(alias: String?) :
-    Table<ICompositionInstanceToSourceEntity>("composition_to_privileges", alias) {
-    companion object : CompositionInstanceToSourcesTable(null)
+open class CompositionInstanceToSourcesModel(alias: String?) :
+    Table<ICompositionInstanceToSourceEntity>("composition_instance_to_sources", alias) {
+    companion object : CompositionInstanceToSourcesModel(null)
 
-    override fun aliased(alias: String) = CompositionInstanceToSourcesTable(alias)
+    override fun aliased(alias: String) = CompositionInstanceToSourcesModel(alias)
 
     val compositionId = int("composition_id").bindTo { it.compositionId }
     val sourceId = int("source_id").bindTo { it.sourceId }

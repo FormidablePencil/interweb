@@ -33,13 +33,38 @@ class SpaceRepository(
     // endregion
 
     // region Get
+    fun getLayoutOfCompositions(layoutId: Int, authorId: Int) {
+        val layoutMetadata = getLayoutMetadata(
+            spaceAddress = null,
+            layoutId = layoutId,
+            authorId = authorId
+        )
+        return getCompositionsOfLayout(layoutMetadata)
+    }
+
     fun getSpaceLayoutPreviewOfCompositions(layoutId: Int, authorId: Int) {
     }
 
     fun getSpaceLayoutOfCompositions(spaceAddress: String, authorId: Int) {
-        val layoutMetadata = getLayoutMetadata(spaceAddress, authorId)
+        val layoutMetadata = getLayoutMetadata(
+            spaceAddress = spaceAddress,
+            layoutId = null,
+            authorId = authorId
+        )
         val composition = getCompositionsOfLayout(layoutMetadata)
     }
+
+
+    fun fromSpace(): QuerySource {
+        return database.from(space)
+            .leftJoin(layout2Space, layout2Space.spaceAddress eq space.address)
+            .leftJoin(layout, layout.id eq layout2Space.layoutId)
+    }
+
+    fun fromLayout(): QuerySource {
+        return database.from(layout)
+    }
+
 
     /**
      * Get layout metadata
@@ -49,18 +74,21 @@ class SpaceRepository(
      * @return Pair(CompositionSourceToLayout, all [CompositionCategory] to search through, all [CompositionCategory] to search through)
      */
     private fun getLayoutMetadata(
-        spaceAddress: String, authorId: Int
+        spaceAddress: String?, layoutId: Int?, authorId: Int
     ): Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>> {
         val listOfCompositionSourceToLayout = mutableListOf<CompositionSourceToLayout>()
 
         // region Used to find out what composition tables to search through
         val allTypesOfCompositionsLayoutContains = mutableSetOf<Pair<CompositionCategory, Int>>()
         // endregion
+//        database.from(layout)
 
-        database.from(space)
+        val query: QuerySource = if (spaceAddress != null) fromSpace()
+        else if (layoutId != null) fromLayout()
+        else throw Exception("space nor layoutId was provided")
+
+        query
             .leftJoinAuthor(authorId)
-            .leftJoin(layout2Space, layout2Space.spaceAddress eq space.address)
-            .leftJoin(layout, layout.id eq layout2Space.layoutId)
             .leftJoin(compSource2Layout, compSource2Layout.layoutId eq layout.id)
             .leftJoin(compSource, compSource.id eq compSource2Layout.sourceId)
             .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
@@ -69,7 +97,13 @@ class SpaceRepository(
                 compSource2Layout.sourceId,
                 compInstance2compSource.compositionCategory,
                 compInstance2compSource.compositionType,
-            ).where { space.address eq spaceAddress }
+            ).whereWithConditions {
+                it += if (spaceAddress != null)
+                    (space.address eq spaceAddress)
+                else if (layoutId != null)
+                    (layout.id eq layoutId)
+                else throw Exception("space nor layoutId was provided")
+            }
             .map {
                 allTypesOfCompositionsLayoutContains += Pair(
                     CompositionCategory.fromInt(it[compInstance2compSource.compositionCategory]!!),
@@ -230,10 +264,11 @@ class SpaceRepository(
         return database.insertAndGenerateKey(space) {} as String
     }
 
-    fun associateCompositionToLayout(compositionSourceId: Int, layoutId: Int): Boolean {
+    fun associateCompositionToLayout(orderRank: Int, compositionSourceId: Int, layoutId: Int): Boolean {
         return database.insert(compSource2Layout) {
-            set(compSource2Layout.layoutId, layoutId)
             set(compSource2Layout.sourceId, compositionSourceId)
+            set(compSource2Layout.layoutId, layoutId)
+            set(compSource2Layout.orderRank, orderRank)
         } == 1
     }
 

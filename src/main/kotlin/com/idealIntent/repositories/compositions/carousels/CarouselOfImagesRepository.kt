@@ -15,7 +15,7 @@ import com.idealIntent.models.compositions.basicCollections.texts.TextToCollecti
 import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
-import com.idealIntent.models.privileges.CompositionInstanceToSourcesTable
+import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
 import com.idealIntent.models.space.SpacesModel
@@ -23,6 +23,8 @@ import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
+import dtos.compositions.CompositionCategory
+import dtos.compositions.carousels.CompositionCarousel
 import models.profile.AuthorsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
@@ -57,25 +59,25 @@ class CarouselOfImagesRepository(
         CarouselBasicImagesRes, CarouselOfImagesComposePrepared> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
 
-     val space = SpacesModel.aliased("space")
-     val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
-     val layout = CompositionLayoutsModel.aliased("layout")
-     val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
-     val compSource = CompositionSourcesModel.aliased("compSource")
+    val space = SpacesModel.aliased("space")
+    val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
+    val layout = CompositionLayoutsModel.aliased("layout")
+    val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
+    val compSource = CompositionSourcesModel.aliased("compSource")
 
     // region composition
-     val compInstance2compSource = CompositionInstanceToSourcesTable.aliased("compInstance2compSource")
-     val compInstance = ImagesCarouselsModel.aliased("compInstance")
+    val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
+    val compInstance = ImagesCarouselsModel.aliased("compInstance")
 
-     val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
+    val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
     // endregion
 
     // region composition's collections
-     val img2Col = ImageToCollectionsModel.aliased("img2Col")
-     val img = ImagesModel.aliased("img")
-     val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
-     val text = TextsModel.aliased("textRedirect")
-     val author = AuthorsModel.aliased("author")
+    val img2Col = ImageToCollectionsModel.aliased("img2Col")
+    val img = ImagesModel.aliased("img")
+    val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
+    val text = TextsModel.aliased("textRedirect")
+    val author = AuthorsModel.aliased("author")
     // endregion
 
     val selectCarouselOfImages = listOf<Column<out Any>>(
@@ -106,7 +108,7 @@ class CarouselOfImagesRepository(
 
             dto.idAndNameOfCompositions += Triple(
                 row[compInstance.id]!!,
-                row[compInstance.sourceId]!!,
+                row[compInstance2compSource.sourceId]!!,
                 row[compInstance.name]!!
             )
             dto.images.add(
@@ -226,7 +228,7 @@ class CarouselOfImagesRepository(
     }
 
     fun leftJoinCarouselBasicImages(querySource: QuerySource): QuerySource {
-        querySource.leftJoin(compInstance, compInstance.sourceId eq compSource.id)
+        querySource.leftJoin(compInstance, compInstance2compSource.sourceId eq compSource.id)
 
             .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
             .leftJoin(author, author.id eq prvAth2CompSource.authorId)
@@ -281,7 +283,9 @@ class CarouselOfImagesRepository(
             set(it.imageCollectionId, composePrepared.imageCollectionId)
             set(it.redirectTextCollectionId, composePrepared.redirectTextCollectionId)
         } as Int?
-        database.insert(CompositionInstanceToSourcesTable) {
+        database.insert(CompositionInstanceToSourcesModel) {
+            set(it.compositionCategory, CompositionCategory.Carousel.value)
+            set(it.compositionType, CompositionCarousel.BasicImages.value)
             set(it.sourceId, composePrepared.sourceId)
             set(it.compositionId, compositionId)
         }

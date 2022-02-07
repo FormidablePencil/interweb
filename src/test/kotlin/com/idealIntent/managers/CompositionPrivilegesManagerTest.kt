@@ -38,7 +38,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
     given("createPrivileges") {
         then("success. User gets absolute privileges.") {
             // region setup
-            every { compositionPrivilegesRepository.addCompositionSource() } returns sourceId
+            every { compositionPrivilegesRepository.addCompositionSource(compositionType = 0) } returns sourceId
             justRun {
                 compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, userId
@@ -46,9 +46,9 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             }
             // endregion
 
-            compositionPrivilegesManager.createCompositionSource(userId)
+            compositionPrivilegesManager.createCompositionSource(compositionType = 0, userId)
 
-            verify { compositionPrivilegesRepository.addCompositionSource() }
+            verify { compositionPrivilegesRepository.addCompositionSource(compositionType = 0) }
             verify {
                 compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, userId
