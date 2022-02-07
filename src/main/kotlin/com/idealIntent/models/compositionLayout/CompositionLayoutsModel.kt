@@ -22,6 +22,5 @@ open class CompositionLayoutsModel(alias: String?) : Table<ICompositionLayoutEnt
     override fun aliased(alias: String) = CompositionLayoutsModel(alias)
 
     val id = int("id").primaryKey().bindTo { it.layoutId }
-    val sourceId = int("source_id").bindTo { it.sourceId }
     val name = varchar("name").bindTo { it.name }
 }

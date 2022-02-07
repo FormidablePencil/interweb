@@ -15,7 +15,11 @@ class CarouselsManager(
 ) : ICompositionCategoryManagerStructure<CarouselBasicImagesRes, CompositionResponse> {
     private val gson = Gson()
 
-    override fun getComposition(compositionType: CompositionCarousel, compositionId: Int, authorId: Int): CarouselBasicImagesRes? =
+    override fun getComposition(
+        compositionType: CompositionCarousel,
+        compositionId: Int,
+        authorId: Int
+    ): CarouselBasicImagesRes? =
         when (compositionType) {
             CarouselBlurredOverlay -> TODO()
             CarouselMagnifying -> TODO()
@@ -23,12 +27,20 @@ class CarouselsManager(
                 carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(compositionId, authorId).first()
         }
 
-    override fun createCompositionOfCategory(compositionType: CompositionCarousel, jsonData: String, userId: Int): CompositionResponse =
+    override fun createCompositionOfCategory(
+        compositionType: CompositionCarousel,
+        jsonData: String,
+        layoutId: Int,
+        userId: Int
+    ): CompositionResponse =
         when (compositionType) {
             CarouselBlurredOverlay -> TODO()
             CarouselMagnifying -> TODO()
             BasicImages ->
-                carouselOfImagesManager.createComposition(gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java), userId)
+                carouselOfImagesManager.createComposition(
+                    gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java), layoutId,
+                    userId
+                )
         }
 
     override fun updateComposition() {

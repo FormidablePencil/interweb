@@ -3,9 +3,10 @@ package com.idealIntent.models.compositionLayout
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
+import org.ktorm.schema.varchar
 
 interface ILayoutToSpace {
-    val spaceId: Int
+    val spaceAddress: String
     val layoutId: Int
 }
 
@@ -21,5 +22,5 @@ open class LayoutToSpacesModel(alias: String?) : Table<ILayoutToSpaceEntity>("la
     override fun aliased(alias: String) = LayoutToSpacesModel(alias)
 
     val layoutId = int("layout_id").bindTo { it.layoutId }
-//    val spaceId = int("space_id").bindTo { it.spaceId }
+    val spaceAddress = varchar("space_address").bindTo { it.spaceAddress }
 }

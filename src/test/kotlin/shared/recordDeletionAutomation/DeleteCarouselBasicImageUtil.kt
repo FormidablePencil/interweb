@@ -207,7 +207,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
             }
 
         return idAndNameOfCompositions.map { idAndNameOfComposition ->
-            val (compId, privilegeSourceId, name) = idAndNameOfComposition
+            val (compId, sourceId, name) = idAndNameOfComposition
 
             val compImages = mutableListOf<ImagePK>()
             images.forEach { if (it.first == compId) compImages.add(it.second) }
@@ -221,7 +221,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
 
             return@map CarouselBasicImagesRes(
                 id = compId,
-                privilegeSourceId = privilegeSourceId,
+                sourceId = sourceId,
                 name = name,
                 images = compImages,
                 imgOnclickRedirects = compRedirects,

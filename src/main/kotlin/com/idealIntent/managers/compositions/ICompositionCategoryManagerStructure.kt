@@ -27,7 +27,11 @@ interface ICompositionCategoryManagerStructure<Composition, Response> {
      * @param jsonData
      * @return
      */
-    fun createCompositionOfCategory(compositionType: CompositionCarousel, jsonData: String, userId: Int): Response
+    fun createCompositionOfCategory(
+        compositionType: CompositionCarousel, jsonData: String,
+        layoutId: Int,
+        userId: Int
+    ): Response
 
     fun updateComposition()
 

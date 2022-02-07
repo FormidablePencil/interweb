@@ -1,4 +1,4 @@
-package integrationTests.compositions.tests
+package integrationTests.space.tests
 
 import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
@@ -12,7 +12,10 @@ import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
-import shared.testUtils.*
+import shared.testUtils.BehaviorSpecIT
+import shared.testUtils.images
+import shared.testUtils.rollback
+import shared.testUtils.texts
 
 class CompositionIT : BehaviorSpecIT({
     val signupFlow: SignupFlow by inject()
@@ -31,10 +34,13 @@ class CompositionIT : BehaviorSpecIT({
                         val userId = signupFlow.signupReturnId()
                         // endregion
 
+                        val layoutId = cmsService.createNewLayout("my new layout")
+
                         val res: CompositionResponse = cmsService.createComposition(
                             CompositionCategory.Carousel,
                             CompositionCarousel.BasicImages,
                             gson.toJson(createCarouselBasicImagesReq),
+                            layoutId,
                             userId
                         )
 
@@ -43,8 +49,9 @@ class CompositionIT : BehaviorSpecIT({
                         res.data shouldNotBe null
                         val compositionId = res.data
 
-                        val compRes = carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(compositionId!!, userId)
-                            ?: throw failure("didn't return composition by id")
+                        val compRes =
+                            carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(compositionId!!, userId)
+                                ?: throw failure("didn't return composition by id")
 
 //                        compRes.images.forEach {
 //

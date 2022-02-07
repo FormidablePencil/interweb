@@ -34,7 +34,7 @@ data class CreateCarouselBasicImagesReq(
 @Serializable
 data class CarouselBasicImagesRes(
     override val id: Int,
-    val privilegeSourceId: Int,
+    override val sourceId: Int,
     override val name: String,
     override val images: List<ImagePK>,
     override val imgOnclickRedirects: List<TextPK>,

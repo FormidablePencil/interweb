@@ -7,6 +7,7 @@ import com.idealIntent.dtos.compositionCRUD.SingleUpdateCompositionRequest
 import com.idealIntent.dtos.compositionCRUD.UpdateCompositionRequest
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
+import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel
 import dtos.space.IUserComposition
@@ -22,6 +23,7 @@ import dtos.space.IUserComposition
  */
 class CmsService(
     private val carouselsManager: CarouselsManager,
+    private val spaceRepository: SpaceRepository,
 ) {
 
     fun getAuthorsCompositions(userId: Int) {
@@ -48,6 +50,7 @@ class CmsService(
         compositionCategory: CompositionCategory,
         compositionOfCategory: CompositionCarousel,
         jsonData: String,
+        layoutId: Int,
         userId: Int
     ): CompositionResponse {
         return when (compositionCategory) {
@@ -58,7 +61,7 @@ class CmsService(
             CompositionCategory.Divider -> TODO()
             CompositionCategory.LineDivider -> TODO()
             CompositionCategory.Carousel ->
-                carouselsManager.createCompositionOfCategory(compositionOfCategory, jsonData, userId)
+                carouselsManager.createCompositionOfCategory(compositionOfCategory, jsonData, layoutId, userId)
         }
     }
 
@@ -203,5 +206,18 @@ class CmsService(
             // endregion
         }
         return false
+    }
+
+    fun getSpace() {
+    }
+
+    fun createSpace(layoutName: String) {
+        val spaceAddress = spaceRepository.insertNewSpace()
+        val layoutId = spaceRepository.insertNewLayout(layoutName)
+        spaceRepository.associateLayoutToSpace(spaceAddress = spaceAddress, layoutId = layoutId)
+    }
+
+    fun createNewLayout(name: String): Int {
+        return spaceRepository.insertNewLayout(name)
     }
 }

@@ -24,8 +24,6 @@ class SpaceRepository : RepositoryBase() {
     fun insertSpace(space: CreateSpaceRequest, address: String): Boolean {
         return database.insert(SpacesModel) {
             set(it.address, address)
-            set(it.authorId, space.authorId)
-            set(it.jsonData, space.jsonData)
         } != 0
     }
 

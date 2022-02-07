@@ -1,7 +1,7 @@
 package com.idealIntent.managers.compositions
 
 import com.google.gson.Gson
-import com.idealIntent.dtos.compositions.banners.BannerBasic
+import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.repositories.compositions.banners.BasicBannerRepository
@@ -14,15 +14,15 @@ class CarouselManager(
     private val carouselOfImagesManager: CarouselOfImagesManager,
 ) {
 
-    fun insertComposition(request: IUserComposition, spaceAddress: String, userId: Int): Boolean {
+    fun insertComposition(request: IUserComposition, layoutId: Int, userId: Int): CompositionResponse {
         val gson = Gson()
         return when (request.compositionType) {
             // region Carousels
             CompositionCategory.Carousel -> {
                 // todo - accesses carouselCompositions.composition directly
                 return carouselOfImagesManager.createComposition(
-                    gson.fromJson(request.jsonData, CreateCarouselBasicImagesReq::class.java), userId
-                ) != null
+                    gson.fromJson(request.jsonData, CreateCarouselBasicImagesReq::class.java), layoutId, userId
+                )
             }
             // endregion
 
@@ -32,10 +32,12 @@ class CarouselManager(
             // endregion
 
             // region Banners
-            CompositionCategory.Banner ->
-                bannerRepository.createBannerBasic(
-                    gson.fromJson(request.jsonData, BannerBasic::class.java)
-                ) != null
+            CompositionCategory.Banner -> {
+                TODO()
+//                bannerRepository.createBannerBasic(
+//                    gson.fromJson(request.jsonData, BannerBasic::class.java)
+//                )
+            }
             // endregion
 
             // region Grids

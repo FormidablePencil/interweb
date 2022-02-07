@@ -1,5 +1,6 @@
 package com.idealIntent.repositories.compositions
 
+import com.idealIntent.models.compositionLayout.PrivilegedAuthorToSpacesModel
 import com.idealIntent.models.privileges.CompositionSourceToLayout
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
@@ -10,9 +11,10 @@ import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 
 class SpaceRepository(
-    val carouselOfImagesRepository: CarouselOfImagesRepository,
+    private val carouselOfImagesRepository: CarouselOfImagesRepository,
 ) : RepositoryBase() {
     private val space = carouselOfImagesRepository.space
+    private val prvAuth2Space = PrivilegedAuthorToSpacesModel.aliased("prvAuth2Space")
     private val layout2Space = carouselOfImagesRepository.layout2Space
     private val layout = carouselOfImagesRepository.layout
     private val compSource2Layout = carouselOfImagesRepository.compSource2Layout
@@ -30,12 +32,12 @@ class SpaceRepository(
     // region compositions
     // endregion
 
-
+    // region Get
     fun getSpaceLayoutPreviewOfCompositions(layoutId: Int, authorId: Int) {
     }
 
-    fun getSpaceLayoutOfCompositions(layoutId: Int, authorId: Int) {
-        val layoutMetadata = getLayoutMetadata(layoutId, authorId)
+    fun getSpaceLayoutOfCompositions(spaceAddress: String, authorId: Int) {
+        val layoutMetadata = getLayoutMetadata(spaceAddress, authorId)
         val composition = getCompositionsOfLayout(layoutMetadata)
     }
 
@@ -47,7 +49,7 @@ class SpaceRepository(
      * @return Pair(CompositionSourceToLayout, all [CompositionCategory] to search through, all [CompositionCategory] to search through)
      */
     private fun getLayoutMetadata(
-        layoutId: Int, authorId: Int
+        spaceAddress: String, authorId: Int
     ): Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>> {
         val listOfCompositionSourceToLayout = mutableListOf<CompositionSourceToLayout>()
 
@@ -55,7 +57,10 @@ class SpaceRepository(
         val allTypesOfCompositionsLayoutContains = mutableSetOf<Pair<CompositionCategory, Int>>()
         // endregion
 
-        database.from(layout)
+        database.from(space)
+            .leftJoinAuthor(authorId)
+            .leftJoin(layout2Space, layout2Space.spaceAddress eq space.address)
+            .leftJoin(layout, layout.id eq layout2Space.layoutId)
             .leftJoin(compSource2Layout, compSource2Layout.layoutId eq layout.id)
             .leftJoin(compSource, compSource.id eq compSource2Layout.sourceId)
             .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
@@ -64,7 +69,7 @@ class SpaceRepository(
                 compSource2Layout.sourceId,
                 compInstance2compSource.compositionCategory,
                 compInstance2compSource.compositionType,
-            ).where { layout.id eq layoutId }
+            ).where { space.address eq spaceAddress }
             .map {
                 allTypesOfCompositionsLayoutContains += Pair(
                     CompositionCategory.fromInt(it[compInstance2compSource.compositionCategory]!!),
@@ -191,4 +196,60 @@ class SpaceRepository(
             }
         }
     }
+
+//    fun getPublicSpace(address: String) {
+//        getSpace(address = address, authorId = null)
+//    }
+//
+//    fun getPrivateSpace(address: String, authorId: Int) {
+//        getSpace(address = address, authorId = authorId)
+//    }
+
+
+    private fun QuerySource.leftJoinAuthor(authorId: Int?): QuerySource {
+        if (authorId != null)
+            return leftJoin(prvAuth2Space, prvAuth2Space.authorId eq authorId)
+        return this
+    }
+    // endregion Get
+
+
+    // region Insert
+    /**
+     * Insert new layout
+     *
+     * @param name User defined space.
+     */
+    fun insertNewLayout(name: String): Int {
+        return database.insertAndGenerateKey(layout) {
+            set(layout.name, name)
+        } as Int
+    }
+
+    fun insertNewSpace(): String {
+        return database.insertAndGenerateKey(space) {} as String
+    }
+
+    fun associateCompositionToLayout(compositionSourceId: Int, layoutId: Int): Boolean {
+        return database.insert(compSource2Layout) {
+            set(compSource2Layout.layoutId, layoutId)
+            set(compSource2Layout.sourceId, compositionSourceId)
+        } == 1
+    }
+
+    fun associateLayoutToSpace(spaceAddress: String, layoutId: Int): Boolean {
+        return database.insert(layout2Space) {
+            set(layout2Space.spaceAddress, spaceAddress)
+            set(layout2Space.layoutId, layoutId)
+        } == 1
+    }
+
+    fun giveAuthorPrivilegesToPrivateSpace(spaceId: Int, authorId: Int): Boolean {
+        return database.insert(prvAuth2Space) {
+            set(prvAuth2Space.authorId, authorId)
+            set(prvAuth2Space.spaceId, spaceId)
+        } == 1
+    }
+
+    // endregion Insert
 }

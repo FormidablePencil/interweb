@@ -32,7 +32,7 @@ object DIHelper {
         // domain com.idealIntent.services
         single { AuthorsPortfolioService(get(), get()) }
         single { AuthorizationService(get(), get(), get(), get(), get(), get(), get()) }
-        single { CmsService(get()) }
+        single { CmsService(get(), get()) }
 
         // com.idealIntent.managers
         single { AuthorsPortfolioManager() }
@@ -41,7 +41,7 @@ object DIHelper {
         single { EmailManager(get(), get(), get()) }
         single { CompositionPrivilegesManager(get(), get(), get()) }
         single { CarouselsManager(get(), get()) }
-        single { CarouselOfImagesManager(get(), get(), get(), get(), get()) }
+        single { CarouselOfImagesManager(get(), get(), get(), get(), get(), get()) }
 
         // com.idealIntent.repositories
         single { AuthorRepository() }

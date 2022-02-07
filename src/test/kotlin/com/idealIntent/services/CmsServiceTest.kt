@@ -5,6 +5,7 @@ import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
+import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel.BasicImages
 import dtos.compositions.carousels.CompositionCarousel.values
@@ -18,9 +19,11 @@ import shared.testUtils.carouselBasicImagesReqStingified
 
 class CmsServiceTest : BehaviorSpec({
     val carouselsManager: CarouselsManager = mockk()
+    val spaceRepository: SpaceRepository = mockk()
+    val layoutId = 0
     val userId = 0
 
-    val componentManager = CmsService(carouselsManager)
+    val componentManager = CmsService(carouselsManager, spaceRepository)
 
     beforeEach {
         clearAllMocks()
@@ -36,7 +39,10 @@ class CmsServiceTest : BehaviorSpec({
                         val httpStatus = HttpStatusCode.Created
                         every {
                             carouselsManager.createCompositionOfCategory(
-                                BasicImages, carouselBasicImagesReqStingified, userId
+                                BasicImages,
+                                carouselBasicImagesReqStingified,
+                                layoutId,
+                                userId
                             )
                         } returns CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
                         // endregion setup
@@ -44,7 +50,10 @@ class CmsServiceTest : BehaviorSpec({
                         val res =
                             componentManager.createComposition(
                                 CompositionCategory.Carousel,
-                                BasicImages, carouselBasicImagesReqStingified, userId
+                                BasicImages,
+                                carouselBasicImagesReqStingified,
+                                layoutId,
+                                userId
                             )
 
                         res.isSuccess shouldBe true
@@ -56,7 +65,10 @@ class CmsServiceTest : BehaviorSpec({
                         // region setup
                         every {
                             carouselsManager.createCompositionOfCategory(
-                                BasicImages, carouselBasicImagesReqStingified, userId
+                                BasicImages,
+                                carouselBasicImagesReqStingified,
+                                layoutId,
+                                userId
                             )
                         } returns CompositionResponse().failed(CompositionCode.FailedToInsertRecord)
                         // endregion setup
@@ -64,7 +76,10 @@ class CmsServiceTest : BehaviorSpec({
                         val res =
                             componentManager.createComposition(
                                 CompositionCategory.Carousel,
-                                BasicImages, carouselBasicImagesReqStingified, userId)
+                                BasicImages,
+                                carouselBasicImagesReqStingified,
+                                layoutId, userId
+                            )
 
                         res.isSuccess shouldBe false
                         res.data shouldBe null

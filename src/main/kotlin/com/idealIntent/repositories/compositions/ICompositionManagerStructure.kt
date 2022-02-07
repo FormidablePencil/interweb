@@ -27,7 +27,11 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
      * @param authorId Id of user to validate that they are privileged.
      * @return CollectionId or null if failed.
      */
-    fun createComposition(createRequest: CreateRequest, authorId: Int): Response
+    fun createComposition(
+        createRequest: CreateRequest,
+        layoutId: Int,
+        authorId: Int
+    ): Response
     // endregion Insert
 
 

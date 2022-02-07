@@ -21,7 +21,7 @@ data class CompositionsGenericPrivileges(
 ) : ICompositionsGenericPrivileges
 
 class CompositionPrivilegesRepository() : RepositoryBase() {
-    private val Database.privilegeSource get() = this.sequenceOf(CompositionSourcesModel)
+    private val Database.compositionSource get() = this.sequenceOf(CompositionSourcesModel)
     private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionSourcesModel)
 
     // todo - validate privilege to record - collectionSource.sourceId -> privilegeSource.id -> composition_privileged_authors.authorId
@@ -70,7 +70,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
      *
      * @param privileges What kind of privileges, view mod, etc.
      */
-    fun giveAnAuthorPrivilege(privileges: CompositionsGenericPrivileges, sourceId: Int, authorId: Int) {
+    fun giveAnAuthorPrivilegeToComposition(privileges: CompositionsGenericPrivileges, sourceId: Int, authorId: Int) {
         database.insert(PrivilegedAuthorsToCompositionSourcesModel) {
             set(it.modify, privileges.modify)
             set(it.view, privileges.view)
@@ -86,7 +86,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
      * @param privilegeLevel level of privileges such as whether it is a viewable for everyone or private.
      * @return Id to privilege source.
      */
-    fun addPrivilegeSource(privilegeLevel: Int = 0): Int {
+    fun addCompositionSource(privilegeLevel: Int = 0): Int {
         return database.insertAndGenerateKey(CompositionSourcesModel) {
             set(it.privilegeLevel, privilegeLevel)
         } as Int

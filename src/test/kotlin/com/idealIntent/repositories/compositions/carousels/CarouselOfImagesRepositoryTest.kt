@@ -3,6 +3,7 @@ package com.idealIntent.repositories.compositions.carousels
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
+import com.idealIntent.repositories.compositions.SpaceRepository
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.failure
@@ -22,6 +23,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
     private val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
     private val carouselOfImagesManager: CarouselOfImagesManager by inject()
+    private val spaceRepository: SpaceRepository by inject()
     private val signupFlow: SignupFlow by inject()
 
     private val createCarouselBasicImagesReq =
@@ -30,7 +32,8 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
     private suspend fun createCompositionAndGetId(): Int {
         val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
-        val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, authorId)
+        val layoutId = spaceRepository.insertNewLayout(name = "That was lagitness")
+        val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, layoutId, authorId)
         res.isSuccess shouldBe true
         res.data ?: throw failure("failed to return composition id at setup")
         return res.data!!

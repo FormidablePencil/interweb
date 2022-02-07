@@ -202,7 +202,7 @@ class CarouselOfImagesRepository(
 
 
         return idAndNameOfCompositions.map { idAndNameOfComposition ->
-            val (compId, privilegeSourceId, name) = idAndNameOfComposition
+            val (compId, sourceId, name) = idAndNameOfComposition
 
             val compImages = mutableListOf<ImagePK>()
             images.forEach { if (it.first == compId) compImages.add(it.second) }
@@ -216,7 +216,7 @@ class CarouselOfImagesRepository(
 
             return@map CarouselBasicImagesRes(
                 id = compId,
-                privilegeSourceId = privilegeSourceId,
+                sourceId = sourceId,
                 name = name,
                 images = compImages,
                 imgOnclickRedirects = compRedirects,
@@ -274,6 +274,7 @@ class CarouselOfImagesRepository(
      * @param composePrepared
      * @return
      */
+    // todo - no need to return Int if compositionSourceId is returned instead I believe
     override fun compose(composePrepared: CarouselOfImagesComposePrepared): Int? {
         val compositionId = database.insertAndGenerateKey(ImagesCarouselsModel) {
             set(it.name, composePrepared.name)

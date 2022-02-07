@@ -15,6 +15,7 @@ import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepo
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionManagerStructure
+import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.carousels.CarouselOfImagesTABLE
@@ -28,6 +29,7 @@ class CarouselOfImagesManager(
     private val imageRepository: ImageRepository,
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
+    private val spaceRepository: SpaceRepository,
 ) : ICompositionManagerStructure<CreateCarouselBasicImagesReq, IImagesCarouselEntity,
         CreateCarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
     val appEnv: AppEnv by inject()
@@ -42,6 +44,7 @@ class CarouselOfImagesManager(
     // endregion Get
 
     // region Insert
+
     /**
      * Insert images and redirection texts, create a collection for each, create an association between image and
      * assign privileges compositions to specified authors. If either looking up author by id or assigning privileges to
@@ -52,28 +55,38 @@ class CarouselOfImagesManager(
      * @see ICompositionManagerStructure.createComposition
      * @return Response of id of the newly created composition or failed response of [FailedToFindAuthorByUsername].
      */
-    override fun createComposition(createRequest: CreateCarouselBasicImagesReq, authorId: Int): CompositionResponse {
+    override fun createComposition(
+        createRequest: CreateCarouselBasicImagesReq,
+        layoutId: Int,
+        authorId: Int
+    ): CompositionResponse {
         try {
             appEnv.database.useTransaction {
                 val imageCollectionId = imageRepository.batchInsertRecordsToNewCollection(createRequest.images)
                 val redirectsCollectionId =
                     textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
-                val privilegeSourceId = compositionPrivilegesManager.createPrivileges(authorId)
-                compositionPrivilegesManager.giveMultipleAuthorsPrivilegesByUsername(
-                    createRequest.privilegedAuthors, privilegeSourceId, authorId
+                val compositionSourceId = compositionPrivilegesManager.createCompositionSource(authorId)
+
+                // todo wrap in a try catch and response to user that layout by id does not exist
+                spaceRepository.associateCompositionToLayout(
+                    compositionSourceId = compositionSourceId, layoutId = layoutId
                 )
 
-                val compositionId = carouselOfImagesRepository.compose(
+                carouselOfImagesRepository.compose(
                     CarouselOfImagesComposePrepared(
                         name = createRequest.name,
                         imageCollectionId = imageCollectionId,
                         redirectTextCollectionId = redirectsCollectionId,
-                        sourceId = privilegeSourceId,
+                        sourceId = compositionSourceId,
                     )
                 ) ?: throw CompositionExceptionReport(FailedToCompose, this::class.java)
 
-                return CompositionResponse().succeeded(HttpStatusCode.Created, compositionId)
+                compositionPrivilegesManager.giveMultipleAuthorsPrivilegesToCompositionByUsername(
+                    createRequest.privilegedAuthors, compositionSourceId, authorId
+                )
+
+                return CompositionResponse().succeeded(HttpStatusCode.Created, compositionSourceId)
             }
         } catch (ex: CompositionException) {
             when (ex.code) {
