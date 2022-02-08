@@ -23,7 +23,7 @@ class CmsServiceTest : BehaviorSpec({
     val layoutId = 0
     val userId = 0
 
-    val componentManager = CmsService(carouselsManager, spaceRepository)
+    val componentManager = CompositionService(carouselsManager, spaceRepository)
 
     beforeEach {
         clearAllMocks()

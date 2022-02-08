@@ -1,7 +1,7 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
-import com.idealIntent.services.CmsService
+import com.idealIntent.services.CompositionService
 import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
 import org.koin.core.component.inject
@@ -12,7 +12,7 @@ class SpaceRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(listOf(DIHelper.CoreModule, DITestHelper.FlowModule)))
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
     private val spaceRepository: SpaceRepository by inject()
-    private val cmsService: CmsService by inject()
+    private val cmsService: CompositionService by inject()
 
     init {
         given("getSpaceLayoutOfCompositions") {

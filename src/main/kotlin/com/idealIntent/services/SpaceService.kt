@@ -66,6 +66,8 @@ import io.ktor.http.*
 // primaryId: _, id 100, model_address: "ER334K3KJ43NLO", memory: "...", processor: "..."
 // primaryId: _, id 653, model_address: "ER334K3KJ43NLO", memory: "...", processor: "..." (correct)
 
+// todo - delete. Use CompositionService instead
+
 class SpaceService(
     private val spaceRepository: SpaceRepository,
 ) {

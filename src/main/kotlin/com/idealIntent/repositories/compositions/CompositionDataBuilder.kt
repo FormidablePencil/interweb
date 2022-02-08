@@ -1,17 +1,17 @@
 package com.idealIntent.repositories.compositions
 
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesData
+import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesDataMapped
 
-class CompositionBuilder {
+class CompositionDataBuilder {
     var isCarouselOfImagesData: Boolean = false
-    var carouselOfImagesData = CarouselOfImagesData()
+    var carouselOfImagesData = CarouselOfImagesDataMapped()
         get() {
             isCarouselOfImagesData = true
             return field
         }
 
     var isCarouselOfImagesData2: Boolean = false
-    var carouselOfImagesData2 = CarouselOfImagesData()
+    var carouselOfImagesData2 = CarouselOfImagesDataMapped()
         get() {
             isCarouselOfImagesData2 = true
             return field

@@ -17,7 +17,7 @@ import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
 import com.idealIntent.services.AuthorizationService
 import com.idealIntent.services.AuthorsPortfolioService
-import com.idealIntent.services.CmsService
+import com.idealIntent.services.CompositionService
 import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
 import org.apache.commons.mail.SimpleEmail
@@ -33,7 +33,7 @@ object DIHelper {
         // domain com.idealIntent.services
         single { AuthorsPortfolioService(get(), get()) }
         single { AuthorizationService(get(), get(), get(), get(), get(), get(), get()) }
-        single { CmsService(get(), get()) }
+        single { CompositionService(get(), get()) }
 
         // com.idealIntent.managers
         single { AuthorsPortfolioManager() }

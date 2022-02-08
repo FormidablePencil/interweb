@@ -7,7 +7,7 @@ import com.idealIntent.dtos.compositionCRUD.SingleUpdateCompositionRequest
 import com.idealIntent.dtos.compositionCRUD.UpdateCompositionRequest
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
-import com.idealIntent.repositories.compositions.CompositionBuilder
+import com.idealIntent.repositories.compositions.CompositionDataBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel
@@ -17,12 +17,12 @@ import dtos.space.IUserComposition
  * Cms service.
  *
  * There are 5 levels of depth to composition logic.
- * [cms server][CmsService],
+ * [cms server][CompositionService],
  * [composition of category manager][com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure],
  * [composition of category repository][com.idealIntent.repositories.compositions.ICompositionRepositoryStructure],
  * [collection repositories][com.idealIntent.repositories.collections.ICollectionStructure].
  */
-class CmsService(
+class CompositionService(
     private val carouselsManager: CarouselsManager,
     private val spaceRepository: SpaceRepository,
 ) {
@@ -36,9 +36,10 @@ class CmsService(
         // spaces table should hold a collection of all components, id of components and what component (whatComponent: Enum(value: Int))
     }
 
-    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionBuilder {
-        return spaceRepository.getPrivateLayoutOfCompositions(layoutId, authorId)
-    }
+    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder = spaceRepository.getPublicLayoutOfCompositions(layoutId)
+
+    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionDataBuilder =
+        spaceRepository.getPrivateLayoutOfCompositions(layoutId, authorId)
 
 
     /**
@@ -57,6 +58,8 @@ class CmsService(
         layoutId: Int,
         userId: Int
     ): CompositionResponse {
+        // todo validate that userId has privileges to layoutId
+
         return when (compositionCategory) {
             CompositionCategory.Text -> TODO()
             CompositionCategory.Markdown -> TODO()

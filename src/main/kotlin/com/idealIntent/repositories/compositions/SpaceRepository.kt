@@ -5,10 +5,8 @@ import com.idealIntent.models.privileges.CompositionSourceToLayout
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.CompositionCategory
-import dtos.compositions.carousels.CompositionCarousel
 import org.ktorm.dsl.*
 import org.ktorm.schema.Column
-import org.ktorm.schema.ColumnDeclaring
 
 class SpaceRepository(
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
@@ -29,15 +27,12 @@ class SpaceRepository(
     private val text = carouselOfImagesRepository.text
     private val author = carouselOfImagesRepository.author
 
-    // region compositions
-    // endregion
-
-    // region Get
-    fun getPublicLayoutOfCompositions(layoutId: Int) {
+    // space and layout
+    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder {
         TODO()
     }
 
-    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionBuilder {
+    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionDataBuilder {
         val layoutMetadata = getLayoutMetadata(
             spaceAddress = null,
             layoutId = layoutId,
@@ -58,24 +53,30 @@ class SpaceRepository(
         val composition = getCompositionsOfLayout(layoutMetadata)
     }
 
-
-    fun fromSpace(): QuerySource {
+    /**
+     * This is used to build queries with. Query from space.
+     */
+    fun queryFromSpace(): QuerySource {
         return database.from(space)
             .leftJoin(layout2Space, layout2Space.spaceAddress eq space.address)
             .leftJoin(layout, layout.id eq layout2Space.layoutId)
     }
 
+    /**
+     * This is used to build queries with. Query from layout.
+     */
     fun fromLayout(): QuerySource {
         return database.from(layout)
     }
 
 
     /**
-     * Get layout metadata
+     * Query all ids of compositions in layout and category and type of composition.
      *
-     * @param layoutId
-     * @param authorId
-     * @return Pair(CompositionSourceToLayout, all [CompositionCategory] to search through, all [CompositionCategory] to search through)
+     * @param spaceAddress Query all compositions of the layout associated to the space with the [spaceAddress] provided.
+     * @param layoutId Query all compositions of layout with id of [layoutId].
+     * @param authorId Provide authorId for private layouts.
+     * @return CompositionSourceToLayout, all [CompositionCategory ] to query through)
      */
     private fun getLayoutMetadata(
         spaceAddress: String?, layoutId: Int?, authorId: Int
@@ -87,7 +88,7 @@ class SpaceRepository(
         // endregion
 //        database.from(layout)
 
-        val query: QuerySource = if (spaceAddress != null) fromSpace()
+        val query: QuerySource = if (spaceAddress != null) queryFromSpace()
         else if (layoutId != null) fromLayout()
         else throw Exception("space nor layoutId was provided")
 
@@ -132,15 +133,15 @@ class SpaceRepository(
      */
     private fun getCompositionsOfLayout(
         layoutMetadata: Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>>
-    ): CompositionBuilder {
+    ): CompositionDataBuilder {
         val (compositionSourceToLayout, compCategoryAndType) = layoutMetadata
         val select = mutableSetOf<Column<out Any>>()
-        val compositionBuilder = CompositionBuilder()
+        val compositionBuilder = CompositionDataBuilder()
 
-        select += carouselOfImagesRepository.selectCarouselOfImages
+        select += carouselOfImagesRepository.compositionSelect
 
         database.from(compSource)
-            .compositionsSelectAndLeftJoinBuilder(compCategoryAndType)
+            .compositionsLeftJoinBuilder(compCategoryAndType)
             .select(select)
             .whereWithConditions {
                 compositionSourceToLayout.forEach { item -> it += compSource.id eq item.sourceId }
@@ -154,96 +155,7 @@ class SpaceRepository(
     }
 
 
-    /**
-     * Compositions query builder.
-     *
-     * Figures out what composition tables to query based on what is used in the layout which [compCategoryAndType] is
-     * the list of all compositions that are used.
-     *
-     * @param select
-     * @param query
-     * @param compCategoryAndType
-     * @return
-     */
-    private fun QuerySource.compositionsSelectAndLeftJoinBuilder(
-        compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
-    ): QuerySource {
-        var res: QuerySource? = null
-        compCategoryAndType.forEach {
-            when (it.first) {
-                CompositionCategory.Carousel -> {
-                    when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
-                        CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages -> {
-                            res = carouselOfImagesRepository.leftJoinCarouselBasicImages(this)
-                        }
-                    }
-//                kcarouselOfImagesRepository.selectCarouselOfImages
-                }
-                CompositionCategory.Text -> TODO()
-                CompositionCategory.Markdown -> TODO()
-                CompositionCategory.Banner -> TODO()
-                CompositionCategory.OneOffGrid -> TODO()
-                CompositionCategory.Divider -> TODO()
-                CompositionCategory.LineDivider -> TODO()
-            }
-        }
-        return res ?: this
-    }
 
-    private fun compositionWhereClauseBuilder(
-        mutableList: MutableList<ColumnDeclaring<Boolean>>,
-        compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
-    ) {
-        compCategoryAndType.forEach {
-            when (it.first) {
-                CompositionCategory.Carousel -> {
-                    when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
-                        CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages ->
-                            carouselOfImagesRepository.whereClauseCarouselOfImages(mutableList)
-                    }
-//                kcarouselOfImagesRepository.selectCarouselOfImages
-                }
-                CompositionCategory.Text -> TODO()
-                CompositionCategory.Markdown -> TODO()
-                CompositionCategory.Banner -> TODO()
-                CompositionCategory.OneOffGrid -> TODO()
-                CompositionCategory.Divider -> TODO()
-                CompositionCategory.LineDivider -> TODO()
-            }
-        }
-    }
-
-    private fun compositionMapBuilder(
-        queryRowSet: QueryRowSet,
-        compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
-        compositionBuilder: CompositionBuilder,
-    ) {
-        compCategoryAndType.forEach {
-            when (it.first) {
-                CompositionCategory.Carousel -> {
-                    when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
-                        CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages ->
-                            carouselOfImagesRepository.mapClauseBuilderCarouselOfImages(
-                                queryRowSet,
-                                compositionBuilder.carouselOfImagesData
-                            )
-                    }
-                }
-                CompositionCategory.Text -> TODO()
-                CompositionCategory.Markdown -> TODO()
-                CompositionCategory.Banner -> TODO()
-                CompositionCategory.OneOffGrid -> TODO()
-                CompositionCategory.Divider -> TODO()
-                CompositionCategory.LineDivider -> TODO()
-            }
-        }
-    }
 
 //    fun getPublicSpace(address: String) {
 //        getSpace(address = address, authorId = null)

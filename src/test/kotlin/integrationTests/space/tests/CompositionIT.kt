@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
-import com.idealIntent.services.CmsService
+import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel
 import integrationTests.auth.flows.SignupFlow
@@ -18,7 +18,7 @@ import shared.testUtils.texts
 
 class CompositionIT : BehaviorSpecIT({
     val signupFlow: SignupFlow by inject()
-    val cmsService: CmsService by inject()
+    val cmsService: CompositionService by inject()
     val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
     val gson = Gson()
 
