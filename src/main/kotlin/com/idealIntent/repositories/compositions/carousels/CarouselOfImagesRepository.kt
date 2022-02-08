@@ -4,6 +4,9 @@ import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+import com.idealIntent.dtos.compositions.carousels.ImagesCarouselTopLvlIds
+import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.models.compositionLayout.CompositionLayoutsModel
 import com.idealIntent.models.compositionLayout.CompositionSourceToLayoutsModel
 import com.idealIntent.models.compositionLayout.LayoutToSpacesModel
@@ -21,6 +24,7 @@ import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel
 import models.profile.AuthorsModel
@@ -45,22 +49,23 @@ data class CarouselOfImagesComposePrepared(
 class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
+    private val spaceRepository: SpaceRepository,
     // todo replace Image
 ) : RepositoryBase(), ICompositionRepositoryStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
         CarouselBasicImagesRes, CarouselOfImagesComposePrepared, CarouselOfImagesDataMapped> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
 
-    val space = SpacesModel.aliased("space")
-    val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
-    val layout = CompositionLayoutsModel.aliased("layout")
-    val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
-    val compSource = CompositionSourcesModel.aliased("compSource")
+    private val space = SpacesModel.aliased("space")
+    private val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
+    private val layout = CompositionLayoutsModel.aliased("layout")
+    private val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
+    private val compSource = CompositionSourcesModel.aliased("compSource")
 
     // region composition
-    val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
-    val compInstance = ImagesCarouselsModel.aliased("compInstance")
+    private val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
+    private val compInstance = ImagesCarouselsModel.aliased("compInstance")
 
-    val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
+    private val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
     // endregion
 
 
@@ -74,7 +79,7 @@ class CarouselOfImagesRepository(
 
 
     // region Composition query instructions
-    override val compositionSelect = listOf<Column<out Any>>(
+    override val compositionSelect = mutableListOf<Column<out Any>>(
         compSource.name, compSource.id,
         compInstance.id,
         compInstance2compSource.sourceId,
@@ -82,6 +87,14 @@ class CarouselOfImagesRepository(
         text2Col.orderRank, text.id, text.text,
         prvAth2CompSource.modify, prvAth2CompSource.view,
         author.username
+    )
+
+    override val compositionOnlyIdsSelect = mutableListOf<Column<out Any>>(
+        compSource.name, compSource.id,
+        compInstance2compSource.compositionId,
+        compInstance2compSource.sourceId,
+        prvAth2CompSource.sourceId, prvAth2CompSource.authorId,
+        img.id, text.id,
     )
 
     override fun compositionLeftJoin(querySource: QuerySource): QuerySource {
@@ -97,6 +110,14 @@ class CarouselOfImagesRepository(
 
             .leftJoin(text2Col, text2Col.collectionId eq compInstance.redirectTextCollectionId)
             .leftJoin(text, text.id eq text2Col.textId)
+    }
+
+    override fun compositionOnlyIdsLeftJoin(querySource: QuerySource): QuerySource {
+        return querySource
+            .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
+            .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
+            .leftJoin(img2Col, img2Col.collectionId eq compInstance.imageCollectionId)
+            .leftJoin(text2Col, text2Col.collectionId eq compInstance.redirectTextCollectionId)
     }
 
     override fun compositionWhereClause(mutableList: MutableList<ColumnDeclaring<Boolean>>) {
@@ -155,22 +176,26 @@ class CarouselOfImagesRepository(
 
     // region Get compositions
     override fun getPublicComposition(compositionSourceId: Int) =
-        getCompositionsQuery(restricted = false, authorId = null, compositionSourceId = compositionSourceId).first()
+        getCompositionsQuery(
+            restricted = false,
+            authorId = null,
+            compositionSourceId = compositionSourceId
+        )?.first()
 
     override fun getPrivateComposition(compositionSourceId: Int, authorId: Int) =
-        getCompositionsQuery(restricted = true, authorId = authorId, compositionSourceId = compositionSourceId).first()
+        getCompositionsQuery(
+            restricted = true,
+            authorId = authorId,
+            compositionSourceId = compositionSourceId
+        )?.first()
+
 
     private fun getCompositionsQuery(
         restricted: Boolean, authorId: Int?, compositionSourceId: Int,
-    ): List<CarouselBasicImagesRes> {
-        val idAndNameOfCompositions = mutableSetOf<Triple<Int, Int, String>>()
-        val images = mutableListOf<Pair<Int, ImagePK>>()
-        val imgOnclickRedirects = mutableListOf<Pair<Int, TextPK>>()
-        val privilegedAuthors = mutableListOf<Pair<Int, PrivilegedAuthor>>()
-
+    ): List<CarouselBasicImagesRes>? {
         val dto = CarouselOfImagesDataMapped()
 
-        database.from(compSource)
+        compositionLeftJoin(database.from(compSource))
             .select(compositionSelect)
             .whereWithConditions {
                 it += (img2Col.orderRank eq text2Col.orderRank)
@@ -180,10 +205,47 @@ class CarouselOfImagesRepository(
                     it += (prvAth2CompSource.authorId eq authorIdRes)
                 }
             }.map { compositionQueryMap(it, dto) }
-        return dto.get()
+
+        return dto.get().ifEmpty { null }
+    }
+
+    fun getOnlyTopLvlIdsOfCompositionOnlyModifiable(onlyModifiable: Boolean, compositionSourceId: Int, authorId: Int) =
+        getOnlyTopLvlIdsOfCompositionQuery(onlyModifiable, compositionSourceId, authorId)
+
+    private fun getOnlyTopLvlIdsOfCompositionQuery(
+        onlyModifiable: Boolean,
+        compositionSourceId: Int,
+        authorId: Int
+    ): ImagesCarouselTopLvlIds? {
+        val dto = CarouselOfImagesDataMapped()
+        var imageCollectionId: Int? = null
+        var textCollectionId: Int? = null
+
+        return compositionOnlyIdsLeftJoin(database.from(compSource))
+            .select(compositionOnlyIdsSelect)
+            .whereWithConditions {
+                (compSource.id eq compositionSourceId) and (text2Col.orderRank eq img2Col.orderRank)
+                it += (prvAth2CompSource.authorId eq authorId)
+                if (onlyModifiable)
+                    it += (prvAth2CompSource.modify eq 1)
+            }
+            .map {
+                compositionQueryMap(it, dto)
+                ImagesCarouselTopLvlIds(
+                    id = it[compInstance.id]!!,
+                    sourceId = it[compSource.id]!!,
+                    name = it[compSource.name]!!,
+                    imageCollectionId = it[img2Col.collectionId]!!,
+                    redirectTextCollectionId = it[text2Col.collectionId]!!
+                )
+            }.ifEmpty { null }?.first()
     }
     // endregion
 
+
+    override fun getMetadataOfComposition(id: Int): IImagesCarouselEntity? {
+        TODO("Not yet implemented")
+    }
 
     /**
      * Composes composition by saving ids as one record. Then associating newly created composition
@@ -209,11 +271,42 @@ class CarouselOfImagesRepository(
         return compositionId
     }
 
-    override fun getMetadataOfComposition(id: Int): IImagesCarouselEntity? {
-        TODO("Not yet implemented")
-    }
 
     override fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean {
-        TODO("Not yet implemented")
+        database.useTransaction {
+
+            val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionQuery(
+                true,
+                compositionSourceId = compositionSourceId,
+                authorId = authorId
+            ) ?: throw CompositionException(CompositionCode.CompositionNotFound)
+
+            // region deletion
+            imageRepository.deleteAllRecordsInCollection(imageCollectionId)
+            textRepository.deleteAllRecordsInCollection(redirectTextCollectionId)
+
+            // todo delete items of collections by calling their respective repositories
+
+//            database.delete(ImagesCarouselsModel) { item -> item.id eq it.id }
+//
+//            dto.imgOnclickRedirects.forEach { record ->
+//                textRepository.deleteTextRecords(record.id)
+//            }
+//
+//            dto.images.forEach { record ->
+//                deleteCollectionsUtil.deleteImageRecords(record.id)
+//            }
+//
+//            dto.privilegedAuthors.forEach { record ->
+//                if (record.username.isEmpty()) return@forEach
+//                val authorId = authorRepository.getByUsername(record.username)?.id
+//                    ?: throw Exception("Did not find author by username of ${record.username}")
+//
+//                deleteCollectionsUtil.deletePrivilegedAuthors(authorId)
+//            }
+//            database.delete(CompositionSourcesModel) { record -> record.id eq record.privilegeLevel }
+            // endregion
+        }
+        return false
     }
 }

@@ -5,6 +5,7 @@ import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
+import com.idealIntent.models.compositions.carousels.IImagesCarousel
 import dtos.compositions.carousels.ICarouselBasicImages
 import kotlinx.serialization.Serializable
 import models.IWithPK
@@ -38,9 +39,19 @@ data class CarouselBasicImagesRes(
     override val name: String,
     override val images: List<ImagePK>,
     override val imgOnclickRedirects: List<TextPK>,
+
     override val privilegedAuthors: List<PrivilegedAuthor>,
 //    val clickable: boolean,
 ) : ICarouselBasicImages, IWithPK, IWithPrivilegeSourcePK
+
+// used for query purposes. todo - may need to move
+data class ImagesCarouselTopLvlIds(
+    val sourceId: Int,
+    override val id: Int, // todo - rename to collectionId
+    override val name: String,
+    override val imageCollectionId: Int,
+    override val redirectTextCollectionId: Int
+) : IImagesCarousel
 
 //data class CarouselItem( // todo - delete
 //    val name: String,

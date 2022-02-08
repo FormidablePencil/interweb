@@ -19,6 +19,13 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
     val compositionSelect: List<Column<out Any>>
 
     /**
+     * Composition select statement of only ids.
+     *
+     * @see compositionSelect
+     */
+    val compositionOnlyIdsSelect: MutableList<Column<out Any>>
+
+    /**
      * Left join all related records of composition.
      *
      * Left joins all tables that compose a composition of category and type. For instance, if a composition is a basic image carousel,
@@ -35,6 +42,13 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @return The appended left join statements for querying records of composition.
      */
     fun compositionLeftJoin(querySource: QuerySource): QuerySource
+
+    /**
+     * Left join all related ids of records composed of composition.
+     *
+     * @see compositionLeftJoin
+     */
+    fun compositionOnlyIdsLeftJoin(querySource: QuerySource): QuerySource
 
     /**
      * Composition's where clause for to query its records properly.
@@ -67,7 +81,7 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param compositionSourceId Id of composition source.
      * @return Composition
      */
-    fun getPublicComposition(compositionSourceId: Int): ResponseOfComposition
+    fun getPublicComposition(compositionSourceId: Int): ResponseOfComposition?
 
     /**
      * Get private composition
@@ -76,7 +90,15 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param authorId Validate that author is privileged to view composition.
      * @return Composition
      */
-    fun getPrivateComposition(compositionSourceId: Int, authorId: Int): ResponseOfComposition
+    fun getPrivateComposition(compositionSourceId: Int, authorId: Int): ResponseOfComposition?
+
+    /**
+     * Get composition for modification
+     *
+     * @param compositionSourceId Id of composition source.
+     * @param authorId Validate that author is privileged to modify.
+     * @return Composition
+     */
     // endregion
 
 

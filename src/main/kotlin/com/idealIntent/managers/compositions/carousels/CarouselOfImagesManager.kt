@@ -1,5 +1,6 @@
 package com.idealIntent.managers.compositions.carousels
 
+import com.google.gson.Gson
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
@@ -133,7 +134,7 @@ class CarouselOfImagesManager(
     fun update(componentId: Int, column: CarouselOfImagesTABLE, updateToData: RecordUpdate) {
         TODO()
 //        when (column) {
-//            CarouselOfImagesTABLE.Images ->
+//        CarouselOfImagesTABLEOfImagesTABLE.Images ->
 //                imageRepository.updateRecord(updateToData,, componentId)
 //            CarouselOfImagesTABLE.NavTos ->
 //                textRepository.updateRecord(updateToData,, componentId)
@@ -141,6 +142,62 @@ class CarouselOfImagesManager(
 //                compositionPrivilegesRepository.updateRecord(updateToData,, componentId)
 //        }
     }
+
+    /**
+     * Update composition
+     *
+     * First validate that the author is privileged to update a composition of source id provided. Then transforms provided
+     * value from json to a type object corresponding to [UpdateCarouselOfImages]. Validate that the id of
+     * item to update to is of the id of the composition source provided. Then update property of composition.
+     *
+     * @param compositionUpdateQue Id of composition source of composition to do an update on, what to update and
+     * the value to update to.
+     * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound]
+     */
+    fun updateComposition(
+        compositionUpdateQue: List<Pair<UpdateCarouselOfImages, RecordUpdate>>,
+        compositionSourceId: Int,
+        authorId: Int
+    ) {
+        with(carouselOfImagesRepository) {
+            val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionOnlyModifiable(
+                onlyModifiable = true,
+                compositionSourceId = compositionSourceId,
+                authorId = authorId
+            ) ?: throw CompositionException(ModifyPermittedToAuthorOfCompositionNotFound)
+            val gson = Gson()
+
+            compositionUpdateQue.forEach {
+                val record = it.second
+
+                when (it.first) {
+                    UpdateCarouselOfImages.Image -> {
+                        if (!imageRepository.validateRecordToCollectionRelationship(record.recordId, imageCollectionId))
+                            throw CompositionException(
+                                IdOfRecordProvidedNotOfComposition,
+                                gson.toJson("Image id ${record.recordId}")
+                            )
+                        else imageRepository.updateRecord(record, imageCollectionId)
+                    }
+                    UpdateCarouselOfImages.RedirectText -> {
+                        if (!textRepository.validateRecordToCollectionRelationship(record.recordId, imageCollectionId))
+                            throw CompositionException(
+                                IdOfRecordProvidedNotOfComposition,
+                                gson.toJson("Text id ${record.recordId}")
+                            )
+                        else textRepository.updateRecord(record, imageCollectionId)
+                    }
+                    UpdateCarouselOfImages.PrivilegedAuthor ->
+                        TODO("CompositionPrivilegesRepository.update")
+
+                    UpdateCarouselOfImages.CompositionName ->
+                        TODO()
+                }
+            }
+        }
+    }
+
+    // region Validate id of composition property to be of composition
 
 
     fun insertCompositions(components: List<CreateCarouselBasicImagesReq>, label: String): Int? {
@@ -159,4 +216,15 @@ class CarouselOfImagesManager(
         TODO("Not yet implemented")
     }
     // endregion
+}
+
+enum class UpdateCarouselOfImages(val value: Int) {
+    Image(0),
+    RedirectText(1),
+    PrivilegedAuthor(2),
+    CompositionName(3);
+
+    companion object {
+        fun fromInt(value: Int) = CarouselOfImagesTABLE.values().first { it.value == value }
+    }
 }

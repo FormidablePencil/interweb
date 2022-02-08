@@ -5,13 +5,20 @@ import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel
 import org.ktorm.dsl.QueryRowSet
 import org.ktorm.dsl.QuerySource
+import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 
 class CompositionQueryBuilder(
-    val carouselOfImagesRepository: CarouselOfImagesRepository,
+    private val carouselOfImagesRepository: CarouselOfImagesRepository,
 ) {
-
     // region query builder
+    // todo comment
+    fun compositionSelect(): MutableSet<Column<out Any>> {
+        val select = mutableSetOf<Column<out Any>>()
+        select += carouselOfImagesRepository.compositionSelect
+        return select
+    }
+
     /**
      * Left joins compositions of category and type.
      *
@@ -24,10 +31,10 @@ class CompositionQueryBuilder(
      *
      * @param compCategoryAndType Set of all types of compositions to join it related records to.
      */
-    private fun QuerySource.compositionsLeftJoinBuilder(
-        compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
+    fun compositionsLeftJoinBuilder(
+        querySource: QuerySource, compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
     ): QuerySource {
-        var res: QuerySource? = null
+        var res: QuerySource = querySource
         compCategoryAndType.forEach {
             when (it.first) {
                 CompositionCategory.Carousel -> {
@@ -35,7 +42,7 @@ class CompositionQueryBuilder(
                         CompositionCarousel.CarouselBlurredOverlay -> TODO()
                         CompositionCarousel.CarouselMagnifying -> TODO()
                         CompositionCarousel.BasicImages -> {
-                            res = carouselOfImagesRepository.compositionLeftJoin(this)
+                            res = carouselOfImagesRepository.compositionLeftJoin(querySource)
                         }
                     }
                 }
@@ -47,7 +54,7 @@ class CompositionQueryBuilder(
                 CompositionCategory.LineDivider -> TODO()
             }
         }
-        return res ?: this
+        return res
     }
 
     /**
@@ -61,7 +68,7 @@ class CompositionQueryBuilder(
      * @param mutableList The list of where statements which will be processed to sql queries by ktorm.
      * @param compCategoryAndType
      */
-    private fun compositionWhereClauseBuilder(
+    fun compositionWhereClauseBuilder(
         mutableList: MutableList<ColumnDeclaring<Boolean>>,
         compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
     ) {
@@ -85,7 +92,7 @@ class CompositionQueryBuilder(
         }
     }
 
-    private fun compositionMapBuilder(
+    fun compositionMapBuilder(
         queryRowSet: QueryRowSet,
         compCategoryAndType: Set<Pair<CompositionCategory, Int>>,
         compositionBuilder: CompositionDataBuilder,

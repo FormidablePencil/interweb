@@ -122,14 +122,36 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
 
 
     // region Update
+
     /**
-     * Update record
+     * Update record. Check mod privileges before using this method. Such as ... todo
      *
-     * @param collectionId ID to identify under what collection [record] is under
-     * @param record Update to
-     * @return Success or fail in updating [record]
+     * Method used in conjunctions with others. Not meant be used standalone but for testing purposes.
+     *
+     * @param record Record to update to and id of the record to do the update to.
+     * @param collectionId If order rank needs to be updated,
+     *
+     * @throws CompositionException [ FailedToAddRecordToCompositionValidator][CompositionCode.FailedToAddRecordToCompositionValidator] from [convertToInt]
      */
-    fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean
+    fun updateRecord(record: RecordUpdate, collectionId: Int)
+
+    /**
+     * Convert to int.
+     *
+     * Reusable piece of to convert a value to integer and if fails throw.
+     *
+     * @param value Value to convert into Int.
+     * @return Converted value of String to Int.
+     *
+     * @throws CompositionException [ FailedToConvertToIntOrderRank][CompositionCode.FailedToConvertToIntOrderRank]
+     */
+    fun convertToInt(value: String): Int {
+        try {
+            return value.toInt()
+        } catch (ex: Exception) {
+            throw CompositionException(CompositionCode.FailedToConvertToIntOrderRank)
+        }
+    }
 
     /**
      * Batch update records

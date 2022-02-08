@@ -22,7 +22,7 @@ class CarouselsManagerTest : BehaviorSpec({
     val carouselOfImagesManager: CarouselOfImagesManager = mockk()
     val carouselOfImagesRepository: CarouselOfImagesRepository = mockk()
     val layoutId = 543
-    val compositionId = 1
+    val compositionSourceId = 1
     val authorId = 1
     val gson = Gson()
 
@@ -39,24 +39,28 @@ class CarouselsManagerTest : BehaviorSpec({
 
                     then("provided id of composition that does NOT exist") {
                         every {
-                            carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(
-                                compositionId,
-                                authorId
+                            carouselOfImagesRepository.getPrivateComposition(
+                                compositionSourceId = compositionSourceId,
+                                authorId = authorId
                             )
-                        } returns listOf()
+                        } returns carouselBasicImagesRes
 
-                        carouselsManager.getComposition(it, compositionId, authorId) shouldBe null
+                        carouselsManager.getPrivateComposition(it, compositionSourceId, authorId) shouldBe null
                     }
 
                     then("success") {
                         every {
-                            carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(
-                                compositionId,
-                                authorId
+                            carouselOfImagesRepository.getPrivateComposition(
+                                compositionSourceId = compositionSourceId,
+                                authorId = authorId
                             )
-                        } returns listOf()
+                        } returns carouselBasicImagesRes
 
-                        carouselsManager.getComposition(it, compositionId, authorId) shouldBe carouselBasicImagesRes
+                        carouselsManager.getPrivateComposition(
+                            it,
+                            compositionSourceId = compositionSourceId,
+                            authorId = authorId
+                        ) shouldBe carouselBasicImagesRes
                     }
                 }
             }

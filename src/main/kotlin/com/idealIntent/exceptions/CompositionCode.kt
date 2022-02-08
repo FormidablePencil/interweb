@@ -20,6 +20,11 @@ enum class CompositionCode {
     FailedToAssociateRecordToCollection,
     EmptyListOfRecordsProvided,
     NoAuthorIdProvidedToRestrictedResource,
+    ModifyPermittedToAuthorOfCompositionNotFound,
+    IdOfRecordProvidedNotOfComposition,
+    FailedToAddRecordToCompositionValidator,
+    FailedToConvertToIntOrderRank,
+    CompositionNotFound,
     ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
@@ -29,13 +34,17 @@ enum class CompositionCode {
                 FailedToCompose -> "Failed to compose."
                 FailedToInsertRecord -> "Failed to insert records."
                 NoAuthorIdProvidedToRestrictedResource -> "No id of author provided to restricted resource for validation of privileges."
-
+                FailedToAddRecordToCompositionValidator -> "No records updates which only means that developer failed to add a record to composition validator."
                 ServerError -> genericServerError
 
+                FailedToConvertToIntOrderRank,
                 EmptyListOfRecordsProvided,
                 FailedToAssociateRecordToCollection,
                 UserNotPrivileged,
                 FailedToFindAuthorByUsername,
+                ModifyPermittedToAuthorOfCompositionNotFound,
+                IdOfRecordProvidedNotOfComposition,
+                CompositionNotFound,
                 -> {
                     logError(logAttemptToLogClientAsServerError(code), this::class.java)
                     return "Not an internal error."
@@ -49,7 +58,12 @@ enum class CompositionCode {
                 FailedToFindAuthorByUsername -> "Failed to find author by username."
                 FailedToAssociateRecordToCollection -> "Failed to associateRecordToCollection."
                 EmptyListOfRecordsProvided -> "Provided an empty list of records."
+                ModifyPermittedToAuthorOfCompositionNotFound -> "Either composition of id provided did not exist or author was not permitted to modify"
+                IdOfRecordProvidedNotOfComposition -> "Id of record to update is not part of the composition."
+                FailedToConvertToIntOrderRank -> "Provided a value for updating order rank that was not a number." // todo - client error but not user error. How should we return this data
+                CompositionNotFound -> "Composition not found by composition source id."
 
+                FailedToAddRecordToCompositionValidator,
                 NoAuthorIdProvidedToRestrictedResource,
                 FailedToGivePrivilege,
                 ServerError -> genericServerError
@@ -64,14 +78,19 @@ enum class CompositionCode {
                 UserNotPrivileged,
                 FailedToFindAuthorByUsername,
                 FailedToAssociateRecordToCollection,
-                EmptyListOfRecordsProvided
+                EmptyListOfRecordsProvided,
+                ModifyPermittedToAuthorOfCompositionNotFound,
+                IdOfRecordProvidedNotOfComposition,
+                FailedToConvertToIntOrderRank,
+                CompositionNotFound,
                 -> HttpStatusCode.BadRequest
 
                 ServerError,
                 FailedToCompose,
                 FailedToGivePrivilege,
                 FailedToInsertRecord,
-                NoAuthorIdProvidedToRestrictedResource
+                NoAuthorIdProvidedToRestrictedResource,
+                FailedToAddRecordToCompositionValidator,
                 -> HttpStatusCode.InternalServerError
             }
         }

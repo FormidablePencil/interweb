@@ -24,13 +24,12 @@ class CarouselOfImagesDataMapped {
             images.forEach { if (it.first == compId) compImages.add(it.second) }
 
             val compRedirects = mutableListOf<TextPK>()
-            images.forEach { if (it.first == compId) compImages.add(it.second) }
             imgOnclickRedirects.forEach { if (it.first == compId) compRedirects.add(it.second) }
 
             val compPrivilegedAuthors = mutableListOf<PrivilegedAuthor>()
             privilegedAuthors.forEach { if (it.first == compId) compPrivilegedAuthors.add(it.second) }
 
-            return@map CarouselBasicImagesRes(
+            CarouselBasicImagesRes(
                 id = compId,
                 sourceId = sourceId,
                 name = name,

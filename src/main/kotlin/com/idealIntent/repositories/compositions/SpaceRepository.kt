@@ -1,31 +1,49 @@
 package com.idealIntent.repositories.compositions
 
+import com.idealIntent.models.compositionLayout.CompositionLayoutsModel
+import com.idealIntent.models.compositionLayout.CompositionSourceToLayoutsModel
+import com.idealIntent.models.compositionLayout.LayoutToSpacesModel
 import com.idealIntent.models.compositionLayout.PrivilegedAuthorToSpacesModel
+import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
+import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourceToLayout
+import com.idealIntent.models.privileges.CompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
+import com.idealIntent.models.space.SpacesModel
 import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import com.idealIntent.repositories.collectionsGeneric.ImageRepository
+import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import dtos.compositions.CompositionCategory
+import models.profile.AuthorsModel
 import org.ktorm.dsl.*
-import org.ktorm.schema.Column
 
 class SpaceRepository(
-    private val carouselOfImagesRepository: CarouselOfImagesRepository,
+    private val compositionQueryBuilder: CompositionQueryBuilder,
+    imageRepository: ImageRepository,
+    textRepository: TextRepository,
 ) : RepositoryBase() {
-    private val space = carouselOfImagesRepository.space
+    val space = SpacesModel.aliased("space")
     private val prvAuth2Space = PrivilegedAuthorToSpacesModel.aliased("prvAuth2Space")
-    private val layout2Space = carouselOfImagesRepository.layout2Space
-    private val layout = carouselOfImagesRepository.layout
-    private val compSource2Layout = carouselOfImagesRepository.compSource2Layout
-    private val compSource = carouselOfImagesRepository.compSource
-    private val compInstance2compSource = carouselOfImagesRepository.compInstance2compSource
-    private val compInstance = carouselOfImagesRepository.compInstance
-    private val prvAth2CompSource = carouselOfImagesRepository.prvAth2CompSource
+    private val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
+    private val layout = CompositionLayoutsModel.aliased("layout")
+    val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
+    val compSource = CompositionSourcesModel.aliased("compSource")
 
-    private val img2Col = carouselOfImagesRepository.img2Col
-    private val img = carouselOfImagesRepository.img
-    private val text2Col = carouselOfImagesRepository.text2Col
-    private val text = carouselOfImagesRepository.text
-    private val author = carouselOfImagesRepository.author
+    // region composition
+    val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
+    val compInstance = ImagesCarouselsModel.aliased("compInstance")
+
+    val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
+    // endregion
+
+    // region composition's collections
+    val img2Col = imageRepository.img2Col
+    val img = imageRepository.img
+    val text2Col = textRepository.text2Col
+    val text = textRepository.text
+    val author = AuthorsModel.aliased("author")
+    // endregion
+
 
     // space and layout
     fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder {
@@ -135,26 +153,21 @@ class SpaceRepository(
         layoutMetadata: Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>>
     ): CompositionDataBuilder {
         val (compositionSourceToLayout, compCategoryAndType) = layoutMetadata
-        val select = mutableSetOf<Column<out Any>>()
+        val select = compositionQueryBuilder.compositionSelect()
         val compositionBuilder = CompositionDataBuilder()
 
-        select += carouselOfImagesRepository.compositionSelect
+        val query = compositionQueryBuilder.compositionsLeftJoinBuilder(database.from(compSource), compCategoryAndType)
 
-        database.from(compSource)
-            .compositionsLeftJoinBuilder(compCategoryAndType)
-            .select(select)
+        query.select(select)
             .whereWithConditions {
                 compositionSourceToLayout.forEach { item -> it += compSource.id eq item.sourceId }
-                compositionWhereClauseBuilder(it, compCategoryAndType)
+                compositionQueryBuilder.compositionWhereClauseBuilder(it, compCategoryAndType)
             }.map {
-                println(it) // row should tell you what composition type and
-                compositionMapBuilder(it, compCategoryAndType, compositionBuilder)
+                compositionQueryBuilder.compositionMapBuilder(it, compCategoryAndType, compositionBuilder)
             }
 
         return compositionBuilder
     }
-
-
 
 
 //    fun getPublicSpace(address: String) {

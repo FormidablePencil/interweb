@@ -10,6 +10,7 @@ import com.idealIntent.repositories.codes.ResetPasswordCodeRepository
 import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.compositions.CompositionQueryBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import com.idealIntent.repositories.profile.AccountRepository
@@ -58,6 +59,9 @@ object DIHelper {
         single { CarouselOfImagesRepository(get(), get()) }
         single { SpaceRepository(get()) }
         // env com.idealIntent.configurations
+
+        single { CompositionQueryBuilder(get()) }
+
         val dbConnection = Properties()
         dbConnection.load(FileInputStream("local.datasource.properties"))
 

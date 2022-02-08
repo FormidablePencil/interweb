@@ -12,13 +12,13 @@ import dtos.compositions.carousels.CompositionCarousel
 interface ICompositionCategoryManagerStructure<Composition, Response> {
 
     /**
-     * Find the composition to of compositionType and sends the composition compositionId to composition's manager to get composition.
+     * Find the composition to of compositionType and sends the composition compositionSourceId to composition's manager to get composition.
      *
      * @param compositionType
      * @param jsonData
      * @return
      */
-    fun getComposition(compositionType: CompositionCarousel, compositionId: Int, authorId: Int): Composition?
+    fun getPrivateComposition(compositionType: CompositionCarousel, compositionSourceId: Int, authorId: Int): Composition?
 
     /**
      * Find the composition to of compositionType and sends the json data off to the composition's manager to create composition.

@@ -48,7 +48,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
         given("Composition query instructions - Create a few compositions") {
             and("save under layout and query layout of compositions") {
                 then("success") {
-
+                    rollback {}
                 }
             }
         }
@@ -56,13 +56,30 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
         given("getPublicComposition") {
             then("success") {
                 rollback {
-                    val compositionId = createAccountAndCompositionAndGetIds()
+                    val (compositionSourceId, authorId) = createAccountAndCompositionAndGetIds()
+                    val comp: CarouselBasicImagesRes =
+                        carouselOfImagesRepository.getPublicComposition(compositionSourceId)
+                            ?: throw failure("failed to get composition")
+
+                    comp.images.size shouldBe createCarouselBasicImagesReq.images.size
+                    comp.imgOnclickRedirects.size shouldBe createCarouselBasicImagesReq.imgOnclickRedirects.size
+                    comp.images.forEach { resItem ->
+                        val found = createCarouselBasicImagesReq.images.find { it.orderRank == resItem.orderRank }
+                        found shouldNotBe null
+                    }
+                    comp.imgOnclickRedirects.forEach { item ->
+                        val found =
+                            createCarouselBasicImagesReq.imgOnclickRedirects.find { item.orderRank == it.orderRank }
+                        found shouldNotBe null
+                    }
+                    comp.name shouldBe createCarouselBasicImagesReq.name
                 }
             }
         }
 
         given("getPrivateComposition") {
             then("success") {
+                rollback {}
             }
         }
 
@@ -76,44 +93,41 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
         given("deleteComposition") {
             then("success") {
-                val (authorId, compositionSourceId) = createAccountAndCompositionAndGetIds()
+                rollback {
+                    val (compositionSourceId, authorId) = createAccountAndCompositionAndGetIds()
 
-                // region before deletion assertion
-                // todo - test privileges also
-                val resBeforeDeletion: CarouselBasicImagesRes =
-                    carouselOfImagesRepository.getPublicComposition(compositionSourceId)
+                    // region before deletion assertion
+                    // todo - test privileges also
+                    val resBeforeDeletion: CarouselBasicImagesRes =
+                        carouselOfImagesRepository.getPublicComposition(compositionSourceId)
+                            ?: throw failure("failed to get composition")
 
-                resBeforeDeletion.images.size shouldBe createCarouselBasicImagesReq.images.size
-                resBeforeDeletion.imgOnclickRedirects.size shouldBe createCarouselBasicImagesReq.imgOnclickRedirects.size
-                resBeforeDeletion.images.forEach { resItem ->
-                    val found = createCarouselBasicImagesReq.images.find { it.orderRank == resItem.orderRank }
-                    found shouldNotBe null
+
+                    resBeforeDeletion.images.size shouldBe createCarouselBasicImagesReq.images.size
+                    resBeforeDeletion.imgOnclickRedirects.size shouldBe createCarouselBasicImagesReq.imgOnclickRedirects.size
+                    resBeforeDeletion.images.forEach { resItem ->
+                        val found = createCarouselBasicImagesReq.images.find { it.orderRank == resItem.orderRank }
+                        found shouldNotBe null
+                    }
+                    resBeforeDeletion.imgOnclickRedirects.forEach { item ->
+                        val found =
+                            createCarouselBasicImagesReq.imgOnclickRedirects.find { item.orderRank == it.orderRank }
+                        found shouldNotBe null
+                    }
+//                    resBeforeDeletion.name shouldBe createCarouselBasicImagesReq.name
+                    // todo - set to static string, change to dynamic
+                    resBeforeDeletion.name shouldBe "my composition"
+                    // endregion
+
+                    carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)
+
+                    // region after deletion assertion
+                    val resAfterDeletion =
+                        carouselOfImagesRepository.getPublicComposition(compositionSourceId)
+
+                    resAfterDeletion shouldBe null
+                    // endregion
                 }
-                resBeforeDeletion.imgOnclickRedirects.forEach { item ->
-                    val found = createCarouselBasicImagesReq.imgOnclickRedirects.find { item.orderRank == it.orderRank }
-                    found shouldNotBe null
-                }
-                resBeforeDeletion.name shouldBe createCarouselBasicImagesReq.name
-                // endregion
-
-                carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)
-
-                // region after deletion assertion
-                val resAfterDeletion: CarouselBasicImagesRes =
-                    carouselOfImagesRepository.getPublicComposition(compositionSourceId)
-
-                resAfterDeletion.images.size shouldBe 0
-                resAfterDeletion.imgOnclickRedirects.size shouldBe 0
-                resAfterDeletion.images.forEach { item ->
-                    val found = createCarouselBasicImagesReq.images.find { it.orderRank == item.orderRank }
-                    found shouldNotBe null
-                }
-                resBeforeDeletion.imgOnclickRedirects.forEach { item ->
-                    val found = createCarouselBasicImagesReq.imgOnclickRedirects.find { item.orderRank == it.orderRank }
-                    found shouldNotBe null
-                }
-                resBeforeDeletion.name shouldBe createCarouselBasicImagesReq.name
-                // endregion
             }
         }
     }

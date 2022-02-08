@@ -15,16 +15,16 @@ class CarouselsManager(
 ) : ICompositionCategoryManagerStructure<CarouselBasicImagesRes, CompositionResponse> {
     private val gson = Gson()
 
-    override fun getComposition(
+    override fun getPrivateComposition(
         compositionType: CompositionCarousel,
-        compositionId: Int,
+        compositionSourceId: Int,
         authorId: Int
     ): CarouselBasicImagesRes? =
         when (compositionType) {
             CarouselBlurredOverlay -> TODO()
             CarouselMagnifying -> TODO()
             BasicImages ->
-                carouselOfImagesRepository.getSingleCompositionOfPrivilegedAuthor(compositionId, authorId).first()
+                carouselOfImagesRepository.getPrivateComposition(compositionSourceId, authorId)
         }
 
     override fun createCompositionOfCategory(

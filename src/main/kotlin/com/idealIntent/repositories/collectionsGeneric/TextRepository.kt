@@ -7,18 +7,19 @@ import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
+import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.ITextToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
-import dtos.collectionsGeneric.texts.TextIdentifiableRecordByCol
 import dtos.collectionsGeneric.texts.TextsCOL
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
+import org.ktorm.schema.text
 
 /**
  * Responsible for collections of texts.
@@ -36,6 +37,9 @@ class TextRepository : RepositoryBase(),
     private val Database.textCollections get() = this.sequenceOf(TextCollectionsModel)
     private val Database.textToCollections get() = this.sequenceOf(TextToCollectionsModel)
     private val Database.texts get() = this.sequenceOf(TextsModel)
+
+    val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
+    val text = TextsModel.aliased("textRedirect")
 
     // region Get
     override fun getSingleRecordOfCollection(recordId: Int, collectionId: Int): TextPK? =
@@ -129,57 +133,92 @@ class TextRepository : RepositoryBase(),
         } == 1
     // endregion Insert
 
-
-    // region Update
-    override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
-//        val collection =
-//            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle gracefully
-
-        database.update(TextsModel) {
-            record.updateTo.map { recordCol ->
-                when (TextsCOL.fromInt(recordCol.column)) {
-                    TextsCOL.Text -> set(it.text, recordCol.value)
-//                    TextsCOL.OrderRank -> set(it.orderRank, recordCol.value.toInt()) // todo - may fail
-                    // todo - toInt() may fail
-                }
-            }
-            where {
-                when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-                    TextIdentifiableRecordByCol.OrderRank ->
-                        TODO()
-//                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
-                } // todo - handle incorrect recordIdentifiableByCol gracefully
-                // todo - handle failure gracefully
-            }
-        }
-        TODO("validate if successful")
-    }
-
-    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
-//        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - hadle gracefully
-
-        database.batchUpdate(TextsModel) {
-            records.map { record ->
-                item {
-                    record.updateTo.map { updateCol ->
-                        when (TextsCOL.fromInt(updateCol.column)) {
-                            TextsCOL.Text -> set(it.text, updateCol.value)
-//                            TextsCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
-                            // todo - toInt() may fail, handle gracefully
+    override fun updateRecord(record: RecordUpdate, collectionId: Int) {
+        database.useTransaction {
+            var doUpdateOrderRank: Boolean = false
+            var updateOrderRankTo: String? = null
+            val effectedRecords = database.update(TextsModel) {
+                record.updateTo.map { updateCol ->
+                    when (TextsCOL.fromInt(updateCol.column)) {
+                        TextsCOL.Text ->
+                            set(it.text, updateCol.value)
+                        // todo - orderRank is now of record2Col
+                        // todo - toInt() may fail
+                        TextsCOL.OrderRank -> {
+                            doUpdateOrderRank = true
+                            updateOrderRankTo = updateCol.value
                         }
                     }
-                    where {
-                        when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-                            TextIdentifiableRecordByCol.OrderRank ->
-                                TODO()
-//                                (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
-                        } // todo - handle incorrect recordIdentifiableByCol gracefully
-                    }
                 }
+                where { text.id eq record.recordId }
+            }
+            if (effectedRecords == 0)
+                throw CompositionException(CompositionCode.FailedToAddRecordToCompositionValidator)
+
+            if (doUpdateOrderRank) {
+                val updateTo = updateOrderRankTo?.toInt()
+                    ?: throw CompositionException(CompositionCode.FailedToAddRecordToCompositionValidator)
+                val effectedCollections = database.update(TextToCollectionsModel) {
+                    set(it.orderRank, updateTo)
+                    where { it.textId eq record.recordId }
+                }
+                if (effectedCollections == 0)
+                    throw CompositionException(CompositionCode.FailedToAddRecordToCompositionValidator)
             }
         }
-        TODO("validate if successful")
     }
+
+
+    // region Update
+//    override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
+////        val collection =
+////            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle gracefully
+//
+//        database.update(TextsModel) {
+//            record.updateTo.map { recordCol ->
+//                when (TextsCOL.fromInt(recordCol.column)) {
+//                    TextsCOL.Text -> set(it.text, recordCol.value)
+////                    TextsCOL.OrderRank -> set(it.orderRank, recordCol.value.toInt()) // todo - may fail
+//                    // todo - toInt() may fail
+//                }
+//            }
+//            where {
+//                when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
+//                    TextIdentifiableRecordByCol.OrderRank ->
+//                        TODO()
+////                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
+//                } // todo - handle incorrect recordIdentifiableByCol gracefully
+//                // todo - handle failure gracefully
+//            }
+//        }
+//        TODO("validate if successful")
+//    }
+//
+//    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
+////        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - hadle gracefully
+//
+//        database.batchUpdate(TextsModel) {
+//            records.map { record ->
+//                item {
+//                    record.updateTo.map { updateCol ->
+//                        when (TextsCOL.fromInt(updateCol.column)) {
+//                            TextsCOL.Text -> set(it.text, updateCol.value)
+////                            TextsCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
+//                            // todo - toInt() may fail, handle gracefully
+//                        }
+//                    }
+//                    where {
+//                        when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
+//                            TextIdentifiableRecordByCol.OrderRank ->
+//                                TODO()
+////                                (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
+//                        } // todo - handle incorrect recordIdentifiableByCol gracefully
+//                    }
+//                }
+//            }
+//        }
+//        TODO("validate if successful")
+//    }
 // endregion Update
 
 
@@ -194,7 +233,18 @@ class TextRepository : RepositoryBase(),
     }
 
     override fun deleteAllRecordsInCollection(collectionId: Int) {
-        TODO("Not yet implemented")
+        database.useTransaction {
+            // get record ids of collection
+            val textIds = database.from(TextToCollectionsModel)
+                .select(TextToCollectionsModel.textId)
+                .where { TextToCollectionsModel.collectionId eq collectionId }
+                .map { it[TextToCollectionsModel.textId]!! }
+
+            // delete association between records and collection then collection and records
+            database.delete(TextToCollectionsModel) { it.collectionId eq collectionId }
+            database.delete(TextCollectionsModel) { it.id eq collectionId }
+            textIds.map { database.delete(TextsModel) { it.id eq it.id } }
+        }
     }
 
     override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {
@@ -202,6 +252,10 @@ class TextRepository : RepositoryBase(),
     }
 
     override fun deleteCollectionButNotRecord() {
+        TODO("Not yet implemented")
+    }
+
+    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 // endregion Delete
