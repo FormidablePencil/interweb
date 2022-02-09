@@ -4,6 +4,7 @@ import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.managers.SpaceManager
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
@@ -19,11 +20,12 @@ import shared.testUtils.carouselBasicImagesReqStingified
 
 class CmsServiceTest : BehaviorSpec({
     val carouselsManager: CarouselsManager = mockk()
+    val spaceManager: SpaceManager = mockk()
     val spaceRepository: SpaceRepository = mockk()
     val layoutId = 0
     val userId = 0
 
-    val componentManager = CompositionService(carouselsManager, spaceRepository)
+    val componentManager = CompositionService(carouselsManager, spaceManager, spaceRepository)
 
     beforeEach {
         clearAllMocks()

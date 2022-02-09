@@ -1,7 +1,7 @@
 package com.idealIntent.services
 
 import com.idealIntent.repositories.profile.AuthorRepository
-import com.idealIntent.repositories.SpaceRepository
+import com.idealIntent.repositories.compositions.SpaceRepository
 
 class ExploreService(
     private var authorRepository: AuthorRepository,

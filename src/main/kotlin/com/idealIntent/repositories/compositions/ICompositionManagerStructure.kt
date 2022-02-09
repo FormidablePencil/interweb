@@ -1,6 +1,7 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 
 /**
  * Structure for CRUD operations on compositions
@@ -13,7 +14,10 @@ import com.idealIntent.dtos.compositionCRUD.RecordUpdate
  * @param CreateRequest Ids of compositions and collections to compose and raw data to save before composition.
  * @param ComposePrepared Ids of composition and collections to created beforehand.
  */
-interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response> {
+interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared,
+        Response> {
+
+    fun getPrivateComposition(compositionSourceId: Int, authorId: Int): Composition?
 
     // region Insert
     /**
@@ -43,8 +47,11 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
      * @param record Update to
      * @return Success or fail in updating [record]
      */
-    fun updateComposition(id: Int, record: RecordUpdate): Boolean
-    // todo - reimplement this to work with compositions
+    fun updateComposition(
+        compositionUpdateQue: List<UpdateDataOfComposition>,
+        compositionSourceId: Int,
+        authorId: Int
+    )
 
     /**
      * Batch update compositions
@@ -60,5 +67,6 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
 
     // todo deletes
     // region Delete
+    fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean
     // endregion Delete
 }

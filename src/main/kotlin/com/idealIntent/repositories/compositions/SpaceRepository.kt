@@ -1,5 +1,6 @@
 package com.idealIntent.repositories.compositions
 
+import com.idealIntent.dtos.space.CreateSpaceRequest
 import com.idealIntent.models.compositionLayout.CompositionLayoutsModel
 import com.idealIntent.models.compositionLayout.CompositionSourceToLayoutsModel
 import com.idealIntent.models.compositionLayout.LayoutToSpacesModel
@@ -9,20 +10,26 @@ import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourceToLayout
 import com.idealIntent.models.privileges.CompositionSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
+import com.idealIntent.models.space.ISpaceEntity
 import com.idealIntent.models.space.SpacesModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import dtos.compositions.CompositionCategory
 import models.profile.AuthorsModel
+import org.ktorm.database.Database
 import org.ktorm.dsl.*
+import org.ktorm.entity.find
+import org.ktorm.entity.sequenceOf
 
 class SpaceRepository(
-    private val compositionQueryBuilder: CompositionQueryBuilder,
     imageRepository: ImageRepository,
     textRepository: TextRepository,
 ) : RepositoryBase() {
+    private val Database.spaces get() = this.sequenceOf(SpacesModel)
+
     val space = SpacesModel.aliased("space")
+
     private val prvAuth2Space = PrivilegedAuthorToSpacesModel.aliased("prvAuth2Space")
     private val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
     private val layout = CompositionLayoutsModel.aliased("layout")
@@ -46,31 +53,6 @@ class SpaceRepository(
 
 
     // space and layout
-    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder {
-        TODO()
-    }
-
-    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionDataBuilder {
-        val layoutMetadata = getLayoutMetadata(
-            spaceAddress = null,
-            layoutId = layoutId,
-            authorId = authorId
-        )
-        return getCompositionsOfLayout(layoutMetadata)
-    }
-
-    fun getSpaceLayoutPreviewOfCompositions(layoutId: Int, authorId: Int) {
-    }
-
-    fun getSpaceLayoutOfCompositions(spaceAddress: String, authorId: Int) {
-        val layoutMetadata = getLayoutMetadata(
-            spaceAddress = spaceAddress,
-            layoutId = null,
-            authorId = authorId
-        )
-        val composition = getCompositionsOfLayout(layoutMetadata)
-    }
-
     /**
      * This is used to build queries with. Query from space.
      */
@@ -96,7 +78,7 @@ class SpaceRepository(
      * @param authorId Provide authorId for private layouts.
      * @return CompositionSourceToLayout, all [CompositionCategory ] to query through)
      */
-    private fun getLayoutMetadata(
+    fun getLayoutMetadata(
         spaceAddress: String?, layoutId: Int?, authorId: Int
     ): Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>> {
         val listOfCompositionSourceToLayout = mutableListOf<CompositionSourceToLayout>()
@@ -142,33 +124,6 @@ class SpaceRepository(
             }
         return Pair(listOfCompositionSourceToLayout, allTypesOfCompositionsLayoutContains)
     }
-
-    /**
-     * Get compositions
-     *
-     * @param layoutMetadata List of composition source to layout info to query compositions and specify what
-     * composition category and composition type to query from.
-     */
-    private fun getCompositionsOfLayout(
-        layoutMetadata: Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>>
-    ): CompositionDataBuilder {
-        val (compositionSourceToLayout, compCategoryAndType) = layoutMetadata
-        val select = compositionQueryBuilder.compositionSelect()
-        val compositionBuilder = CompositionDataBuilder()
-
-        val query = compositionQueryBuilder.compositionsLeftJoinBuilder(database.from(compSource), compCategoryAndType)
-
-        query.select(select)
-            .whereWithConditions {
-                compositionSourceToLayout.forEach { item -> it += compSource.id eq item.sourceId }
-                compositionQueryBuilder.compositionWhereClauseBuilder(it, compCategoryAndType)
-            }.map {
-                compositionQueryBuilder.compositionMapBuilder(it, compCategoryAndType, compositionBuilder)
-            }
-
-        return compositionBuilder
-    }
-
 
 //    fun getPublicSpace(address: String) {
 //        getSpace(address = address, authorId = null)
@@ -225,5 +180,63 @@ class SpaceRepository(
         } == 1
     }
 
+
+    fun getSpace(address: String): ISpaceEntity? {
+        return database.spaces.find { it.address eq address }
+    }
+
+    fun insertSpace(space: CreateSpaceRequest, address: String): Boolean {
+        return database.insert(SpacesModel) {
+            set(it.address, address)
+        } != 0
+    }
+
     // endregion Insert
 }
+
+
+//    /**
+//     * Get layouts of space
+//     *
+//     * @param spaceAddress
+//     */
+//    fun getSpaceLayout(spaceAddress: String): ISpaceEntity? {
+//        return database.spaces.find { it.address eq spaceAddress }
+//    }
+// todo - there are 2 different kinds of spaces. Author space (multiple spaces), public space
+
+/**
+ * Associate a layout to space
+ *
+ * @param layoutId Id of composition layout
+ * @param spaceAddress Space to associate to by space's address
+ */
+//fun addLayoutToSpace(layoutId: Int, spaceAddress: String) {
+//}
+
+// space own layouts.
+// layout owns compositions (components)
+//
+
+//    fun getSpacesByAuthor(authorId: Int): Space? {
+//        return database.spaces.find { it.authorId eq authorId }
+//    }
+
+//    fun softDeleteSpace() {
+//    }
+
+//    fun GetThreads(threadsIds: List<Int>): List<Thread> {
+//        return emptyList<Thread>()
+//    }
+//
+//    fun GetThreadsByTag(author: String) {
+//
+//    }
+//
+//    fun FilterThreadByCategories(threadIds: List<Int>, category: List<String>): Thread {
+//        return Thread()
+//    }
+//
+//    fun GetThreadByAuthorsTags(authorId: Int, tag: String): List<Thread> {
+//        throw Exception()
+//    }

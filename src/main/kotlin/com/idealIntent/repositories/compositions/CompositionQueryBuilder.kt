@@ -49,7 +49,7 @@ class CompositionQueryBuilder(
                 CompositionCategory.Text -> TODO()
                 CompositionCategory.Markdown -> TODO()
                 CompositionCategory.Banner -> TODO()
-                CompositionCategory.OneOffGrid -> TODO()
+                CompositionCategory.Grid -> TODO()
                 CompositionCategory.Divider -> TODO()
                 CompositionCategory.LineDivider -> TODO()
             }
@@ -85,7 +85,7 @@ class CompositionQueryBuilder(
                 CompositionCategory.Text -> TODO()
                 CompositionCategory.Markdown -> TODO()
                 CompositionCategory.Banner -> TODO()
-                CompositionCategory.OneOffGrid -> TODO()
+                CompositionCategory.Grid -> TODO()
                 CompositionCategory.Divider -> TODO()
                 CompositionCategory.LineDivider -> TODO()
             }
@@ -113,7 +113,7 @@ class CompositionQueryBuilder(
                 CompositionCategory.Text -> TODO()
                 CompositionCategory.Markdown -> TODO()
                 CompositionCategory.Banner -> TODO()
-                CompositionCategory.OneOffGrid -> TODO()
+                CompositionCategory.Grid -> TODO()
                 CompositionCategory.Divider -> TODO()
                 CompositionCategory.LineDivider -> TODO()
             }

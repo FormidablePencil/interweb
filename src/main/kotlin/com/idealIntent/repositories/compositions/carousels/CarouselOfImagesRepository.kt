@@ -24,7 +24,6 @@ import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
-import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarousel
 import models.profile.AuthorsModel
@@ -49,24 +48,22 @@ data class CarouselOfImagesComposePrepared(
 class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
-    private val spaceRepository: SpaceRepository,
     // todo replace Image
 ) : RepositoryBase(), ICompositionRepositoryStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
         CarouselBasicImagesRes, CarouselOfImagesComposePrepared, CarouselOfImagesDataMapped> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
 
+    // todo - move to a source file
     private val space = SpacesModel.aliased("space")
     private val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
     private val layout = CompositionLayoutsModel.aliased("layout")
     private val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
     private val compSource = CompositionSourcesModel.aliased("compSource")
 
-    // region composition
     private val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
     private val compInstance = ImagesCarouselsModel.aliased("compInstance")
 
     private val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
-    // endregion
 
 
     // region composition's collections
@@ -174,48 +171,13 @@ class CarouselOfImagesRepository(
     // endregion
 
 
-    // region Get compositions
-    override fun getPublicComposition(compositionSourceId: Int) =
-        getCompositionsQuery(
-            restricted = false,
-            authorId = null,
-            compositionSourceId = compositionSourceId
-        )?.first()
-
-    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int) =
-        getCompositionsQuery(
-            restricted = true,
-            authorId = authorId,
-            compositionSourceId = compositionSourceId
-        )?.first()
-
-
-    private fun getCompositionsQuery(
-        restricted: Boolean, authorId: Int?, compositionSourceId: Int,
-    ): List<CarouselBasicImagesRes>? {
-        val dto = CarouselOfImagesDataMapped()
-
-        compositionLeftJoin(database.from(compSource))
-            .select(compositionSelect)
-            .whereWithConditions {
-                it += (img2Col.orderRank eq text2Col.orderRank)
-                it += (compSource.id eq compositionSourceId)
-                if (restricted) {
-                    val authorIdRes = throwIfNull(authorId)
-                    it += (prvAth2CompSource.authorId eq authorIdRes)
-                }
-            }.map { compositionQueryMap(it, dto) }
-
-        return dto.get().ifEmpty { null }
-    }
-
-    fun getOnlyTopLvlIdsOfCompositionOnlyModifiable(onlyModifiable: Boolean, compositionSourceId: Int, authorId: Int) =
-        getOnlyTopLvlIdsOfCompositionQuery(onlyModifiable, compositionSourceId, authorId)
+    // region Get top lvl only of composition
+    override fun getOnlyTopLvlIdsOfCompositionOnlyModifiable(
+        onlyModifiable: Boolean, compositionSourceId: Int, authorId: Int
+    ) = getOnlyTopLvlIdsOfCompositionQuery(onlyModifiable, compositionSourceId, authorId)
 
     private fun getOnlyTopLvlIdsOfCompositionQuery(
-        onlyModifiable: Boolean,
-        compositionSourceId: Int,
-        authorId: Int
+        onlyModifiable: Boolean, compositionSourceId: Int, authorId: Int
     ): ImagesCarouselTopLvlIds? {
         val dto = CarouselOfImagesDataMapped()
         var imageCollectionId: Int? = null
@@ -243,22 +205,43 @@ class CarouselOfImagesRepository(
     // endregion
 
 
-    override fun getMetadataOfComposition(id: Int): IImagesCarouselEntity? {
-        TODO("Not yet implemented")
-    }
+    // region Get composition
+    override fun getPublicComposition(compositionSourceId: Int) =
+        getCompositionsQuery(
+            restricted = false,
+            authorId = null,
+            compositionSourceId = compositionSourceId
+        )?.first()
 
-    /**
-     * Composes composition by saving ids as one record. Then associating newly created composition
-     * to a privilege source. Think of privilege source as a door with a lock required to get through
-     * to get your data.
-     *
-     * @param composePrepared
-     * @return
-     */
-    // todo - no need to return Int if compositionSourceId is returned instead I believe
+    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int) =
+        getCompositionsQuery(
+            restricted = true,
+            authorId = authorId,
+            compositionSourceId = compositionSourceId
+        )?.first()
+
+    private fun getCompositionsQuery(
+        restricted: Boolean, authorId: Int?, compositionSourceId: Int,
+    ): List<CarouselBasicImagesRes>? {
+        val dto = CarouselOfImagesDataMapped()
+
+        compositionLeftJoin(database.from(compSource))
+            .select(compositionSelect)
+            .whereWithConditions {
+                it += (img2Col.orderRank eq text2Col.orderRank)
+                it += (compSource.id eq compositionSourceId)
+                if (restricted) {
+                    val authorIdRes = throwIfNull(authorId)
+                    it += (prvAth2CompSource.authorId eq authorIdRes)
+                }
+            }.map { compositionQueryMap(it, dto) }
+
+        return dto.get().ifEmpty { null }
+    }
+    // endregion
+
     override fun compose(composePrepared: CarouselOfImagesComposePrepared): Int? {
         val compositionId = database.insertAndGenerateKey(ImagesCarouselsModel) {
-//            set(it.name, composePrepared.name) // todo moved name to compSource
             set(it.imageCollectionId, composePrepared.imageCollectionId)
             set(it.redirectTextCollectionId, composePrepared.redirectTextCollectionId)
         } as Int?
@@ -270,7 +253,6 @@ class CarouselOfImagesRepository(
         }
         return compositionId
     }
-
 
     override fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean {
         database.useTransaction {

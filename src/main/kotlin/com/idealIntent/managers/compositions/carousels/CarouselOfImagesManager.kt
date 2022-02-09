@@ -3,6 +3,7 @@ package com.idealIntent.managers.compositions.carousels
 import com.google.gson.Gson
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.dtos.failed
@@ -11,6 +12,7 @@ import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.CompositionPrivilegesManager
+import com.idealIntent.managers.compositions.carousels.UpdateDataOfCarouselOfImages.*
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
@@ -24,6 +26,8 @@ import io.ktor.http.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+//List<Pair<UpdateDataOfCarouselOfImages, RecordUpdate>>
+
 class CarouselOfImagesManager(
     private val compositionPrivilegesManager: CompositionPrivilegesManager,
     private val textRepository: TextRepository,
@@ -31,8 +35,8 @@ class CarouselOfImagesManager(
     private val compositionPrivilegesRepository: CompositionPrivilegesRepository,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
     private val spaceRepository: SpaceRepository,
-) : ICompositionManagerStructure<CreateCarouselBasicImagesReq, IImagesCarouselEntity,
-        CreateCarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
+) : ICompositionManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity, CreateCarouselBasicImagesReq,
+        CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
     val appEnv: AppEnv by inject()
 
     // region Get
@@ -41,6 +45,9 @@ class CarouselOfImagesManager(
      *
      * Validate that user is privileged first returning composition.
      */
+
+    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): CarouselBasicImagesRes? =
+        carouselOfImagesRepository.getPrivateComposition(compositionSourceId, authorId)
 
     // endregion Get
 
@@ -112,7 +119,8 @@ class CarouselOfImagesManager(
     // region CarouselOfImages
 
     // Everything else will be extracted into managers. SpaceResponseFailed manager for each component of category (e.g. carousel.CarouselBasicImages)
-    fun deleteComposition(id: Int): Boolean {
+    override fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean {
+        carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)
         TODO()
 //        return database.imagesCarousels.removeIf { it.id eq id } != 0
     }
@@ -143,19 +151,20 @@ class CarouselOfImagesManager(
 //        }
     }
 
+
     /**
      * Update composition
      *
      * First validate that the author is privileged to update a composition of source id provided. Then transforms provided
-     * value from json to a type object corresponding to [UpdateCarouselOfImages]. Validate that the id of
+     * value from json to a type object corresponding to [UpdateDataOfCarouselOfImages]. Validate that the id of
      * item to update to is of the id of the composition source provided. Then update property of composition.
      *
      * @param compositionUpdateQue Id of composition source of composition to do an update on, what to update and
      * the value to update to.
      * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound]
      */
-    fun updateComposition(
-        compositionUpdateQue: List<Pair<UpdateCarouselOfImages, RecordUpdate>>,
+    override fun updateComposition(
+        compositionUpdateQue: List<UpdateDataOfComposition>,
         compositionSourceId: Int,
         authorId: Int
     ) {
@@ -168,10 +177,10 @@ class CarouselOfImagesManager(
             val gson = Gson()
 
             compositionUpdateQue.forEach {
-                val record = it.second
+                val record = it.recordUpdate
 
-                when (it.first) {
-                    UpdateCarouselOfImages.Image -> {
+                when (UpdateDataOfCarouselOfImages.fromInt(it.updateDataOf)) {
+                    Image -> {
                         if (!imageRepository.validateRecordToCollectionRelationship(record.recordId, imageCollectionId))
                             throw CompositionException(
                                 IdOfRecordProvidedNotOfComposition,
@@ -179,7 +188,7 @@ class CarouselOfImagesManager(
                             )
                         else imageRepository.updateRecord(record, imageCollectionId)
                     }
-                    UpdateCarouselOfImages.RedirectText -> {
+                    RedirectText -> {
                         if (!textRepository.validateRecordToCollectionRelationship(record.recordId, imageCollectionId))
                             throw CompositionException(
                                 IdOfRecordProvidedNotOfComposition,
@@ -187,10 +196,10 @@ class CarouselOfImagesManager(
                             )
                         else textRepository.updateRecord(record, imageCollectionId)
                     }
-                    UpdateCarouselOfImages.PrivilegedAuthor ->
+                    PrivilegedAuthor ->
                         TODO("CompositionPrivilegesRepository.update")
 
-                    UpdateCarouselOfImages.CompositionName ->
+                    CompositionName ->
                         TODO()
                 }
             }
@@ -204,10 +213,6 @@ class CarouselOfImagesManager(
         TODO("Not yet implemented")
     }
 
-    override fun updateComposition(id: Int, record: RecordUpdate): Boolean {
-        TODO("Not yet implemented")
-    }
-
     override fun batchUpdateCompositions(id: Int, records: List<RecordUpdate>): Boolean {
         TODO("Not yet implemented")
     }
@@ -218,13 +223,13 @@ class CarouselOfImagesManager(
     // endregion
 }
 
-enum class UpdateCarouselOfImages(val value: Int) {
+enum class UpdateDataOfCarouselOfImages(val value: Int) {
     Image(0),
     RedirectText(1),
     PrivilegedAuthor(2),
     CompositionName(3);
 
     companion object {
-        fun fromInt(value: Int) = CarouselOfImagesTABLE.values().first { it.value == value }
+        fun fromInt(value: Int) = values().first { it.value == value }
     }
 }

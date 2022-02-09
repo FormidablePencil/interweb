@@ -1,13 +1,15 @@
 package com.idealIntent.dtos.compositionCRUD
 
-import dtos.compositionCRUD.IUpdateComposition
+import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
+import dtos.compositions.CompositionCategory
+import dtos.space.IUserComposition
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SingleUpdateCompositionRequest(
-    override val id: Int,
+data class SingleUpdateCompositionRequest<T>(
+    override val compositionSourceId: Int,
+    override val compositionCategory: CompositionCategory,
     override val compositionType: Int,
-    override val updateToData: RecordUpdate,
-    override val where: List<UpdateWhereAt>,
-) : IUpdateComposition
-
+    val updateDataOfComposition: UpdateDataOfComposition<T>,
+    val authorId: Int,
+) : IUserComposition

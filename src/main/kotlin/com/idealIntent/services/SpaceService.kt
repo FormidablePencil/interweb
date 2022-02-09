@@ -7,7 +7,7 @@ import com.idealIntent.dtos.space.GetSpaceRequest
 import com.idealIntent.dtos.space.GetSpaceResponse
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.helpers.RandomStringGenerator
-import com.idealIntent.repositories.SpaceRepository
+import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.space.CreateSpaceResponseFailed
 import dtos.space.SpaceResponseFailed
 import io.ktor.http.*
@@ -37,7 +37,7 @@ import io.ktor.http.*
 // may have a lot of tables just for components but a lot of it will be handled by generic named cols and tables
 // how you would know what data/row is for what component would be by primary ids
 
-// Example: OneOffGrid & FlatCarousel
+// Example: Grid & FlatCarousel
 
 // Multi-dimensional array
 // outermost table - table name of which nested data is stored, id of data representing rows

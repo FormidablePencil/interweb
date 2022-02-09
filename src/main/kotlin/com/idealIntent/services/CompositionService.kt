@@ -5,12 +5,21 @@ import com.idealIntent.dtos.compositionCRUD.BatchUpdateCompositionRequest
 import com.idealIntent.dtos.compositionCRUD.BatchUpdateCompositionsRequest
 import com.idealIntent.dtos.compositionCRUD.SingleUpdateCompositionRequest
 import com.idealIntent.dtos.compositionCRUD.UpdateCompositionRequest
+import com.idealIntent.dtos.compositions.UserComposition
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.managers.SpaceManager
+import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
+import com.idealIntent.managers.compositions.banners.BannersManager
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
+import com.idealIntent.managers.compositions.grids.GridsManager
+import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.compositions.CompositionDataBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
+import dtos.compositions.banners.CompositionBanner
 import dtos.compositions.carousels.CompositionCarousel
+import dtos.compositions.grids.CompositionGrid
+import dtos.compositions.texts.CompositionText
 import dtos.space.IUserComposition
 
 /**
@@ -24,22 +33,26 @@ import dtos.space.IUserComposition
  */
 class CompositionService(
     private val carouselsManager: CarouselsManager,
+    private val spaceManager: SpaceManager,
     private val spaceRepository: SpaceRepository,
+    private val textsManager: TextsManager,
+    private val bannersManager: BannersManager,
+    private val gridsManager: GridsManager,
 ) {
 
     fun getAuthorsCompositions(userId: Int) {
-
-
+        print("ok")
     }
 
     fun getCompositionOfSpace(spaceAddress: String) {
         // spaces table should hold a collection of all components, id of components and what component (whatComponent: Enum(value: Int))
     }
 
-    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder = spaceRepository.getPublicLayoutOfCompositions(layoutId)
+    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder =
+        spaceManager.getPublicLayoutOfCompositions(layoutId)
 
     fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionDataBuilder =
-        spaceRepository.getPrivateLayoutOfCompositions(layoutId, authorId)
+        spaceManager.getPrivateLayoutOfCompositions(layoutId, authorId)
 
 
     /**
@@ -52,23 +65,37 @@ class CompositionService(
      * @return Id of created composition.
      */
     fun createComposition(
-        compositionCategory: CompositionCategory,
-        compositionOfCategory: CompositionCarousel,
+        userComposition: UserComposition,
         jsonData: String,
         layoutId: Int,
         userId: Int
     ): CompositionResponse {
         // todo validate that userId has privileges to layoutId
 
-        return when (compositionCategory) {
-            CompositionCategory.Text -> TODO()
-            CompositionCategory.Markdown -> TODO()
-            CompositionCategory.Banner -> TODO()
-            CompositionCategory.OneOffGrid -> TODO()
-            CompositionCategory.Divider -> TODO()
-            CompositionCategory.LineDivider -> TODO()
+        return when (userComposition.compositionCategory) {
+            CompositionCategory.Text ->
+                textsManager.createCompositionOfCategory(
+                    compositionType = CompositionText.fromInt(userComposition.compositionType),
+                    jsonData, layoutId, userId
+                )
+            CompositionCategory.Banner ->
+                bannersManager.createCompositionOfCategory(
+                    compositionType = CompositionBanner.fromInt(userComposition.compositionType),
+                    jsonData, layoutId, userId
+                )
+            CompositionCategory.Grid ->
+                gridsManager.createCompositionOfCategory(
+                    compositionType = CompositionGrid.fromInt(userComposition.compositionType),
+                    jsonData, layoutId, userId
+                )
             CompositionCategory.Carousel ->
-                carouselsManager.createCompositionOfCategory(compositionOfCategory, jsonData, layoutId, userId)
+                carouselsManager.createCompositionOfCategory(
+                    compositionType = CompositionCarousel.fromInt(userComposition.compositionType),
+                    jsonData, layoutId, userId
+                )
+            CompositionCategory.Markdown -> TODO() // todo - part of text, remove
+            CompositionCategory.Divider -> TODO() // todo - style and text, move to text
+            CompositionCategory.LineDivider -> TODO() // todo - styles, remove
         }
     }
 
@@ -86,86 +113,87 @@ class CompositionService(
 //        }
     }
 
+    // todo - response
     /**
-     * Insert composition
+     * Delete composition
      *
-     * @param request
-     * @param spaceAddress
-     * @return
+     * Given the composition category the method will call the corresponding manager. The user of [authorId] must be
+     * privileged to delete composition of [compositionSourceId]. todo - exception catching could be done here.
+     *
+     * @param userComposition Category and type of category of composition to delete.
+     * @param compositionSourceId Composition source id that is the source of the composition and its records.
+     * @param authorId Id of the author who should be privileged to modify or delete composition.
+     * @return Failed of success responses. todo
+     * @see  ICompositionCategoryManagerStructure.deleteComposition
      */
-
-
-    fun deleteComposition(request: IUserComposition): Boolean {
+    fun deleteComposition(
+        userComposition: UserComposition,
+        authorId: Int
+    ): Boolean {
         val gson = Gson()
-        return when (request.compositionType) {
-            // region Carousels
+        return when (userComposition.compositionCategory) {
             CompositionCategory.Carousel ->
-                TODO()
-//                carouselOfImagesRepository.deleteComposition(
-//                    gson.fromJson(request.jsonData, CarouselBasicImages::class.java),
-//                )
-            // endregion
-
-            // region Texts
-            CompositionCategory.Markdown -> TODO()
+                carouselsManager.deleteComposition(
+                    compositionType = CompositionCarousel.fromInt(userComposition.compositionType),
+                    compositionSourceId = userComposition.compositionSourceId,
+                    authorId = authorId,
+                )
             CompositionCategory.Text ->
-                TODO("code")
-//                bannerRepository.deleteBannerBasic(
-//                    gson.fromJson(request.jsonData, BannerBasic::class.java)
-//                )
-            // endregion
+                textsManager.deleteComposition(
+                    compositionType = CompositionText.fromInt(userComposition.compositionType),
+                    compositionSourceId = userComposition.compositionSourceId,
+                    authorId = authorId,
+                )
+            CompositionCategory.Banner ->
+                bannersManager.deleteComposition(
+                    compositionType = CompositionBanner.fromInt(userComposition.compositionType),
+                    compositionSourceId = userComposition.compositionSourceId,
+                    authorId = authorId,
+                )
+            CompositionCategory.Grid -> {
+                gridsManager.deleteComposition(
+                    compositionType = CompositionGrid.fromInt(userComposition.compositionType),
+                    compositionSourceId = userComposition.compositionSourceId,
+                    authorId = authorId,
+                )
+            }
 
-            // region Banners
-            CompositionCategory.Banner -> TODO()
-            // endregion
-
-            // region Grids
-            CompositionCategory.OneOffGrid -> TODO()
-            // endregion
-
-            // region Dividers
-            CompositionCategory.Divider -> TODO()
-            CompositionCategory.LineDivider -> TODO()
-            // endregion
+            CompositionCategory.Markdown -> TODO() // todo - part of text, remove
+            CompositionCategory.Divider -> TODO() // todo - style and text, move to text
+            CompositionCategory.LineDivider -> TODO() // todo - styles, remove
         }
     }
 
+    // region todo
     fun updateComposition(request: UpdateCompositionRequest) {
         request.updateComposition.map {
             updateComposition(it)
         }
     }
 
-    fun updateComposition(request: SingleUpdateCompositionRequest): Boolean {
+    fun <T> updateComposition(
+        request: SingleUpdateCompositionRequest<T>
+//        compositionUpdateQue = List<UpdateDataOfComposition<UpdateDataOfCarouselOfImages>>,
+    ): Boolean {
         val gson = Gson()
         when (CompositionCategory.fromInt(request.compositionType)) {
-            // region Carousels
             CompositionCategory.Carousel -> {
-//                carouselOfImagesRepository.update(
+                carouselsManager.updateComposition(
+                    compositionType = CompositionCarousel.fromInt(request.compositionType),
+                    compositionSourceId = request.compositionSourceId,
+                    compositionUpdateQue = request.updateDataOfComposition,
+                    authorId = authorId
 //                    componentId = request.id,
 //                    column = CarouselOfImagesTABLE.fromInt(request.where[0].table),
 //                    updateToData = request.updateToData
-//                )
+                )
             }
-            // endregion
-
-            // region Just texts
             CompositionCategory.Text -> TODO()
-            CompositionCategory.Markdown -> TODO()
-            // endregion
-
-            // region Banners
             CompositionCategory.Banner -> TODO()
-            // endregion
-
-            // region Grids
-            CompositionCategory.OneOffGrid -> TODO()
-            // endregion
-
-            // region Dividers
-            CompositionCategory.Divider -> TODO()
-            CompositionCategory.LineDivider -> TODO()
-            // endregion
+            CompositionCategory.Grid -> TODO()
+            CompositionCategory.Markdown -> TODO() // todo - part of text, remove
+            CompositionCategory.Divider -> TODO() // todo - style and text, move to text
+            CompositionCategory.LineDivider -> TODO() // todo - styles, remove
         }
         return false
     }
@@ -204,7 +232,7 @@ class CompositionService(
             // endregion
 
             // region Grids
-            CompositionCategory.OneOffGrid -> TODO()
+            CompositionCategory.Grid -> TODO()
             // endregion
 
             // region Dividers
@@ -214,17 +242,10 @@ class CompositionService(
         }
         return false
     }
+    // endregion todo
 
-    fun getSpace() {
-    }
 
-    fun createSpace(layoutName: String) {
-        val spaceAddress = spaceRepository.insertNewSpace()
-        val layoutId = spaceRepository.insertNewLayout(layoutName)
-        spaceRepository.associateLayoutToSpace(spaceAddress = spaceAddress, layoutId = layoutId)
-    }
+    fun createSpaceWithNewLayout(layoutName: String) = spaceManager.createSpaceWithNewLayout(layoutName)
 
-    fun createNewLayout(name: String): Int {
-        return spaceRepository.insertNewLayout(name)
-    }
+    fun createNewLayout(name: String): Int = spaceRepository.insertNewLayout(name)
 }

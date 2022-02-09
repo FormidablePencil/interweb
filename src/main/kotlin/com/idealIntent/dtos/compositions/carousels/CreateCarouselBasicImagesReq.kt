@@ -11,8 +11,6 @@ import kotlinx.serialization.Serializable
 import models.IWithPK
 import models.IWithPrivilegeSourcePK
 
-// todo - 2 are extra. Required a Refactor.
-
 /**
  * CarouselBasicImage request and response.
  *

@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class UserComposition(
-    override val compositionType: CompositionCategory,
-    override val jsonData: String,
+    override val compositionSourceId: Int,
+    override val compositionCategory: CompositionCategory,
+    override val compositionType: Int,
 ) : IUserComposition
