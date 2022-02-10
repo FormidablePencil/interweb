@@ -4,7 +4,7 @@ import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.CompositionCode.FailedToFindAuthorByUsername
 import com.idealIntent.exceptions.CompositionCode.UserNotPrivileged
 import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.CompositionsGenericPrivileges
 import com.idealIntent.repositories.profile.AuthorRepository
 import io.kotest.assertions.throwables.shouldThrow
@@ -17,7 +17,7 @@ import shared.testUtils.privilegedAuthors
 
 class CompositionPrivilegesManagerTest : BehaviorSpec({
     val authorRepository: AuthorRepository = mockk()
-    val compositionPrivilegesRepository: CompositionPrivilegesRepository = mockk()
+    val compositionSourceRepository: CompositionSourceRepository = mockk()
     val appEnv: AppEnv = mockk()
 
     val sourceId = 5432
@@ -29,7 +29,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
         CompositionPrivilegesManager(
             appEnv = appEnv,
             authorRepository = authorRepository,
-            compositionPrivilegesRepository = compositionPrivilegesRepository,
+            compositionPrivilegesRepository = compositionSourceRepository,
         ), recordPrivateCalls = true
     )
 
@@ -38,9 +38,9 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
     given("createPrivileges") {
         then("success. User gets absolute privileges.") {
             // region setup
-            every { compositionPrivilegesRepository.addCompositionSource(name = "my composition", compositionType = 0) } returns sourceId
+            every { compositionSourceRepository.addCompositionSource(name = "my composition", compositionType = 0) } returns sourceId
             justRun {
-                compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+                compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, userId
                 )
             }
@@ -48,9 +48,9 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
 
             compositionPrivilegesManager.createCompositionSource(compositionType = 0, userId)
 
-            verify { compositionPrivilegesRepository.addCompositionSource(name = "my composition", compositionType = 0) }
+            verify { compositionSourceRepository.addCompositionSource(name = "my composition", compositionType = 0) }
             verify {
-                compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+                compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, userId
                 )
             }
@@ -61,10 +61,10 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
         beforeEach {
             // region setup
             appEnvMockHelper(appEnv)
-            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
+            every { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
             every { authorRepository.getByUsername(any()) } returns author
             justRun {
-                compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+                compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     privileges = any(),
                     compositionSourceId = sourceId,
                     authorId = any()
@@ -75,7 +75,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
 
         then("user not privileged") {
             // region setup
-            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns false
+            every { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns false
             // endregion
 
             val ex = shouldThrow<CompositionException> {
@@ -110,10 +110,10 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             )
 
             verify(exactly = 1) { appEnv.database.useTransaction {} } // verify it is wrapped in a useTransaction
-            verify { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }
+            verify { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }
             verify { authorRepository.getByUsername(any()) }
             verify {
-                compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+                compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     privileges = any(), compositionSourceId = sourceId, authorId = any()
                 )
             }
@@ -124,10 +124,10 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
     given("giveAnAuthorPrivilegesByUsername") {
         beforeEach {
             // region setup
-            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
+            every { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
             every { authorRepository.getByUsername(privilegedAuthor.username) } returns author
             justRun {
-                compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+                compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
                     compositionSourceId = sourceId,
                     authorId = author.id
@@ -138,7 +138,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
 
         then("user not privileged") {
             // region setup
-            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns false
+            every { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns false
             // endregion
 
             val ex = shouldThrow<CompositionException> {
@@ -171,10 +171,10 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
         then("success") {
             compositionPrivilegesManager.giveAnAuthorPrivilegesToCompositionSourceByUsername(privilegedAuthor, sourceId, userId)
 
-            verify { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }
+            verify { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }
             verify { authorRepository.getByUsername(privilegedAuthor.username) }
             verify {
-                compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+                compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
                     compositionSourceId = sourceId,
                     authorId = author.id

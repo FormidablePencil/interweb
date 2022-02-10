@@ -131,7 +131,7 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param authorId Author's id to validate if privileged to delete.
      * @return success or fail.
      */
-    fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean
+    fun deleteComposition(compositionSourceId: Int, authorId: Int)
 
     /**
      * Throw if authorId is null. Saves from code duplications.

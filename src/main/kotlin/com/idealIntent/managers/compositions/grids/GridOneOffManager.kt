@@ -2,20 +2,19 @@ package com.idealIntent.managers.compositions.grids
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-import com.idealIntent.managers.compositions.carousels.UpdateDataOfCarouselOfImages
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
-import com.idealIntent.repositories.compositions.ICompositionManagerStructure
+import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import org.koin.core.component.KoinComponent
 
-class GridOneOffManager : ICompositionManagerStructure<GridRes, IImagesCarouselEntity,
+class GridOneOffManager : ICompositionTypeManagerStructure<GridRes, IImagesCarouselEntity,
         CreateGridReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
     override fun createComposition(
         createRequest: CreateGridReq,
         layoutId: Int,
         authorId: Int
-    ): CompositionResponse {
+    ): Int {
         TODO("Not yet implemented")
     }
 

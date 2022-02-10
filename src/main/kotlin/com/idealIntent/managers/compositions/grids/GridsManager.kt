@@ -37,7 +37,7 @@ class GridsManager(
         jsonData: String,
         layoutId: Int,
         userId: Int
-    ): CompositionResponse {
+    ): Int {
         return when (compositionType) {
             Basic -> {
                 oneOffGridManager.createComposition(
@@ -66,7 +66,7 @@ class GridsManager(
         compositionType: CompositionGrid,
         compositionSourceId: Int,
         authorId: Int
-    ): Boolean {
+    ) {
         return when (compositionType) {
             Basic -> {
                 oneOffGridManager.deleteComposition(compositionSourceId, authorId)

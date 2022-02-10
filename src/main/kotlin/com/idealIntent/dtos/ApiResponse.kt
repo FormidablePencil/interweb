@@ -30,7 +30,7 @@ open class ApiDataResponse<Data, Enum, ClassExtendedFrom>(
 
 fun <Data, Enum, ClassExtendedFrom> ApiDataResponse<Data, Enum, ClassExtendedFrom>.succeeded(
     httpStatusCode: HttpStatusCode,
-    data: Data
+    data: Data? = null
 ): ClassExtendedFrom {
     this.isSuccess = true
     this.successHttpStatusCode = httpStatusCode

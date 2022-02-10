@@ -5,7 +5,7 @@ import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionCode.FailedToFindAuthorByUsername
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.CompositionPrivilegesManager
-import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.SpaceRepository
@@ -22,7 +22,7 @@ import shared.testUtils.privilegedAuthors
 class CarouselOfImagesManagerTest : BehaviorSpec({
     val textRepository: TextRepository = mockk()
     val imageRepository: ImageRepository = mockk()
-    val compositionPrivilegesRepository: CompositionPrivilegesRepository = mockk()
+    val compositionSourceRepository: CompositionSourceRepository = mockk()
     val compositionPrivilegesManager: CompositionPrivilegesManager = mockk()
     val carouselOfImagesRepository: CarouselOfImagesRepository = mockk()
     val spaceRepository: SpaceRepository = mockk()
@@ -45,7 +45,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             compositionPrivilegesManager = compositionPrivilegesManager,
             textRepository = textRepository,
             imageRepository = imageRepository,
-            compositionPrivilegesRepository = compositionPrivilegesRepository,
+            compositionPrivilegesRepository = compositionSourceRepository,
             carouselOfImagesRepository = carouselOfImagesRepository,
             spaceRepository = spaceRepository,
         )

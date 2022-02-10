@@ -2,7 +2,7 @@ package com.idealIntent.repositories.compositions
 
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.CompositionCategory
-import dtos.compositions.carousels.CompositionCarousel
+import dtos.compositions.carousels.CompositionCarouselType
 import org.ktorm.dsl.QueryRowSet
 import org.ktorm.dsl.QuerySource
 import org.ktorm.schema.Column
@@ -38,10 +38,10 @@ class CompositionQueryBuilder(
         compCategoryAndType.forEach {
             when (it.first) {
                 CompositionCategory.Carousel -> {
-                    when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
-                        CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages -> {
+                    when (CompositionCarouselType.fromInt(it.second)) {
+                        CompositionCarouselType.CarouselBlurredOverlay -> TODO()
+                        CompositionCarouselType.CarouselMagnifying -> TODO()
+                        CompositionCarouselType.BasicImages -> {
                             res = carouselOfImagesRepository.compositionLeftJoin(querySource)
                         }
                     }
@@ -75,10 +75,10 @@ class CompositionQueryBuilder(
         compCategoryAndType.forEach {
             when (it.first) {
                 CompositionCategory.Carousel -> {
-                    when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
-                        CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages ->
+                    when (CompositionCarouselType.fromInt(it.second)) {
+                        CompositionCarouselType.CarouselBlurredOverlay -> TODO()
+                        CompositionCarouselType.CarouselMagnifying -> TODO()
+                        CompositionCarouselType.BasicImages ->
                             carouselOfImagesRepository.compositionWhereClause(mutableList)
                     }
                 }
@@ -100,10 +100,10 @@ class CompositionQueryBuilder(
         compCategoryAndType.forEach {
             when (it.first) {
                 CompositionCategory.Carousel -> {
-                    when (CompositionCarousel.fromInt(it.second)) {
-                        CompositionCarousel.CarouselBlurredOverlay -> TODO()
-                        CompositionCarousel.CarouselMagnifying -> TODO()
-                        CompositionCarousel.BasicImages ->
+                    when (CompositionCarouselType.fromInt(it.second)) {
+                        CompositionCarouselType.CarouselBlurredOverlay -> TODO()
+                        CompositionCarouselType.CarouselMagnifying -> TODO()
+                        CompositionCarouselType.BasicImages ->
                             carouselOfImagesRepository.compositionQueryMap(
                                 queryRowSet,
                                 compositionBuilder.carouselOfImagesData

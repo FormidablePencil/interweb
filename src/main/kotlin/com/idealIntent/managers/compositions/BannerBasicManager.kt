@@ -6,17 +6,16 @@ import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.managers.compositions.grids.CreateGridReq
 import com.idealIntent.managers.compositions.grids.GridRes
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
-import com.idealIntent.repositories.compositions.ICompositionManagerStructure
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import org.koin.core.component.KoinComponent
 
-class BannerBasicManager: ICompositionManagerStructure<GridRes, IImagesCarouselEntity,
+class BannerBasicManager: ICompositionTypeManagerStructure<GridRes, IImagesCarouselEntity,
         CreateGridReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
     override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): GridRes? {
         TODO("Not yet implemented")
     }
 
-    override fun createComposition(createRequest: CreateGridReq, layoutId: Int, authorId: Int): CompositionResponse {
+    override fun createComposition(createRequest: CreateGridReq, layoutId: Int, authorId: Int): Int {
         TODO("Not yet implemented")
     }
 

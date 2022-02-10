@@ -1,22 +1,37 @@
 package com.idealIntent.managers.compositions
 
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
+import dtos.compositions.carousels.CompositionCarouselType
 
-// todo - will create CompositionCategoryManager for each category and move related logic there such as createComposition[Category], updateComposition[Category], deleteComposition[Category], getSingleCompositionOfPrivilegedAuthor[Category]
-//  once the library of compositions get too vast for one file to contain
+//Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response
 
 /**
- * I composition
+ * Directs CRUD operations of composition categories by [CompositionType].
+ *
+ * While [composition type manager][ICompositionTypeManagerStructure] directs actions of the type of category,
+ * [composition category manager][ICompositionCategoryManagerStructure] directs actions of the category of compositions.
+ *
+ * E.g. If a deletion requested on a composition of a Carousel category, the delete method of
+ * [CarouselsManager][com.idealIntent.managers.compositions.carousels.CarouselsManager]
+ * which in turn will basically do the same but for type of category.
  */
-//Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response
 interface ICompositionCategoryManagerStructure<CompositionType, Composition, Response> {
+
+
+    fun getPublicComposition(
+        compositionType: CompositionCarouselType,
+        compositionSourceId: Int,
+    ): CarouselBasicImagesRes?
 
     /**
      * Find the composition to of compositionType and sends the composition compositionSourceId to composition's manager to get composition.
      *
-     * @param compositionType
-     * @param jsonData
-     * @return
+     * @param compositionType The type of composition of category such as Basic Images of Carousel.
+     * @param compositionSourceId Id of composition's source and not the composition's id itself.
+     * @param authorId Only retrieves composition if author is privileged to get private composition.
+     * @return Composition of records.
+     * 
      */
     fun getPrivateComposition(
         compositionType: CompositionType,
@@ -35,7 +50,7 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
         compositionType: CompositionType, jsonData: String,
         layoutId: Int,
         userId: Int
-    ): Response
+    ): Int
 
     fun updateComposition(
         compositionType: CompositionType,
@@ -48,5 +63,5 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
         compositionType: CompositionType,
         compositionSourceId: Int,
         authorId: Int
-    ): Boolean
+    )
 }

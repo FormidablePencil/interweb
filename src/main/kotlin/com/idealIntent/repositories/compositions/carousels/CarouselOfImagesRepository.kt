@@ -25,11 +25,12 @@ import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
-import dtos.compositions.carousels.CompositionCarousel
+import dtos.compositions.carousels.CompositionCarouselType
 import models.profile.AuthorsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.sequenceOf
+import org.ktorm.entity.update
 import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 
@@ -247,14 +248,18 @@ class CarouselOfImagesRepository(
         } as Int?
         database.insert(CompositionInstanceToSourcesModel) {
             set(it.compositionCategory, CompositionCategory.Carousel.value)
-            set(it.compositionType, CompositionCarousel.BasicImages.value)
+            set(it.compositionType, CompositionCarouselType.BasicImages.value)
             set(it.sourceId, composePrepared.sourceId)
             set(it.compositionId, compositionId)
         }
         return compositionId
     }
 
-    override fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean {
+    fun updateName(name: String) {
+        database.update(ImagesCarouselsModel) {it}
+    }
+
+    override fun deleteComposition(compositionSourceId: Int, authorId: Int) {
         database.useTransaction {
 
             val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionQuery(
@@ -268,6 +273,7 @@ class CarouselOfImagesRepository(
             textRepository.deleteAllRecordsInCollection(redirectTextCollectionId)
 
             // todo delete items of collections by calling their respective repositories
+            //  and compositionSource
 
 //            database.delete(ImagesCarouselsModel) { item -> item.id eq it.id }
 //
@@ -289,6 +295,5 @@ class CarouselOfImagesRepository(
 //            database.delete(CompositionSourcesModel) { record -> record.id eq record.privilegeLevel }
             // endregion
         }
-        return false
     }
 }

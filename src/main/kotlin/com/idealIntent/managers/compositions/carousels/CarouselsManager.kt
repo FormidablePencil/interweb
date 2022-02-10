@@ -5,18 +5,28 @@ import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
-import dtos.compositions.carousels.CompositionCarousel
-import dtos.compositions.carousels.CompositionCarousel.*
+import dtos.compositions.carousels.CompositionCarouselType
+import dtos.compositions.carousels.CompositionCarouselType.*
 
 class CarouselsManager(
     private val carouselOfImagesManager: CarouselOfImagesManager,
     private val carouselBlurredOverlayManager: CarouselBlurredOverlayManager,
-) : ICompositionCategoryManagerStructure<CompositionCarousel, CarouselBasicImagesRes, CompositionResponse> {
+) : ICompositionCategoryManagerStructure<CompositionCarouselType, CarouselBasicImagesRes, CompositionResponse> {
     private val gson = Gson()
 
+    override fun getPublicComposition(
+        compositionType: CompositionCarouselType,
+        compositionSourceId: Int,
+    ): CarouselBasicImagesRes? = when (compositionType) {
+        CarouselBlurredOverlay ->
+            carouselBlurredOverlayManager.getPublicComposition(compositionSourceId)
+        CarouselMagnifying -> TODO() // todo - this is a style variant of BasicImages
+        BasicImages ->
+            carouselOfImagesManager.getPublicComposition(compositionSourceId)
+    }
+
     override fun getPrivateComposition(
-        compositionType: CompositionCarousel,
+        compositionType: CompositionCarouselType,
         compositionSourceId: Int,
         authorId: Int
     ): CarouselBasicImagesRes? = when (compositionType) {
@@ -28,11 +38,11 @@ class CarouselsManager(
     }
 
     override fun createComposition(
-        compositionType: CompositionCarousel,
+        compositionType: CompositionCarouselType,
         jsonData: String,
         layoutId: Int,
         userId: Int
-    ): CompositionResponse = when (compositionType) {
+    ): Int = when (compositionType) {
         CarouselBlurredOverlay ->
             carouselBlurredOverlayManager.createComposition(
                 gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java), layoutId,
@@ -47,7 +57,7 @@ class CarouselsManager(
     }
 
     override fun updateComposition(
-        compositionType: CompositionCarousel,
+        compositionType: CompositionCarouselType,
         compositionSourceId: Int,
         compositionUpdateQue: List<UpdateDataOfComposition>,
         authorId: Int,
@@ -70,15 +80,14 @@ class CarouselsManager(
     }
 
     override fun deleteComposition(
-        compositionType: CompositionCarousel,
+        compositionType: CompositionCarouselType,
         compositionSourceId: Int,
         authorId: Int
-    ): Boolean = when (compositionType) {
+    ) = when (compositionType) {
         CarouselBlurredOverlay ->
-            carouselOfImagesManager.deleteComposition(compositionSourceId, authorId)
+            carouselBlurredOverlayManager.deleteComposition(compositionSourceId, authorId)
         CarouselMagnifying -> TODO()
         BasicImages ->
             carouselOfImagesManager.deleteComposition(compositionSourceId, authorId)
     }
-//    TODO("Not yet implemented")
 }

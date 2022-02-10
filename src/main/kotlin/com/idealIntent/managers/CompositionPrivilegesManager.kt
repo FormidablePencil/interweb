@@ -5,14 +5,14 @@ import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
-import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.CompositionsGenericPrivileges
 import com.idealIntent.repositories.profile.AuthorRepository
 
 class CompositionPrivilegesManager(
     private val appEnv: AppEnv,
     private val authorRepository: AuthorRepository,
-    private val compositionPrivilegesRepository: CompositionPrivilegesRepository,
+    private val compositionSourceRepository: CompositionSourceRepository,
 ) {
 
     /**
@@ -23,10 +23,10 @@ class CompositionPrivilegesManager(
      * @return adds a privilege source and associates to creator's id to it.
      */
     fun createCompositionSource(compositionType: Int, authorId: Int): Int {
-        val sourceId = compositionPrivilegesRepository.addCompositionSource(
+        val sourceId = compositionSourceRepository.addCompositionSource(
             privilegeLevel = 0, name = "my composition", compositionType = compositionType
         )
-        compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+        compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
             CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, authorId
         )
         return sourceId
@@ -48,7 +48,7 @@ class CompositionPrivilegesManager(
         var iteration = 0
         try {
             appEnv.database.useTransaction {
-                if (!compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(compositionSourceId, userId))
+                if (!compositionSourceRepository.isUserPrivilegedToModifyComposition(compositionSourceId, userId))
                     throw CompositionException(UserNotPrivileged)
 
                 privilegedAuthors.forEach {
@@ -57,7 +57,7 @@ class CompositionPrivilegesManager(
                     val author = authorRepository.getByUsername(it.username)
                         ?: throw CompositionException(FailedToFindAuthorByUsername)
 
-                    compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+                    compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                         privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
                         compositionSourceId = compositionSourceId,
                         authorId = author.id
@@ -93,13 +93,13 @@ class CompositionPrivilegesManager(
         compositionSourceId: Int,
         userId: Int
     ) {
-        if (!compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(compositionSourceId, userId))
+        if (!compositionSourceRepository.isUserPrivilegedToModifyComposition(compositionSourceId, userId))
             throw CompositionException(UserNotPrivileged)
 
         val author = authorRepository.getByUsername(privilegedAuthor.username)
             ?: throw CompositionException(FailedToFindAuthorByUsername)
 
-        compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
+        compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
             privileges = CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
             compositionSourceId = compositionSourceId,
             authorId = author.id

@@ -19,12 +19,14 @@ data class CompositionsGenericPrivileges(
     override val modifyUserPrivileges: Int,
 ) : ICompositionsGenericPrivileges
 
-class CompositionPrivilegesRepository() : RepositoryBase() {
+// todo - compositionSource
+class CompositionSourceRepository : RepositoryBase() {
     private val Database.compositionSource get() = this.sequenceOf(CompositionSourcesModel)
     private val Database.privilegedAuthorsToCompositions
         get() = this.sequenceOf(PrivilegedAuthorToCompositionSourcesModel)
 
-    // region Get
+    // region Privileges
+
     /**
      * Get author's privileges.
      */
@@ -65,10 +67,7 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
         database.privilegedAuthorsToCompositions.find {
             it.authorId eq authorId and (it.sourceId eq compositionSourceId) and (it.modifyUserPrivileges eq 1)
         } != null
-    // endregion Get
 
-
-    // region Insert
     /**
      * Give an author privilege.
      *
@@ -85,21 +84,6 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
         set(it.sourceId, compositionSourceId)
         set(it.authorId, authorId)
     }
-
-    /**
-     * Add privilege source which is a record for compositions to key off of as a source of truth for privileges,
-     * making the privileges unique to every kind of compositional record that references it.
-     *
-     * @param privilegeLevel level of privileges such as whether it is a viewable for everyone or private.
-     * @return Id to privilege source.
-     */
-    fun addCompositionSource(privilegeLevel: Int = 0, name: String, compositionType: Int): Int =
-        database.insertAndGenerateKey(CompositionSourcesModel) {
-            set(it.name, name)
-            set(it.compositionType, compositionType)
-            set(it.privilegeLevel, privilegeLevel)
-        } as Int
-    // endregion Insert
 
     /**
      * Remove author from all privileges.
@@ -132,4 +116,24 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
         }
         where { it.authorId eq authorIdToUpdatePrivilegesOf and (it.sourceId eq compositionSourceId) }
     } != 0
+    // endregion
+
+    /**
+     * Add privilege source which is a record for compositions to key off of as a source of truth for privileges,
+     * making the privileges unique to every kind of compositional record that references it.
+     *
+     * @param privilegeLevel level of privileges such as whether it is a viewable for everyone or private.
+     * @return Id to privilege source.
+     */
+    fun addCompositionSource(privilegeLevel: Int = 0, name: String, compositionType: Int): Int =
+        database.insertAndGenerateKey(CompositionSourcesModel) {
+            set(it.name, name)
+            set(it.compositionType, compositionType)
+            set(it.privilegeLevel, privilegeLevel)
+        } as Int
+
+    /**
+     * Change name of composition.
+     */
+    fun renameComposition(name: String) = database.update(CompositionSourcesModel) { set(it.name, name) }
 }

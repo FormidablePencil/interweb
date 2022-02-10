@@ -16,7 +16,7 @@ import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.CompositionCategory.*
 import dtos.compositions.banners.CompositionBanner
-import dtos.compositions.carousels.CompositionCarousel
+import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.grids.CompositionGrid
 import dtos.compositions.texts.CompositionText
 import io.kotest.core.spec.style.BehaviorSpec
@@ -458,7 +458,7 @@ class CompositionServiceTest : BehaviorSpec({
                 val httpStatus = HttpStatusCode.Created
                 every {
                     carouselsManager.createComposition(
-                        compositionType = CompositionCarousel.fromInt(newUserComposition.compositionType),
+                        compositionType = CompositionCarouselType.fromInt(newUserComposition.compositionType),
                         jsonData = carouselBasicImagesReqStingified,
                         layoutId = layoutId,
                         userId = authorId
@@ -483,7 +483,7 @@ class CompositionServiceTest : BehaviorSpec({
                 // region setup
                 every {
                     carouselsManager.createComposition(
-                        compositionType = CompositionCarousel.fromInt(newUserComposition.compositionType),
+                        compositionType = CompositionCarouselType.fromInt(newUserComposition.compositionType),
                         jsonData = carouselBasicImagesReqStingified,
                         layoutId = layoutId,
                         userId = authorId
@@ -511,7 +511,7 @@ class CompositionServiceTest : BehaviorSpec({
                 // region setup
                 every {
                     carouselsManager.deleteComposition(
-                        CompositionCarousel.fromInt(userComposition.compositionType),
+                        CompositionCarouselType.fromInt(userComposition.compositionType),
                         userComposition.compositionSourceId,
                         authorId = authorId
                     )
@@ -527,7 +527,7 @@ class CompositionServiceTest : BehaviorSpec({
                 // region setup
                 every {
                     carouselsManager.deleteComposition(
-                        CompositionCarousel.fromInt(userComposition.compositionType),
+                        CompositionCarouselType.fromInt(userComposition.compositionType),
                         userComposition.compositionSourceId,
                         authorId
                     )
@@ -546,7 +546,7 @@ class CompositionServiceTest : BehaviorSpec({
                 // region setup
                 every {
                     carouselsManager.updateComposition(
-                        CompositionCarousel.fromInt(request.compositionType),
+                        CompositionCarouselType.fromInt(request.compositionType),
                         request.compositionSourceId,
                         compositionUpdateQue = request.compositionUpdateQue,
                         authorId = authorId
@@ -562,7 +562,7 @@ class CompositionServiceTest : BehaviorSpec({
                 // region setup
                 justRun {
                     carouselsManager.updateComposition(
-                        compositionType = CompositionCarousel.fromInt(request.compositionType),
+                        compositionType = CompositionCarouselType.fromInt(request.compositionType),
                         compositionSourceId = request.compositionSourceId,
                         compositionUpdateQue = request.compositionUpdateQue,
                         authorId = authorId

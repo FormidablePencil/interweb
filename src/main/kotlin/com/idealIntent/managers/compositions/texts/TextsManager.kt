@@ -1,11 +1,20 @@
 package com.idealIntent.managers.compositions.texts
 
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
+import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.texts.CompositionText
 
 class TextsManager: ICompositionCategoryManagerStructure<CompositionText, CompositionResponse, CompositionResponse> {
+    override fun getPublicComposition(
+        compositionType: CompositionCarouselType,
+        compositionSourceId: Int
+    ): CarouselBasicImagesRes? {
+        TODO("Not yet implemented")
+    }
+
     override fun getPrivateComposition(
         compositionType: CompositionText,
         compositionSourceId: Int,
@@ -19,7 +28,7 @@ class TextsManager: ICompositionCategoryManagerStructure<CompositionText, Compos
         jsonData: String,
         layoutId: Int,
         userId: Int
-    ): CompositionResponse {
+    ): Int {
         TODO("Not yet implemented")
     }
 
@@ -36,7 +45,7 @@ class TextsManager: ICompositionCategoryManagerStructure<CompositionText, Compos
         compositionType: CompositionText,
         compositionSourceId: Int,
         authorId: Int
-    ): Boolean {
+    ) {
         TODO("Not yet implemented")
     }
 }

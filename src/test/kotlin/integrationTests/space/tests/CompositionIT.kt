@@ -8,7 +8,7 @@ import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
-import dtos.compositions.carousels.CompositionCarousel
+import dtos.compositions.carousels.CompositionCarouselType
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
@@ -38,7 +38,7 @@ class CompositionIT : BehaviorSpecIT({
                 val layoutId = compositionService.createNewLayout("my new layout", userId)
 
                 val res: CompositionResponse = compositionService.createComposition(
-                    NewUserComposition(CompositionCategory.Carousel, CompositionCarousel.BasicImages.value),
+                    NewUserComposition(CompositionCategory.Carousel, CompositionCarouselType.BasicImages.value),
                     gson.toJson(createCarouselBasicImagesReq),
                     layoutId,
                     userId
@@ -59,7 +59,7 @@ class CompositionIT : BehaviorSpecIT({
                 val layoutId = compositionService.createNewLayout("my new layout", userId)
 
                 val res: CompositionResponse = compositionService.createComposition(
-                    NewUserComposition(CompositionCategory.Carousel, CompositionCarousel.BasicImages.value),
+                    NewUserComposition(CompositionCategory.Carousel, CompositionCarouselType.BasicImages.value),
                     gson.toJson(createCarouselBasicImagesReq),
                     layoutId,
                     userId
@@ -77,7 +77,7 @@ class CompositionIT : BehaviorSpecIT({
                     userComposition = ExistingUserComposition(
                         compositionSourceId = carouselOfImagesCompositionId,
                         compositionCategory = CompositionCategory.Carousel,
-                        compositionType = CompositionCarousel.BasicImages.value,
+                        compositionType = CompositionCarouselType.BasicImages.value,
                     ),
                     authorId = userId
                 )

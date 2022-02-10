@@ -1,25 +1,24 @@
-package com.idealIntent.repositories.compositions
+package com.idealIntent.managers.compositions
 
-import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 
 /**
- * Structure for CRUD operations on compositions
+ * Directs CRUD operations of composition types.
  *
- * SpaceResponseFailed CMS requires CRUD operations on compositions. This is an interface for all CRUD operational repositories of compositions
- * to adhere to for structure and CRUD operation requirements.
+ * While [composition category manager][ICompositionCategoryManagerStructure] directs actions of the category of
+ * compositions, [composition type manager][ICompositionTypeManagerStructure] directs actions of the type of category,
  *
  * @param Composition Records of composition.
  * @param CompositionMetadata Composition information, ids, ect.
  * @param CreateRequest Ids of compositions and collections to compose and raw data to save before composition.
  * @param ComposePrepared Ids of composition and collections to created beforehand.
  */
-interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared,
-        Response> {
+interface ICompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response> {
+
+    fun getPublicComposition(compositionSourceId: Int): Composition?
 
     fun getPrivateComposition(compositionSourceId: Int, authorId: Int): Composition?
 
-    // region Insert
     /**
      * Firstly creates composition's collections and compositions (side note - some compositions are nested in one another),
      * inserts the records and creates a record to collection relationship.
@@ -35,17 +34,14 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
         createRequest: CreateRequest,
         layoutId: Int,
         authorId: Int
-    ): Response
-    // endregion Insert
+    ): Int
 
-
-    // region Update
     /**
      * Update composition
      *
-     * @param id Id to identify under what collection [record] is under
-     * @param record Update to
-     * @return Success or fail in updating [record]
+     * @param compositionUpdateQue Update que. Gives you what column to update and to what value.
+     * @param authorId Id of author to get only the composition they are privileged to update.
+     * @throws
      */
     fun updateComposition(
         compositionUpdateQue: List<UpdateDataOfComposition>,
@@ -54,19 +50,7 @@ interface ICompositionManagerStructure<Composition, CompositionMetadata, CreateR
     )
 
     /**
-     * Batch update compositions
-     *
-     * @param id ID to identify under what collection [records] are under
-     * @param records Update to
+     * Delete composition and records its composed.
      */
-    fun batchUpdateCompositions(id: Int, records: List<RecordUpdate>): Boolean
-    // todo - reimplement this to work with compositions
-
-    // endregion Update
-
-
-    // todo deletes
-    // region Delete
-    fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean
-    // endregion Delete
+    fun deleteComposition(compositionSourceId: Int, authorId: Int)
 }

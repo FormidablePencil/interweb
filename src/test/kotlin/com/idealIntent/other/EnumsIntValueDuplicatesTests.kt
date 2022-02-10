@@ -9,7 +9,7 @@ import dtos.compositions.CompositionCategory
 import dtos.compositions.CompositionModLvl
 import dtos.compositions.banners.CompositionBanner
 import dtos.compositions.carousels.CarouselOfImagesTABLE
-import dtos.compositions.carousels.CompositionCarousel
+import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.grids.CompositionGrid
 import dtos.compositions.headers.CompositionHeader
 import io.kotest.core.spec.style.BehaviorSpec
@@ -46,12 +46,12 @@ class EnumsIntValueDuplicatesTests : BehaviorSpec({
 
         setCollection.size shouldBe CompositionBanner.values().size
     }
-    given("CompositionCarousel") {
-        val setCollection = CompositionCarousel.values().map {
-            return@map CompositionCarousel.fromInt(it.value).name
+    given("CompositionCarouselType") {
+        val setCollection = CompositionCarouselType.values().map {
+            return@map CompositionCarouselType.fromInt(it.value).name
         }.toSet()
 
-        setCollection.size shouldBe CompositionCarousel.values().size
+        setCollection.size shouldBe CompositionCarouselType.values().size
     }
     given("CompositionGrid") {
         val setCollection = CompositionGrid.values().map {

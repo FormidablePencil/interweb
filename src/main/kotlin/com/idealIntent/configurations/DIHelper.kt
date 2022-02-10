@@ -7,7 +7,7 @@ import com.idealIntent.repositories.PasswordRepository
 import com.idealIntent.repositories.RefreshTokenRepository
 import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
 import com.idealIntent.repositories.codes.ResetPasswordCodeRepository
-import com.idealIntent.repositories.collectionsGeneric.CompositionPrivilegesRepository
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.CompositionQueryBuilder
@@ -54,7 +54,7 @@ object DIHelper {
         single { ResetPasswordCodeRepository() }
         single { AccountRepository() }
         single { AuthorProfileRelatedRepository() }
-        single { CompositionPrivilegesRepository() }
+        single { CompositionSourceRepository() }
         single { TextRepository() }
         single { ImageRepository() }
         single { CarouselOfImagesRepository(get(), get()) }

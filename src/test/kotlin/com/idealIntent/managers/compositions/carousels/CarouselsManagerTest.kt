@@ -5,7 +5,7 @@ import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode
-import dtos.compositions.carousels.CompositionCarousel.*
+import dtos.compositions.carousels.CompositionCarouselType.*
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*

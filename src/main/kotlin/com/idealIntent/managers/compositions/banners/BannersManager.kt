@@ -19,7 +19,7 @@ class BannersManager: ICompositionCategoryManagerStructure<CompositionBanner, Co
         jsonData: String,
         layoutId: Int,
         userId: Int
-    ): CompositionResponse {
+    ): Int {
         TODO("Not yet implemented")
     }
 
@@ -36,7 +36,7 @@ class BannersManager: ICompositionCategoryManagerStructure<CompositionBanner, Co
         compositionType: CompositionBanner,
         compositionSourceId: Int,
         authorId: Int
-    ): Boolean {
+    ) {
         TODO("Not yet implemented")
     }
 }
