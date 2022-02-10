@@ -48,14 +48,14 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
             clearAllMocks()
         }
 
-        given("isUserPrivileged") {
+        given("isUserPrivilegedToModifyComposition") {
             then("provided a non existing user id") {
                 rollback {
                     val sourceId = compositionPrivilegesRepository.addCompositionSource(
                         name = "my composition",
                         compositionType = 0
                     )
-                    val privileged = compositionPrivilegesRepository.isUserPrivileged(99999999, sourceId)
+                    val privileged = compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(99999999, sourceId)
                     privileged shouldBe false
                 }
             }
@@ -63,7 +63,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
             then("provided a non existing privilege source id") {
                 rollback {
                     val authorId = createAuthors()[0].second
-                    val privileged = compositionPrivilegesRepository.isUserPrivileged(authorId, 99999999)
+                    val privileged = compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(authorId, 99999999)
                     privileged shouldBe false
 
                 }
@@ -81,7 +81,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                     compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(privileges, sourceId, authorId)
                     // endregion setup
 
-                    val privileged = compositionPrivilegesRepository.isUserPrivileged(sourceId, authorId)
+                    val privileged = compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, authorId)
                     privileged shouldBe true
                 }
             }
@@ -133,7 +133,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
                     // endregion
 
                     compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(privileges, sourceId, authorId)
-                    compositionPrivilegesRepository.isUserPrivileged(sourceId, authorId)
+                    compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, authorId)
                 }
             }
         }

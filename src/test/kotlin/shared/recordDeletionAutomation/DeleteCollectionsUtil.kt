@@ -7,7 +7,7 @@ import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import org.koin.test.KoinTest
 import org.koin.test.inject
 import org.ktorm.dsl.*
@@ -42,6 +42,6 @@ class DeleteCollectionsUtil: KoinTest {
     }
 
     fun deletePrivilegedAuthors(authorId: Int) {
-        appEnv.database.delete(PrivilegedAuthorsToCompositionSourcesModel) { it.authorId eq authorId }
+        appEnv.database.delete(PrivilegedAuthorToCompositionSourcesModel) { it.authorId eq authorId }
     }
 }

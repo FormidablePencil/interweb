@@ -12,7 +12,7 @@ class SpaceRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(listOf(DIHelper.CoreModule, DITestHelper.FlowModule)))
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
     private val spaceRepository: SpaceRepository by inject()
-    private val cmsService: CompositionService by inject()
+    private val compositionService: CompositionService by inject()
 
     init {
         given("getSpaceLayoutOfCompositions") {

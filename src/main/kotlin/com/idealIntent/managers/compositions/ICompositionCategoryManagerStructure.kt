@@ -31,7 +31,7 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
      * @param jsonData
      * @return
      */
-    fun createCompositionOfCategory(
+    fun createComposition(
         compositionType: CompositionType, jsonData: String,
         layoutId: Int,
         userId: Int

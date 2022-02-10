@@ -5,8 +5,14 @@ import dtos.space.IUserComposition
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class UserComposition(
-    override val compositionSourceId: Int,
+data class ExistingUserComposition(
+    val compositionSourceId: Int,
     override val compositionCategory: CompositionCategory,
     override val compositionType: Int,
 ) : IUserComposition
+
+@Serializable
+data class NewUserComposition(
+    override val compositionCategory: CompositionCategory,
+    override val compositionType: Int,
+): IUserComposition

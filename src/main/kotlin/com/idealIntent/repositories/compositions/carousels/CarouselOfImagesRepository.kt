@@ -18,7 +18,7 @@ import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import com.idealIntent.models.space.SpacesModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
@@ -63,7 +63,7 @@ class CarouselOfImagesRepository(
     private val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
     private val compInstance = ImagesCarouselsModel.aliased("compInstance")
 
-    private val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
+    private val prvAth2CompSource = PrivilegedAuthorToCompositionSourcesModel.aliased("prvAth2CompSource")
 
 
     // region composition's collections
@@ -82,7 +82,7 @@ class CarouselOfImagesRepository(
         compInstance2compSource.sourceId,
         img2Col.orderRank, img.id, img.url, img.description,
         text2Col.orderRank, text.id, text.text,
-        prvAth2CompSource.modify, prvAth2CompSource.view,
+        prvAth2CompSource.modify, prvAth2CompSource.deletion,
         author.username
     )
 
@@ -163,7 +163,7 @@ class CarouselOfImagesRepository(
                 PrivilegedAuthor(
                     username = row[author.username]!!,
                     modify = row[prvAth2CompSource.modify]!!,
-                    view = row[prvAth2CompSource.view]!!,
+                    view = row[prvAth2CompSource.deletion]!!,
                 )
             )
         )

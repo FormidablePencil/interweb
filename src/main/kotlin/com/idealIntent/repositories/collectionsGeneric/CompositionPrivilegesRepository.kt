@@ -2,14 +2,12 @@ package com.idealIntent.repositories.collectionsGeneric
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.models.privileges.CompositionSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import com.idealIntent.repositories.RepositoryBase
+import dtos.collectionsGeneric.privileges.PrivilegedAuthorCOL
 import models.privileges.ICompositionsGenericPrivileges
 import org.ktorm.database.Database
-import org.ktorm.dsl.and
-import org.ktorm.dsl.eq
-import org.ktorm.dsl.insert
-import org.ktorm.dsl.insertAndGenerateKey
+import org.ktorm.dsl.*
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 
@@ -17,18 +15,21 @@ data class PrivilegeRecord(val id: Int)
 
 data class CompositionsGenericPrivileges(
     override val modify: Int,
-    override val view: Int,
+    override val deletion: Int,
+    override val modifyUserPrivileges: Int,
 ) : ICompositionsGenericPrivileges
 
 class CompositionPrivilegesRepository() : RepositoryBase() {
     private val Database.compositionSource get() = this.sequenceOf(CompositionSourcesModel)
-    private val Database.privilegedAuthorsToCompositions get() = this.sequenceOf(PrivilegedAuthorsToCompositionSourcesModel)
-
-    // todo - validate privilege to record - collectionSource.sourceId -> privilegeSource.id -> composition_privileged_authors.authorId
+    private val Database.privilegedAuthorsToCompositions
+        get() = this.sequenceOf(PrivilegedAuthorToCompositionSourcesModel)
 
     // region Get
-    fun getPrivilegesByAuthorId(getPrivilegesOfAuthorId: Int): Pair<List<PrivilegeRecord>, Int> {
-        TODO()
+    /**
+     * Get author's privileges.
+     */
+    fun getPrivilegesOfAuthor(getPrivilegesOfAuthorId: Int): Pair<List<PrivilegeRecord>, Int> {
+        TODO("implement when there's a need for this")
 //        val privCol = Privileges.aliased("privCol")
 //        val priv = PrivilegedAuthors.aliased("priv")
 //
@@ -48,35 +49,41 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
     }
 
     /**
-     * get privilege lvl if user is assigned to it.
-     *
-     * @param sourceId
-     * @param userId For privilege sources that are restricted lvl 2 restricted.
+     * Validate if user is privileged to modify a composition.
      */
-//    fun getPrivilegeLvl(sourceId: Int, userId: Int? = null) = database.privilegedAuthorsToCompositions.find {
-//        (it.sourceId eq sourceId) and (it.authorId eq userId)
-//    } !== null
+    fun isUserPrivilegedToModifyComposition(compositionSourceId: Int, authorId: Int) =
+        database.privilegedAuthorsToCompositions.find {
+            (it.sourceId eq compositionSourceId) and (it.authorId eq authorId) and (it.modify eq 1)
+        } != null
 
-    // todo - add give privileges to option
-    fun isUserPrivileged(sourceId: Int, userId: Int) = database.privilegedAuthorsToCompositions.find {
-        (it.sourceId eq sourceId) and (it.authorId eq userId) and (it.modify eq 1)
-    } != null
+    /**
+     * Validate if user permitted to update.
+     *
+     * @return success or failure.
+     */
+    fun isUserPermittedToUpdatePrivileges(authorId: Int, compositionSourceId: Int): Boolean =
+        database.privilegedAuthorsToCompositions.find {
+            it.authorId eq authorId and (it.sourceId eq compositionSourceId) and (it.modifyUserPrivileges eq 1)
+        } != null
     // endregion Get
 
 
     // region Insert
     /**
-     * Give an author privilege
+     * Give an author privilege.
+     *
+     * Used in conjunction with [isUserPermittedToUpdatePrivileges] to validate user is permitted to give
+     * privileges to others.
      *
      * @param privileges What kind of privileges, view mod, etc.
      */
-    fun giveAnAuthorPrivilegeToComposition(privileges: CompositionsGenericPrivileges, sourceId: Int, authorId: Int) {
-        database.insert(PrivilegedAuthorsToCompositionSourcesModel) {
-            set(it.modify, privileges.modify)
-            set(it.view, privileges.view)
-            set(it.sourceId, sourceId)
-            set(it.authorId, authorId)
-        }
+    fun giveAnAuthorPrivilegeToComposition(
+        privileges: CompositionsGenericPrivileges, compositionSourceId: Int, authorId: Int
+    ) = database.insert(PrivilegedAuthorToCompositionSourcesModel) {
+        set(it.modify, privileges.modify)
+        set(it.deletion, privileges.deletion)
+        set(it.sourceId, compositionSourceId)
+        set(it.authorId, authorId)
     }
 
     /**
@@ -86,64 +93,43 @@ class CompositionPrivilegesRepository() : RepositoryBase() {
      * @param privilegeLevel level of privileges such as whether it is a viewable for everyone or private.
      * @return Id to privilege source.
      */
-    fun addCompositionSource(privilegeLevel: Int = 0, name: String, compositionType: Int): Int {
-        return database.insertAndGenerateKey(CompositionSourcesModel) {
+    fun addCompositionSource(privilegeLevel: Int = 0, name: String, compositionType: Int): Int =
+        database.insertAndGenerateKey(CompositionSourcesModel) {
             set(it.name, name)
             set(it.compositionType, compositionType)
             set(it.privilegeLevel, privilegeLevel)
         } as Int
-    }
     // endregion Insert
 
+    /**
+     * Remove author from all privileges.
+     */
+    fun removeAuthorFromAllPrivileges(authorId: Int) =
+        database.delete(PrivilegedAuthorToCompositionSourcesModel) { it.authorId eq authorId }
 
-    // region Update
-    fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
-        TODO()
-//        val collection =
-//            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
-//
-//        val res = database.update(PrivilegedAuthors) {
-//            record.updateTo.map { updateCol ->
-//                when (PrivilegedAuthorCOL.fromInt(updateCol.column)) {
-//                    PrivilegedAuthorCOL.ModLvl -> set(it.modLvl, updateCol.value.toInt())
-//                    PrivilegedAuthorCOL.AuthorId -> set(it.authorId, updateCol.value.toInt())
-//                    // todo - remove changing of authorId
-//                    // todo - toInt() may fail
-//                }
-//            }
-//            where {
-//                when (PrivilegedAuthorIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-//                    PrivilegedAuthorIdentifiableRecordByCol.AuthorId ->
-//                        (it.sourceId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
-//                } // todo - handle incorrect recordIdentifiableByCol gracefully
-//            }
-//        }
-    }
-
-    fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
-        TODO()
-//        val collection =
-//            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle failure gracefully
-//
-//        database.batchUpdate(PrivilegedAuthors) {
-//            records.map { record ->
-//                record.updateTo.map { updateCol ->
-//                    item {
-//                        when (PrivilegedAuthorCOL.fromInt(updateCol.column)) {
-//                            PrivilegedAuthorCOL.AuthorId -> set(it.authorId, updateCol.value.toInt())
-//                            PrivilegedAuthorCOL.ModLvl -> set(it.modLvl, updateCol.value.toInt())
-//                            // todo - toInt() may fail, handle gracefully
-//                        }
-//                        where {
-//                            when (PrivilegedAuthorIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-//                                PrivilegedAuthorIdentifiableRecordByCol.AuthorId ->
-//                                    (it.sourceId eq collection.id) and (it.authorId eq record.recordIdentifiableByColOfValue.toInt())
-//                            } // todo - handle incorrect recordIdentifiableByCol gracefully
-//                        }
-//                    }
-//                }
-//            }
-//        }
-    }
-    // endregion Update
+    /**
+     * Update privileges of authors.
+     *
+     * Update author's privileges of modify, deletion and whether author may update privileges of other users.
+     *
+     * Used to conjunction with [isUserPermittedToUpdatePrivileges] to validate if user is permitted.
+     *
+     * @param record Rows and columns to update and value to update to.
+     * @param authorIdToUpdatePrivilegesOf Id of author to update on.
+     * @param compositionSourceId Id of composition's source.
+     * @return success or failure.
+     */
+    fun updatePrivilegesOfAuthors(
+        record: RecordUpdate,
+        authorIdToUpdatePrivilegesOf: Int,
+        compositionSourceId: Int,
+    ): Boolean = database.update(PrivilegedAuthorToCompositionSourcesModel) {
+        record.updateTo.map { updateCol ->
+            when (PrivilegedAuthorCOL.fromInt(updateCol.column)) {
+                PrivilegedAuthorCOL.Modify -> set(it.modify, updateCol.value.toInt())
+                PrivilegedAuthorCOL.Deletion -> set(it.deletion, updateCol.value.toInt()) // todo - toInt() may fail
+            }
+        }
+        where { it.authorId eq authorIdToUpdatePrivilegesOf and (it.sourceId eq compositionSourceId) }
+    } != 0
 }

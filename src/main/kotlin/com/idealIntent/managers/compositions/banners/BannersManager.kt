@@ -14,7 +14,7 @@ class BannersManager: ICompositionCategoryManagerStructure<CompositionBanner, Co
         TODO("Not yet implemented")
     }
 
-    override fun createCompositionOfCategory(
+    override fun createComposition(
         compositionType: CompositionBanner,
         jsonData: String,
         layoutId: Int,

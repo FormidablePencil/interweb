@@ -15,7 +15,7 @@ class SpaceFlow: BehaviorSpecFlow() {
 //            val space:  Space {
 //
 //        }
-//            spaceService.createSpace()
+//            spaceService.createNewSpace()
         }
     }
 

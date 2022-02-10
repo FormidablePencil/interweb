@@ -5,9 +5,7 @@ import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
-import dtos.compositions.carousels.CompositionCarousel.BasicImages
-import dtos.compositions.carousels.CompositionCarousel.values
+import dtos.compositions.carousels.CompositionCarousel.*
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.ktor.http.*
@@ -20,44 +18,88 @@ import shared.testUtils.createCarouselBasicImagesReq
 
 class CarouselsManagerTest : BehaviorSpec({
     val carouselOfImagesManager: CarouselOfImagesManager = mockk()
-    val carouselOfImagesRepository: CarouselOfImagesRepository = mockk()
+    val carouselBlurredOverlayManager: CarouselBlurredOverlayManager = mockk()
     val layoutId = 543
     val compositionSourceId = 1
     val authorId = 1
     val gson = Gson()
 
-    val carouselsManager = CarouselsManager(carouselOfImagesManager, carouselOfImagesRepository)
+    val carouselsManager = CarouselsManager(carouselOfImagesManager, carouselBlurredOverlayManager)
 
     beforeEach {
         clearAllMocks()
     }
 
-    values().map {
-        when (it) {
-            BasicImages -> {
-                given("getPublicComposition") {
-
+    given("getPublicComposition") {
+        values().map {
+            when (it) {
+                CarouselBlurredOverlay -> {
                     then("provided id of composition that does NOT exist") {
+                        // region setup
                         every {
-                            carouselOfImagesRepository.getPrivateComposition(
+                            carouselsManager.getPrivateComposition(
+                                compositionType = it,
                                 compositionSourceId = compositionSourceId,
                                 authorId = authorId
                             )
-                        } returns carouselBasicImagesRes
+                        } returns null
+                        // endregion
 
-                        carouselsManager.getPrivateComposition(it, compositionSourceId, authorId) shouldBe null
+                        carouselsManager.getPrivateComposition(
+                            compositionType = it,
+                            compositionSourceId = compositionSourceId,
+                            authorId = authorId
+                        ) shouldBe null
                     }
 
                     then("success") {
+                        // region setup
                         every {
-                            carouselOfImagesRepository.getPrivateComposition(
+                            carouselsManager.getPrivateComposition(
+                                compositionType = it,
                                 compositionSourceId = compositionSourceId,
                                 authorId = authorId
                             )
                         } returns carouselBasicImagesRes
+                        // endregion
 
                         carouselsManager.getPrivateComposition(
-                            it,
+                            compositionType = it,
+                            compositionSourceId = compositionSourceId,
+                            authorId = authorId
+                        ) shouldBe carouselBasicImagesRes
+                    }
+                }
+                BasicImages -> {
+                    then("provided id of composition that does NOT exist") {
+                        // region setup
+                        every {
+                            carouselOfImagesManager.getPrivateComposition(
+                                compositionSourceId = compositionSourceId,
+                                authorId = authorId
+                            )
+                        } returns null
+                        // endregion
+
+                        carouselsManager.getPrivateComposition(
+                            compositionType = it,
+                            compositionSourceId = compositionSourceId,
+                            authorId = authorId
+                        ) shouldBe null
+                    }
+
+                    then("success") {
+                        // region setup
+                        every {
+                            carouselOfImagesManager.getPrivateComposition(
+                                compositionSourceId = compositionSourceId,
+                                authorId = authorId
+                            )
+                        } returns carouselBasicImagesRes
+                        // endregion
+
+                        carouselsManager.getPrivateComposition(
+                            compositionType = it,
                             compositionSourceId = compositionSourceId,
                             authorId = authorId
                         ) shouldBe carouselBasicImagesRes
@@ -67,10 +109,14 @@ class CarouselsManagerTest : BehaviorSpec({
         }
     }
 
-    values().map {
-        when (it) {
-            BasicImages -> {
-                given("createCompositionOfCategory - BasicImages") {
+    given("createCompositionOfCategory") {
+        values().map {
+            when (it) {
+                CarouselBlurredOverlay -> {
+
+                }
+
+                BasicImages -> {
                     then("failed response") {
                         // region setup
                         every {
@@ -78,7 +124,7 @@ class CarouselsManagerTest : BehaviorSpec({
                         } returns CompositionResponse().failed(CompositionCode.FailedToGivePrivilege)
                         // endregion setup
 
-                        val res = carouselsManager.createCompositionOfCategory(
+                        val res = carouselsManager.createComposition(
                             BasicImages, carouselBasicImagesReqStingified, layoutId, authorId
                         )
 
@@ -93,7 +139,7 @@ class CarouselsManagerTest : BehaviorSpec({
                         } returns CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
                         // endregion setup
 
-                        val res = carouselsManager.createCompositionOfCategory(
+                        val res = carouselsManager.createComposition(
                             BasicImages, carouselBasicImagesReqStingified, layoutId, authorId
                         )
 

@@ -25,20 +25,20 @@ class GridsManager(
         compositionSourceId: Int,
         authorId: Int
     ): GridRes? {
-       return when (compositionType) {
+        return when (compositionType) {
             Basic -> {
                 oneOffGridManager.getPrivateComposition(compositionSourceId, authorId)
             }
         }
     }
 
-    override fun createCompositionOfCategory(
+    override fun createComposition(
         compositionType: CompositionGrid,
         jsonData: String,
         layoutId: Int,
         userId: Int
     ): CompositionResponse {
-   return      when (compositionType) {
+        return when (compositionType) {
             Basic -> {
                 oneOffGridManager.createComposition(
                     gson.fromJson(jsonData, CreateGridReq::class.java), layoutId,
@@ -61,7 +61,6 @@ class GridsManager(
             }
         }
     }
-
 
     override fun deleteComposition(
         compositionType: CompositionGrid,

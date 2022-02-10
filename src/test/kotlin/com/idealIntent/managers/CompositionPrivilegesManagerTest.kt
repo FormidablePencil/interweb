@@ -61,12 +61,12 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
         beforeEach {
             // region setup
             appEnvMockHelper(appEnv)
-            every { compositionPrivilegesRepository.isUserPrivileged(sourceId, userId) } returns true
+            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
             every { authorRepository.getByUsername(any()) } returns author
             justRun {
                 compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
                     privileges = any(),
-                    sourceId = sourceId,
+                    compositionSourceId = sourceId,
                     authorId = any()
                 )
             }
@@ -75,7 +75,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
 
         then("user not privileged") {
             // region setup
-            every { compositionPrivilegesRepository.isUserPrivileged(sourceId, userId) } returns false
+            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns false
             // endregion
 
             val ex = shouldThrow<CompositionException> {
@@ -110,11 +110,11 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             )
 
             verify(exactly = 1) { appEnv.database.useTransaction {} } // verify it is wrapped in a useTransaction
-            verify { compositionPrivilegesRepository.isUserPrivileged(sourceId, userId) }
+            verify { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }
             verify { authorRepository.getByUsername(any()) }
             verify {
                 compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
-                    privileges = any(), sourceId = sourceId, authorId = any()
+                    privileges = any(), compositionSourceId = sourceId, authorId = any()
                 )
             }
         }
@@ -124,12 +124,12 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
     given("giveAnAuthorPrivilegesByUsername") {
         beforeEach {
             // region setup
-            every { compositionPrivilegesRepository.isUserPrivileged(sourceId, userId) } returns true
+            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
             every { authorRepository.getByUsername(privilegedAuthor.username) } returns author
             justRun {
                 compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
-                    sourceId = sourceId,
+                    compositionSourceId = sourceId,
                     authorId = author.id
                 )
             }
@@ -138,7 +138,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
 
         then("user not privileged") {
             // region setup
-            every { compositionPrivilegesRepository.isUserPrivileged(sourceId, userId) } returns false
+            every { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns false
             // endregion
 
             val ex = shouldThrow<CompositionException> {
@@ -171,12 +171,12 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
         then("success") {
             compositionPrivilegesManager.giveAnAuthorPrivilegesToCompositionSourceByUsername(privilegedAuthor, sourceId, userId)
 
-            verify { compositionPrivilegesRepository.isUserPrivileged(sourceId, userId) }
+            verify { compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }
             verify { authorRepository.getByUsername(privilegedAuthor.username) }
             verify {
                 compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
-                    sourceId = sourceId,
+                    compositionSourceId = sourceId,
                     authorId = author.id
                 )
             }

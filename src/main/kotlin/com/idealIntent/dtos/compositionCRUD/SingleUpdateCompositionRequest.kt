@@ -6,10 +6,10 @@ import dtos.space.IUserComposition
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SingleUpdateCompositionRequest<T>(
-    override val compositionSourceId: Int,
+data class SingleUpdateCompositionRequest(
+    val compositionSourceId: Int,
     override val compositionCategory: CompositionCategory,
     override val compositionType: Int,
-    val updateDataOfComposition: UpdateDataOfComposition<T>,
+    val compositionUpdateQue: List<UpdateDataOfComposition>,
     val authorId: Int,
 ) : IUserComposition

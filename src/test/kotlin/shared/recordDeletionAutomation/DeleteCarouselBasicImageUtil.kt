@@ -12,7 +12,7 @@ import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import com.idealIntent.repositories.profile.AuthorRepository
 import models.profile.AuthorsModel
 import org.koin.test.KoinTest
@@ -85,7 +85,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
         val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
         val text = TextsModel.aliased("textRedirect")
 
-        val prvAth = PrivilegedAuthorsToCompositionSourcesModel("prvAuthorsComp")
+        val prvAth = PrivilegedAuthorToCompositionSourcesModel("prvAuthorsComp")
         val author = AuthorsModel.aliased("author")
 
         val selectOnlyIds = listOf(
@@ -96,7 +96,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
             compSource.name, comp.id,
             img2Col.orderRank, img.id, img.url, img.description,
             text2Col.orderRank, text.id, text.text,
-            prvAth.modify, prvAth.view,
+            prvAth.modify, prvAth.deletion,
             author.username
         )
 
@@ -123,7 +123,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                 if (compositionId != null) it += (comp.id eq compositionId)
                 if (authorId != null) it += (prvAth.authorId eq authorId)
                 if (editable != null) it += (prvAth.modify eq editable)
-                if (deletable != null) it += (prvAth.view eq deletable)
+                if (deletable != null) it += (prvAth.deletion eq deletable)
             }
             .map {
                 println(
@@ -205,7 +205,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                             PrivilegedAuthor(
                                 username = it[author.username]!!,
                                 modify = it[prvAth.modify]!!,
-                                view = it[prvAth.view]!!,
+                                view = it[prvAth.deletion]!!,
                             )
                         )
                     )

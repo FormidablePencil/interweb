@@ -1,7 +1,8 @@
 package integrationTests.space.tests
 
 import com.google.gson.Gson
-import com.idealIntent.dtos.compositions.UserComposition
+import com.idealIntent.dtos.compositions.ExistingUserComposition
+import com.idealIntent.dtos.compositions.NewUserComposition
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
@@ -34,11 +35,10 @@ class CompositionIT : BehaviorSpecIT({
                 val userId = signupFlow.signupReturnId()
                 // endregion
 
-                val layoutId = compositionService.createNewLayout("my new layout")
+                val layoutId = compositionService.createNewLayout("my new layout", userId)
 
                 val res: CompositionResponse = compositionService.createComposition(
-                    CompositionCategory.Carousel,
-                    CompositionCarousel.BasicImages,
+                    NewUserComposition(CompositionCategory.Carousel, CompositionCarousel.BasicImages.value),
                     gson.toJson(createCarouselBasicImagesReq),
                     layoutId,
                     userId
@@ -56,11 +56,10 @@ class CompositionIT : BehaviorSpecIT({
             rollback {
                 // create account, layout and create compositions under layout
                 val userId = signupFlow.signupReturnId()
-                val layoutId = compositionService.createNewLayout("my new layout")
+                val layoutId = compositionService.createNewLayout("my new layout", userId)
 
                 val res: CompositionResponse = compositionService.createComposition(
-                    CompositionCategory.Carousel,
-                    CompositionCarousel.BasicImages,
+                    NewUserComposition(CompositionCategory.Carousel, CompositionCarousel.BasicImages.value),
                     gson.toJson(createCarouselBasicImagesReq),
                     layoutId,
                     userId
@@ -75,11 +74,11 @@ class CompositionIT : BehaviorSpecIT({
 
                 // delete composition
                 val deleteRes = compositionService.deleteComposition(
-                    userComposition = UserComposition(
+                    userComposition = ExistingUserComposition(
+                        compositionSourceId = carouselOfImagesCompositionId,
                         compositionCategory = CompositionCategory.Carousel,
-                        CompositionCarousel.BasicImages.value,
+                        compositionType = CompositionCarousel.BasicImages.value,
                     ),
-                    compositionSourceId = carouselOfImagesCompositionId,
                     authorId = userId
                 )
 

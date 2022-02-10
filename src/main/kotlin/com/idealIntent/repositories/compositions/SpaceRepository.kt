@@ -9,7 +9,7 @@ import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourceToLayout
 import com.idealIntent.models.privileges.CompositionSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorsToCompositionSourcesModel
+import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import com.idealIntent.models.space.ISpaceEntity
 import com.idealIntent.models.space.SpacesModel
 import com.idealIntent.repositories.RepositoryBase
@@ -40,7 +40,7 @@ class SpaceRepository(
     val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
     val compInstance = ImagesCarouselsModel.aliased("compInstance")
 
-    val prvAth2CompSource = PrivilegedAuthorsToCompositionSourcesModel.aliased("prvAth2CompSource")
+    val prvAth2CompSource = PrivilegedAuthorToCompositionSourcesModel.aliased("prvAth2CompSource")
     // endregion
 
     // region composition's collections

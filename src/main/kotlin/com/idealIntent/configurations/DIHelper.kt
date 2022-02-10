@@ -34,7 +34,7 @@ object DIHelper {
         // domain com.idealIntent.services
         single { AuthorsPortfolioService(get(), get()) }
         single { AuthorizationService(get(), get(), get(), get(), get(), get(), get()) }
-        single { CompositionService(get(), get(), get()) }
+        single { CompositionService(get(), get(), get(), get(), get(), get()) }
 
         // com.idealIntent.managers
         single { AuthorsPortfolioManager() }
@@ -57,7 +57,7 @@ object DIHelper {
         single { CompositionPrivilegesRepository() }
         single { TextRepository() }
         single { ImageRepository() }
-        single { CarouselOfImagesRepository(get(), get(), get()) }
+        single { CarouselOfImagesRepository(get(), get()) }
         single { SpaceRepository(get(), get()) }
         // env com.idealIntent.configurations
 

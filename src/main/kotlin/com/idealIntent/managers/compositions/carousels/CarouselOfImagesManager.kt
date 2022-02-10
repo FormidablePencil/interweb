@@ -196,9 +196,11 @@ class CarouselOfImagesManager(
                             )
                         else textRepository.updateRecord(record, imageCollectionId)
                     }
-                    PrivilegedAuthor ->
+                    PrivilegedAuthor -> {
+                        if (!compositionPrivilegesRepository.validateIfAuthorPermittedToUpdate(authorId, compositionSourceId))
                         TODO("CompositionPrivilegesRepository.update")
-
+                        else compositionPrivilegesRepository.updatePrivilegesOfAuthors(record, imageId, collectionId)
+                    }
                     CompositionName ->
                         TODO()
                 }

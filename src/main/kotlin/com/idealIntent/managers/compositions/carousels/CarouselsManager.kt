@@ -12,7 +12,6 @@ import dtos.compositions.carousels.CompositionCarousel.*
 class CarouselsManager(
     private val carouselOfImagesManager: CarouselOfImagesManager,
     private val carouselBlurredOverlayManager: CarouselBlurredOverlayManager,
-    private val carouselOfImagesRepository: CarouselOfImagesRepository,
 ) : ICompositionCategoryManagerStructure<CompositionCarousel, CarouselBasicImagesRes, CompositionResponse> {
     private val gson = Gson()
 
@@ -22,13 +21,13 @@ class CarouselsManager(
         authorId: Int
     ): CarouselBasicImagesRes? = when (compositionType) {
         CarouselBlurredOverlay ->
-            carouselOfImagesManager.getPrivateComposition(compositionSourceId, authorId)
+            carouselBlurredOverlayManager.getPrivateComposition(compositionSourceId, authorId)
         CarouselMagnifying -> TODO() // todo - this is a style variant of BasicImages
         BasicImages ->
             carouselOfImagesManager.getPrivateComposition(compositionSourceId, authorId)
     }
 
-    override fun createCompositionOfCategory(
+    override fun createComposition(
         compositionType: CompositionCarousel,
         jsonData: String,
         layoutId: Int,
@@ -68,7 +67,6 @@ class CarouselsManager(
                     authorId = authorId,
                 )
         }
-        TODO("Not yet implemented")
     }
 
     override fun deleteComposition(

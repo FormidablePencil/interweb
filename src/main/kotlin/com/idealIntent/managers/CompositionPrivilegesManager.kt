@@ -48,7 +48,7 @@ class CompositionPrivilegesManager(
         var iteration = 0
         try {
             appEnv.database.useTransaction {
-                if (!compositionPrivilegesRepository.isUserPrivileged(compositionSourceId, userId))
+                if (!compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(compositionSourceId, userId))
                     throw CompositionException(UserNotPrivileged)
 
                 privilegedAuthors.forEach {
@@ -59,7 +59,7 @@ class CompositionPrivilegesManager(
 
                     compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
                         privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
-                        sourceId = compositionSourceId,
+                        compositionSourceId = compositionSourceId,
                         authorId = author.id
                     )
                 }
@@ -93,7 +93,7 @@ class CompositionPrivilegesManager(
         compositionSourceId: Int,
         userId: Int
     ) {
-        if (!compositionPrivilegesRepository.isUserPrivileged(compositionSourceId, userId))
+        if (!compositionPrivilegesRepository.isUserPrivilegedToModifyComposition(compositionSourceId, userId))
             throw CompositionException(UserNotPrivileged)
 
         val author = authorRepository.getByUsername(privilegedAuthor.username)
@@ -101,7 +101,7 @@ class CompositionPrivilegesManager(
 
         compositionPrivilegesRepository.giveAnAuthorPrivilegeToComposition(
             privileges = CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
-            sourceId = compositionSourceId,
+            compositionSourceId = compositionSourceId,
             authorId = author.id
         )
     }

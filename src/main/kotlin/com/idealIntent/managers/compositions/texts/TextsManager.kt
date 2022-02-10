@@ -14,7 +14,7 @@ class TextsManager: ICompositionCategoryManagerStructure<CompositionText, Compos
         TODO("Not yet implemented")
     }
 
-    override fun createCompositionOfCategory(
+    override fun createComposition(
         compositionType: CompositionText,
         jsonData: String,
         layoutId: Int,

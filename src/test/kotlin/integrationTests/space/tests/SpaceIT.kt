@@ -9,6 +9,6 @@ class SpaceIT : BehaviorSpecIT({
     val cmsService: CompositionService by inject()
 
     given("create new space with a layout of compositions") {
-//        cmsService.createSpace(layoutName = "My first space")
+//        cmsService.createNewSpace(layoutName = "My first space")
     }
 })
