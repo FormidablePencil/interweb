@@ -96,7 +96,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
             compSource.name, comp.id,
             img2Col.orderRank, img.id, img.url, img.description,
             text2Col.orderRank, text.id, text.text,
-            prvAth.modify, prvAth.deletion,
+            prvAth.modify, prvAth.deletion, prvAth.modifyUserPrivileges,
             author.username
         )
 
@@ -168,7 +168,8 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                             PrivilegedAuthor(
                                 username = it[author.username]!!,
                                 modify = 0,
-                                view = 0,
+                                deletion = 0,
+                                modifyUserPrivileges = 0,
                             )
                         )
                     )
@@ -205,7 +206,8 @@ class DeleteCarouselBasicImageUtil : KoinTest {
                             PrivilegedAuthor(
                                 username = it[author.username]!!,
                                 modify = it[prvAth.modify]!!,
-                                view = it[prvAth.deletion]!!,
+                                deletion = it[prvAth.deletion]!!,
+                                modifyUserPrivileges = it[prvAth.modifyUserPrivileges]!!,
                             )
                         )
                     )

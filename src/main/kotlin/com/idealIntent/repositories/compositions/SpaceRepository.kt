@@ -1,10 +1,9 @@
 package com.idealIntent.repositories.compositions
 
 import com.idealIntent.dtos.space.CreateSpaceRequest
-import com.idealIntent.models.compositionLayout.CompositionLayoutsModel
-import com.idealIntent.models.compositionLayout.CompositionSourceToLayoutsModel
-import com.idealIntent.models.compositionLayout.LayoutToSpacesModel
-import com.idealIntent.models.compositionLayout.PrivilegedAuthorToSpacesModel
+import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionExceptionReport
+import com.idealIntent.models.compositionLayout.*
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourceToLayout
@@ -33,6 +32,7 @@ class SpaceRepository(
     private val prvAuth2Space = PrivilegedAuthorToSpacesModel.aliased("prvAuth2Space")
     private val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
     private val layout = CompositionLayoutsModel.aliased("layout")
+    private val prvAuth2Layout = PrivilegedAuthorToLayoutsModel.aliased("prvAuth2Layout")
     val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
     val compSource = CompositionSourcesModel.aliased("compSource")
 
@@ -147,11 +147,20 @@ class SpaceRepository(
      * Insert new layout
      *
      * @param name User defined space.
+     * @param authorId Associate to author.
      */
-    fun insertNewLayout(name: String): Int {
-        return database.insertAndGenerateKey(layout) {
+    fun insertNewLayout(name: String, authorId: Int): Int {
+        val layoutId = database.insertAndGenerateKey(layout) {
             set(layout.name, name)
         } as Int
+
+        if (database.insert(prvAuth2Layout) {
+                set(prvAuth2Layout.layoutId, layoutId)
+                set(prvAuth2Layout.authorId, authorId)
+            } != 1) throw CompositionExceptionReport(
+            CompositionCode.FailedToAssociateAuthorToLayout, authorId.toString(), this::class.java
+        )
+        return layoutId
     }
 
     fun insertNewSpace(): String {

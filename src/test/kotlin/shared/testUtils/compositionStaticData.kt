@@ -42,17 +42,29 @@ val texts = listOf(
 )
 
 val privilegedAuthors = listOf(
-    PrivilegedAuthor("billy", modify = 1, view = 0),
-    PrivilegedAuthor("bob", modify = 0, view = 1),
-    PrivilegedAuthor("lex", modify = 1, view = 1),
-    PrivilegedAuthor("freya", modify = 0, view = 0),
+    PrivilegedAuthor("billy", modify = 1, deletion = 0, modifyUserPrivileges = 1),
+    PrivilegedAuthor("bob", modify = 0, deletion = 1, modifyUserPrivileges = 1),
+    PrivilegedAuthor("lex", modify = 1, deletion = 1, modifyUserPrivileges = 1),
+    PrivilegedAuthor("freya", modify = 0, deletion = 0, modifyUserPrivileges = 1),
 )
 // endregion compositions and collections
 
 // region categories of compositions
-val createCarouselBasicImagesReq = CreateCarouselBasicImagesReq("Projects", images, texts, privilegedAuthors)
-val carouselBasicImagesRes =
-    CarouselBasicImagesRes(99999999, 88888888, "Projects", giveIdsToImages(images), giveIdsToTexts(texts), privilegedAuthors)
+val createPublicCarouselBasicImagesReq = CreateCarouselBasicImagesReq(
+    "Projects", images, texts, listOf(), privilegeLevel = 0
+)
+val createPrivateCarouselBasicImagesReq = CreateCarouselBasicImagesReq(
+    "Projects", images, texts, listOf(), privilegeLevel = 1
+)
+
+val carouselBasicImagesRes = CarouselBasicImagesRes(
+    99999999,
+    88888888,
+    "Projects",
+    giveIdsToImages(images),
+    giveIdsToTexts(texts),
+    privilegedAuthors
+)
 
 fun giveIdsToImages(records: List<Image> = images): List<ImagePK> =
     records.mapIndexed { idx, it ->
@@ -64,6 +76,8 @@ fun giveIdsToTexts(records: List<Text> = texts): List<TextPK> =
         TextPK(id = 99999 + idx, orderRank = it.orderRank, text = it.text)
     }
 
-val carouselBasicImagesReqStingified =
-    Gson().toJson(createCarouselBasicImagesReq, createCarouselBasicImagesReq::class.java)
+val carouselPublicBasicImagesReqSerialized =
+    Gson().toJson(createPublicCarouselBasicImagesReq, createPublicCarouselBasicImagesReq::class.java)
+val carouselPrivateBasicImagesReqSerialized =
+    Gson().toJson(createPrivateCarouselBasicImagesReq, createPrivateCarouselBasicImagesReq::class.java)
 // endregion categories of compositions

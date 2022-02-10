@@ -29,7 +29,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
         CompositionPrivilegesManager(
             appEnv = appEnv,
             authorRepository = authorRepository,
-            compositionPrivilegesRepository = compositionSourceRepository,
+            compositionSourceRepository = compositionSourceRepository,
         ), recordPrivateCalls = true
     )
 
@@ -38,20 +38,30 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
     given("createPrivileges") {
         then("success. User gets absolute privileges.") {
             // region setup
-            every { compositionSourceRepository.addCompositionSource(name = "my composition", compositionType = 0) } returns sourceId
+            every {
+                compositionSourceRepository.addCompositionSource(
+                    name = "my composition",
+                    compositionType = 0
+                )
+            } returns sourceId
             justRun {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
-                    CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, userId
+                    CompositionsGenericPrivileges(1, 1, 1), sourceId, userId
                 )
             }
             // endregion
 
-            compositionPrivilegesManager.createCompositionSource(compositionType = 0, userId)
+            compositionPrivilegesManager.createCompositionSource(
+                compositionType = 0,
+                privilegeLevel = 0,
+                name = "some name",
+                authorId = userId
+            )
 
             verify { compositionSourceRepository.addCompositionSource(name = "my composition", compositionType = 0) }
             verify {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
-                    CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, userId
+                    CompositionsGenericPrivileges(1, 1, 1), sourceId, userId
                 )
             }
         }
@@ -128,7 +138,11 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             every { authorRepository.getByUsername(privilegedAuthor.username) } returns author
             justRun {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
-                    CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
+                    CompositionsGenericPrivileges(
+                        modify = privilegedAuthor.modify,
+                        deletion = privilegedAuthor.deletion,
+                        modifyUserPrivileges = privilegedAuthor.modifyUserPrivileges
+                    ),
                     compositionSourceId = sourceId,
                     authorId = author.id
                 )
@@ -169,14 +183,21 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
         }
 
         then("success") {
-            compositionPrivilegesManager.giveAnAuthorPrivilegesToCompositionSourceByUsername(privilegedAuthor, sourceId, userId)
+            compositionPrivilegesManager.giveAnAuthorPrivilegesToCompositionSourceByUsername(
+                privilegedAuthor,
+                sourceId,
+                userId
+            )
 
             verify { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }
             verify { authorRepository.getByUsername(privilegedAuthor.username) }
             verify {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
-                    CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
-                    compositionSourceId = sourceId,
+                    CompositionsGenericPrivileges(
+                        modify = privilegedAuthor.modify,
+                        deletion = privilegedAuthor.deletion,
+                        modifyUserPrivileges = privilegedAuthor.modifyUserPrivileges
+                    ), compositionSourceId = sourceId,
                     authorId = author.id
                 )
             }

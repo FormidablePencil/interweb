@@ -82,6 +82,7 @@ class CompositionSourceRepository : RepositoryBase() {
         set(it.modify, privileges.modify)
         set(it.deletion, privileges.deletion)
         set(it.sourceId, compositionSourceId)
+        set(it.modifyUserPrivileges, privileges.modifyUserPrivileges)
         set(it.authorId, authorId)
     }
 
@@ -121,6 +122,8 @@ class CompositionSourceRepository : RepositoryBase() {
     /**
      * Add privilege source which is a record for compositions to key off of as a source of truth for privileges,
      * making the privileges unique to every kind of compositional record that references it.
+     *
+     * For now, a [privilegeLevel] of 0 is public and [privilegeLevel] of 1 is private.
      *
      * @param privilegeLevel level of privileges such as whether it is a viewable for everyone or private.
      * @return Id to privilege source.

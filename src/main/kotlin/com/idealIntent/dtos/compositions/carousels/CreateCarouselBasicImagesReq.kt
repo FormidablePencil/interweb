@@ -25,6 +25,7 @@ data class CreateCarouselBasicImagesReq(
     override val images: List<Image>,
     override val imgOnclickRedirects: List<Text>,
     override val privilegedAuthors: List<PrivilegedAuthor>,
+    val privilegeLevel: Int,
 //    val clickable: boolean,
 ) : ICarouselBasicImages
 

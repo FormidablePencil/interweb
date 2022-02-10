@@ -68,7 +68,7 @@ class SpaceManager(
     // todo associate space to author id
     fun createSpace(layoutName: String, authorId: Int) {
 //        val spaceAddress = spaceRepository.insertNewSpace()
-        val layoutId = spaceRepository.insertNewLayout(layoutName)
+        val layoutId = spaceRepository.insertNewLayout(layoutName, authorId)
 //        spaceRepository.associateLayoutToSpace(spaceAddress = spaceAddress, layoutId = layoutId)
     }
 }

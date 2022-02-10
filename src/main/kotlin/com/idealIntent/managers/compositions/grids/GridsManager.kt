@@ -1,9 +1,11 @@
 package com.idealIntent.managers.compositions.grids
 
 import com.google.gson.Gson
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
+import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.grids.CompositionGrid
 import dtos.compositions.grids.CompositionGrid.Basic
 import kotlinx.serialization.Serializable
@@ -19,6 +21,13 @@ class GridsManager(
     private val oneOffGridManager: GridOneOffManager,
 ) : ICompositionCategoryManagerStructure<CompositionGrid, GridRes, CompositionResponse> {
     private val gson = Gson() // todo - could create a singleton since it's used ubiquitously
+
+    override fun getPublicComposition(
+        compositionType: CompositionCarouselType,
+        compositionSourceId: Int
+    ): CarouselBasicImagesRes? {
+        TODO("Not yet implemented")
+    }
 
     override fun getPrivateComposition(
         compositionType: CompositionGrid,

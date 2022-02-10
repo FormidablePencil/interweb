@@ -85,9 +85,7 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param authorId Criteria query composition of only privileged author.
      * @return Only top level ids of composition.
      */
-    fun getOnlyTopLvlIdsOfCompositionOnlyModifiable(
-        onlyModifiable: Boolean, compositionSourceId: Int, authorId: Int
-    ): ImagesCarouselTopLvlIds?
+    fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(compositionSourceId: Int, authorId: Int): ImagesCarouselTopLvlIds?
 
 
     // region Get compositions
@@ -111,8 +109,10 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
 
 
     /**
-     * Composes composition by saving ids as one record. Then associating newly created composition
-     * to a privilege source. Think of privilege source as a door with a lock required to get through
+     * Composes composition by saving ids of collections and compositions under one composition record.
+     * Then associating newly created composition to a composition source which keeps the uniqueness of id.
+     *
+     * Think of privilege source as a door with a lock required to get through
      * to get your data.
      *
      * @param composePrepared All collection and compositions of ids to compose as one composition.
@@ -123,7 +123,7 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
     /**
      * Delete composition.
      *
-     * Invokes [getOnlyTopLvlIdsOfCompositionOnlyModifiable] to query all the ids of collection and compositions
+     * Invokes [getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify] to query all the ids of collection and compositions
      * composed of composition requested to delete then calls delete methods of its respective repositories to
      * delete each collection and composition composed of composition requested to delete.
      *

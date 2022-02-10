@@ -9,5 +9,6 @@ data class PrivilegedAuthorsToComposition(
     override val sourceId: Int,
     override val authorId: Int,
     override val modify: Int,
-    override val view: Int
+    override val modifyUserPrivileges: Int,
+    override val deletion: Int,
 ) : IPrivilegedAuthorsToComposition

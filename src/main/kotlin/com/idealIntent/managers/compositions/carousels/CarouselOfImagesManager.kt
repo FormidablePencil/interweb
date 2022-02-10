@@ -9,15 +9,16 @@ import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.CompositionPrivilegesManager
+import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfCarouselOfImages.*
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import dtos.compositions.carousels.CompositionCarouselType
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -59,8 +60,12 @@ class CarouselOfImagesManager(
             val redirectsCollectionId =
                 textRepository.batchInsertRecordsToNewCollection(createRequest.imgOnclickRedirects)
 
-            val compositionSourceId =
-                compositionPrivilegesManager.createCompositionSource(compositionType = 0, authorId)
+            val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
+                compositionType = CompositionCarouselType.BasicImages.value,
+                privilegeLevel = createRequest.privilegeLevel,
+                name = createRequest.name,
+                authorId = authorId,
+            )
 
             // todo wrap in a try catch and response to user that layout by id does not exist
             spaceRepository.associateCompositionToLayout(
@@ -107,8 +112,7 @@ class CarouselOfImagesManager(
         authorId: Int
     ) {
         with(carouselOfImagesRepository) {
-            val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionOnlyModifiable(
-                onlyModifiable = true,
+            val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
                 compositionSourceId = compositionSourceId,
                 authorId = authorId
             ) ?: throw CompositionException(ModifyPermittedToAuthorOfCompositionNotFound)

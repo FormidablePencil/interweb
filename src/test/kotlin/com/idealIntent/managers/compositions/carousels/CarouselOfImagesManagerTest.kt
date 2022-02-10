@@ -1,7 +1,6 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.configurations.AppEnv
-import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionCode.FailedToFindAuthorByUsername
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.CompositionPrivilegesManager
@@ -11,12 +10,12 @@ import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.ktor.http.*
 import io.mockk.*
 import shared.appEnvMockHelper
-import shared.testUtils.createCarouselBasicImagesReq
+import shared.testUtils.createPublicCarouselBasicImagesReq
 import shared.testUtils.privilegedAuthors
 
 class CarouselOfImagesManagerTest : BehaviorSpec({
@@ -37,7 +36,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
         imageCollectionId = idOfNewlyCreatedImageCollection,
         redirectTextCollectionId = idOfNewlyCreatedTextCollection,
         sourceId = compositionSourceId,
-        name = createCarouselBasicImagesReq.name,
+        name = createPublicCarouselBasicImagesReq.name,
     )
 
     val carouselOfImagesManager = spyk(
@@ -45,7 +44,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             compositionPrivilegesManager = compositionPrivilegesManager,
             textRepository = textRepository,
             imageRepository = imageRepository,
-            compositionPrivilegesRepository = compositionSourceRepository,
+            compositionSourceRepository = compositionSourceRepository,
             carouselOfImagesRepository = carouselOfImagesRepository,
             spaceRepository = spaceRepository,
         )
@@ -59,11 +58,18 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
     given("createComposition") {
         beforeEach {
             // region setup
-            every { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) } returns
+            every { imageRepository.batchInsertRecordsToNewCollection(createPublicCarouselBasicImagesReq.images) } returns
                     carouselOfImagesComposePrepared.imageCollectionId
-            every { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) } returns
+            every { textRepository.batchInsertRecordsToNewCollection(createPublicCarouselBasicImagesReq.imgOnclickRedirects) } returns
                     carouselOfImagesComposePrepared.redirectTextCollectionId
-            every { compositionPrivilegesManager.createCompositionSource(compositionType = 0, authorId) } returns
+            every {
+                compositionPrivilegesManager.createCompositionSource(
+                    compositionType = 0,
+                    privilegeLevel = 0,
+                    name = "some name",
+                    authorId = authorId
+                )
+            } returns
                     carouselOfImagesComposePrepared.sourceId
             justRun {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesToCompositionByUsername(
@@ -90,12 +96,12 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             } throws CompositionException(FailedToFindAuthorByUsername)
             // endregion
 
-            val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, layoutId, authorId)
-
+            val ex = shouldThrowExactly<CompositionException> {
+                carouselOfImagesManager.createComposition(createPublicCarouselBasicImagesReq, layoutId, authorId)
+            }
             verify { appEnv.database.useTransaction { } }
-            res.code shouldBe FailedToFindAuthorByUsername
-            res.message() shouldBe CompositionCode.getClientMsg(FailedToFindAuthorByUsername)
-            res.statusCode() shouldBe HttpStatusCode.BadRequest
+
+            ex.code shouldBe FailedToFindAuthorByUsername
         }
 
         xthen("provided a layoutId that is restricted") {
@@ -107,11 +113,18 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
         }
 
         then("success") {
-            val res = carouselOfImagesManager.createComposition(createCarouselBasicImagesReq, layoutId, authorId)
+            val res = carouselOfImagesManager.createComposition(createPublicCarouselBasicImagesReq, layoutId, authorId)
 
-            verify { imageRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.images) }
-            verify { textRepository.batchInsertRecordsToNewCollection(createCarouselBasicImagesReq.imgOnclickRedirects) }
-            verify { compositionPrivilegesManager.createCompositionSource(compositionType = 0, authorId) }
+            verify { imageRepository.batchInsertRecordsToNewCollection(createPublicCarouselBasicImagesReq.images) }
+            verify { textRepository.batchInsertRecordsToNewCollection(createPublicCarouselBasicImagesReq.imgOnclickRedirects) }
+            verify {
+                compositionPrivilegesManager.createCompositionSource(
+                    compositionType = 0,
+                    privilegeLevel = 0,
+                    name = "my composition",
+                    authorId = authorId,
+                )
+            }
             verify {
                 compositionPrivilegesManager.giveMultipleAuthorsPrivilegesToCompositionByUsername(
                     privilegedAuthors, compositionSourceId, authorId
@@ -119,9 +132,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
             }
             verify { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared) }
 
-            res.isSuccess shouldBe true
-            res.message() shouldBe null
-            res.data shouldBe compositionSourceId
+            res shouldBe compositionSourceId
         }
     }
 })

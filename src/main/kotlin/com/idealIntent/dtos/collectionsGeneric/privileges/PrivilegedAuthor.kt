@@ -7,5 +7,6 @@ import models.privileges.IPrivilegedAuthor
 data class PrivilegedAuthor(
     override val username: String,
     override val modify: Int,
-    override val view: Int,
+    override val deletion: Int,
+    override val modifyUserPrivileges: Int,
 ) : IPrivilegedAuthor

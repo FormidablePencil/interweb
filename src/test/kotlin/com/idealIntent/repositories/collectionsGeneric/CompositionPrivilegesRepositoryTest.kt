@@ -41,7 +41,8 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
     init {
         val privileges = CompositionsGenericPrivileges(
             modify = privilegedAuthors[0].modify,
-            view = privilegedAuthors[0].view,
+            deletion = privilegedAuthors[0].deletion,
+            modifyUserPrivileges = privilegedAuthors[0].modifyUserPrivileges
         )
 
         beforeEach {

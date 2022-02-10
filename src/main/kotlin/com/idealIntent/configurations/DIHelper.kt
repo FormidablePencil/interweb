@@ -1,8 +1,13 @@
 package com.idealIntent.configurations
 
 import com.idealIntent.managers.*
+import com.idealIntent.managers.compositions.banners.BannersManager
+import com.idealIntent.managers.compositions.carousels.CarouselBlurredOverlayManager
 import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
+import com.idealIntent.managers.compositions.grids.GridOneOffManager
+import com.idealIntent.managers.compositions.grids.GridsManager
+import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.PasswordRepository
 import com.idealIntent.repositories.RefreshTokenRepository
 import com.idealIntent.repositories.codes.EmailVerificationCodeRepository
@@ -44,7 +49,12 @@ object DIHelper {
         single { CompositionPrivilegesManager(get(), get(), get()) }
         single { CarouselsManager(get(), get()) }
         single { CarouselOfImagesManager(get(), get(), get(), get(), get(), get()) }
+        single { CarouselBlurredOverlayManager() }
         single { SpaceManager(get(), get(), get()) }
+        single { TextsManager() }
+        single { BannersManager() }
+        single { GridsManager(get()) }
+        single { GridOneOffManager() }
 
         // com.idealIntent.repositories
         single { AuthorRepository() }

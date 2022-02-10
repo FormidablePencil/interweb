@@ -25,6 +25,8 @@ enum class CompositionCode {
     FailedToAddRecordToCompositionValidator,
     FailedToConvertToIntOrderRank,
     CompositionNotFound,
+    FailedToAssociateAuthorToLayout,
+    FailedToComposeInternalError,
     ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
@@ -35,6 +37,9 @@ enum class CompositionCode {
                 FailedToInsertRecord -> "Failed to insert records."
                 NoAuthorIdProvidedToRestrictedResource -> "No id of author provided to restricted resource for validation of privileges."
                 FailedToAddRecordToCompositionValidator -> "No records updates which only means that developer failed to add a record to composition validator."
+                FailedToAssociateAuthorToLayout -> "Failed to associate author to layout. Author id does not exist perhaps."
+                FailedToComposeInternalError -> "Failed to compose. Internal cms error."
+
                 ServerError -> genericServerError
 
                 FailedToConvertToIntOrderRank,
@@ -63,9 +68,11 @@ enum class CompositionCode {
                 FailedToConvertToIntOrderRank -> "Provided a value for updating order rank that was not a number." // todo - client error but not user error. How should we return this data
                 CompositionNotFound -> "Composition not found by composition source id."
 
+                FailedToComposeInternalError,
                 FailedToAddRecordToCompositionValidator,
                 NoAuthorIdProvidedToRestrictedResource,
                 FailedToGivePrivilege,
+                FailedToAssociateAuthorToLayout,
                 ServerError -> genericServerError
 
                 FailedToInsertRecord,
@@ -85,12 +92,14 @@ enum class CompositionCode {
                 CompositionNotFound,
                 -> HttpStatusCode.BadRequest
 
+                FailedToComposeInternalError,
                 ServerError,
                 FailedToCompose,
                 FailedToGivePrivilege,
                 FailedToInsertRecord,
                 NoAuthorIdProvidedToRestrictedResource,
                 FailedToAddRecordToCompositionValidator,
+                FailedToAssociateAuthorToLayout,
                 -> HttpStatusCode.InternalServerError
             }
         }

@@ -23,3 +23,8 @@ fun logError(logMsg: String, location: String) {
     val logger = LoggerFactory.getLogger(location)
     logger.error(logMsg)
 }
+
+fun logInfo(logMsg: String, location: Class<*>) {
+    val logger = LoggerFactory.getLogger(location)
+    logger.info(logMsg)
+}

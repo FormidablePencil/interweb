@@ -11,6 +11,10 @@ import org.koin.core.component.KoinComponent
 
 class BannerBasicManager: ICompositionTypeManagerStructure<GridRes, IImagesCarouselEntity,
         CreateGridReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
+    override fun getPublicComposition(compositionSourceId: Int): GridRes? {
+        TODO("Not yet implemented")
+    }
+
     override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): GridRes? {
         TODO("Not yet implemented")
     }
@@ -27,11 +31,8 @@ class BannerBasicManager: ICompositionTypeManagerStructure<GridRes, IImagesCarou
         TODO("Not yet implemented")
     }
 
-    override fun batchUpdateCompositions(id: Int, records: List<RecordUpdate>): Boolean {
+    override fun deleteComposition(compositionSourceId: Int, authorId: Int) {
         TODO("Not yet implemented")
     }
 
-    override fun deleteComposition(compositionSourceId: Int, authorId: Int): Boolean {
-        TODO("Not yet implemented")
-    }
 }

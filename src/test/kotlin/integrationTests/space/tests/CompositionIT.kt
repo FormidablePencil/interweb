@@ -25,7 +25,9 @@ class CompositionIT : BehaviorSpecIT({
     val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
     val gson = Gson()
 
-    val createCarouselBasicImagesReq = CreateCarouselBasicImagesReq("Projects", images, texts, listOf())
+    val createCarouselBasicImagesReq = CreateCarouselBasicImagesReq(
+        "Projects", images, texts, listOf(), privilegeLevel = 0
+    )
 
     // todo - the more extensive tests will be done with repository tests
     given("create a private layout and then create a few compositions for the layout") {

@@ -66,11 +66,7 @@ class CompositionService(
     fun createNewSpace(layoutName: String, authorId: Int) =
         spaceManager.createSpace(layoutName, authorId)
 
-    fun createNewLayout(name: String, authorId: Int): Int {
-        val layoutId = spaceRepository.insertNewLayout(name)
-        TODO("associate layout to account through author id")
-        return layoutId
-    }
+    fun createNewLayout(name: String, authorId: Int): Int = spaceRepository.insertNewLayout(name, authorId)
 
     /**
      * Create composition under an existing layout.

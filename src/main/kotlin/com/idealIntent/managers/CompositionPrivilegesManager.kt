@@ -22,12 +22,12 @@ class CompositionPrivilegesManager(
      *
      * @return adds a privilege source and associates to creator's id to it.
      */
-    fun createCompositionSource(compositionType: Int, authorId: Int): Int {
+    fun createCompositionSource(compositionType: Int, privilegeLevel: Int, name: String, authorId: Int): Int {
         val sourceId = compositionSourceRepository.addCompositionSource(
-            privilegeLevel = 0, name = "my composition", compositionType = compositionType
+            privilegeLevel = privilegeLevel, name = name, compositionType = compositionType
         )
         compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
-            CompositionsGenericPrivileges(modify = 1, view = 1), sourceId, authorId
+            CompositionsGenericPrivileges(modify = 1, deletion = 1, modifyUserPrivileges = 1), sourceId, authorId
         )
         return sourceId
     }
@@ -58,7 +58,11 @@ class CompositionPrivilegesManager(
                         ?: throw CompositionException(FailedToFindAuthorByUsername)
 
                     compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
-                        privileges = CompositionsGenericPrivileges(modify = it.modify, view = it.view),
+                        privileges = CompositionsGenericPrivileges(
+                            modify = it.modify,
+                            deletion = it.deletion,
+                            modifyUserPrivileges = it.modifyUserPrivileges
+                        ),
                         compositionSourceId = compositionSourceId,
                         authorId = author.id
                     )
@@ -100,7 +104,11 @@ class CompositionPrivilegesManager(
             ?: throw CompositionException(FailedToFindAuthorByUsername)
 
         compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
-            privileges = CompositionsGenericPrivileges(modify = privilegedAuthor.modify, view = privilegedAuthor.view),
+            privileges = CompositionsGenericPrivileges(
+                modify = privilegedAuthor.modify,
+                deletion = privilegedAuthor.deletion,
+                modifyUserPrivileges = privilegedAuthor.modifyUserPrivileges
+            ),
             compositionSourceId = compositionSourceId,
             authorId = author.id
         )
