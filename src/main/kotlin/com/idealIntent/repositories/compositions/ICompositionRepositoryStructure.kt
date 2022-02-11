@@ -130,12 +130,14 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param compositionSourceId Id of composition source and not id of composition itself.
      * @param authorId Author's id to validate if privileged to delete.
      * @return success or fail.
-     * @throws [CompositionException] [ CompositionNotFound][CompositionCode.CompositionNotFound]
+     * @throws CompositionException [ CompositionNotFound][CompositionCode.CompositionNotFound].
      */
     fun deleteComposition(compositionSourceId: Int, authorId: Int)
 
     /**
-     * Throw if authorId is null. Saves from code duplications.
+     * Throw a report if authorId is null. Saves from code duplications. Exception must not be
+     * caught. It's a failure of the developer to ensure that authorId is provided when composition
+     * restriction is false. Used by private method getCompositionsQuery.
      *
      * @return authorId
      */

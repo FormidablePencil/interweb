@@ -102,7 +102,7 @@ class CarouselOfImagesManager(
                                 IdOfRecordProvidedNotOfComposition,
                                 gson.toJson("Image id ${record.recordId}")
                             )
-                        else imageRepository.updateRecord(record, imageCollectionId)
+                        else imageRepository.updateRecord(record)
                     }
                     RedirectText -> {
                         if (!textRepository.validateRecordToCollectionRelationship(
@@ -114,7 +114,7 @@ class CarouselOfImagesManager(
                                 IdOfRecordProvidedNotOfComposition,
                                 gson.toJson("Text id ${record.recordId}")
                             )
-                        else textRepository.updateRecord(record, imageCollectionId)
+                        else textRepository.updateRecord(record)
                     }
                     CompositionName -> {
                         compositionSourceRepository.renameComposition(record.updateTo[0].value)

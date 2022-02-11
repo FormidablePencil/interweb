@@ -67,7 +67,8 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
     /**
      * Update composition
      *
-     * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound], [IdOfRecordProvidedNotOfComposition].
+     * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound], [IdOfRecordProvidedNotOfComposition],
+     * [ProvidedStringInPlaceOfInt].
      * @see ICompositionTypeManagerStructure.updateComposition
      */
     fun updateComposition(

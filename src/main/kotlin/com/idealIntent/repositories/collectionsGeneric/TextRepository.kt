@@ -7,6 +7,7 @@ import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
+import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositions.basicCollections.texts.ITextToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
@@ -39,14 +40,15 @@ class TextRepository : RepositoryBase(),
     val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
     val text = TextsModel.aliased("textRedirect")
 
-    // region Get
+
+    // region Get records
     override fun getSingleRecordOfCollection(recordId: Int, collectionId: Int): TextPK? =
         getRecordsQuery(recordId, collectionId)?.first()
 
     override fun getAllRecordsOfCollection(collectionId: Int): List<TextPK>? =
         getRecordsQuery(null, collectionId)
 
-    override fun getRecordsQuery(recordId: Int?, collectionId: Int): List<TextPK>? {
+    private fun getRecordsQuery(recordId: Int?, collectionId: Int): List<TextPK>? {
         val itemToCol = TextToCollectionsModel.aliased("textToCol")
         val item = TextsModel.aliased("text")
 
@@ -67,10 +69,11 @@ class TextRepository : RepositoryBase(),
 
         return records.ifEmpty { null }
     }
+    // endregion
+
 
     override fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean =
         database.textToCollections.find { (it.textId eq recordId) and (it.collectionId eq collectionId) } != null
-    // endregion Get
 
 
     // region Insert
@@ -131,113 +134,68 @@ class TextRepository : RepositoryBase(),
         } == 1
     // endregion Insert
 
-    override fun updateRecord(record: RecordUpdate, collectionId: Int) {
+
+    // region Update record
+    override fun updateRecord(record: RecordUpdate) {
         database.useTransaction {
-            var doUpdateOrderRank: Boolean = false
-            var updateOrderRankTo: String? = null
-            val effectedRecords = database.update(TextsModel) {
-                record.updateTo.map { updateCol ->
-                    when (TextsCOL.fromInt(updateCol.column)) {
-                        TextsCOL.Text ->
-                            set(it.text, updateCol.value)
-                        // todo - orderRank is now of record2Col
-                        // todo - toInt() may fail
-                        TextsCOL.OrderRank -> {
-                            doUpdateOrderRank = true
-                            updateOrderRankTo = updateCol.value
+            record.updateTo.map { updateCol ->
+                when (TextsCOL.fromInt(updateCol.column)) {
+                    TextsCOL.Text -> updateRecordOnly(TextsCOL.Text, updateCol.value, record.recordId)
+                    TextsCOL.OrderRank -> {
+                        try {
+                            val orderRank = updateCol.value.toInt()
+                            updateOrderRank(orderRank, record.recordId)
+                        } catch (ex: NumberFormatException) {
+                            throw CompositionException(
+                                CompositionCode.ProvidedStringInPlaceOfInt,
+                                "On column: ${TextsCOL.OrderRank.name}. Record id: ${record.recordId}. Value provided: ${updateCol.value}"
+                            )
                         }
                     }
                 }
-                where { text.id eq record.recordId }
-            }
-            if (effectedRecords == 0)
-                throw CompositionException(CompositionCode.FailedToAddRecordToCompositionValidator)
-
-            if (doUpdateOrderRank) {
-                val updateTo = updateOrderRankTo?.toInt()
-                    ?: throw CompositionException(CompositionCode.FailedToAddRecordToCompositionValidator)
-                val effectedCollections = database.update(TextToCollectionsModel) {
-                    set(it.orderRank, updateTo)
-                    where { it.textId eq record.recordId }
-                }
-                if (effectedCollections == 0)
-                    throw CompositionException(CompositionCode.FailedToAddRecordToCompositionValidator)
             }
         }
     }
 
+    private fun updateRecordOnly(column: TextsCOL, newValue: String, recordId: Int) {
+        if (database.update(TextsModel) {
+                when (column) {
+                    TextsCOL.Text ->
+                        set(it.text, newValue)
+                    else ->
+                        throw CompositionExceptionReport(CompositionCode.ColumnDoesNotExist, this::class.java)
+                }
+                where { text.id eq recordId }
+            } == 0) throw CompositionExceptionReport(
+            CompositionCode.FailedToAddRecordToCompositionValidator, this::class.java
+        )
+    }
 
-    // region Update
-//    override fun updateRecord(record: RecordUpdate, imageId: Int, collectionId: Int): Boolean {
-////        val collection =
-////            validateRecordToCollectionRelationship(collectionId) ?: return false // todo - handle gracefully
-//
-//        database.update(TextsModel) {
-//            record.updateTo.map { recordCol ->
-//                when (TextsCOL.fromInt(recordCol.column)) {
-//                    TextsCOL.Text -> set(it.text, recordCol.value)
-////                    TextsCOL.OrderRank -> set(it.orderRank, recordCol.value.toInt()) // todo - may fail
-//                    // todo - toInt() may fail
-//                }
-//            }
-//            where {
-//                when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-//                    TextIdentifiableRecordByCol.OrderRank ->
-//                        TODO()
-////                        (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
-//                } // todo - handle incorrect recordIdentifiableByCol gracefully
-//                // todo - handle failure gracefully
-//            }
-//        }
-//        TODO("validate if successful")
-//    }
-//
-//    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
-////        val collection = validateRecordToCollectionRelationship(collectionId) ?: return false // todo - hadle gracefully
-//
-//        database.batchUpdate(TextsModel) {
-//            records.map { record ->
-//                item {
-//                    record.updateTo.map { updateCol ->
-//                        when (TextsCOL.fromInt(updateCol.column)) {
-//                            TextsCOL.Text -> set(it.text, updateCol.value)
-////                            TextsCOL.OrderRank -> set(it.orderRank, updateCol.value.toInt())
-//                            // todo - toInt() may fail, handle gracefully
-//                        }
-//                    }
-//                    where {
-//                        when (TextIdentifiableRecordByCol.fromInt(record.recordIdentifiableByCol)) {
-//                            TextIdentifiableRecordByCol.OrderRank ->
-//                                TODO()
-////                                (it.collectionId eq collection.id) and (it.orderRank eq record.recordIdentifiableByColOfValue.toInt())
-//                        } // todo - handle incorrect recordIdentifiableByCol gracefully
-//                    }
-//                }
-//            }
-//        }
-//        TODO("validate if successful")
-//    }
-// endregion Update
+    private fun updateOrderRank(orderRank: Int, recordId: Int) {
+        if (database.update(TextToCollectionsModel) {
+                set(it.orderRank, orderRank)
+                where { it.textId eq recordId }
+            } == 0) throw CompositionExceptionReport(
+            CompositionCode.FailedToAddRecordToCompositionValidator, this::class.java
+        )
+    }
+    // endregion Update record
 
 
     // region Delete
     override fun deleteRecord(recordId: Int, collectionId: Int): Boolean {
-
-        TODO("Not yet implemented")
-    }
-
-    override fun batchDeleteRecords(id: Int, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 
     override fun deleteRecordsCollection(collectionId: Int) {
         database.useTransaction {
             val record = getAllRecordsOfCollection(collectionId)
+                ?: throw CompositionException(CompositionCode.CollectionOfRecordsNotFound)
 
             database.delete(TextToCollectionsModel) { it.collectionId eq collectionId }
             database.delete(TextCollectionsModel) { it.id eq collectionId }
 
-            record?.forEach { item ->
+            record.forEach { item ->
                 database.delete(TextsModel) { it.id eq item.id }
             }
         }
@@ -248,10 +206,6 @@ class TextRepository : RepositoryBase(),
     }
 
     override fun deleteCollectionButNotRecord() {
-        TODO("Not yet implemented")
-    }
-
-    override fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean {
         TODO("Not yet implemented")
     }
 // endregion Delete

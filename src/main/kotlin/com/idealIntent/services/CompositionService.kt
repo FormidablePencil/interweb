@@ -177,7 +177,8 @@ class CompositionService(
         } catch (ex: CompositionException) {
             return when (ex.code) {
                 CompositionCode.ModifyPermittedToAuthorOfCompositionNotFound,
-                CompositionCode.IdOfRecordProvidedNotOfComposition ->
+                CompositionCode.IdOfRecordProvidedNotOfComposition,
+                CompositionCode.ProvidedStringInPlaceOfInt ->
                     CompositionResponse().failed(ex.code, ex.moreDetails)
                 else ->
                     throw CompositionExceptionReport(CompositionCode.ServerError, this::class.java, ex)

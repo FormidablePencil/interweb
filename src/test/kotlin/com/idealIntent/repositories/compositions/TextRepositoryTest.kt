@@ -2,10 +2,12 @@ package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
-import com.idealIntent.exceptions.CompositionCode.FailedToAssociateRecordToCollection
-import com.idealIntent.exceptions.CompositionCode.EmptyListOfRecordsProvided
+import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.dtos.compositionCRUD.UpdateColumn
+import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import dtos.collectionsGeneric.texts.TextsCOL
 import io.kotest.assertions.failure
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.IsolationMode
@@ -59,11 +61,6 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
             }
         }
 
-        given("getRecordsQuery") {
-            // Not meant to be tested. This method would have been private
-            // if it wasn't in ICollectionStructure protocol.
-        }
-
         given("validateRecordToCollectionRelationship") {
             then("success") {
                 rollback {
@@ -101,6 +98,14 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
                     val collectionId = textRepository.addRecordCollection()
                     if (!textRepository.batchInsertRecordsToCollection(texts, collectionId))
                         throw failure("failed to insert new records under an existing collection")
+                }
+            }
+        }
+
+        given("insertRecordToNewCollection") {
+            then("success") {
+                rollback {
+                    textRepository.insertRecordToNewCollection(texts[0]) shouldNotBe null
                 }
             }
         }
@@ -162,6 +167,7 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("associateRecordToCollection") {
+
             then("success") {
                 rollback {
                     val collectionId = textRepository.batchInsertRecordsToNewCollection(texts)
@@ -178,10 +184,137 @@ class TextRepositoryTest : BehaviorSpecUtRepo() {
         // endregion Insert
 
 
-        // region Update
-        // endregion Update
+        given("updateRecord") {
 
-        // region Delete
-        // endregion Delete
+            then("provided not a number for updating order rank") {
+                rollback {
+                    // region Setup
+                    val updateOrderRankTo = "abcdefg"
+                    val collectionId = textRepository.insertRecordToNewCollection(texts[0])
+                    val records = textRepository.getAllRecordsOfCollection(collectionId)
+                        ?: throw failure("failed to get record saved earlier")
+
+                    val recordUpdate = RecordUpdate(
+                        recordId = records[0].id,
+                        updateTo = listOf(UpdateColumn(TextsCOL.OrderRank.value, updateOrderRankTo))
+                    )
+                    // endregion
+
+                    val ex = shouldThrowExactly<CompositionException> {
+                        textRepository.updateRecord(recordUpdate)
+                    }.code shouldBe ProvidedStringInPlaceOfInt
+                }
+            }
+
+            then("successfully update record") {
+                val updateToValueOf = "updated value"
+                rollback {
+                    // region Setup
+                    val collectionId = textRepository.insertRecordToNewCollection(texts[0])
+                    textRepository.insertRecordToCollection(texts[1], collectionId)
+
+                    val recordsBeforeUpdate = textRepository.getAllRecordsOfCollection(collectionId)
+                        ?: throw failure("failed to get record saved earlier")
+
+                    val recordBeforeUpdate = recordsBeforeUpdate.find { it.orderRank == texts[0].orderRank }
+                        ?: throw failure("failed to get record saved earlier")
+
+                    recordBeforeUpdate.text shouldBe texts[0].text
+
+                    val recordUpdate = RecordUpdate(
+                        recordId = recordBeforeUpdate.id,
+                        updateTo = listOf(UpdateColumn(TextsCOL.Text.value, updateToValueOf))
+                    )
+                    // endregion Setup
+
+                    textRepository.updateRecord(recordUpdate)
+
+                    val recordsAfterUpdate = textRepository.getAllRecordsOfCollection(collectionId)
+                        ?: throw failure("failed to get record saved earlier")
+
+                    // region Validate the change
+                    val recordAfterUpdate = recordsAfterUpdate.find { it.orderRank == texts[0].orderRank }
+                        ?: throw failure("failed to get record saved earlier")
+
+                    recordAfterUpdate.text shouldNotBe texts[0].text
+                    recordAfterUpdate.text shouldBe updateToValueOf
+                    // endregion
+
+
+                    // region Test that second record was not updated too
+                    val record2 = recordsAfterUpdate.find { it.orderRank == texts[1].orderRank }
+                        ?: throw failure("failed to get record saved earlier")
+
+                    record2.text shouldBe texts[1].text
+                    // endregion
+                }
+            }
+
+            then("successfully update order rank of record") {
+                val updateOrderRankTo = "80000"
+                rollback {
+                    // region Setup
+                    val collectionId = textRepository.insertRecordToNewCollection(texts[0])
+                    textRepository.insertRecordToCollection(texts[1], collectionId)
+
+                    val recordsBeforeUpdate = textRepository.getAllRecordsOfCollection(collectionId)
+                        ?: throw failure("failed to get record saved earlier")
+
+                    val recordBeforeUpdate = recordsBeforeUpdate.find { it.orderRank == texts[0].orderRank }
+                        ?: throw failure("failed to get record saved earlier")
+
+                    recordBeforeUpdate.text shouldBe texts[0].text
+
+                    val recordUpdate = RecordUpdate(
+                        recordId = recordBeforeUpdate.id,
+                        updateTo = listOf(UpdateColumn(TextsCOL.OrderRank.value, updateOrderRankTo))
+                    )
+                    // endregion Setup
+
+                    textRepository.updateRecord(recordUpdate)
+
+                    val recordsAfterUpdate = textRepository.getAllRecordsOfCollection(collectionId)
+                        ?: throw failure("failed to get record saved earlier")
+
+                    // region Validate the change
+                    recordsAfterUpdate.find {
+                        it.orderRank == updateOrderRankTo.toInt()
+                                && it.text == texts[0].text
+                    } shouldNotBe null
+                    // endregion
+
+
+                    // region Test that the order rank of the second record was not updated too
+                    val record2 = recordsAfterUpdate.find {
+                        it.orderRank == texts[1].orderRank
+                                && it.text == texts[1].text
+                    } shouldNotBe null
+                    // endregion
+                }
+            }
+        }
+
+        given("deleteRecordsCollection") {
+
+            then("failed to delete collection of id because provided id does not exist thus nothing to delete") {
+                rollback {
+                    shouldThrowExactly<CompositionException> {
+                        textRepository.deleteRecordsCollection(99999999)
+                    }.code shouldBe CollectionOfRecordsNotFound
+                }
+            }
+
+            then("successfully deleted collection of records and all related things") {
+                rollback {
+                    val collectionId = textRepository.insertRecordToNewCollection(texts[0])
+
+                    textRepository.getAllRecordsOfCollection(collectionId) shouldNotBe null
+
+                    textRepository.deleteRecordsCollection(collectionId)
+
+                    textRepository.getAllRecordsOfCollection(collectionId) shouldBe null
+                }
+            }
+        }
     }
 }

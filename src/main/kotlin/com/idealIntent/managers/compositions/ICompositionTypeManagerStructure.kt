@@ -73,7 +73,7 @@ interface ICompositionTypeManagerStructure<Composition, CompositionMetadata, Cre
      *
      * @param compositionUpdateQue Update que. Gives you what column to update and to what value.
      * @param authorId Id of author to get only the composition they are privileged to update.
-     * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound], [IdOfRecordProvidedNotOfComposition].
+     * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound], [IdOfRecordProvidedNotOfComposition], [ProvidedStringInPlaceOfInt].
      */
     fun updateComposition(
         compositionUpdateQue: List<UpdateDataOfComposition>,

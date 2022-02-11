@@ -27,6 +27,10 @@ enum class CompositionCode {
     CompositionNotFound,
     FailedToAssociateAuthorToLayout,
     FailedToComposeInternalError,
+    ColumnDoesNotExist,
+    ProvidedStringInPlaceOfInt,
+    CollectionOfRecordsNotFound,
+    CompositionRecordIsCorrupt,
     ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
@@ -39,6 +43,8 @@ enum class CompositionCode {
                 FailedToAddRecordToCompositionValidator -> "No records updates which only means that developer failed to add a record to composition validator."
                 FailedToAssociateAuthorToLayout -> "Failed to associate author to layout. Author id does not exist perhaps."
                 FailedToComposeInternalError -> "Failed to compose. Internal cms error."
+                ColumnDoesNotExist -> "Failed to handle a column of a record."
+                CompositionRecordIsCorrupt -> "Composition is corrupt. Could not find id of collection composition composes."
 
                 ServerError -> genericServerError
 
@@ -50,6 +56,8 @@ enum class CompositionCode {
                 ModifyPermittedToAuthorOfCompositionNotFound,
                 IdOfRecordProvidedNotOfComposition,
                 CompositionNotFound,
+                ProvidedStringInPlaceOfInt,
+                CollectionOfRecordsNotFound,
                 -> {
                     logError(logAttemptToLogClientAsServerError(code), this::class.java)
                     return "Not an internal error."
@@ -67,7 +75,11 @@ enum class CompositionCode {
                 IdOfRecordProvidedNotOfComposition -> "Id of record to update is not part of the composition."
                 FailedToConvertToIntOrderRank -> "Provided a value for updating order rank that was not a number." // todo - client error but not user error. How should we return this data
                 CompositionNotFound -> "Composition not found by composition source id."
+                ProvidedStringInPlaceOfInt -> "Provided a string in place of an integer, thus failed to convert String to Int."
+                CollectionOfRecordsNotFound -> "Collection of records not found by provided collection id."
 
+                CompositionRecordIsCorrupt,
+                ColumnDoesNotExist,
                 FailedToComposeInternalError,
                 FailedToAddRecordToCompositionValidator,
                 NoAuthorIdProvidedToRestrictedResource,
@@ -90,6 +102,9 @@ enum class CompositionCode {
                 IdOfRecordProvidedNotOfComposition,
                 FailedToConvertToIntOrderRank,
                 CompositionNotFound,
+                ProvidedStringInPlaceOfInt,
+                CollectionOfRecordsNotFound,
+                CompositionRecordIsCorrupt,
                 -> HttpStatusCode.BadRequest
 
                 FailedToComposeInternalError,
@@ -100,6 +115,7 @@ enum class CompositionCode {
                 NoAuthorIdProvidedToRestrictedResource,
                 FailedToAddRecordToCompositionValidator,
                 FailedToAssociateAuthorToLayout,
+                ColumnDoesNotExist,
                 -> HttpStatusCode.InternalServerError
             }
         }

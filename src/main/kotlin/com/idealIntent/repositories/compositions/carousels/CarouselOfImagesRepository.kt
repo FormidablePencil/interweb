@@ -268,21 +268,34 @@ class CarouselOfImagesRepository(
     }
 
     override fun deleteComposition(compositionSourceId: Int, authorId: Int) {
-        database.useTransaction {
-            val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionQuery(
-                true,
-                compositionSourceId = compositionSourceId,
-                authorId = authorId
-            ) ?: throw CompositionException(CompositionCode.CompositionNotFound)
+        try {
+            database.useTransaction {
+                val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionQuery(
+                    true,
+                    compositionSourceId = compositionSourceId,
+                    authorId = authorId
+                ) ?: throw CompositionException(CompositionCode.CompositionNotFound)
 
-            // region deletion
-            database.delete(ImagesCarouselsModel) { it.id eq id }
-            imageRepository.deleteRecordsCollection(imageCollectionId)
-            textRepository.deleteRecordsCollection(redirectTextCollectionId)
-            database.delete(PrivilegedAuthorToCompositionSourcesModel) { it.sourceId eq compositionSourceId }
-            database.delete(CompositionInstanceToSourcesModel) { it.sourceId eq compositionSourceId }
-            database.delete(CompositionSourcesModel) { it.id eq id }
-            // endregion
+                // region deletion
+                database.delete(ImagesCarouselsModel) { it.id eq id }
+                imageRepository.deleteRecordsCollection(imageCollectionId)
+                textRepository.deleteRecordsCollection(redirectTextCollectionId)
+                database.delete(PrivilegedAuthorToCompositionSourcesModel) { it.sourceId eq compositionSourceId }
+                database.delete(CompositionInstanceToSourcesModel) { it.sourceId eq compositionSourceId }
+                database.delete(CompositionSourcesModel) { it.id eq id }
+                // endregion
+            }
+        } catch (ex: CompositionException) {
+            when (ex.code) {
+                CompositionCode.CollectionOfRecordsNotFound ->
+                    throw CompositionExceptionReport(
+                        CompositionCode.CompositionRecordIsCorrupt,
+                        compositionSourceId.toString(),
+                        this::class.java,
+                        ex
+                    )
+                else -> throw CompositionException(ex.code, ex.moreDetails, ex)
+            }
         }
     }
 }

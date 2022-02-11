@@ -2,6 +2,7 @@ package com.idealIntent.repositories.collections
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionCode.ProvidedStringInPlaceOfInt
 import com.idealIntent.exceptions.CompositionException
 import org.ktorm.database.Database
 
@@ -25,12 +26,13 @@ import org.ktorm.database.Database
  */
 interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, RecordToCollection, CollectionOfRecords> {
     val database: Database
+
     // region Get
     /**
      * Get a single record.
      *
-     * @param recordId id of record.
-     * @param collectionId id of collection.
+     * @param recordId Id of record to look up null for returning only record.
+     * @param collectionId Get records under collection's id.
      * @return Single record or null if not found.
      */
     fun getSingleRecordOfCollection(recordId: Int, collectionId: Int): RecordPK?
@@ -42,22 +44,13 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * @return A list of records under collection of [collectionId] or null if non found
      */
     fun getAllRecordsOfCollection(collectionId: Int): List<RecordPK>?
+    // endregion Get
 
-    /**
-     * Get records query. Not used directly but by [getSingleRecordOfCollection] and [getAllRecordsOfCollection]
-     *
-     * @param recordId Id of record to look up null for returning only record
-     * @param collectionId Get records under collection's id
-     * @return A list of records under collection of [collectionId] or null if non found
-     */
-    fun getRecordsQuery(recordId: Int? = null, collectionId: Int): List<RecordPK>?
 
     /**
      * validate image to collection relationship.
      */
-    // todo - no use for it yet. Maybe deleted
     fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean
-    // endregion Get
 
 
     // region Insert
@@ -122,18 +115,17 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
 
 
     // region Update
-
     /**
      * Update record. Check mod privileges before using this method. Such as ... todo
      *
      * Method used in conjunctions with others. Not meant be used standalone but for testing purposes.
      *
      * @param record Record to update to and id of the record to do the update to.
-     * @param collectionId If order rank needs to be updated,
      *
-     * @throws CompositionException [ FailedToAddRecordToCompositionValidator][CompositionCode.FailedToAddRecordToCompositionValidator] from [convertToInt]
+     * @throws CompositionException [ FailedToAddRecordToCompositionValidator][CompositionCode.FailedToAddRecordToCompositionValidator] from [convertToInt],
+     * [ProvidedStringInPlaceOfInt].
      */
-    fun updateRecord(record: RecordUpdate, collectionId: Int)
+    fun updateRecord(record: RecordUpdate)
 
     /**
      * Convert to int.
@@ -152,18 +144,9 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
             throw CompositionException(CompositionCode.FailedToConvertToIntOrderRank)
         }
     }
-
-    /**
-     * Batch update records
-     *
-     * @param collectionId Id of collection
-     * @param records records to update to
-     */
-    fun batchUpdateRecords(records: List<RecordUpdate>, collectionId: Int): Boolean
     // endregion Update
 
 
-    // todo deletes
     // region Delete
     /**
      * Delete a record from collection of [collectionId].
@@ -171,12 +154,8 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
     fun deleteRecord(recordId: Int, collectionId: Int): Boolean
 
     /**
-     * Delete records from collection of [collectionId].
-     */
-    fun batchDeleteRecords(id: Int, collectionId: Int): Boolean
-
-    /**
      * Delete all records from collection of [collectionId].
+     * @throws CompositionException [ CollectionOfRecordsNotFound][CompositionCode.CollectionOfRecordsNotFound].
      */
     fun deleteRecordsCollection(collectionId: Int)
 
@@ -189,6 +168,5 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      * Delete only the collection and its relationship to records but not the records themselves.
      */
     fun deleteCollectionButNotRecord()
-
     // endregion Delete
 }
