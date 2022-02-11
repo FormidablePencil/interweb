@@ -4,15 +4,16 @@ import com.google.gson.Gson
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.CompositionPrivilegesManager
-import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.SpaceRepository
-import com.idealIntent.services.CompositionService
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.flows.CompositionFlow
 import io.kotest.assertions.failure
+import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
@@ -25,6 +26,11 @@ import shared.testUtils.images
 import shared.testUtils.rollback
 import shared.testUtils.texts
 
+/**
+ * Carousel of images repository integration/unit testing
+ *
+ * NOTE: Everything in reusable query instructions region is tested in composition integration tests
+ */
 class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(listOf(DIHelper.CoreModule, DITestHelper.FlowModule)))
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
@@ -33,32 +39,20 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
     private val spaceRepository: SpaceRepository by inject()
     private val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
     private val compositionPrivilegesManager: CompositionPrivilegesManager by inject()
-    private val carouselOfImagesManager: CarouselOfImagesManager by inject()
-    private val compositionService: CompositionService by inject()
     private val signupFlow: SignupFlow by inject()
     private val compositionFlow: CompositionFlow by inject()
 
     private val createCarouselBasicImagesReq =
         CreateCarouselBasicImagesReq("Projects", images, texts, listOf(), privilegeLevel = 0)
 
-    private val jsonData =
-        Gson().toJson(createCarouselBasicImagesReq, createCarouselBasicImagesReq::class.java)
-
     init {
         beforeEach { clearAllMocks() }
 
-        xgiven("Composition query instructions - Create a few compositions") {
-            and("save under layout and query layout of compositions") {
-                then("success") {
-                    rollback {}
-                }
-            }
-        }
-
         given("getOnlyTopLvlIdsOfCompositionOnlyModifiable") {
+
             then("Author id not privileged to view nor modify. Failed to retrieve private composition") {
                 rollback {
-                    val (compositionSourceId, _, authorId) = compositionFlow.signup_then_CreateComposition(true)
+                    val (compositionSourceId, _, authorId) = compositionFlow.signup_then_createComposition(true)
 
                     carouselOfImagesRepository.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
                         compositionSourceId = compositionSourceId, authorId = 1
@@ -68,7 +62,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
             then("successfully retrieved private composition") {
                 rollback {
-                    val (compositionSourceId, _, authorId) = compositionFlow.signup_then_CreateComposition(true)
+                    val (compositionSourceId, _, authorId) = compositionFlow.signup_then_createComposition(true)
 
                     carouselOfImagesRepository.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
                         compositionSourceId = compositionSourceId, authorId = authorId
@@ -78,10 +72,11 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("getPublicComposition") {
+
             then("failed to get because composition is private") {
                 rollback {
                     val (compositionSourceId, layoutId, authorId) =
-                        compositionFlow.signup_then_CreateComposition(false)
+                        compositionFlow.signup_then_createComposition(false)
 
                     carouselOfImagesRepository.getPublicComposition(compositionSourceId = compositionSourceId) shouldBe null
                 }
@@ -90,7 +85,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
             then("successfully got public composition") {
                 rollback {
                     val (compositionSourceId, layoutId, authorId) =
-                        compositionFlow.signup_then_CreateComposition(true)
+                        compositionFlow.signup_then_createComposition(true)
 
                     val comp: CarouselBasicImagesRes = carouselOfImagesRepository.getPublicComposition(
                         compositionSourceId = compositionSourceId
@@ -119,10 +114,11 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("getPrivateComposition") {
+
             then("successfully got private composition") {
                 rollback {
                     val (compositionSourceId, layoutId, authorId) =
-                        compositionFlow.signup_then_CreateComposition(false)
+                        compositionFlow.signup_then_createComposition(false)
 
                     val comp: CarouselBasicImagesRes =
                         carouselOfImagesRepository.getPrivateComposition(compositionSourceId, authorId)
@@ -205,40 +201,64 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
             }
         }
 
-        xgiven("deleteComposition") {
+        given("deleteComposition") {
+
+            then("failed to delete because author id provided is not privileged to delete.") {
+                rollback {
+                    val (compositionSourceId, layoutId, authorId) =
+                        compositionFlow.signup_then_createComposition(true)
+
+                    val ex = shouldThrowExactly<CompositionException> {
+                        carouselOfImagesRepository.deleteComposition(compositionSourceId, 999999999)
+                    }
+                    ex.code shouldBe CompositionCode.CompositionNotFound
+                }
+            }
+
+            then("failed to delete on an id of a composition that doesn't exist") {
+                rollback {
+                    val (compositionSourceId, layoutId, authorId) =
+                        compositionFlow.signup_then_createComposition(true)
+
+                    val ex = shouldThrowExactly<CompositionException> {
+                        carouselOfImagesRepository.deleteComposition(999999999, authorId)
+                    }
+                    ex.code shouldBe CompositionCode.CompositionNotFound
+                }
+            }
+
             then("success") {
                 rollback {
                     val (compositionSourceId, layoutId, authorId) =
-                        compositionFlow.signup_then_CreateComposition(true)
+                        compositionFlow.signup_then_createComposition(true)
 
-                    // region before deletion assertion
-                    // todo - test privileges also
-                    val resBeforeDeletion: CarouselBasicImagesRes =
-                        carouselOfImagesRepository.getPublicComposition(compositionSourceId)
-                            ?: throw failure("failed to get composition")
-
+                    // region before deletion assertions
+                    val resBeforeDeletion: CarouselBasicImagesRes = carouselOfImagesRepository.getPublicComposition(
+                        compositionSourceId = compositionSourceId
+                    ) ?: throw failure("failed to get composition")
 
                     resBeforeDeletion.images.size shouldBe createCarouselBasicImagesReq.images.size
                     resBeforeDeletion.imgOnclickRedirects.size shouldBe createCarouselBasicImagesReq.imgOnclickRedirects.size
                     resBeforeDeletion.images.forEach { resItem ->
-                        val found = createCarouselBasicImagesReq.images.find { it.orderRank == resItem.orderRank }
-                        found shouldNotBe null
+                        createCarouselBasicImagesReq.images.find {
+                            it.orderRank == resItem.orderRank
+                                    && it.url == resItem.url
+                                    && it.description == resItem.description
+                        } shouldNotBe null
                     }
                     resBeforeDeletion.imgOnclickRedirects.forEach { item ->
-                        val found =
-                            createCarouselBasicImagesReq.imgOnclickRedirects.find { item.orderRank == it.orderRank }
-                        found shouldNotBe null
+                        createCarouselBasicImagesReq.imgOnclickRedirects.find {
+                            item.orderRank == it.orderRank
+                                    && item.text == it.text
+                        } shouldNotBe null
                     }
-//                    resBeforeDeletion.name shouldBe createPublicCarouselBasicImagesReq.name
-                    // todo - set to static string, change to dynamic
-                    resBeforeDeletion.name shouldBe "my composition"
+                    resBeforeDeletion.name shouldBe createCarouselBasicImagesReq.name
                     // endregion
 
                     carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)
 
-                    // region after deletion assertion
-                    val resAfterDeletion =
-                        carouselOfImagesRepository.getPublicComposition(compositionSourceId)
+                    // region after deletion assertions
+                    val resAfterDeletion = carouselOfImagesRepository.getPublicComposition(compositionSourceId)
 
                     resAfterDeletion shouldBe null
                     // endregion

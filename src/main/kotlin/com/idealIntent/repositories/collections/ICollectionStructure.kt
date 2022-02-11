@@ -178,7 +178,7 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
     /**
      * Delete all records from collection of [collectionId].
      */
-    fun deleteAllRecordsInCollection(collectionId: Int)
+    fun deleteRecordsCollection(collectionId: Int)
 
     /**
      * Disassociate all records from collection of [collectionId].

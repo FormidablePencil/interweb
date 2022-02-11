@@ -7,7 +7,6 @@ import com.idealIntent.dtos.collectionsGeneric.texts.TextToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.ITextToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
@@ -19,7 +18,6 @@ import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
-import org.ktorm.schema.text
 
 /**
  * Responsible for collections of texts.
@@ -232,18 +230,16 @@ class TextRepository : RepositoryBase(),
         TODO("Not yet implemented")
     }
 
-    override fun deleteAllRecordsInCollection(collectionId: Int) {
+    override fun deleteRecordsCollection(collectionId: Int) {
         database.useTransaction {
-            // get record ids of collection
-            val textIds = database.from(TextToCollectionsModel)
-                .select(TextToCollectionsModel.textId)
-                .where { TextToCollectionsModel.collectionId eq collectionId }
-                .map { it[TextToCollectionsModel.textId]!! }
+            val record = getAllRecordsOfCollection(collectionId)
 
-            // delete association between records and collection then collection and records
             database.delete(TextToCollectionsModel) { it.collectionId eq collectionId }
             database.delete(TextCollectionsModel) { it.id eq collectionId }
-            textIds.map { database.delete(TextsModel) { it.id eq it.id } }
+
+            record?.forEach { item ->
+                database.delete(TextsModel) { it.id eq item.id }
+            }
         }
     }
 

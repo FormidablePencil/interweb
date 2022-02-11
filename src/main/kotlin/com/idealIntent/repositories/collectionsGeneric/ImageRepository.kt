@@ -205,7 +205,17 @@ class ImageRepository() : RepositoryBase(),
         TODO()
     }
 
-    override fun deleteAllRecordsInCollection(collectionId: Int) {
+    override fun deleteRecordsCollection(collectionId: Int) {
+        database.useTransaction {
+            val record = getAllRecordsOfCollection(collectionId)
+
+            database.delete(ImageToCollectionsModel) { it.collectionId eq collectionId }
+            database.delete(ImageCollectionsModel) { it.id eq collectionId }
+
+            record?.forEach { item ->
+                database.images.removeIf { it.id eq item.id }
+            }
+        }
     }
 
     override fun disassociateRecordFromCollection(recordId: Int, collectionId: Int) {

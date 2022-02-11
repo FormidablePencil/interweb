@@ -49,7 +49,7 @@ data class ImagesCarouselTopLvlIds(
     override val id: Int, // todo - rename to collectionId
     override val name: String,
     override val imageCollectionId: Int,
-    override val redirectTextCollectionId: Int
+    override val redirectTextCollectionId: Int,
 ) : IImagesCarousel
 
 //data class CarouselItem( // todo - delete

@@ -32,7 +32,7 @@ class CompositionFlow : BehaviorSpecFlow() {
     private val spaceRepository: SpaceRepository by inject()
     private val carouselOfImagesManager: CarouselOfImagesManager by inject()
 
-    suspend fun signup_then_CreateComposition(publicView: Boolean): Triple<Int, Int, Int> {
+    suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
         val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
         val layoutId = spaceRepository.insertNewLayout(name = layoutName, authorId = authorId)
         val compositionSourceId = createComposition(publicView, layoutId, authorId)

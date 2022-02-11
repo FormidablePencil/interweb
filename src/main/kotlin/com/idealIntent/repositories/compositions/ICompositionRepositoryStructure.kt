@@ -2,6 +2,7 @@ package com.idealIntent.repositories.compositions
 
 import com.idealIntent.dtos.compositions.carousels.ImagesCarouselTopLvlIds
 import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import org.ktorm.dsl.QueryRowSet
 import org.ktorm.dsl.QuerySource
@@ -130,6 +131,7 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param compositionSourceId Id of composition source and not id of composition itself.
      * @param authorId Author's id to validate if privileged to delete.
      * @return success or fail.
+     * @throws [CompositionException] [ CompositionNotFound][CompositionCode.CompositionNotFound]
      */
     fun deleteComposition(compositionSourceId: Int, authorId: Int)
 

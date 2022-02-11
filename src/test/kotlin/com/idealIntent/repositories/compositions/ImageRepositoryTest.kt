@@ -185,6 +185,10 @@ class ImageRepositoryTest : BehaviorSpecUtRepo() {
         // endregion Update
 
         // region Delete
+        given("deleteAllRecordsInCollection") {
+            then("d") {
+            }
+        }
         // endregion Delete
     }
 }

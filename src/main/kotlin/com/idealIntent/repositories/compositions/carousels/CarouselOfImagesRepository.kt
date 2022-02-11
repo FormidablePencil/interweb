@@ -187,34 +187,27 @@ class CarouselOfImagesRepository(
 
     private fun getOnlyTopLvlIdsOfCompositionQuery(
         onlyModifiable: Boolean, compositionSourceId: Int, authorId: Int
-    ): ImagesCarouselTopLvlIds? {
-        val dto = CarouselOfImagesDataMapped()
-        var imageCollectionId: Int? = null
-        var textCollectionId: Int? = null
-
-        return compositionOnlyIdsLeftJoin(database.from(compSource))
-            .select(compositionOnlyIdsSelect)
-            .whereWithConditions {
-                it += (compSource.id eq compositionSourceId)
-                it += (prvAth2CompSource.authorId eq authorId)
-                if (onlyModifiable)
-                    it += (prvAth2CompSource.modify eq 1)
-            }
-            .map {
-//                compositionQueryMap(it, dto)
-                println(
-                    "${it[compInstance2compSource.compositionId]} ${it[compInstance2compSource.sourceId]} " +
-                            "${it[compSource.name]} ${it[imgCol.id]} ${it[textCol.id]}"
-                )
-                ImagesCarouselTopLvlIds(
-                    id = it[compInstance2compSource.compositionId]!!,
-                    sourceId = it[compInstance2compSource.sourceId]!!,
-                    name = it[compSource.name]!!,
-                    imageCollectionId = it[imgCol.id]!!,
-                    redirectTextCollectionId = it[textCol.id]!!
-                )
-            }.ifEmpty { null }?.first()
-    }
+    ): ImagesCarouselTopLvlIds? = compositionOnlyIdsLeftJoin(database.from(compSource))
+        .select(compositionOnlyIdsSelect)
+        .whereWithConditions {
+            it += (compSource.id eq compositionSourceId)
+            it += (prvAth2CompSource.authorId eq authorId)
+            if (onlyModifiable)
+                it += (prvAth2CompSource.modify eq 1)
+        }
+        .map {
+            println(
+                "${it[compInstance2compSource.compositionId]} ${it[compInstance2compSource.sourceId]} " +
+                        "${it[compSource.name]} ${it[imgCol.id]} ${it[textCol.id]}"
+            )
+            ImagesCarouselTopLvlIds(
+                id = it[compInstance2compSource.compositionId]!!,
+                sourceId = it[compInstance2compSource.sourceId]!!,
+                name = it[compSource.name]!!,
+                imageCollectionId = it[imgCol.id]!!,
+                redirectTextCollectionId = it[textCol.id]!!
+            )
+        }.ifEmpty { null }?.first()
     // endregion
 
 
@@ -284,30 +277,12 @@ class CarouselOfImagesRepository(
             ) ?: throw CompositionException(CompositionCode.CompositionNotFound)
 
             // region deletion
-            imageRepository.deleteAllRecordsInCollection(imageCollectionId)
-            textRepository.deleteAllRecordsInCollection(redirectTextCollectionId)
-
-            // todo delete items of collections by calling their respective repositories
-            //  and compositionSource
-
-//            database.delete(ImagesCarouselsModel) { item -> item.id eq it.id }
-//
-//            dto.imgOnclickRedirects.forEach { record ->
-//                textRepository.deleteTextRecords(record.id)
-//            }
-//
-//            dto.images.forEach { record ->
-//                deleteCollectionsUtil.deleteImageRecords(record.id)
-//            }
-//
-//            dto.privilegedAuthors.forEach { record ->
-//                if (record.username.isEmpty()) return@forEach
-//                val authorId = authorRepository.getByUsername(record.username)?.id
-//                    ?: throw Exception("Did not find author by username of ${record.username}")
-//
-//                deleteCollectionsUtil.deletePrivilegedAuthors(authorId)
-//            }
-//            database.delete(CompositionSourcesModel) { record -> record.id eq record.privilegeLevel }
+            database.delete(ImagesCarouselsModel) { it.id eq id }
+            imageRepository.deleteRecordsCollection(imageCollectionId)
+            textRepository.deleteRecordsCollection(redirectTextCollectionId)
+            database.delete(PrivilegedAuthorToCompositionSourcesModel) { it.sourceId eq compositionSourceId }
+            database.delete(CompositionInstanceToSourcesModel) { it.sourceId eq compositionSourceId }
+            database.delete(CompositionSourcesModel) { it.id eq id }
             // endregion
         }
     }
