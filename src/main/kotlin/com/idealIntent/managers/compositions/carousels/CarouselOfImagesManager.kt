@@ -39,17 +39,6 @@ class CarouselOfImagesManager(
     override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): CarouselBasicImagesRes? =
         carouselOfImagesRepository.getPrivateComposition(compositionSourceId, authorId)
 
-    /**
-     * Insert images and redirection texts, create a collection for each, create an association between image and
-     * assign privileges compositions to specified authors. If either looking up author by id or assigning privileges to
-     * authors fails then return a response a fail response to client with the author's username that failed.
-     * Otherwise, if all went well, pass ids of image's and redirection text's collections to
-     * [compose][CarouselOfImagesRepository.compose]. Then return id of the newly created composition.
-     *
-     * @see ICompositionTypeManagerStructure.createComposition
-     * @return Id of the newly created composition.
-     * @throws CompositionException [FailedToFindAuthorByUsername]
-     */
     override fun createComposition(
         createRequest: CreateCarouselBasicImagesReq,
         layoutId: Int,
@@ -81,7 +70,7 @@ class CarouselOfImagesManager(
                     redirectTextCollectionId = redirectsCollectionId,
                     sourceId = compositionSourceId,
                 )
-            ) ?: throw CompositionExceptionReport(FailedToCompose, this::class.java)
+            )
 
             compositionPrivilegesManager.giveMultipleAuthorsPrivilegesToCompositionByUsername(
                 createRequest.privilegedAuthors, compositionSourceId, authorId
@@ -91,21 +80,6 @@ class CarouselOfImagesManager(
         }
     }
 
-    override fun deleteComposition(compositionSourceId: Int, authorId: Int) {
-        carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)
-    }
-
-    /**
-     * Update composition
-     *
-     * First validate that the author is privileged to update a composition of source id provided. Then transforms provided
-     * value from json to a type object corresponding to [UpdateDataOfCarouselOfImages]. Validate that the id of
-     * item to update to is of the id of the composition source provided. Then update property of composition.
-     *
-     * @param compositionUpdateQue Id of composition source of composition to do an update on, what to update and
-     * the value to update to.
-     * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound], [IdOfRecordProvidedNotOfComposition].
-     */
     override fun updateComposition(
         compositionUpdateQue: List<UpdateDataOfComposition>,
         compositionSourceId: Int,
@@ -149,4 +123,7 @@ class CarouselOfImagesManager(
             }
         }
     }
+
+    override fun deleteComposition(compositionSourceId: Int, authorId: Int) =
+        carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)
 }

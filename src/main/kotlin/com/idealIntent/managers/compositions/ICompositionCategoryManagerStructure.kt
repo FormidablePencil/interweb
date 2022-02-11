@@ -1,7 +1,10 @@
 package com.idealIntent.managers.compositions
 
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+import com.idealIntent.exceptions.CompositionCode.*
+import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
+import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
 import dtos.compositions.carousels.CompositionCarouselType
 
 //Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response
@@ -18,20 +21,29 @@ import dtos.compositions.carousels.CompositionCarouselType
  */
 interface ICompositionCategoryManagerStructure<CompositionType, Composition, Response> {
 
-
+    /**
+     * Get public composition.
+     *
+     * Find the composition to of compositionType and sends the composition compositionSourceId to composition's manager to get composition.
+     *
+     * @param compositionType The type of composition of category such as Basic Images of Carousel.
+     * @param compositionSourceId Id of composition's source and not the composition's id itself.
+     * @return Composition of records.
+     */
     fun getPublicComposition(
         compositionType: CompositionCarouselType,
         compositionSourceId: Int,
     ): CarouselBasicImagesRes?
 
     /**
+     * Get private composition.
+     *
      * Find the composition to of compositionType and sends the composition compositionSourceId to composition's manager to get composition.
      *
      * @param compositionType The type of composition of category such as Basic Images of Carousel.
      * @param compositionSourceId Id of composition's source and not the composition's id itself.
      * @param authorId Only retrieves composition if author is privileged to get private composition.
      * @return Composition of records.
-     * 
      */
     fun getPrivateComposition(
         compositionType: CompositionType,
@@ -42,9 +54,9 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
     /**
      * Find the composition to of compositionType and sends the json data off to the composition's manager to create composition.
      *
-     * @param compositionType
-     * @param jsonData
-     * @return
+     * @return Id of newly created source composition.
+     * @throws CompositionException [FailedToFindAuthorByUsername].
+     * @see [ICompositionTypeManagerStructure.createComposition]
      */
     fun createComposition(
         compositionType: CompositionType, jsonData: String,
@@ -52,6 +64,12 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
         userId: Int
     ): Int
 
+    /**
+     * Update composition
+     *
+     * @throws CompositionException [ModifyPermittedToAuthorOfCompositionNotFound], [IdOfRecordProvidedNotOfComposition].
+     * @see ICompositionTypeManagerStructure.updateComposition
+     */
     fun updateComposition(
         compositionType: CompositionType,
         compositionSourceId: Int,
@@ -59,6 +77,12 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
         authorId: Int
     )
 
+    /**
+     * Delete composition
+     *
+     * @throws CompositionException [CompositionNotFound]
+     * @see ICompositionRepositoryStructure.deleteComposition
+     */
     fun deleteComposition(
         compositionType: CompositionType,
         compositionSourceId: Int,

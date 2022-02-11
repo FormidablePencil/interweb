@@ -81,7 +81,6 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      *
      * Method [deleteComposition] uses it.
      *
-     * @param onlyModifiable Criteria query only modifiable composition.
      * @param compositionSourceId Id of composition source.
      * @param authorId Criteria query composition of only privileged author.
      * @return Only top level ids of composition.

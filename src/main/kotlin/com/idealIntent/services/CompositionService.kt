@@ -11,12 +11,13 @@ import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.SpaceManager
-import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
+import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.banners.BannersManager
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
 import com.idealIntent.managers.compositions.grids.GridsManager
 import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.compositions.CompositionDataBuilder
+import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.CompositionCategory.*
@@ -80,6 +81,7 @@ class CompositionService(
      * @param layoutId Id of layout to associate composition to.
      * @param userId AuthorId to given absolute privileges to.
      * @return Response of [HttpStatusCode.Created] and source id of newly created composition.
+     * @see ICompositionTypeManagerStructure.createComposition
      */
     fun createComposition(
         userComposition: NewUserComposition,
@@ -128,6 +130,11 @@ class CompositionService(
         }
     }
 
+    /**
+     * Update composition.
+     *
+     * @see ICompositionRepositoryStructure.deleteComposition
+     */
     fun updateComposition(request: SingleUpdateCompositionRequest): CompositionResponse {
         try {
             with(request) {
@@ -179,16 +186,14 @@ class CompositionService(
     }
 
     /**
-     * Delete composition but only if user id privileged to do so.
+     * Delete composition but only if user of id privileged to do so.
      *
-     * Given the composition category the method will call the corresponding manager. The user of [authorId] must be
-     * privileged to delete composition of [compositionSourceId]. todo - exception catching could be done here.
+     * Given the composition category the method will call the corresponding manager...
      *
-     * @param userComposition Category and type of category of composition to delete.
-     * @param compositionSourceId Composition source id that is the source of the composition and its records.
+     * @param userComposition Category and type of category of composition to delete and composition source id.
      * @param authorId Id of the author who should be privileged to modify or delete composition.
-     * @return Failed of success responses. todo
-     * @see  ICompositionCategoryManagerStructure.deleteComposition
+     * @return Failed or success responses object.
+     * @see ICompositionRepositoryStructure.deleteComposition
      */
     fun deleteComposition(
         userComposition: ExistingUserComposition,

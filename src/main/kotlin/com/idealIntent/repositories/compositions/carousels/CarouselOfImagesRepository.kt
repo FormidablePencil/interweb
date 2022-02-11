@@ -51,7 +51,6 @@ data class CarouselOfImagesComposePrepared(
 class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
-    // todo replace Image
 ) : RepositoryBase(), ICompositionRepositoryStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
         CarouselBasicImagesRes, CarouselOfImagesComposePrepared, CarouselOfImagesDataMapped> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
