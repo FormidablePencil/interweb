@@ -2,6 +2,7 @@ package com.idealIntent.repositories.compositions
 
 import com.idealIntent.dtos.compositions.carousels.ImagesCarouselTopLvlIds
 import com.idealIntent.exceptions.CompositionCode
+import com.idealIntent.exceptions.CompositionCode.CollectionOfRecordsNotFound
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import org.ktorm.dsl.QueryRowSet
@@ -85,7 +86,10 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param authorId Criteria query composition of only privileged author.
      * @return Only top level ids of composition.
      */
-    fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(compositionSourceId: Int, authorId: Int): ImagesCarouselTopLvlIds?
+    fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
+        compositionSourceId: Int,
+        authorId: Int
+    ): ImagesCarouselTopLvlIds?
 
 
     // region Get compositions
@@ -126,6 +130,10 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * Invokes [getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify] to query all the ids of collection and compositions
      * composed of composition requested to delete then calls delete methods of its respective repositories to
      * delete each collection and composition composed of composition requested to delete.
+     *
+     * This method handles one exception which is [when collection by id of composition was not found][CollectionOfRecordsNotFound].
+     * This could only mean that composition is corrupt because the composition is composed of compositions
+     * and collections that do exist.
      *
      * @param compositionSourceId Id of composition source and not id of composition itself.
      * @param authorId Author's id to validate if privileged to delete.

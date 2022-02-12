@@ -55,7 +55,7 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
      * Find the composition to of compositionType and sends the json data off to the composition's manager to create composition.
      *
      * @return Id of newly created source composition.
-     * @throws CompositionException [FailedToFindAuthorByUsername].
+     * @throws CompositionException [FailedToFindAuthorByUsername], [NotPrivilegedToLayout].
      * @see [ICompositionTypeManagerStructure.createComposition]
      */
     fun createComposition(

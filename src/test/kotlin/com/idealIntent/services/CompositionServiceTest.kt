@@ -1,12 +1,8 @@
 package com.idealIntent.services
 
-import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.compositionCRUD.SingleUpdateCompositionRequest
 import com.idealIntent.dtos.compositions.ExistingUserComposition
 import com.idealIntent.dtos.compositions.NewUserComposition
-import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-import com.idealIntent.dtos.failed
-import com.idealIntent.dtos.succeeded
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.SpaceManager
@@ -16,17 +12,12 @@ import com.idealIntent.managers.compositions.grids.GridsManager
 import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
-import dtos.compositions.banners.CompositionBanner
 import dtos.compositions.carousels.CompositionCarouselType
-import dtos.compositions.grids.CompositionGrid
-import dtos.compositions.texts.CompositionText
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.ktor.http.*
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.justRun
-import io.mockk.mockk
+import io.mockk.*
 import shared.testUtils.carouselPublicBasicImagesReqSerialized
 
 /**
@@ -464,7 +455,46 @@ class CompositionServiceTest : BehaviorSpec({
     given("Some category - Carousel") {
 
         and("createComposition") {
+            beforeEach {
+                every { spaceRepository.validateAuthorPrivilegedToModify(layoutId, authorId) } returns true
+            }
             val newUserComposition = genNewUserComposition(CompositionCategory.Carousel)
+
+            then("AuthorId not privileged to layoutId provided") {
+                every { spaceRepository.validateAuthorPrivilegedToModify(layoutId, authorId) } returns false
+
+                val res = compositionService.createComposition(
+                    userComposition = newUserComposition,
+                    jsonData = carouselPublicBasicImagesReqSerialized,
+                    layoutId = layoutId,
+                    userId = authorId
+                )
+
+                res.isSuccess shouldBe false
+                res.data shouldBe null
+                res.code shouldBe CompositionCode.NotPrivilegedToLayout
+            }
+
+            then("Failed to find username of author to give privileges to. Transaction reverted.") {
+                every {
+                    carouselsManager.createComposition(
+                        compositionType = CompositionCarouselType.fromInt(newUserComposition.compositionType),
+                        jsonData = carouselPublicBasicImagesReqSerialized,
+                        layoutId = layoutId,
+                        authorId = authorId
+                    )
+                } throws CompositionException(CompositionCode.FailedToFindAuthorByUsername)
+
+                val res = compositionService.createComposition(
+                    userComposition = newUserComposition,
+                    jsonData = carouselPublicBasicImagesReqSerialized,
+                    layoutId = layoutId,
+                    userId = authorId
+                )
+
+                res.isSuccess shouldBe false
+                res.code shouldBe CompositionCode.FailedToFindAuthorByUsername
+            }
 
             then("successfully created composition") {
                 // region setup
@@ -475,7 +505,7 @@ class CompositionServiceTest : BehaviorSpec({
                         compositionType = CompositionCarouselType.fromInt(newUserComposition.compositionType),
                         jsonData = carouselPublicBasicImagesReqSerialized,
                         layoutId = layoutId,
-                        userId = authorId
+                        authorId = authorId
                     )
                 } returns idOfNewlyCreatedComposition
                 // endregion setup
@@ -492,71 +522,12 @@ class CompositionServiceTest : BehaviorSpec({
                 res.statusCode() shouldBe httpStatus
                 res.message() shouldBe null
             }
-
-            then("failed to create composition") {
-                // region setup
-                every {
-                    carouselsManager.createComposition(
-                        compositionType = CompositionCarouselType.fromInt(newUserComposition.compositionType),
-                        jsonData = carouselPublicBasicImagesReqSerialized,
-                        layoutId = layoutId,
-                        userId = authorId
-                    )
-                } throws CompositionException(CompositionCode.FailedToInsertRecord)
-                // endregion setup
-
-                val res = compositionService.createComposition(
-                    userComposition = newUserComposition,
-                    jsonData = carouselPublicBasicImagesReqSerialized,
-                    layoutId = layoutId,
-                    userId = authorId
-                )
-
-                res.isSuccess shouldBe false
-                res.data shouldBe null
-                res.code shouldBe CompositionCode.FailedToInsertRecord
-            }
-        }
-
-        and("deleteComposition") {
-            val userComposition = genExistingUserComposition(CompositionCategory.Carousel)
-
-            then("failed to delete") {
-                // region setup
-                every {
-                    carouselsManager.deleteComposition(
-                        CompositionCarouselType.fromInt(userComposition.compositionType),
-                        userComposition.compositionSourceId,
-                        authorId = authorId
-                    )
-                }
-                // endregion
-
-                val res = compositionService.deleteComposition(userComposition, authorId)
-
-                res shouldBe false
-            }
-
-            then("deleted") {
-                // region setup
-                every {
-                    carouselsManager.deleteComposition(
-                        CompositionCarouselType.fromInt(userComposition.compositionType),
-                        userComposition.compositionSourceId,
-                        authorId
-                    )
-                }
-                // endregion
-
-                val res = compositionService.deleteComposition(userComposition, authorId)
-                res shouldBe true
-            }
         }
 
         and("updateComposition") {
             val request = genSingleUpdateReq(CompositionCategory.Carousel)
 
-            then("failed to update") {
+            then("failed because of some user error. Handle exceptions") {
                 // region setup
                 every {
                     carouselsManager.updateComposition(
@@ -565,14 +536,15 @@ class CompositionServiceTest : BehaviorSpec({
                         compositionUpdateQue = request.compositionUpdateQue,
                         authorId = authorId
                     )
-                } throws Exception()
+                } throws CompositionException(CompositionCode.ProvidedStringInPlaceOfInt)
                 // endregion
 
                 val res = compositionService.updateComposition(request)
-
+                res.isSuccess shouldBe false
+                res.code shouldBe CompositionCode.ProvidedStringInPlaceOfInt
             }
 
-            then("updated") {
+            then("successfully updated") {
                 // region setup
                 justRun {
                     carouselsManager.updateComposition(
@@ -584,20 +556,54 @@ class CompositionServiceTest : BehaviorSpec({
                 }
                 // endregion
 
-                val res = compositionService.updateComposition(request)
+                compositionService.updateComposition(request).isSuccess shouldBe true
             }
         }
+
+        and("deleteComposition") {
+            val userComposition = genExistingUserComposition(CompositionCategory.Carousel)
+
+            then("Failed to delete. Id of composition source not found that could be modified by authorId.") {
+                // region setup
+                every {
+                    carouselsManager.deleteComposition(
+                        compositionType = CompositionCarouselType.fromInt(userComposition.compositionType),
+                        compositionSourceId = userComposition.compositionSourceId,
+                        authorId = authorId
+                    )
+                } throws CompositionException(CompositionCode.CompositionNotFound)
+                // endregion
+
+                val res = compositionService.deleteComposition(userComposition, authorId)
+                res.isSuccess shouldBe false
+                res.code shouldBe CompositionCode.CompositionNotFound
+            }
+
+            then("successfully deleted") {
+                // region setup
+                justRun {
+                    carouselsManager.deleteComposition(
+                        compositionType = CompositionCarouselType.fromInt(userComposition.compositionType),
+                        compositionSourceId = userComposition.compositionSourceId,
+                        authorId = authorId
+                    )
+                }
+                // endregion
+
+                val res = compositionService.deleteComposition(userComposition, authorId)
+                res.isSuccess shouldBe true
+            }
+        }
+
     }
 
     given("createNewLayout") {
+        every { spaceRepository.insertNewLayout(name, authorId) } returns layoutId
 
-        then("success") {
-            TODO()
-//                every { spaceRepository.insertNewLayout(name) } returns layoutId
-//
-//                compositionService.createNewLayout(name)
-//
-//                verify { spaceRepository.insertNewLayout(name) }
-        }
+        val res = compositionService.createNewLayout(name, authorId)
+
+        verify { spaceRepository.insertNewLayout(name, authorId) }
+        res.isSuccess shouldBe true
+        res.data shouldNotBe null
     }
 })

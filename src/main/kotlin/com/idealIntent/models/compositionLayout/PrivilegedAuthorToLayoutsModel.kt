@@ -7,6 +7,8 @@ import org.ktorm.schema.int
 interface IPrivilegedAuthorToLayouts {
     val authorId: Int
     val layoutId: Int
+    val modify: Int
+    val modifyUserPrivileges: Int
 }
 
 interface IPrivilegedAuthorToLayoutsEntity : Entity<IPrivilegedAuthorToLayoutsEntity>, IPrivilegedAuthorToLayouts {
@@ -21,4 +23,6 @@ open class PrivilegedAuthorToLayoutsModel(alias: String?) :
 
     val authorId = int("author_id").bindTo { it.authorId }
     val layoutId = int("layout_id").bindTo { it.layoutId }
+    val modify = int("modify").bindTo { it.modify }
+    val modifyUserPrivileges = int("modify_user_privileges").bindTo { it.modifyUserPrivileges }
 }

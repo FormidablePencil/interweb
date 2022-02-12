@@ -1,6 +1,8 @@
 package com.idealIntent.managers
 
 import com.idealIntent.configurations.AppEnv
+import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.dtos.succeeded
 import com.idealIntent.models.privileges.CompositionSourceToLayout
 import com.idealIntent.repositories.compositions.CompositionDataBuilder
 import com.idealIntent.repositories.compositions.CompositionQueryBuilder
@@ -66,7 +68,8 @@ class SpaceManager(
     }
 
     // todo associate space to author id
-    fun createSpace(layoutName: String, authorId: Int) {
+    fun createSpace(layoutName: String, authorId: Int): Int {
+        TODO()
 //        val spaceAddress = spaceRepository.insertNewSpace()
         val layoutId = spaceRepository.insertNewLayout(layoutName, authorId)
 //        spaceRepository.associateLayoutToSpace(spaceAddress = spaceAddress, layoutId = layoutId)

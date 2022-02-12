@@ -52,22 +52,38 @@ class CompositionService(
 ) {
     val gson = Gson()
 
+    // region todo
     fun getCompositionOfSpace(spaceAddress: String) {
         // spaces table should hold a collection of all components, id of components and what component (whatComponent: Enum(value: Int))
         // todo query getPublicLayoutOfCompositions but by space
     }
 
-    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder =
+    fun getPublicLayoutOfCompositions(layoutId: Int) {
+        TODO()
         spaceManager.getPublicLayoutOfCompositions(layoutId)
+    }
 
-    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionDataBuilder =
-        spaceManager.getPrivateLayoutOfCompositions(layoutId, authorId)
+    fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionResponse {
+        val res: CompositionDataBuilder = spaceManager.getPrivateLayoutOfCompositions(layoutId, authorId)
+        return CompositionResponse().succeeded(HttpStatusCode.OK)
+    }
 
-    // todo, may not need...
-    fun createNewSpace(layoutName: String, authorId: Int) =
-        spaceManager.createSpace(layoutName, authorId)
+    fun createNewSpace(layoutName: String, authorId: Int) = CompositionResponse().succeeded(
+        HttpStatusCode.Created, spaceManager.createSpace(layoutName, authorId)
+    )
+    // endregion todo
 
-    fun createNewLayout(name: String, authorId: Int): Int = spaceRepository.insertNewLayout(name, authorId)
+    /**
+     * Create new composition layout.
+     *
+     * Should always succeed.
+     *
+     * @param name User given name for layout.
+     * @param authorId Id to associate absolute privileges to.
+     */
+    fun createNewLayout(name: String, authorId: Int) = CompositionResponse().succeeded(
+        HttpStatusCode.Created, spaceRepository.insertNewLayout(name, authorId)
+    )
 
     /**
      * Create composition under an existing layout.
@@ -89,8 +105,10 @@ class CompositionService(
         layoutId: Int,
         userId: Int
     ): CompositionResponse {
-        // todo validate that userId has privileges to layoutId
         try {
+            if (!spaceRepository.validateAuthorPrivilegedToModify(layoutId, userId))
+                throw CompositionException(CompositionCode.NotPrivilegedToLayout)
+
             with(userComposition) {
                 val compositionSourceId = when (compositionCategory) {
                     Text ->
@@ -122,6 +140,7 @@ class CompositionService(
             }
         } catch (ex: CompositionException) {
             return when (ex.code) {
+                CompositionCode.NotPrivilegedToLayout,
                 CompositionCode.FailedToFindAuthorByUsername ->
                     CompositionResponse().failed(ex.code, ex.moreDetails)
                 else ->

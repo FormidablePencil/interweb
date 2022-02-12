@@ -37,20 +37,19 @@ class CompositionIT : BehaviorSpecIT({
                 val userId = signupFlow.signupReturnId()
                 // endregion
 
-                val layoutId = compositionService.createNewLayout("my new layout", userId)
+                val layoutId = compositionService.createNewLayout("my new layout", userId).data!!
 
                 val res: CompositionResponse = compositionService.createComposition(
                     NewUserComposition(CompositionCategory.Carousel, CompositionCarouselType.BasicImages.value),
-                    gson.toJson(createCarouselBasicImagesReq),
-                    layoutId,
-                    userId
+                    jsonData = gson.toJson(createCarouselBasicImagesReq),
+                    layoutId = layoutId,
+                    userId = userId
                 )
 
                 res.isSuccess shouldBe true
                 res.data shouldNotBe null
 
-                val compositionBuilder = compositionService.getPrivateLayoutOfCompositions(layoutId, userId)
-                compositionBuilder.getCompositionsOfLayouts()
+                val res2 = compositionService.getPrivateLayoutOfCompositions(layoutId, userId)
             }
         }
 
@@ -58,13 +57,13 @@ class CompositionIT : BehaviorSpecIT({
             rollback {
                 // create account, layout and create compositions under layout
                 val userId = signupFlow.signupReturnId()
-                val layoutId = compositionService.createNewLayout("my new layout", userId)
+                val layoutId = compositionService.createNewLayout("my new layout", userId).data!!
 
                 val res: CompositionResponse = compositionService.createComposition(
                     NewUserComposition(CompositionCategory.Carousel, CompositionCarouselType.BasicImages.value),
-                    gson.toJson(createCarouselBasicImagesReq),
-                    layoutId,
-                    userId
+                    jsonData = gson.toJson(createCarouselBasicImagesReq),
+                    layoutId = layoutId,
+                    userId = userId
                 )
 
                 res.data shouldNotBe null

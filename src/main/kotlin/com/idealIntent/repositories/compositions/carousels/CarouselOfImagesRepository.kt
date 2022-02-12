@@ -270,8 +270,7 @@ class CarouselOfImagesRepository(
     override fun deleteComposition(compositionSourceId: Int, authorId: Int) {
         try {
             database.useTransaction {
-                val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionQuery(
-                    true,
+                val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
                     compositionSourceId = compositionSourceId,
                     authorId = authorId
                 ) ?: throw CompositionException(CompositionCode.CompositionNotFound)

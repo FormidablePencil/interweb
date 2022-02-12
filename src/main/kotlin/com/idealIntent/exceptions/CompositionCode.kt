@@ -12,7 +12,6 @@ import io.ktor.http.*
  */
 enum class CompositionCode {
     ServerError,
-    FailedToInsertRecord,
     FailedToCompose,
     FailedToGivePrivilege,
     UserNotPrivileged,
@@ -31,6 +30,7 @@ enum class CompositionCode {
     ProvidedStringInPlaceOfInt,
     CollectionOfRecordsNotFound,
     CompositionRecordIsCorrupt,
+    NotPrivilegedToLayout,
     ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
@@ -38,7 +38,6 @@ enum class CompositionCode {
             return when (code) {
                 FailedToGivePrivilege -> "Failed give user privileges."
                 FailedToCompose -> "Failed to compose."
-                FailedToInsertRecord -> "Failed to insert records."
                 NoAuthorIdProvidedToRestrictedResource -> "No id of author provided to restricted resource for validation of privileges."
                 FailedToAddRecordToCompositionValidator -> "No records updates which only means that developer failed to add a record to composition validator."
                 FailedToAssociateAuthorToLayout -> "Failed to associate author to layout. Author id does not exist perhaps."
@@ -58,6 +57,7 @@ enum class CompositionCode {
                 CompositionNotFound,
                 ProvidedStringInPlaceOfInt,
                 CollectionOfRecordsNotFound,
+                NotPrivilegedToLayout,
                 -> {
                     logError(logAttemptToLogClientAsServerError(code), this::class.java)
                     return "Not an internal error."
@@ -77,6 +77,7 @@ enum class CompositionCode {
                 CompositionNotFound -> "Composition not found by composition source id."
                 ProvidedStringInPlaceOfInt -> "Provided a string in place of an integer, thus failed to convert String to Int."
                 CollectionOfRecordsNotFound -> "Collection of records not found by provided collection id."
+                NotPrivilegedToLayout -> "Not privileged to modify composition."
 
                 CompositionRecordIsCorrupt,
                 ColumnDoesNotExist,
@@ -87,7 +88,6 @@ enum class CompositionCode {
                 FailedToAssociateAuthorToLayout,
                 ServerError -> genericServerError
 
-                FailedToInsertRecord,
                 FailedToCompose -> contextualServerErrorResponse(code)
             }
         }
@@ -105,13 +105,13 @@ enum class CompositionCode {
                 ProvidedStringInPlaceOfInt,
                 CollectionOfRecordsNotFound,
                 CompositionRecordIsCorrupt,
+                NotPrivilegedToLayout,
                 -> HttpStatusCode.BadRequest
 
                 FailedToComposeInternalError,
                 ServerError,
                 FailedToCompose,
                 FailedToGivePrivilege,
-                FailedToInsertRecord,
                 NoAuthorIdProvidedToRestrictedResource,
                 FailedToAddRecordToCompositionValidator,
                 FailedToAssociateAuthorToLayout,

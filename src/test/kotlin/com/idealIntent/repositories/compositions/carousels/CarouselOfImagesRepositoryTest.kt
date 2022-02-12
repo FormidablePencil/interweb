@@ -1,6 +1,5 @@
 package com.idealIntent.repositories.compositions.carousels
 
-import com.google.gson.Gson
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
@@ -170,7 +169,6 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
                         privilegeLevel = 0,
                     )
 
-                // todo wrap in a try catch and response to user that layout by id does not exist
                 spaceRepository.associateCompositionToLayout(
                     orderRank = 0,
                     compositionSourceId = compositionSourceId,
@@ -210,8 +208,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
                     val ex = shouldThrowExactly<CompositionException> {
                         carouselOfImagesRepository.deleteComposition(compositionSourceId, 999999999)
-                    }
-                    ex.code shouldBe CompositionCode.CompositionNotFound
+                    } shouldBe CompositionCode.CompositionNotFound
                 }
             }
 
@@ -222,8 +219,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
                     val ex = shouldThrowExactly<CompositionException> {
                         carouselOfImagesRepository.deleteComposition(999999999, authorId)
-                    }
-                    ex.code shouldBe CompositionCode.CompositionNotFound
+                    } shouldBe CompositionCode.CompositionNotFound
                 }
             }
 

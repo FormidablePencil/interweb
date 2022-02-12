@@ -36,12 +36,12 @@ import java.util.*
  */
 object DIHelper {
     val CoreModule = module {
-        // domain com.idealIntent.services
+        // services
         single { AuthorsPortfolioService(get(), get()) }
         single { AuthorizationService(get(), get(), get(), get(), get(), get(), get()) }
         single { CompositionService(get(), get(), get(), get(), get(), get()) }
 
-        // com.idealIntent.managers
+        // managers
         single { AuthorsPortfolioManager() }
         single { TokenManager(get()) }
         single { PasswordManager(get(), get(), get()) }
@@ -56,7 +56,7 @@ object DIHelper {
         single { GridsManager(get()) }
         single { GridOneOffManager() }
 
-        // com.idealIntent.repositories
+        // repositories
         single { AuthorRepository() }
         single { PasswordRepository() }
         single { RefreshTokenRepository() }
@@ -69,7 +69,7 @@ object DIHelper {
         single { ImageRepository() }
         single { CarouselOfImagesRepository(get(), get()) }
         single { SpaceRepository(get(), get()) }
-        // env com.idealIntent.configurations
+        // env configurations
 
         single { CompositionQueryBuilder(get()) }
 

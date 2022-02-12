@@ -122,8 +122,7 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
      *
      * @param record Record to update to and id of the record to do the update to.
      *
-     * @throws CompositionException [ FailedToAddRecordToCompositionValidator][CompositionCode.FailedToAddRecordToCompositionValidator] from [convertToInt],
-     * [ProvidedStringInPlaceOfInt].
+     * @throws CompositionException [ProvidedStringInPlaceOfInt].
      */
     fun updateRecord(record: RecordUpdate)
 

@@ -5,9 +5,9 @@ import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
-import com.idealIntent.exceptions.CompositionCode.*
+import com.idealIntent.exceptions.CompositionCode.IdOfRecordProvidedNotOfComposition
+import com.idealIntent.exceptions.CompositionCode.ModifyPermittedToAuthorOfCompositionNotFound
 import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfCarouselOfImages.*
@@ -56,7 +56,6 @@ class CarouselOfImagesManager(
                 authorId = authorId,
             )
 
-            // todo wrap in a try catch and response to user that layout by id does not exist
             spaceRepository.associateCompositionToLayout(
                 orderRank = 0,
                 compositionSourceId = compositionSourceId,
@@ -86,10 +85,11 @@ class CarouselOfImagesManager(
         authorId: Int
     ) {
         with(carouselOfImagesRepository) {
-            val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) = getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
-                compositionSourceId = compositionSourceId,
-                authorId = authorId
-            ) ?: throw CompositionException(ModifyPermittedToAuthorOfCompositionNotFound)
+            val (sourceId, id, name, imageCollectionId, redirectTextCollectionId) =
+                getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
+                    compositionSourceId = compositionSourceId,
+                    authorId = authorId
+                ) ?: throw CompositionException(ModifyPermittedToAuthorOfCompositionNotFound)
             val gson = Gson()
 
             compositionUpdateQue.forEach {
@@ -106,14 +106,12 @@ class CarouselOfImagesManager(
                     }
                     RedirectText -> {
                         if (!textRepository.validateRecordToCollectionRelationship(
-                                record.recordId,
-                                redirectTextCollectionId
+                                record.recordId, redirectTextCollectionId
                             )
+                        ) throw CompositionException(
+                            IdOfRecordProvidedNotOfComposition,
+                            gson.toJson("Text id ${record.recordId}")
                         )
-                            throw CompositionException(
-                                IdOfRecordProvidedNotOfComposition,
-                                gson.toJson("Text id ${record.recordId}")
-                            )
                         else textRepository.updateRecord(record)
                     }
                     CompositionName -> {

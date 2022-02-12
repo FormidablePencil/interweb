@@ -138,5 +138,6 @@ class CompositionSourceRepository : RepositoryBase() {
     /**
      * Change name of composition.
      */
-    fun renameComposition(name: String) = database.update(CompositionSourcesModel) { set(it.name, name) }
+    fun renameComposition(name: String) =
+        database.update(CompositionSourcesModel) { set(it.name, name) } == 1
 }

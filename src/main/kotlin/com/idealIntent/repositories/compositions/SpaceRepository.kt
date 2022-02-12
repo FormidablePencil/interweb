@@ -26,6 +26,7 @@ class SpaceRepository(
     textRepository: TextRepository,
 ) : RepositoryBase() {
     private val Database.spaces get() = this.sequenceOf(SpacesModel)
+    private val Database.prvAuth2Layout get() = this.sequenceOf(PrivilegedAuthorToLayoutsModel)
 
     val space = SpacesModel.aliased("space")
 
@@ -144,10 +145,13 @@ class SpaceRepository(
 
     // region Insert
     /**
-     * Insert new layout
+     * Insert new layout.
+     *
+     * Should always succeed.
      *
      * @param name User defined space.
-     * @param authorId Associate to author.
+     * @param authorId Id of author to associate layout to.
+     * @return Id of newly created layout.
      */
     fun insertNewLayout(name: String, authorId: Int): Int {
         val layoutId = database.insertAndGenerateKey(layout) {
@@ -174,6 +178,13 @@ class SpaceRepository(
             set(compSource2Layout.orderRank, orderRank)
         } == 1
     }
+
+    fun validateAuthorPrivilegedToModify(layoutId: Int, authorId: Int) =
+        database.prvAuth2Layout.find {
+            prvAuth2Layout.authorId eq authorId and
+                    (prvAuth2Layout.layoutId eq layoutId) and
+                    (prvAuth2Layout.modify eq 1)
+        } != null
 
     fun associateLayoutToSpace(spaceAddress: String, layoutId: Int): Boolean {
         return database.insert(layout2Space) {
