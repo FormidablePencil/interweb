@@ -34,7 +34,8 @@ class CompositionFlow : BehaviorSpecFlow() {
 
     suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
         val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
-        val layoutId = spaceRepository.insertNewLayout(name = layoutName, authorId = authorId)
+        val layoutId = compositionService.createNewLayout(name = layoutName, authorId = authorId).data
+            ?: throw failure("Failed to get id of newly created layout.")
         val compositionSourceId = createComposition(publicView, layoutId, authorId)
         return Triple(compositionSourceId, layoutId, authorId)
     }
@@ -42,7 +43,7 @@ class CompositionFlow : BehaviorSpecFlow() {
     private fun createComposition(public: Boolean, layoutId: Int, authorId: Int): Int {
         val res = compositionService.createComposition(
             userComposition = userComposition,
-            jsonData = if (public) carouselPublicBasicImagesReqSerialized else carouselPrivateBasicImagesReqSerialized,
+            compositionSerialized = if (public) carouselPublicBasicImagesReqSerialized else carouselPrivateBasicImagesReqSerialized,
             layoutId, authorId
         )
         res.isSuccess shouldBe true

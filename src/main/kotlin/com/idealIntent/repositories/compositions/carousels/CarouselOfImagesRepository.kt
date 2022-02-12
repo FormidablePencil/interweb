@@ -82,6 +82,7 @@ class CarouselOfImagesRepository(
     // region Reusable query instructions
     override val compositionSelect = mutableListOf<Column<out Any>>(
         compSource.name, compSource.id, compSource.privilegeLevel,
+        compSource2Layout.orderRank,
         compInstance.id,
         compInstance2compSource.sourceId,
         img2Col.orderRank, img.id, img.url, img.description,
@@ -101,8 +102,10 @@ class CarouselOfImagesRepository(
 
     override fun compositionLeftJoin(querySource: QuerySource): QuerySource {
         return querySource
+            .leftJoin(compSource2Layout, compSource2Layout.sourceId eq compSource.id)
+
             .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
-            .leftJoin(compInstance, compInstance2compSource.sourceId eq compSource.id)
+            .leftJoin(compInstance, compInstance.id eq compInstance2compSource.compositionId)
 
             .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
             .leftJoin(author, author.id eq prvAth2CompSource.authorId)
@@ -139,10 +142,11 @@ class CarouselOfImagesRepository(
                     " ${row[author.username]}, ${row[compSource.id]}"
         )
 
-        dto.idAndNameOfCompositions += Triple(
-            row[compInstance.id]!!,
-            row[compSource.id]!!,
-            row[compSource.name]!!
+        dto.compositionsMetadata += CompositionMetadata(
+            name = row[compSource.name]!!,
+            orderRank = row[compSource2Layout.orderRank]!!,
+            compositionId = row[compInstance.id]!!,
+            sourceId = row[compSource.id]!!,
         )
         dto.images.add(
             Pair(

@@ -42,7 +42,7 @@ class CompositionIT : BehaviorSpecIT({
 
                 val res: CompositionResponse = compositionService.createComposition(
                     NewUserComposition(CompositionCategory.Carousel, CompositionCarouselType.BasicImages.value),
-                    jsonData = gson.toJson(createCarouselBasicImagesReq),
+                    compositionSerialized = gson.toJson(createCarouselBasicImagesReq),
                     layoutId = layoutId,
                     userId = userId
                 )
@@ -62,7 +62,7 @@ class CompositionIT : BehaviorSpecIT({
 
                 val res: CompositionResponse = compositionService.createComposition(
                     NewUserComposition(CompositionCategory.Carousel, CompositionCarouselType.BasicImages.value),
-                    jsonData = gson.toJson(createCarouselBasicImagesReq),
+                    compositionSerialized = gson.toJson(createCarouselBasicImagesReq),
                     layoutId = layoutId,
                     userId = userId
                 )

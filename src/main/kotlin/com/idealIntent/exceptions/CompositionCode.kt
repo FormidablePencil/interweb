@@ -30,6 +30,7 @@ enum class CompositionCode {
     ProvidedStringInPlaceOfInt,
     CollectionOfRecordsNotFound,
     CompositionRecordIsCorrupt,
+    CompositionRecordIsCorrupt2,
     NotPrivilegedToLayout,
     ;
 
@@ -44,6 +45,7 @@ enum class CompositionCode {
                 FailedToComposeInternalError -> "Failed to compose. Internal cms error."
                 ColumnDoesNotExist -> "Failed to handle a column of a record."
                 CompositionRecordIsCorrupt -> "Composition is corrupt. Could not find id of collection composition composes."
+                CompositionRecordIsCorrupt2 -> "Composition is corrupt. No order rank for composition. Perhaps not associated to any layout."
 
                 ServerError -> genericServerError
 
@@ -79,6 +81,7 @@ enum class CompositionCode {
                 CollectionOfRecordsNotFound -> "Collection of records not found by provided collection id."
                 NotPrivilegedToLayout -> "Not privileged to modify composition."
 
+                CompositionRecordIsCorrupt2,
                 CompositionRecordIsCorrupt,
                 ColumnDoesNotExist,
                 FailedToComposeInternalError,
@@ -116,6 +119,7 @@ enum class CompositionCode {
                 FailedToAddRecordToCompositionValidator,
                 FailedToAssociateAuthorToLayout,
                 ColumnDoesNotExist,
+                CompositionRecordIsCorrupt2,
                 -> HttpStatusCode.InternalServerError
             }
         }

@@ -58,6 +58,7 @@ val createPrivateCarouselBasicImagesReq = CreateCarouselBasicImagesReq(
 )
 
 val carouselBasicImagesRes = CarouselBasicImagesRes(
+    orderRank = 10000,
     99999999,
     88888888,
     "Projects",

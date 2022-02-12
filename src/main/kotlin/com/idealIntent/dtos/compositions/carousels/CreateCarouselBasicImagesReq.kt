@@ -8,6 +8,7 @@ import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.models.compositions.carousels.IImagesCarousel
 import dtos.compositions.carousels.ICarouselBasicImages
 import kotlinx.serialization.Serializable
+import models.IWithOrder
 import models.IWithPK
 import models.IWithPrivilegeSourcePK
 
@@ -33,6 +34,7 @@ data class CreateCarouselBasicImagesReq(
 
 @Serializable
 data class CarouselBasicImagesRes(
+    override val orderRank: Int,
     override val id: Int,
     override val sourceId: Int,
     override val name: String,
@@ -41,7 +43,7 @@ data class CarouselBasicImagesRes(
 
     override val privilegedAuthors: List<PrivilegedAuthor>,
 //    val clickable: boolean,
-) : ICarouselBasicImages, IWithPK, IWithPrivilegeSourcePK
+) : ICarouselBasicImages, IWithPK, IWithOrder, IWithPrivilegeSourcePK
 
 // used for query purposes. todo - may need to move
 data class ImagesCarouselTopLvlIds(

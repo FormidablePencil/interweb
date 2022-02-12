@@ -1,8 +1,6 @@
 package com.idealIntent.managers
 
 import com.idealIntent.configurations.AppEnv
-import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-import com.idealIntent.dtos.succeeded
 import com.idealIntent.models.privileges.CompositionSourceToLayout
 import com.idealIntent.repositories.compositions.CompositionDataBuilder
 import com.idealIntent.repositories.compositions.CompositionQueryBuilder
@@ -78,11 +76,16 @@ class SpaceManager(
         val select = compositionQueryBuilder.compositionSelect()
         val compositionBuilder = CompositionDataBuilder()
 
-        val query = compositionQueryBuilder.compositionsLeftJoinBuilder(appEnv.database.from(spaceRepository.compSource), compCategoryAndType)
+        val query = compositionQueryBuilder.compositionsLeftJoinBuilder(
+            appEnv.database.from(spaceRepository.compSource),
+            compCategoryAndType
+        )
 
         query.select(select)
-            .whereWithConditions {
+            .whereWithOrConditions {
                 compositionSourceToLayout.forEach { item -> it += spaceRepository.compSource.id eq item.sourceId }
+            }
+            .whereWithConditions {
                 compositionQueryBuilder.compositionWhereClauseBuilder(it, compCategoryAndType)
             }.map {
                 compositionQueryBuilder.compositionMapBuilder(it, compCategoryAndType, compositionBuilder)

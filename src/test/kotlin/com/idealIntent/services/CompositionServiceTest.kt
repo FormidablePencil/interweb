@@ -465,7 +465,7 @@ class CompositionServiceTest : BehaviorSpec({
 
                 val res = compositionService.createComposition(
                     userComposition = newUserComposition,
-                    jsonData = carouselPublicBasicImagesReqSerialized,
+                    compositionSerialized = carouselPublicBasicImagesReqSerialized,
                     layoutId = layoutId,
                     userId = authorId
                 )
@@ -487,7 +487,7 @@ class CompositionServiceTest : BehaviorSpec({
 
                 val res = compositionService.createComposition(
                     userComposition = newUserComposition,
-                    jsonData = carouselPublicBasicImagesReqSerialized,
+                    compositionSerialized = carouselPublicBasicImagesReqSerialized,
                     layoutId = layoutId,
                     userId = authorId
                 )
@@ -512,7 +512,7 @@ class CompositionServiceTest : BehaviorSpec({
 
                 val res = compositionService.createComposition(
                     userComposition = newUserComposition,
-                    jsonData = carouselPublicBasicImagesReqSerialized,
+                    compositionSerialized = carouselPublicBasicImagesReqSerialized,
                     layoutId = layoutId,
                     userId = authorId
                 )
@@ -595,6 +595,11 @@ class CompositionServiceTest : BehaviorSpec({
             }
         }
 
+    }
+
+    xgiven("getPrivateLayoutOfCompositions") {
+        then("success") {
+        }
     }
 
     given("createNewLayout") {

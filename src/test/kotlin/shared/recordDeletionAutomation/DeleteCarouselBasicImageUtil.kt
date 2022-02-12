@@ -228,6 +228,7 @@ class DeleteCarouselBasicImageUtil : KoinTest {
             privilegedAuthors.forEach { if (it.first == compId) compPrivilegedAuthors.add(it.second) }
 
             return@map CarouselBasicImagesRes(
+                orderRank = 1, // todo - orderRank not static
                 id = compId,
                 sourceId = sourceId,
                 name = name,

@@ -58,9 +58,9 @@ class CompositionService(
         // todo query getPublicLayoutOfCompositions but by space
     }
 
-    fun getPublicLayoutOfCompositions(layoutId: Int) {
-        TODO()
-        spaceManager.getPublicLayoutOfCompositions(layoutId)
+    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionResponse {
+        TODO("All layouts should be private and spaces be public")
+//        spaceManager.getPublicLayoutOfCompositions(layoutId)
     }
 
     fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionResponse {
@@ -91,8 +91,8 @@ class CompositionService(
      * Create composition given the category and type. If fails, [CompositionException] will be thrown and caught along
      * with data specifying where the request went wrong.
      *
-     * @param userComposition The category and type to cast [jsonData] and save create as.
-     * @param jsonData The composition data serialized as json to pass along this cms tree easily. It will be
+     * @param userComposition The category and type to cast [compositionSerialized] and save create as.
+     * @param compositionSerialized The composition data serialized as json to pass along this cms tree easily. It will be
      * decentralized and cast to its respective types.
      * @param layoutId Id of layout to associate composition to.
      * @param userId AuthorId to given absolute privileges to.
@@ -101,7 +101,7 @@ class CompositionService(
      */
     fun createComposition(
         userComposition: NewUserComposition,
-        jsonData: String,
+        compositionSerialized: String,
         layoutId: Int,
         userId: Int
     ): CompositionResponse {
@@ -114,22 +114,22 @@ class CompositionService(
                     Text ->
                         textsManager.createComposition(
                             compositionType = CompositionText.fromInt(compositionType),
-                            jsonData, layoutId, userId
+                            compositionSerialized, layoutId, userId
                         )
                     Banner ->
                         bannersManager.createComposition(
                             compositionType = CompositionBanner.fromInt(compositionType),
-                            jsonData, layoutId, userId
+                            compositionSerialized, layoutId, userId
                         )
                     Grid ->
                         gridsManager.createComposition(
                             compositionType = CompositionGrid.fromInt(compositionType),
-                            jsonData, layoutId, userId
+                            compositionSerialized, layoutId, userId
                         )
                     Carousel ->
                         carouselsManager.createComposition(
                             compositionType = CompositionCarouselType.fromInt(compositionType),
-                            jsonData, layoutId, userId
+                            compositionSerialized, layoutId, userId
                         )
 
                     Markdown -> TODO() // todo - part of text, remove
