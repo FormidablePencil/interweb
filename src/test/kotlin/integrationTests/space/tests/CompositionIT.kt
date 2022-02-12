@@ -31,6 +31,7 @@ class CompositionIT : BehaviorSpecIT({
 
     // todo - the more extensive tests will be done with repository tests
     given("create a private layout and then create a few compositions for the layout") {
+
         then("get private layout of compositions") {
             rollback {
                 // region setup
@@ -89,7 +90,7 @@ class CompositionIT : BehaviorSpecIT({
             }
         }
 
-        then("update composition") {
+        xthen("update composition") {
             rollback {}
         }
     }

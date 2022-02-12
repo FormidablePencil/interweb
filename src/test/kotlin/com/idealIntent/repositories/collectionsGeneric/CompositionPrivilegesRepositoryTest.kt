@@ -140,6 +140,7 @@ class CompositionPrivilegesRepositoryTest : BehaviorSpecUtRepo() {
         }
 
         given("addPrivilegeSource") {
+
             then("set privilege level to 3") {
                 rollback {
                     // region setup

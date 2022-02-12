@@ -36,34 +36,47 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
     beforeEach { clearAllMocks() }
 
     given("createPrivileges") {
+        val name = "my composition"
+        val compositionType = 0
+        val privilegeLevel = 0
+
         then("success. User gets absolute privileges.") {
             // region setup
             every {
                 compositionSourceRepository.addCompositionSource(
-                    name = "my composition",
-                    compositionType = 0
+                    privilegeLevel = privilegeLevel,
+                    name = name,
+                    compositionType = compositionType,
                 )
             } returns sourceId
-            justRun {
+            every {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(1, 1, 1), sourceId, userId
                 )
-            }
+            } returns true
             // endregion
 
             compositionPrivilegesManager.createCompositionSource(
-                compositionType = 0,
-                privilegeLevel = 0,
-                name = "some name",
+                name = name,
+                compositionType = compositionType,
+                privilegeLevel = privilegeLevel,
                 authorId = userId
             )
 
-            verify { compositionSourceRepository.addCompositionSource(name = "my composition", compositionType = 0) }
+            // region Verify
+            verify {
+                compositionSourceRepository.addCompositionSource(
+                    privilegeLevel = privilegeLevel,
+                    name = name,
+                    compositionType = 0
+                )
+            }
             verify {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(1, 1, 1), sourceId, userId
                 )
             }
+            // endregion Verify
         }
     }
 
@@ -73,13 +86,13 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             appEnvMockHelper(appEnv)
             every { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
             every { authorRepository.getByUsername(any()) } returns author
-            justRun {
+            every {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     privileges = any(),
                     compositionSourceId = sourceId,
                     authorId = any()
                 )
-            }
+            } returns true
             // endregion
         }
 
@@ -136,7 +149,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
             // region setup
             every { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) } returns true
             every { authorRepository.getByUsername(privilegedAuthor.username) } returns author
-            justRun {
+            every {
                 compositionSourceRepository.giveAnAuthorPrivilegeToComposition(
                     CompositionsGenericPrivileges(
                         modify = privilegedAuthor.modify,
@@ -146,7 +159,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
                     compositionSourceId = sourceId,
                     authorId = author.id
                 )
-            }
+            } returns true
             // endregion
         }
 
@@ -184,9 +197,7 @@ class CompositionPrivilegesManagerTest : BehaviorSpec({
 
         then("success") {
             compositionPrivilegesManager.giveAnAuthorPrivilegesToCompositionSourceByUsername(
-                privilegedAuthor,
-                sourceId,
-                userId
+                privilegedAuthor, sourceId, userId
             )
 
             verify { compositionSourceRepository.isUserPrivilegedToModifyComposition(sourceId, userId) }

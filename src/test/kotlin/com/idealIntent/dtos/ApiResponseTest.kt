@@ -40,6 +40,8 @@ enum class SampleResponseFailed {
     }
 }
 
+// todo - use an actual response object. Use CompositionCode and CompositionResponse
+
 class ApiResponseKtTest : BehaviorSpec({
 
     given("ResponseFailed enum class") {
@@ -48,14 +50,18 @@ class ApiResponseKtTest : BehaviorSpec({
     }
 
     given("ApiResponse") {
+
         then("succeeded") {
             val statusCode = HttpStatusCode.OK
             val result = ExampleApiResponse().succeeded(statusCode)
 
+            println(result.message())
+
             result.code shouldBe null
             result.statusCode() shouldBe statusCode
-            result.message().shouldBeEmpty()
+            result.message() shouldBe null
         }
+
         then("failed") {
             val enumCode = SampleResponseFailed.EmailTaken
             val result = ExampleApiResponse().failed(enumCode)
@@ -67,6 +73,7 @@ class ApiResponseKtTest : BehaviorSpec({
     }
 
     given("ApiDataResponse") {
+
         then("succeeded") {
             val sample = ExampleDto("example", false)
             val statusCode = HttpStatusCode.OK
@@ -74,7 +81,7 @@ class ApiResponseKtTest : BehaviorSpec({
 
             result.code shouldBe null
             result.statusCode() shouldBe statusCode
-            result.message().shouldBeEmpty()
+            result.message() shouldBe null
 
             val data = result.data ?: throw Exception("test failed")
             data.sample shouldBe sample.sample

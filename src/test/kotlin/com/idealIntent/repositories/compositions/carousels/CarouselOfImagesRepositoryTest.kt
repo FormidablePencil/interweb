@@ -208,7 +208,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
                     val ex = shouldThrowExactly<CompositionException> {
                         carouselOfImagesRepository.deleteComposition(compositionSourceId, 999999999)
-                    } shouldBe CompositionCode.CompositionNotFound
+                    }.code shouldBe CompositionCode.CompositionNotFound
                 }
             }
 
@@ -219,7 +219,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
                     val ex = shouldThrowExactly<CompositionException> {
                         carouselOfImagesRepository.deleteComposition(999999999, authorId)
-                    } shouldBe CompositionCode.CompositionNotFound
+                    }.code shouldBe CompositionCode.CompositionNotFound
                 }
             }
 

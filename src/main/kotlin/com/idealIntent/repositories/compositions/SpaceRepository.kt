@@ -159,8 +159,10 @@ class SpaceRepository(
         } as Int
 
         if (database.insert(prvAuth2Layout) {
-                set(prvAuth2Layout.layoutId, layoutId)
                 set(prvAuth2Layout.authorId, authorId)
+                set(prvAuth2Layout.layoutId, layoutId)
+                set(prvAuth2Layout.modify, 1)
+                set(prvAuth2Layout.modifyUserPrivileges, 1)
             } != 1) throw CompositionExceptionReport(
             CompositionCode.FailedToAssociateAuthorToLayout, authorId.toString(), this::class.java
         )
@@ -181,9 +183,9 @@ class SpaceRepository(
 
     fun validateAuthorPrivilegedToModify(layoutId: Int, authorId: Int) =
         database.prvAuth2Layout.find {
-            prvAuth2Layout.authorId eq authorId and
-                    (prvAuth2Layout.layoutId eq layoutId) and
-                    (prvAuth2Layout.modify eq 1)
+            it.authorId eq authorId and
+                    (it.layoutId eq layoutId) and
+                    (it.modify eq 1)
         } != null
 
     fun associateLayoutToSpace(spaceAddress: String, layoutId: Int): Boolean {

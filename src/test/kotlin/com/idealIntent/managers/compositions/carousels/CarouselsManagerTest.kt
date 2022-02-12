@@ -1,13 +1,17 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.google.gson.Gson
-import dtos.compositions.carousels.CompositionCarouselType.*
+import dtos.compositions.carousels.CompositionCarouselType.BasicImages
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.ktor.http.*
 import io.mockk.clearAllMocks
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import shared.testUtils.carouselBasicImagesRes
+import shared.testUtils.carouselPublicBasicImagesReqSerialized
+import shared.testUtils.createPublicCarouselBasicImagesReq
 
 class CarouselsManagerTest : BehaviorSpec({
     val carouselOfImagesManager: CarouselOfImagesManager = mockk()
@@ -24,128 +28,68 @@ class CarouselsManagerTest : BehaviorSpec({
     }
 
     given("getPublicComposition") {
-        values().map {
-            when (it) {
-                CarouselBlurredOverlay -> {
-                    then("provided id of composition that does NOT exist") {
-                        // region setup
-                        every {
-                            carouselsManager.getPrivateComposition(
-                                compositionType = it,
-                                compositionSourceId = compositionSourceId,
-                                authorId = authorId
-                            )
-                        } returns null
-                        // endregion
+        // region setup
+        every {
+            carouselOfImagesManager.getPublicComposition(
+                compositionSourceId = compositionSourceId,
+            )
+        } returns carouselBasicImagesRes
+        // endregion
 
-                        carouselsManager.getPrivateComposition(
-                            compositionType = it,
-                            compositionSourceId = compositionSourceId,
-                            authorId = authorId
-                        ) shouldBe null
-                    }
-
-                    then("success") {
-                        // region setup
-                        every {
-                            carouselsManager.getPrivateComposition(
-                                compositionType = it,
-                                compositionSourceId = compositionSourceId,
-                                authorId = authorId
-                            )
-                        } returns carouselBasicImagesRes
-                        // endregion
-
-                        carouselsManager.getPrivateComposition(
-                            compositionType = it,
-                            compositionSourceId = compositionSourceId,
-                            authorId = authorId
-                        ) shouldBe carouselBasicImagesRes
-                    }
-                }
-                BasicImages -> {
-                    then("provided id of composition that does NOT exist") {
-                        // region setup
-                        every {
-                            carouselOfImagesManager.getPrivateComposition(
-                                compositionSourceId = compositionSourceId,
-                                authorId = authorId
-                            )
-                        } returns null
-                        // endregion
-
-                        carouselsManager.getPrivateComposition(
-                            compositionType = it,
-                            compositionSourceId = compositionSourceId,
-                            authorId = authorId
-                        ) shouldBe null
-                    }
-
-                    then("success") {
-                        // region setup
-                        every {
-                            carouselOfImagesManager.getPrivateComposition(
-                                compositionSourceId = compositionSourceId,
-                                authorId = authorId
-                            )
-                        } returns carouselBasicImagesRes
-                        // endregion
-
-                        carouselsManager.getPrivateComposition(
-                            compositionType = it,
-                            compositionSourceId = compositionSourceId,
-                            authorId = authorId
-                        ) shouldBe carouselBasicImagesRes
-                    }
-                }
-            }
-        }
+        carouselsManager.getPublicComposition(
+            compositionType = BasicImages,
+            compositionSourceId = compositionSourceId,
+        ) shouldBe carouselBasicImagesRes
     }
 
-    given("createCompositionOfCategory") {
-        values().map {
-            when (it) {
-                CarouselBlurredOverlay -> {
+    given("getPrivateComposition") {
+        // region setup
+        every {
+            carouselOfImagesManager.getPrivateComposition(
+                compositionSourceId = compositionSourceId,
+                authorId = authorId
+            )
+        } returns carouselBasicImagesRes
+        // endregion
 
-                }
-
-                BasicImages -> {
-                    then("failed response") {
-//                        // region setup
-//                        every {
-//                            carouselOfImagesManager.createComposition(createPublicCarouselBasicImagesReq, layoutId, authorId)
-//                        } returns CompositionResponse().failed(CompositionCode.FailedToGivePrivilege)
-//                        // endregion setup
-//
-//                        val res = carouselsManager.createComposition(
-//                            BasicImages, carouselPublicBasicImagesReqStingified, layoutId, authorId
-//                        )
-//
-//                        res.data shouldBe null
-                    }
-                    then("success response") {
-//                        // region setup
-//                        val idOfNewlyCreatedComposition = 123
-//                        val httpStatus = HttpStatusCode.Created
-//                        every {
-//                            carouselOfImagesManager.createComposition(createPublicCarouselBasicImagesReq, layoutId, authorId)
-//                        } returns CompositionResponse().succeeded(httpStatus, idOfNewlyCreatedComposition)
-//                        // endregion setup
-//
-//                        val res = carouselsManager.createComposition(
-//                            BasicImages, carouselPublicBasicImagesReqStingified, layoutId, authorId
-//                        )
-//
-//                        res.isSuccess shouldBe true
-//                        res.data shouldBe idOfNewlyCreatedComposition
-//                        res.successHttpStatusCode shouldBe httpStatus
-                    }
-                }
-            }
-        }
+        carouselsManager.getPrivateComposition(
+            compositionType = BasicImages,
+            compositionSourceId = compositionSourceId,
+            authorId = authorId
+        ) shouldBe carouselBasicImagesRes
     }
 
-    xgiven("updateComposition") { }
+    given("createComposition") {
+        // region setup
+        val idOfNewlyCreatedComposition = 123
+        val httpStatus = HttpStatusCode.Created
+        every {
+            carouselOfImagesManager.createComposition(createPublicCarouselBasicImagesReq, layoutId, authorId)
+        } returns idOfNewlyCreatedComposition
+        // endregion setup
 
-    xgiven("deleteComposition") { }
+        val res = carouselsManager.createComposition(
+            BasicImages, carouselPublicBasicImagesReqSerialized, layoutId, authorId
+        )
+
+        res shouldBe idOfNewlyCreatedComposition
+    }
+
+    given("updateComposition") {
+        // region Setup
+        justRun {
+            carouselOfImagesManager.updateComposition(listOf(), compositionSourceId, authorId)
+        }
+        // endregion
+        carouselsManager.updateComposition(BasicImages, compositionSourceId, listOf(), authorId)
+    }
+
+    given("deleteComposition") {
+        // region Setup
+        justRun {
+            carouselOfImagesManager.deleteComposition(compositionSourceId, authorId)
+        }
+        // endregion
+        carouselsManager.deleteComposition(BasicImages, compositionSourceId, authorId)
+    }
 })

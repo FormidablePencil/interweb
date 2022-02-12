@@ -84,7 +84,7 @@ class CompositionSourceRepository : RepositoryBase() {
         set(it.sourceId, compositionSourceId)
         set(it.modifyUserPrivileges, privileges.modifyUserPrivileges)
         set(it.authorId, authorId)
-    }
+    } == 1
 
     /**
      * Remove author from all privileges.
