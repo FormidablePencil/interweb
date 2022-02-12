@@ -1,16 +1,10 @@
 package com.idealIntent.services
 
-import com.idealIntent.dtos.failed
 import com.idealIntent.dtos.space.CreateSpaceRequest
 import com.idealIntent.dtos.space.CreateSpaceResponse
 import com.idealIntent.dtos.space.GetSpaceRequest
 import com.idealIntent.dtos.space.GetSpaceResponse
-import com.idealIntent.dtos.succeeded
-import com.idealIntent.helpers.RandomStringGenerator
 import com.idealIntent.repositories.compositions.SpaceRepository
-import dtos.space.CreateSpaceResponseFailed
-import dtos.space.SpaceResponseFailed
-import io.ktor.http.*
 
 // spaces (table) have components (table)
 
@@ -73,8 +67,8 @@ class SpaceService(
 ) {
 
     fun getSpaceByAddress(request: GetSpaceRequest): GetSpaceResponse {
-        val space = spaceRepository.getSpace(request.address)
-            ?: return GetSpaceResponse().failed(SpaceResponseFailed.SpaceNotFound)
+//        val space = spaceRepository.getSpace(request.address)
+//            ?: return GetSpaceResponse().failed(SpaceResponseFailed.SpaceNotFound)
 
         TODO()
 //        return GetSpaceResponse().succeeded(HttpStatusCode.OK, space)
@@ -84,10 +78,11 @@ class SpaceService(
     }
 
     fun createSpace(createSpaceRequest: CreateSpaceRequest): CreateSpaceResponse {
-        return if (spaceRepository.insertSpace(createSpaceRequest, uniqueAddress()))
-            CreateSpaceResponse().succeeded(HttpStatusCode.OK)
-        else
-            CreateSpaceResponse().failed(CreateSpaceResponseFailed.FailedToCreateSpace)
+        TODO()
+//        return if (spaceRepository.insertSpace(createSpaceRequest, uniqueAddress()))
+//            CreateSpaceResponse().succeeded(HttpStatusCode.OK)
+//        else
+//            CreateSpaceResponse().failed(CreateSpaceResponseFailed.FailedToCreateSpace)
     }
 
 //    fun createComposition(request: CreateCompositionRequest): CreateCompositionResponse {
@@ -121,16 +116,17 @@ class SpaceService(
     //endregion
 
     private fun uniqueAddress(): String {
-        var foundUniqueAddress = false
-        var address = ""
-        while (!foundUniqueAddress) {
-            val potentialAddress = RandomStringGenerator.string(10)
-            if (spaceRepository.getSpace(potentialAddress) == null) {
-                foundUniqueAddress = true
-                address = potentialAddress
-            }
-        }
-        return address
+        TODO()
+//        var foundUniqueAddress = false
+//        var address = ""
+//        while (!foundUniqueAddress) {
+//            val potentialAddress = RandomStringGenerator.string(10)
+//            if (spaceRepository.getSpace(potentialAddress) == null) {
+//                foundUniqueAddress = true
+//                address = potentialAddress
+//            }
+//        }
+//        return address
     }
 
 //    fun getSpacesOfAuthor(blob: String): SpaceResponse {

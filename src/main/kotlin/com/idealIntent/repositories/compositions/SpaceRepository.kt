@@ -1,6 +1,5 @@
 package com.idealIntent.repositories.compositions
 
-import com.idealIntent.dtos.space.CreateSpaceRequest
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositionLayout.*
@@ -9,7 +8,6 @@ import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourceToLayout
 import com.idealIntent.models.privileges.CompositionSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
-import com.idealIntent.models.space.ISpaceEntity
 import com.idealIntent.models.space.SpacesModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
@@ -21,6 +19,7 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 
+// todo - author space. Special kind of space...
 class SpaceRepository(
     imageRepository: ImageRepository,
     textRepository: TextRepository,
@@ -37,39 +36,65 @@ class SpaceRepository(
     val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
     val compSource = CompositionSourcesModel.aliased("compSource")
 
-    // region composition
     val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
     val compInstance = ImagesCarouselsModel.aliased("compInstance")
 
     val prvAth2CompSource = PrivilegedAuthorToCompositionSourcesModel.aliased("prvAth2CompSource")
-    // endregion
 
-    // region composition's collections
     val img2Col = imageRepository.img2Col
     val img = imageRepository.img
     val text2Col = textRepository.text2Col
     val text = textRepository.text
     val author = AuthorsModel.aliased("author")
-    // endregion
 
 
-    // space and layout
-    /**
-     * This is used to build queries with. Query from space.
-     */
+    // region Used to build queries with
     fun queryFromSpace(): QuerySource {
         return database.from(space)
             .leftJoin(layout2Space, layout2Space.spaceAddress eq space.address)
             .leftJoin(layout, layout.id eq layout2Space.layoutId)
     }
 
-    /**
-     * This is used to build queries with. Query from layout.
-     */
     fun fromLayout(): QuerySource {
         return database.from(layout)
     }
 
+    private fun QuerySource.leftJoinAuthor(authorId: Int?): QuerySource {
+        if (authorId != null)
+            return leftJoin(prvAuth2Space, prvAuth2Space.authorId eq authorId)
+        return this
+    }
+    // endregion
+
+
+    // region Layout metadata
+    // todo - Make it so that it is used in a few different ways.
+    //  1. Query by space address with author id or not for public/private purposes.
+    //  2. Query by layout with author id or without for public/private purpose of cms.
+
+    /**
+     * Get public metadata of layout by space address.
+     */
+    fun getPublicLayoutMetadataBySpace(spaceAddress: String) =
+        getLayoutMetadata(spaceAddress = spaceAddress, layoutId = null, authorId = null)
+
+    /**
+     * Get private metadata of layout by space address. Provide privileged [authorId].
+     */
+    fun getPrivateLayoutMetadataBySpace(spaceAddress: String, authorId: Int) =
+        getLayoutMetadata(spaceAddress = spaceAddress, layoutId = null, authorId = authorId)
+
+    /**
+     * Get public metadata of layout by layout id.
+     */
+    fun getPublicLayoutMetadataById(layoutId: Int) =
+        getLayoutMetadata(spaceAddress = null, layoutId = layoutId, authorId = null)
+
+    /**
+     * Get private metadata of layout by layout's id. Provide privileged [authorId].
+     */
+    fun getPrivateLayoutMetadataById(layoutId: Int, authorId: Int) =
+        getLayoutMetadata(spaceAddress = null, layoutId = layoutId, authorId = authorId)
 
     /**
      * Query all ids of compositions in layout and category and type of composition.
@@ -77,17 +102,16 @@ class SpaceRepository(
      * @param spaceAddress Query all compositions of the layout associated to the space with the [spaceAddress] provided.
      * @param layoutId Query all compositions of layout with id of [layoutId].
      * @param authorId Provide authorId for private layouts.
-     * @return CompositionSourceToLayout, all [CompositionCategory ] to query through)
+     * @return CompositionSourceToLayout, all [CompositionCategory ] to query through
      */
-    fun getLayoutMetadata(
-        spaceAddress: String?, layoutId: Int?, authorId: Int
+    private fun getLayoutMetadata(
+        spaceAddress: String?, layoutId: Int?, authorId: Int?
     ): Pair<List<CompositionSourceToLayout>, Set<Pair<CompositionCategory, Int>>> {
         val listOfCompositionSourceToLayout = mutableListOf<CompositionSourceToLayout>()
 
         // region Used to find out what composition tables to search through
         val allTypesOfCompositionsLayoutContains = mutableSetOf<Pair<CompositionCategory, Int>>()
         // endregion
-//        database.from(layout)
 
         val query: QuerySource = if (spaceAddress != null) queryFromSpace()
         else if (layoutId != null) fromLayout()
@@ -125,32 +149,12 @@ class SpaceRepository(
             }
         return Pair(listOfCompositionSourceToLayout, allTypesOfCompositionsLayoutContains)
     }
-
-//    fun getPublicSpace(address: String) {
-//        getSpace(address = address, authorId = null)
-//    }
-//
-//    fun getPrivateSpace(address: String, authorId: Int) {
-//        getSpace(address = address, authorId = authorId)
-//    }
+    // endregion Layout metadata
 
 
-    private fun QuerySource.leftJoinAuthor(authorId: Int?): QuerySource {
-        if (authorId != null)
-            return leftJoin(prvAuth2Space, prvAuth2Space.authorId eq authorId)
-        return this
-    }
-    // endregion Get
-
-
-    // region Insert
+    // region Insert new
     /**
-     * Insert new layout.
-     *
-     * Should always succeed.
-     *
-     * @param name User defined space.
-     * @param authorId Id of author to associate layout to.
+     * Insert new layout. Give layout a [name] and assign it to [authorId].
      * @return Id of newly created layout.
      */
     fun insertNewLayout(name: String, authorId: Int): Int {
@@ -169,10 +173,28 @@ class SpaceRepository(
         return layoutId
     }
 
-    fun insertNewSpace(): String {
-        return database.insertAndGenerateKey(space) {} as String
+    /**
+     * Insert new space and give [authorId] absolute privileges.
+     *
+     * @return Address of the newly created space.
+     */
+    fun insertNewSpace(authorId: Int): Int {
+        val spaceAddress = database.insertAndGenerateKey(space) {} as Int
+        database.insert(prvAuth2Space) { set(prvAuth2Space.spaceId, spaceAddress) }
+        return spaceAddress
     }
+    // endregion Insert new
 
+
+    // region Associate
+    /**
+     * Associate composition to layout.
+     *
+     * @param orderRank For ordering compositions in layout.
+     * @param compositionSourceId Id of composition source to associate to layout.
+     * @param layoutId Id of layout to associate composition to.
+     * @return Success or failed. Fails if compositionSourceId or layoutId is invalid. Both of these ids are foreign keys.
+     */
     fun associateCompositionToLayout(orderRank: Int, compositionSourceId: Int, layoutId: Int): Boolean {
         return database.insert(compSource2Layout) {
             set(compSource2Layout.sourceId, compositionSourceId)
@@ -181,13 +203,13 @@ class SpaceRepository(
         } == 1
     }
 
-    fun validateAuthorPrivilegedToModify(layoutId: Int, authorId: Int) =
-        database.prvAuth2Layout.find {
-            it.authorId eq authorId and
-                    (it.layoutId eq layoutId) and
-                    (it.modify eq 1)
-        } != null
-
+    /**
+     * Associate layout to space.
+     *
+     * Each space has one layout but each layout may have multiple spaces associated to.
+     *
+     * [spaceAddress] and [layoutId] are foreign keys.
+     */
     fun associateLayoutToSpace(spaceAddress: String, layoutId: Int): Boolean {
         return database.insert(layout2Space) {
             set(layout2Space.spaceAddress, spaceAddress)
@@ -201,64 +223,25 @@ class SpaceRepository(
             set(prvAuth2Space.spaceId, spaceId)
         } == 1
     }
+    // endregion Associate
 
 
-    fun getSpace(address: String): ISpaceEntity? {
-        return database.spaces.find { it.address eq address }
-    }
-
-    fun insertSpace(space: CreateSpaceRequest, address: String): Boolean {
-        return database.insert(SpacesModel) {
-            set(it.address, address)
-        } != 0
-    }
-
-    // endregion Insert
+    // region Validate
+    /**
+     * Validate that [authorId] is privileged to modify layout of [layoutId]. Used to check privileges before modifying.
+     *
+     *  [layoutId] and [authorId] are foreign keys.
+     */
+    fun validateAuthorPrivilegedToModifyLayout(layoutId: Int, authorId: Int) =
+        database.prvAuth2Layout.find {
+            it.authorId eq authorId and
+                    (it.layoutId eq layoutId) and
+                    (it.modify eq 1)
+        } != null
+    // endregion Validate
 }
 
 
-//    /**
-//     * Get layouts of space
-//     *
-//     * @param spaceAddress
-//     */
-//    fun getSpaceLayout(spaceAddress: String): ISpaceEntity? {
-//        return database.spaces.find { it.address eq spaceAddress }
-//    }
-// todo - there are 2 different kinds of spaces. Author space (multiple spaces), public space
-
-/**
- * Associate a layout to space
- *
- * @param layoutId Id of composition layout
- * @param spaceAddress Space to associate to by space's address
- */
-//fun addLayoutToSpace(layoutId: Int, spaceAddress: String) {
-//}
-
-// space own layouts.
-// layout owns compositions (components)
-//
-
-//    fun getSpacesByAuthor(authorId: Int): Space? {
-//        return database.spaces.find { it.authorId eq authorId }
-//    }
-
-//    fun softDeleteSpace() {
-//    }
-
-//    fun GetThreads(threadsIds: List<Int>): List<Thread> {
-//        return emptyList<Thread>()
-//    }
-//
 //    fun GetThreadsByTag(author: String) {
-//
-//    }
-//
 //    fun FilterThreadByCategories(threadIds: List<Int>, category: List<String>): Thread {
-//        return Thread()
-//    }
-//
 //    fun GetThreadByAuthorsTags(authorId: Int, tag: String): List<Thread> {
-//        throw Exception()
-//    }

@@ -27,7 +27,7 @@ class ExploreService(
     }
 
     fun SearchThreadsByTags(tag: String) {
-        spaceRepository.getSpace(tag)
+//        spaceRepository.getSpace(tag)
     }
 
 }

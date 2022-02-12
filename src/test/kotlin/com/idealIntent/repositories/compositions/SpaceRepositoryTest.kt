@@ -18,18 +18,29 @@ class SpaceRepositoryTest : BehaviorSpecUtRepo() {
     private val compositionFlow: CompositionFlow by inject()
 
     init {
-        given("getSpaceLayoutOfCompositions") {
+        given("getLayoutMetadata") {
             then("success") {
-                // region setup
-                // todo - create compositions, associate them to layout, associate layout to space
-//                cmsService.createComposition()
-                // endregion
-                //  then get compositions of space.
+                rollback {}
+            }
+        }
+
+        given("insertNewLayout") {
+            then("success") {
+                rollback {}
+            }
+        }
+
+        given("insertNewSpace") {
+            then("success") {
+                rollback {}
             }
         }
 
         given("associateCompositionToLayout") {
-            then("provided a private layoutId")
+
+            then("provided a private layoutId") {
+                rollback {}
+            }
 
             then("success") {
                 rollback {
@@ -42,5 +53,46 @@ class SpaceRepositoryTest : BehaviorSpecUtRepo() {
                 }
             }
         }
+
+        given("validateAuthorPrivilegedToModify") {
+            then("success") {
+                rollback {}
+            }
+        }
+
+        given("associateLayoutToSpace") {
+            then("success") {
+                rollback {}
+            }
+        }
+
+        given("giveAuthorPrivilegesToPrivateSpace") {
+            then("success") {
+                rollback {}
+            }
+        }
+
+        given("getSpace") {
+            then("success") {
+                rollback {}
+            }
+        }
+
+        given("insertSpace") {
+            then("success") {
+                rollback {}
+            }
+        }
+
+        given("getSpaceLayoutOfCompositions") {
+            then("success") {
+                // region setup
+                // todo - create compositions, associate them to layout, associate layout to space
+//                cmsService.createComposition()
+                // endregion
+                //  then get compositions of space.
+            }
+        }
+
     }
 }

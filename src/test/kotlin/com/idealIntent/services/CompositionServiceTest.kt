@@ -37,7 +37,7 @@ class CompositionServiceTest : BehaviorSpec({
     val name = "my very own layout"
 
     val compositionService = CompositionService(
-        carouselsManager, spaceManager, spaceRepository, textsManager, bannersManager, gridsManager,
+        spaceManager, spaceRepository, textsManager, bannersManager, gridsManager, carouselsManager,
     )
 
     beforeEach { clearAllMocks() }
@@ -456,12 +456,12 @@ class CompositionServiceTest : BehaviorSpec({
 
         and("createComposition") {
             beforeEach {
-                every { spaceRepository.validateAuthorPrivilegedToModify(layoutId, authorId) } returns true
+                every { spaceRepository.validateAuthorPrivilegedToModifyLayout(layoutId, authorId) } returns true
             }
             val newUserComposition = genNewUserComposition(CompositionCategory.Carousel)
 
             then("AuthorId not privileged to layoutId provided") {
-                every { spaceRepository.validateAuthorPrivilegedToModify(layoutId, authorId) } returns false
+                every { spaceRepository.validateAuthorPrivilegedToModifyLayout(layoutId, authorId) } returns false
 
                 val res = compositionService.createComposition(
                     userComposition = newUserComposition,

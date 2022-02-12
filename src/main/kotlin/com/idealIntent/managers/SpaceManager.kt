@@ -16,13 +16,38 @@ class SpaceManager(
     private val spaceRepository: SpaceRepository,
 ) {
 
-    fun getPublicLayoutOfCompositions(layoutId: Int): CompositionDataBuilder {
+    /**
+     * Get space layout of compositions
+     *
+     * @param spaceAddress
+     * @return Space's layout of composition.
+     */
+    fun getSpaceLayoutOfCompositions(spaceAddress: Int): CompositionDataBuilder {
         TODO()
     }
 
+    /**
+     * Get private space layout of compositions
+     *
+     * @param spaceAddress
+     * @param authorId
+     * @return Space's layout of composition.
+     */
+    fun getPrivateSpaceLayoutOfCompositions(spaceAddress: Int, authorId: Int): CompositionDataBuilder {
+        TODO()
+    }
+
+    /**
+     * Get private layout of compositions
+     *
+     * For CMS purposes. Use [getPrivateSpaceLayoutOfCompositions] for user querying purposes.
+     *
+     * @param layoutId Id of layout.
+     * @param authorId Id of author privileged to layout.
+     * @return Layout of compositions.
+     */
     fun getPrivateLayoutOfCompositions(layoutId: Int, authorId: Int): CompositionDataBuilder {
-        val layoutMetadata = spaceRepository.getLayoutMetadata(
-            spaceAddress = null,
+        val layoutMetadata = spaceRepository.getPrivateLayoutMetadataById(
             layoutId = layoutId,
             authorId = authorId
         )
@@ -33,9 +58,8 @@ class SpaceManager(
     }
 
     fun getSpaceLayoutOfCompositions(spaceAddress: String, authorId: Int) {
-        val layoutMetadata = spaceRepository.getLayoutMetadata(
+        val layoutMetadata = spaceRepository.getPrivateLayoutMetadataBySpace(
             spaceAddress = spaceAddress,
-            layoutId = null,
             authorId = authorId
         )
         val composition = getCompositionsOfLayout(layoutMetadata)

@@ -43,12 +43,12 @@ import io.ktor.http.*
  * does CRUD operations of compositions and collections composed of composition request to do on.
  */
 class CompositionService(
-    private val carouselsManager: CarouselsManager,
     private val spaceManager: SpaceManager,
     private val spaceRepository: SpaceRepository,
     private val textsManager: TextsManager,
     private val bannersManager: BannersManager,
     private val gridsManager: GridsManager,
+    private val carouselsManager: CarouselsManager,
 ) {
     val gson = Gson()
 
@@ -106,7 +106,7 @@ class CompositionService(
         userId: Int
     ): CompositionResponse {
         try {
-            if (!spaceRepository.validateAuthorPrivilegedToModify(layoutId, userId))
+            if (!spaceRepository.validateAuthorPrivilegedToModifyLayout(layoutId, userId))
                 throw CompositionException(CompositionCode.NotPrivilegedToLayout)
 
             with(userComposition) {
