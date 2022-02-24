@@ -16,7 +16,7 @@ import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
-import integrationTests.compositions.carousels.CarouselCompositionFlow
+import integrationTests.compositions.carousels.CarouselCompositionsFlow
 import io.kotest.assertions.failure
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.IsolationMode
@@ -45,7 +45,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
     private val signupFlow: SignupFlow by inject()
     private val compositionService: CompositionService by inject()
     private val carouselOfImagesManager: CarouselOfImagesManager by inject()
-    private val carouselCompositionFlow: CarouselCompositionFlow by inject()
+    private val carouselCompositionFlow: CarouselCompositionsFlow by inject()
     private val userComposition = NewUserComposition(
         compositionCategory = CompositionCategory.Carousel,
         compositionType = CompositionCarouselType.BasicImages.value,

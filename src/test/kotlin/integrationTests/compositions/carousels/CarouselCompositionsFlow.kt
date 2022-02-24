@@ -20,7 +20,7 @@ import shared.testUtils.createPrivateCarouselBasicImagesReq
  *
  * Instead of needing to repeat code this class was created to hold code that is or like to be used in multiple places.
  */
-class CarouselCompositionFlow: BehaviorSpecFlow() {
+class CarouselCompositionsFlow: BehaviorSpecFlow() {
     private val compositionService: CompositionService by inject()
     private val carouselOfImagesManager: CarouselOfImagesManager by inject()
     private val userComposition = NewUserComposition(

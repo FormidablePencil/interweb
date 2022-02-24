@@ -1,43 +1,32 @@
 package integrationTests.compositions.carousels
 
 import com.google.gson.Gson
-import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
-import com.idealIntent.dtos.compositions.NewUserComposition
-import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.SpaceManager
 import com.idealIntent.services.CompositionService
-import dtos.compositions.CompositionCategory
-import dtos.compositions.carousels.CompositionCarouselType
-import dtos.compositions.texts.BasicText
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.koin.test.inject
-import shared.testUtils.*
+import shared.testUtils.BehaviorSpecIT
+import shared.testUtils.createPrivateCarouselBasicImagesReq
+import shared.testUtils.rollback
 
 // todo - left to do:
 //  Library of compositions
 //  SpaceRepository and SpaceManager test
 //  Unit test, document and harden codebase
 
-class CarouselCompositionIT : BehaviorSpecIT({
+class CarouselCompositionsIT : BehaviorSpecIT({
     val signupFlow: SignupFlow by inject()
     val compositionService: CompositionService by inject()
-    val carouselCompositionFlow: CarouselCompositionFlow by inject()
+    val carouselCompositionFlow: CarouselCompositionsFlow by inject()
     val spaceManager: SpaceManager by inject()
     val gson = Gson()
 
     given("Carousel of images") {
-
-        val createBasicText = BasicText(
-            name = "My favorite basic text.",
-            text = "Hello, my neighbors!"
-        )
-        val createBasicTextSerialized = gson.toJson(createBasicText)
-
 
         suspend fun setupCreateComposition(): Triple<Int, Int, Int> {
             val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
