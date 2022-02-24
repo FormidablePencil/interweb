@@ -6,7 +6,6 @@ import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
 
 data class WrappedCompPresent(
-    val orderRank: Int,
     val compositionCategory: Int,
     val compositionType: Int,
     val serializedComposition: String
@@ -34,7 +33,6 @@ class CompositionDataBuilder {
                 val comps = carouselOfImagesData.get()
                 comps.forEach {
                     layoutOfCompositionsWrappedPresent += WrappedCompPresent(
-                        orderRank = it.orderRank,
                         compositionType = CompositionCategory.Carousel.value,
                         compositionCategory = CompositionCarouselType.BasicImages.value,
                         serializedComposition = gson.toJson(it),
@@ -43,9 +41,7 @@ class CompositionDataBuilder {
             }
         }
 
-        // todo -
-        //  order rank is always 0,
-        //  seems there's a left join implemented improperly for privileged authors
+        // todo - order rank is always 0
 
         return layoutOfCompositionsWrappedPresent
     }

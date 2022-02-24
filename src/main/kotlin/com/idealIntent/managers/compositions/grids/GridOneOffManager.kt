@@ -1,15 +1,17 @@
 package com.idealIntent.managers.compositions.grids
 
-import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
+import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import org.koin.core.component.KoinComponent
 
-class GridOneOffManager : ICompositionTypeManagerStructure<GridRes, IImagesCarouselEntity,
-        CreateGridReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
+class GridOneOffManager(
+    private val textRepository: TextRepository,
+    ) : ICompositionTypeManagerStructure<GridRes, IImagesCarouselEntity, CreateGridReq, CarouselOfImagesComposePrepared,
+        CompositionResponse>, KoinComponent {
 
     override fun getPublicComposition(compositionSourceId: Int): GridRes? {
         TODO("Not yet implemented")

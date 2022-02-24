@@ -1,13 +1,16 @@
 package com.idealIntent.managers.compositions.texts
 
+import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import dtos.compositions.carousels.CompositionCarouselType
-import dtos.compositions.texts.CompositionText
+import dtos.compositions.texts.CompositionTextType
 
-class TextsManager: ICompositionCategoryManagerStructure<CompositionText, CompositionResponse, CompositionResponse> {
+class TextsManager :
+    ICompositionCategoryManagerStructure<CompositionTextType, CompositionResponse, CompositionResponse> {
     override fun getPublicComposition(
         compositionType: CompositionCarouselType,
         compositionSourceId: Int
@@ -16,7 +19,7 @@ class TextsManager: ICompositionCategoryManagerStructure<CompositionText, Compos
     }
 
     override fun getPrivateComposition(
-        compositionType: CompositionText,
+        compositionType: CompositionTextType,
         compositionSourceId: Int,
         authorId: Int
     ): CompositionResponse? {
@@ -24,16 +27,21 @@ class TextsManager: ICompositionCategoryManagerStructure<CompositionText, Compos
     }
 
     override fun createComposition(
-        compositionType: CompositionText,
+        compositionType: CompositionTextType,
         jsonData: String,
         layoutId: Int,
         userId: Int
     ): Int {
-        TODO("Not yet implemented")
+        TODO("Organized the file structure first.")
+//        val gson = Gson()
+//        return lonelyTextManager.createComposition(
+//            gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java),
+//            layoutId
+//        )
     }
 
     override fun updateComposition(
-        compositionType: CompositionText,
+        compositionType: CompositionTextType,
         compositionSourceId: Int,
         compositionUpdateQue: List<UpdateDataOfComposition>,
         authorId: Int
@@ -42,7 +50,7 @@ class TextsManager: ICompositionCategoryManagerStructure<CompositionText, Compos
     }
 
     override fun deleteComposition(
-        compositionType: CompositionText,
+        compositionType: CompositionTextType,
         compositionSourceId: Int,
         authorId: Int
     ) {

@@ -54,7 +54,7 @@ object DIHelper {
         single { TextsManager() }
         single { BannersManager() }
         single { GridsManager(get()) }
-        single { GridOneOffManager() }
+        single { GridOneOffManager(get()) }
 
         // repositories
         single { AuthorRepository() }

@@ -14,9 +14,9 @@ data class CompositionMetadata(
 
 class CarouselOfImagesDataMapped {
     val compositionsMetadata = mutableSetOf<CompositionMetadata>()
-    val images = mutableListOf<Pair<Int, ImagePK>>()
-    val imgOnclickRedirects = mutableListOf<Pair<Int, TextPK>>()
-    val privilegedAuthors = mutableListOf<Pair<Int, PrivilegedAuthor>>()
+    val images = mutableSetOf<Pair<Int, ImagePK>>()
+    val imgOnclickRedirects = mutableSetOf<Pair<Int, TextPK>>()
+    val privilegedAuthors = mutableSetOf<Pair<Int, PrivilegedAuthor>>()
 
     fun get(): List<CarouselBasicImagesRes> {
         return compositionsMetadata.map { item ->

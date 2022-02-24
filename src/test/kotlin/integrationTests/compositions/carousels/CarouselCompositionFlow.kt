@@ -1,14 +1,11 @@
-package integrationTests.compositions.flows
+package integrationTests.compositions.carousels
 
 import com.idealIntent.dtos.compositions.NewUserComposition
 import com.idealIntent.exceptions.logInfo
 import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
-import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
-import integrationTests.auth.flows.AuthUtilities
-import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -18,29 +15,21 @@ import shared.testUtils.carouselPrivateBasicImagesReqSerialized
 import shared.testUtils.carouselPublicBasicImagesReqSerialized
 import shared.testUtils.createPrivateCarouselBasicImagesReq
 
-class CompositionFlow : BehaviorSpecFlow() {
-    companion object {
-        val userComposition = NewUserComposition(
-            compositionCategory = CompositionCategory.Carousel,
-            compositionType = CompositionCarouselType.BasicImages.value,
-        )
-        val layoutName = "That was legitness"
-    }
-
+/**
+ * Carousel composition flow. Used for code shortcuts.
+ *
+ * Instead of needing to repeat code this class was created to hold code that is or like to be used in multiple places.
+ */
+class CarouselCompositionFlow: BehaviorSpecFlow() {
     private val compositionService: CompositionService by inject()
-    private val signupFlow: SignupFlow by inject()
-    private val spaceRepository: SpaceRepository by inject()
     private val carouselOfImagesManager: CarouselOfImagesManager by inject()
+    private val userComposition = NewUserComposition(
+        compositionCategory = CompositionCategory.Carousel,
+        compositionType = CompositionCarouselType.BasicImages.value,
+    )
+    val layoutName = "That was legitness"
 
-    suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
-        val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
-        val layoutId = compositionService.createNewLayout(name = layoutName, authorId = authorId).data
-            ?: throw failure("Failed to get id of newly created layout.")
-        val compositionSourceId = createComposition(publicView, layoutId, authorId)
-        return Triple(compositionSourceId, layoutId, authorId)
-    }
-
-    private fun createComposition(public: Boolean, layoutId: Int, authorId: Int): Int {
+    fun createComposition(public: Boolean, layoutId: Int, authorId: Int): Int {
         val res = compositionService.createComposition(
             userComposition = userComposition,
             compositionSerialized = if (public) carouselPublicBasicImagesReqSerialized else carouselPrivateBasicImagesReqSerialized,

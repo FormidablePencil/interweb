@@ -24,7 +24,7 @@ import dtos.compositions.CompositionCategory.*
 import dtos.compositions.banners.CompositionBanner
 import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.grids.CompositionGrid
-import dtos.compositions.texts.CompositionText
+import dtos.compositions.texts.CompositionTextType
 import io.ktor.http.*
 
 /**
@@ -113,7 +113,7 @@ class CompositionService(
                 val compositionSourceId = when (compositionCategory) {
                     Text ->
                         textsManager.createComposition(
-                            compositionType = CompositionText.fromInt(compositionType),
+                            compositionType = CompositionTextType.fromInt(compositionType),
                             compositionSerialized, layoutId, userId
                         )
                     Banner ->
@@ -160,7 +160,7 @@ class CompositionService(
                 when (CompositionCategory.fromInt(compositionType)) {
                     Text ->
                         textsManager.updateComposition(
-                            compositionType = CompositionText.fromInt(compositionType),
+                            compositionType = CompositionTextType.fromInt(compositionType),
                             compositionSourceId = compositionSourceId,
                             compositionUpdateQue = compositionUpdateQue,
                             authorId = authorId
@@ -224,7 +224,7 @@ class CompositionService(
                 when (compositionCategory) {
                     Text ->
                         textsManager.deleteComposition(
-                            compositionType = CompositionText.fromInt(compositionType),
+                            compositionType = CompositionTextType.fromInt(compositionType),
                             compositionSourceId = compositionSourceId,
                             authorId = authorId,
                         )

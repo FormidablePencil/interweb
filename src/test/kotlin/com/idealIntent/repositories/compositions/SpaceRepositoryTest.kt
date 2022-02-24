@@ -2,7 +2,7 @@ package com.idealIntent.repositories.compositions
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.services.CompositionService
-import integrationTests.compositions.flows.CompositionFlow
+import integrationTests.compositions.CompositionFlow
 import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
 import org.koin.core.component.inject
@@ -44,12 +44,12 @@ class SpaceRepositoryTest : BehaviorSpecUtRepo() {
 
             then("success") {
                 rollback {
-                    val (compositionSourceId, layoutId, authorId) =
-                        compositionFlow.signup_then_createComposition(false)
-
-                    val vd = spaceRepository.associateCompositionToLayout(
-                        220000, compositionSourceId, layoutId
-                    )
+//                    val (compositionSourceId, layoutId, authorId) =
+//                        compositionFlow.signup_then_createComposition(false)
+//
+//                    val vd = spaceRepository.associateCompositionToLayout(
+//                        220000, compositionSourceId, layoutId
+//                    )
                 }
             }
         }

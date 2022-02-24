@@ -74,7 +74,7 @@ class CompositionServiceTest : BehaviorSpec({
 //                val httpStatus = HttpStatusCode.Created
 //                every {
 //                    textsManager.createComposition(
-//                        compositionType = CompositionText.fromInt(newUserComposition.compositionType),
+//                        compositionType = CompositionTextType.fromInt(newUserComposition.compositionType),
 //                        jsonData = carouselPublicBasicImagesReqSerialized,
 //                        layoutId = layoutId,
 //                        userId = authorId
@@ -100,7 +100,7 @@ class CompositionServiceTest : BehaviorSpec({
 //                // region setup
 //                every {
 //                    textsManager.createComposition(
-//                        compositionType = CompositionText.fromInt(newUserComposition.compositionType),
+//                        compositionType = CompositionTextType.fromInt(newUserComposition.compositionType),
 //                        jsonData = carouselPublicBasicImagesReqSerialized,
 //                        layoutId = layoutId,
 //                        userId = authorId
@@ -128,7 +128,7 @@ class CompositionServiceTest : BehaviorSpec({
 //                // region setup
 //                every {
 //                    textsManager.deleteComposition(
-//                        CompositionText.fromInt(userComposition.compositionType),
+//                        CompositionTextType.fromInt(userComposition.compositionType),
 //                        userComposition.compositionSourceId,
 //                        authorId = authorId
 //                    )
@@ -144,7 +144,7 @@ class CompositionServiceTest : BehaviorSpec({
 //                // region setup
 //                every {
 //                    textsManager.deleteComposition(
-//                        CompositionText.fromInt(userComposition.compositionType),
+//                        CompositionTextType.fromInt(userComposition.compositionType),
 //                        userComposition.compositionSourceId,
 //                        authorId
 //                    )
@@ -163,7 +163,7 @@ class CompositionServiceTest : BehaviorSpec({
 //                // region setup
 //                every {
 //                    textsManager.updateComposition(
-//                        CompositionText.fromInt(request.compositionType),
+//                        CompositionTextType.fromInt(request.compositionType),
 //                        request.compositionSourceId,
 //                        compositionUpdateQue = request.compositionUpdateQue,
 //                        authorId = authorId
@@ -178,7 +178,7 @@ class CompositionServiceTest : BehaviorSpec({
 //                // region setup
 //                justRun {
 //                    textsManager.updateComposition(
-//                        compositionType = CompositionText.fromInt(request.compositionType),
+//                        compositionType = CompositionTextType.fromInt(request.compositionType),
 //                        compositionSourceId = request.compositionSourceId,
 //                        compositionUpdateQue = request.compositionUpdateQue,
 //                        authorId = authorId

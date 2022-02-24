@@ -1,7 +1,9 @@
 package com.idealIntent.dtos.compositions.headers
 
+import dtos.compositions.headers.IHeaderBasic
+
 data class HeaderBasic(
-    val img: String,
-    val imgAlt: String,
-    val title: String,
-)
+    override val img: String,
+    override val imgAlt: String,
+    override val title: String
+) : IHeaderBasic
