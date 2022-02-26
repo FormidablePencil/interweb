@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.NewUserComposition
 import com.idealIntent.dtos.compositions.headers.HeaderBasicCreateReq
 import com.idealIntent.exceptions.logInfo
-import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.managers.compositions.headers.HeaderBasicManager
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
@@ -13,7 +12,6 @@ import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
 import org.koin.core.component.inject
 import shared.testUtils.BehaviorSpecFlow
-import shared.testUtils.createPrivateCarouselBasicImagesReq
 
 class HeaderCompositionsFlow : BehaviorSpecFlow() {
     private val compositionService: CompositionService by inject()
@@ -22,20 +20,27 @@ class HeaderCompositionsFlow : BehaviorSpecFlow() {
         compositionCategory = CompositionCategory.Header,
         compositionType = CompositionHeader.Basic.value,
     )
-    val layoutName = "That was legitness"
-    val gson = Gson()
 
-    val publicHeaderBasicReq = HeaderBasicCreateReq(
-        bgImg = "", profileImg = "", privilegeLevel = 0, name = "name", listOf()
-    )
-    val privateHeaderBasicReq = publicHeaderBasicReq.let {
-        HeaderBasicCreateReq(
-            bgImg = it.bgImg, profileImg = it.profileImg, privilegeLevel = 1, name = it.name, listOf()
+    companion object {
+        private val gson = Gson()
+        val layoutName = "That was legitness"
+        val publicHeaderBasicReq = HeaderBasicCreateReq(
+            bgImg = "", profileImg = "", privilegeLevel = 0, name = "name", listOf()
         )
+        val privateHeaderBasicReq = publicHeaderBasicReq.let {
+            HeaderBasicCreateReq(
+                bgImg = it.bgImg, profileImg = it.profileImg, privilegeLevel = 1, name = it.name, listOf()
+            )
+        }
+        val privateHeaderBasicRes = publicHeaderBasicReq.let {
+            HeaderBasicCreateReq(
+                bgImg = it.bgImg, profileImg = it.profileImg, privilegeLevel = 1, name = it.name, listOf()
+            )
+        }
+        val headerPublicBasicImagesReqSerialized = gson.toJson(publicHeaderBasicReq)
+        val headerPrivateBasicImagesReqSerialized = gson.toJson(privateHeaderBasicReq)
     }
 
-    private val headerPublicBasicImagesReqSerialized = gson.toJson(publicHeaderBasicReq)
-    private val headerPrivateBasicImagesReqSerialized = gson.toJson(privateHeaderBasicReq)
 
     // todo - creates only one variant. Implement more variants
     fun createComposition(public: Boolean, layoutId: Int, authorId: Int): Int {

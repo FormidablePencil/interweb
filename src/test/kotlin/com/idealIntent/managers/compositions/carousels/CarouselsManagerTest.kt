@@ -23,9 +23,7 @@ class CarouselsManagerTest : BehaviorSpec({
 
     val carouselsManager = CarouselsManager(carouselOfImagesManager, carouselBlurredOverlayManager)
 
-    beforeEach {
-        clearAllMocks()
-    }
+    beforeEach { clearAllMocks() }
 
     given("getPublicComposition") {
         // region setup

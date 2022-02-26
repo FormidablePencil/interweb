@@ -45,7 +45,7 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
     private suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
         val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
         val layoutId = compositionService.createNewLayout(
-            name = headerCompositionsFlow.layoutName, authorId = authorId
+            name = HeaderCompositionsFlow.layoutName, authorId = authorId
         ).data ?: throw failure("Failed to get id of newly created layout.")
         val compositionSourceId = headerCompositionsFlow.createComposition(publicView, layoutId, authorId)
         return Triple(compositionSourceId, layoutId, authorId)
@@ -98,10 +98,10 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
                     ) ?: throw failure("failed to get composition")
 
                     // region verify
-                    headerCompositionsFlow.let {
-                        comp.bgImg shouldBe it.publicHeaderBasicReq.bgImg
-                        comp.profileImg shouldBe it.publicHeaderBasicReq.profileImg
-                        comp.name shouldBe it.publicHeaderBasicReq.name
+                    HeaderCompositionsFlow.publicHeaderBasicReq.let {
+                        comp.bgImg shouldBe it.bgImg
+                        comp.profileImg shouldBe it.profileImg
+                        comp.name shouldBe it.name
                     }
                     // endregion
                 }
@@ -120,10 +120,10 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
                             ?: throw failure("failed to get composition")
 
                     // region verify
-                    headerCompositionsFlow.let {
-                        comp.bgImg shouldBe it.publicHeaderBasicReq.bgImg
-                        comp.profileImg shouldBe it.publicHeaderBasicReq.profileImg
-                        comp.name shouldBe it.publicHeaderBasicReq.name
+                    HeaderCompositionsFlow.publicHeaderBasicReq.let {
+                        comp.bgImg shouldBe it.bgImg
+                        comp.profileImg shouldBe it.profileImg
+                        comp.name shouldBe it.name
                     }
                     // endregion
                 }
@@ -199,10 +199,10 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
-                    headerCompositionsFlow.let {
-                        resBeforeDeletion.bgImg shouldBe it.publicHeaderBasicReq.bgImg
-                        resBeforeDeletion.profileImg shouldBe it.publicHeaderBasicReq.profileImg
-                        resBeforeDeletion.name shouldBe it.publicHeaderBasicReq.name
+                    HeaderCompositionsFlow.publicHeaderBasicReq.let {
+                        resBeforeDeletion.bgImg shouldBe it.bgImg
+                        resBeforeDeletion.profileImg shouldBe it.profileImg
+                        resBeforeDeletion.name shouldBe it.name
                     }
                     // endregion
 
