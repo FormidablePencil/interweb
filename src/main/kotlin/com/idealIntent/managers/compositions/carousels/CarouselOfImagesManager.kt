@@ -1,7 +1,6 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.google.gson.Gson
-import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
@@ -9,7 +8,7 @@ import com.idealIntent.exceptions.CompositionCode.IdOfRecordProvidedNotOfComposi
 import com.idealIntent.exceptions.CompositionCode.ModifyPermittedToAuthorOfCompositionNotFound
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.CompositionPrivilegesManager
-import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
+import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfCarouselOfImages.*
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
@@ -19,8 +18,6 @@ import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.carousels.CompositionCarouselType
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class CarouselOfImagesManager(
     private val compositionPrivilegesManager: CompositionPrivilegesManager,
@@ -29,9 +26,8 @@ class CarouselOfImagesManager(
     private val compositionSourceRepository: CompositionSourceRepository,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
     private val spaceRepository: SpaceRepository,
-) : ICompositionTypeManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity, CreateCarouselBasicImagesReq,
-        CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
-    val appEnv: AppEnv by inject()
+) : CompositionTypeManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity, CreateCarouselBasicImagesReq,
+        CarouselOfImagesComposePrepared, CompositionResponse>() {
 
     override fun getPublicComposition(compositionSourceId: Int): CarouselBasicImagesRes? =
         carouselOfImagesRepository.getPublicComposition(compositionSourceId)
@@ -68,7 +64,8 @@ class CarouselOfImagesManager(
                     imageCollectionId = imageCollectionId,
                     redirectTextCollectionId = redirectsCollectionId,
                     sourceId = compositionSourceId,
-                )
+                ),
+                sourceId = compositionSourceId
             )
 
             compositionPrivilegesManager.giveMultipleAuthorsPrivilegesToCompositionByUsername(

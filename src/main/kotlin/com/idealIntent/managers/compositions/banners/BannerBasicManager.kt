@@ -1,16 +1,15 @@
-package com.idealIntent.managers.compositions
+package com.idealIntent.managers.compositions.banners
 
-import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.managers.compositions.grids.CreateGridReq
 import com.idealIntent.managers.compositions.grids.GridRes
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
-import org.koin.core.component.KoinComponent
 
-class BannerBasicManager: ICompositionTypeManagerStructure<GridRes, IImagesCarouselEntity,
-        CreateGridReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
+class BannerBasicManager : CompositionTypeManagerStructure<GridRes, IImagesCarouselEntity,
+        CreateGridReq, CarouselOfImagesComposePrepared, CompositionResponse>() {
     override fun getPublicComposition(compositionSourceId: Int): GridRes? {
         TODO("Not yet implemented")
     }

@@ -1,6 +1,5 @@
 package com.idealIntent.repositories.compositions
 
-import com.idealIntent.dtos.compositions.carousels.ImagesCarouselTopLvlIds
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionCode.CollectionOfRecordsNotFound
 import com.idealIntent.exceptions.CompositionException
@@ -10,7 +9,8 @@ import org.ktorm.dsl.QuerySource
 import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 
-interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, CreateComposition, ComposePrepared, DtoMapper> {
+interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, ComposedPrepared,
+        CreateComposition, DtoMapper, TopLvlIds> {
 
     // region Composition query instructions
     /**
@@ -89,7 +89,7 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
     fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
         compositionSourceId: Int,
         authorId: Int
-    ): ImagesCarouselTopLvlIds?
+    ): TopLvlIds?
 
 
     // region Get compositions
@@ -120,9 +120,9 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * to get your data.
      *
      * @param composePrepared All collection and compositions of ids to compose as one composition.
-     * @return Id of newly created composition or null if failed.
+     * @return Id of newly created composition or throw.
      */
-    fun compose(composePrepared: ComposePrepared): Int?
+    fun compose(composePrepared: ComposedPrepared, sourceId: Int): Int
 
     /**
      * Delete composition.

@@ -1,10 +1,19 @@
 package com.idealIntent.managers.compositions
 
+import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+
+abstract class CompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response>
+    : ICompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response>,
+    KoinComponent {
+    override val appEnv: AppEnv by inject()
+}
 
 /**
  * Directs CRUD operations of composition types.
@@ -17,7 +26,8 @@ import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepos
  * @param CreateRequest Ids of compositions and collections to compose and raw data to save before composition.
  * @param ComposePrepared Ids of composition and collections created beforehand to compose into one composition.
  */
-interface ICompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response> {
+private interface ICompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response> {
+    val appEnv: AppEnv
 
     /**
      * Get public composition. Only can get composition by its source id.

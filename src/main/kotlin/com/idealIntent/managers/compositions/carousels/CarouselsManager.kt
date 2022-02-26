@@ -1,21 +1,16 @@
 package com.idealIntent.managers.compositions.carousels
 
-import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
-import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
-import com.idealIntent.repositories.compositions.SpaceRepository
+import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.carousels.CompositionCarouselType.*
 
 class CarouselsManager(
     private val carouselOfImagesManager: CarouselOfImagesManager,
     private val carouselBlurredOverlayManager: CarouselBlurredOverlayManager,
-) : ICompositionCategoryManagerStructure<CompositionCarouselType, CarouselBasicImagesRes, CompositionResponse> {
-    private val gson = Gson()
+) : CompositionCategoryManagerStructure<CompositionCarouselType, CarouselBasicImagesRes, CompositionResponse>() {
 
     override fun getPublicComposition(
         compositionType: CompositionCarouselType,

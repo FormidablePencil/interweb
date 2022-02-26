@@ -85,6 +85,7 @@ class CompositionIT : BehaviorSpecIT({
                 )
 
                 // validate that the composition was deleted
+                // todo - throws null pointer. Should return empty handed
                 val compositionBuilderAfterDeletion =
                     compositionService.getPrivateLayoutOfCompositions(layoutId, userId)
             }

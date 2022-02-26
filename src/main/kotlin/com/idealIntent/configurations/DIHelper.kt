@@ -7,6 +7,8 @@ import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
 import com.idealIntent.managers.compositions.grids.GridOneOffManager
 import com.idealIntent.managers.compositions.grids.GridsManager
+import com.idealIntent.managers.compositions.headers.HeaderBasicManager
+import com.idealIntent.managers.compositions.headers.HeadersManager
 import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.PasswordRepository
 import com.idealIntent.repositories.RefreshTokenRepository
@@ -18,6 +20,7 @@ import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.CompositionQueryBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import com.idealIntent.repositories.compositions.headers.HeaderBasicRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
@@ -39,7 +42,7 @@ object DIHelper {
         // services
         single { AuthorsPortfolioService(get(), get()) }
         single { AuthorizationService(get(), get(), get(), get(), get(), get(), get()) }
-        single { CompositionService(get(), get(), get(), get(), get(), get()) }
+        single { CompositionService(get(), get(), get(), get(), get(), get(), get()) }
 
         // managers
         single { AuthorsPortfolioManager() }
@@ -55,6 +58,8 @@ object DIHelper {
         single { BannersManager() }
         single { GridsManager(get()) }
         single { GridOneOffManager(get()) }
+        single { HeaderBasicManager(get(), get(), get()) }
+        single { HeadersManager(get()) }
 
         // repositories
         single { AuthorRepository() }
@@ -69,6 +74,7 @@ object DIHelper {
         single { ImageRepository() }
         single { CarouselOfImagesRepository(get(), get()) }
         single { SpaceRepository(get(), get()) }
+        single { HeaderBasicRepository() }
         // env configurations
 
         single { CompositionQueryBuilder(get()) }

@@ -40,7 +40,7 @@ data class CarouselOfImagesComposePrepared(
     val imageCollectionId: Int,
     val redirectTextCollectionId: Int,
     val sourceId: Int,
-    val name: String,
+    val name: String, // todo remove, not being used
 )
 
 /**
@@ -52,7 +52,7 @@ class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
 ) : RepositoryBase(), ICompositionRepositoryStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
-        CarouselBasicImagesRes, CarouselOfImagesComposePrepared, CarouselOfImagesDataMapped> {
+        CarouselOfImagesComposePrepared, CarouselBasicImagesRes, CarouselOfImagesDataMapped, ImagesCarouselTopLvlIds> {
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
 
     // todo - move to a source file
@@ -132,6 +132,7 @@ class CarouselOfImagesRepository(
         mutableList += (img2Col.orderRank eq text2Col.orderRank)
     }
 
+    // todo - didn't add privilege level. May be needed
     override fun compositionQueryMap(row: QueryRowSet, dto: CarouselOfImagesDataMapped) {
         println(
             "${row[compSource.name]}," +
@@ -251,22 +252,22 @@ class CarouselOfImagesRepository(
     // endregion
 
 
-    override fun compose(composePrepared: CarouselOfImagesComposePrepared): Int {
+    override fun compose(composePrepared: CarouselOfImagesComposePrepared, sourceId: Int): Int {
         database.useTransaction {
             val compositionId = database.insertAndGenerateKey(ImagesCarouselsModel) {
                 set(it.imageCollectionId, composePrepared.imageCollectionId)
                 set(it.redirectTextCollectionId, composePrepared.redirectTextCollectionId)
             } as Int? ?: throw CompositionExceptionReport(
-                CompositionCode.FailedToComposeInternalError,
-                this::class.java
+                CompositionCode.FailedToComposeInternalError, this::class.java
             )
 
             if (database.insert(CompositionInstanceToSourcesModel) {
                     set(it.compositionCategory, CompositionCategory.Carousel.value)
                     set(it.compositionType, CompositionCarouselType.BasicImages.value)
-                    set(it.sourceId, composePrepared.sourceId)
+                    set(it.sourceId, sourceId)
                     set(it.compositionId, compositionId)
                 } == 0) throw CompositionExceptionReport(CompositionCode.FailedToComposeInternalError, this::class.java)
+
             return compositionId
         }
     }

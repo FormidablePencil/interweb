@@ -3,13 +3,13 @@ package com.idealIntent.managers.compositions.carousels
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
-import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
-import org.koin.core.component.KoinComponent
 
-class CarouselBlurredOverlayManager: ICompositionTypeManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
-        CreateCarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>, KoinComponent {
+class CarouselBlurredOverlayManager : CompositionTypeManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
+        CreateCarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>() {
+
     override fun getPublicComposition(compositionSourceId: Int): CarouselBasicImagesRes? {
         TODO("Not yet implemented")
     }

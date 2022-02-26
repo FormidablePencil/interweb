@@ -9,6 +9,7 @@ import com.idealIntent.managers.SpaceManager
 import com.idealIntent.managers.compositions.banners.BannersManager
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
 import com.idealIntent.managers.compositions.grids.GridsManager
+import com.idealIntent.managers.compositions.headers.HeadersManager
 import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
@@ -32,12 +33,14 @@ class CompositionServiceTest : BehaviorSpec({
     val textsManager: TextsManager = mockk()
     val bannersManager: BannersManager = mockk()
     val gridsManager: GridsManager = mockk()
+    val headersManager: HeadersManager = mockk()
     val layoutId = 0
     val authorId = 0
     val name = "my very own layout"
 
     val compositionService = CompositionService(
         spaceManager, spaceRepository, textsManager, bannersManager, gridsManager, carouselsManager,
+        headersManager,
     )
 
     beforeEach { clearAllMocks() }

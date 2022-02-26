@@ -1,11 +1,15 @@
 package com.idealIntent.managers.compositions
 
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+import com.google.gson.Gson
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
-import dtos.compositions.carousels.CompositionCarouselType
+
+abstract class CompositionCategoryManagerStructure<CompositionType, Composition, Response> :
+    ICompositionCategoryManagerStructure<CompositionType, Composition, Response> {
+    val gson = Gson()
+}
 
 //Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response
 
@@ -19,7 +23,7 @@ import dtos.compositions.carousels.CompositionCarouselType
  * [CarouselsManager][com.idealIntent.managers.compositions.carousels.CarouselsManager]
  * which in turn will basically do the same but for type of category.
  */
-interface ICompositionCategoryManagerStructure<CompositionType, Composition, Response> {
+private interface ICompositionCategoryManagerStructure<CompositionType, Composition, Response> {
 
     /**
      * Get public composition.
@@ -31,9 +35,9 @@ interface ICompositionCategoryManagerStructure<CompositionType, Composition, Res
      * @return Composition of records.
      */
     fun getPublicComposition(
-        compositionType: CompositionCarouselType,
+        compositionType: CompositionType,
         compositionSourceId: Int,
-    ): CarouselBasicImagesRes?
+    ): Composition?
 
     /**
      * Get private composition.

@@ -107,7 +107,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
                     privilegedAuthors, compositionSourceId, authorId
                 )
             }
-            every { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared) } returns compositionSourceId
+            every { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared, compositionSourceId) } returns compositionSourceId
             every {
                 spaceRepository.associateCompositionToLayout(
                     orderRank = 0,
@@ -152,7 +152,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
                     createPublicCarouselBasicImagesRequest.privilegedAuthors, compositionSourceId, authorId
                 )
             }
-            verify { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared) }
+            verify { carouselOfImagesRepository.compose(carouselOfImagesComposePrepared, compositionSourceId) }
 
             res shouldBe compositionSourceId
         }

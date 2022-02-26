@@ -7,7 +7,6 @@ import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.CompositionPrivilegesManager
-import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.SpaceRepository
@@ -26,7 +25,10 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.clearAllMocks
 import org.koin.core.component.inject
 import shared.DITestHelper
-import shared.testUtils.*
+import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.images
+import shared.testUtils.rollback
+import shared.testUtils.texts
 
 /**
  * Carousel of images repository integration/unit testing
@@ -42,22 +44,22 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
     private val spaceRepository: SpaceRepository by inject()
     private val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
     private val compositionPrivilegesManager: CompositionPrivilegesManager by inject()
-    private val signupFlow: SignupFlow by inject()
     private val compositionService: CompositionService by inject()
-    private val carouselOfImagesManager: CarouselOfImagesManager by inject()
+    private val signupFlow: SignupFlow by inject()
     private val carouselCompositionFlow: CarouselCompositionsFlow by inject()
+
     private val userComposition = NewUserComposition(
         compositionCategory = CompositionCategory.Carousel,
         compositionType = CompositionCarouselType.BasicImages.value,
     )
-
     private val createCarouselBasicImagesReq =
         CreateCarouselBasicImagesReq("Projects", images, texts, listOf(), privilegeLevel = 0)
 
     private suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
         val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
-        val layoutId = compositionService.createNewLayout(name = carouselCompositionFlow.layoutName, authorId = authorId).data
-            ?: throw failure("Failed to get id of newly created layout.")
+        val layoutId =
+            compositionService.createNewLayout(name = carouselCompositionFlow.layoutName, authorId = authorId).data
+                ?: throw failure("Failed to get id of newly created layout.")
         val compositionSourceId = carouselCompositionFlow.createComposition(publicView, layoutId, authorId)
         return Triple(compositionSourceId, layoutId, authorId)
     }
@@ -211,7 +213,8 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
                             imageCollectionId = preparedComposition.imageCollectionId,
                             redirectTextCollectionId = preparedComposition.redirectTextCollectionId,
                             sourceId = preparedComposition.sourceId,
-                        )
+                        ),
+                        preparedComposition.sourceId
                     )
                 }
             }
@@ -221,8 +224,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
             then("failed to delete because author id provided is not privileged to delete.") {
                 rollback {
-                    val (compositionSourceId, layoutId, authorId) =
-                        signup_then_createComposition(true)
+                    val (compositionSourceId, layoutId, authorId) = signup_then_createComposition(true)
 
                     val ex = shouldThrowExactly<CompositionException> {
                         carouselOfImagesRepository.deleteComposition(compositionSourceId, 999999999)
@@ -232,8 +234,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
             then("failed to delete on an id of a composition that doesn't exist") {
                 rollback {
-                    val (compositionSourceId, layoutId, authorId) =
-                        signup_then_createComposition(true)
+                    val (compositionSourceId, layoutId, authorId) = signup_then_createComposition(true)
 
                     val ex = shouldThrowExactly<CompositionException> {
                         carouselOfImagesRepository.deleteComposition(999999999, authorId)
@@ -243,8 +244,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
 
             then("success") {
                 rollback {
-                    val (compositionSourceId, layoutId, authorId) =
-                        signup_then_createComposition(true)
+                    val (compositionSourceId, layoutId, authorId) = signup_then_createComposition(true)
 
                     // region before deletion assertions
                     val resBeforeDeletion: CarouselBasicImagesRes = carouselOfImagesRepository.getPublicComposition(

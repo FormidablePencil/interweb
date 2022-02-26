@@ -11,10 +11,10 @@ import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.SpaceManager
-import com.idealIntent.managers.compositions.ICompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.banners.BannersManager
 import com.idealIntent.managers.compositions.carousels.CarouselsManager
 import com.idealIntent.managers.compositions.grids.GridsManager
+import com.idealIntent.managers.compositions.headers.HeadersManager
 import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.compositions.CompositionDataBuilder
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
@@ -24,6 +24,7 @@ import dtos.compositions.CompositionCategory.*
 import dtos.compositions.banners.CompositionBanner
 import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.grids.CompositionGrid
+import dtos.compositions.headers.CompositionHeader
 import dtos.compositions.texts.CompositionTextType
 import io.ktor.http.*
 
@@ -49,6 +50,7 @@ class CompositionService(
     private val bannersManager: BannersManager,
     private val gridsManager: GridsManager,
     private val carouselsManager: CarouselsManager,
+    private val headersManager: HeadersManager,
 ) {
     val gson = Gson()
 
@@ -135,6 +137,10 @@ class CompositionService(
                     Markdown -> TODO() // todo - part of text, remove
                     Divider -> TODO() // todo - style and text, move to text
                     LineDivider -> TODO() // todo - styles, remove
+                    Header -> headersManager.createComposition(
+                        compositionType = CompositionHeader.fromInt(compositionType),
+                        compositionSerialized, layoutId, userId
+                    )
                 }
                 return CompositionResponse().succeeded(HttpStatusCode.Created, compositionSourceId)
             }
@@ -190,6 +196,7 @@ class CompositionService(
                     Markdown -> TODO() // todo - part of text, remove
                     Divider -> TODO() // todo - style and text, move to text
                     LineDivider -> TODO() // todo - styles, remove
+                    Header -> TODO()
                 }
             }
             return CompositionResponse().succeeded(HttpStatusCode.OK)
@@ -250,6 +257,7 @@ class CompositionService(
                     Markdown -> TODO() // todo - part of text, remove
                     Divider -> TODO() // todo - style and text, move to text
                     LineDivider -> TODO() // todo - styles, remove
+                    Header -> TODO()
                 }
             }
             return CompositionResponse().succeeded(HttpStatusCode.OK)

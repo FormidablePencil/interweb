@@ -1,20 +1,16 @@
 package com.idealIntent.managers.compositions.texts
 
-import com.google.gson.Gson
-import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
-import com.idealIntent.managers.compositions.ICompositionCategoryManagerStructure
+import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
-import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.texts.CompositionTextType
 
 class TextsManager :
-    ICompositionCategoryManagerStructure<CompositionTextType, CompositionResponse, CompositionResponse> {
+    CompositionCategoryManagerStructure<CompositionTextType, CompositionResponse, CompositionResponse>() {
     override fun getPublicComposition(
-        compositionType: CompositionCarouselType,
+        compositionType: CompositionTextType,
         compositionSourceId: Int
-    ): CarouselBasicImagesRes? {
+    ): CompositionResponse? {
         TODO("Not yet implemented")
     }
 
