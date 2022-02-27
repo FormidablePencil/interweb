@@ -1,26 +1,29 @@
 package com.idealIntent.repositories.compositions.headers
 
+import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
+import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.compositions.headers.HeaderBasicRes
 
 class HeaderBasicDataMapped : IDataMapper<HeaderBasicRes> {
-    var data: HeaderBasicRes? = null
-    val privilegedAuthors = mutableListOf<PrivilegedAuthor>()
+    var data = mutableSetOf<HeaderBasicRes>()
+    val images = mutableSetOf<Pair<Int, ImagePK>>()
+    val imgOnclickRedirects = mutableSetOf<Pair<Int, TextPK>>()
+    var privilegedAuthors = mutableSetOf<PrivilegedAuthor>()
 
     override fun get(): List<HeaderBasicRes> {
-        data?.let {
-            return listOf(
+        return data.map { item ->
+            with(item) {
                 HeaderBasicRes(
-                    id = it.id,
-                    name = it.name,
-                    sourceId = it.sourceId,
-                    bgImg = it.bgImg,
-                    profileImg = it.profileImg,
-                    privilegeLevel = it.privilegeLevel,
-                    privilegedAuthors = privilegedAuthors,
+                    id = id,
+                    sourceId = sourceId,
+                    bgImg = bgImg,
+                    profileImg = profileImg,
+                    privilegeLevel = privilegeLevel,
+                    name = name,
+                    privilegedAuthors = this@HeaderBasicDataMapped.privilegedAuthors.toList(),
                 )
-            )
+            }
         }
-        return listOf()
     }
 }

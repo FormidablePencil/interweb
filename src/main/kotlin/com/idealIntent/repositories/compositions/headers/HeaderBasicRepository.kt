@@ -78,8 +78,8 @@ class HeaderBasicRepository(
     }
 
     override fun compositionQueryMap(row: QueryRowSet, dto: HeaderBasicDataMapped) {
-        if (dto.data == null)
-            dto.data = HeaderBasicRes(
+        if (dto.data.isNotEmpty())
+            dto.data += HeaderBasicRes(
                 id = row[compInstance.id]!!,
                 sourceId = row[compSource.id]!!,
                 name = row[compSource.name]!!,

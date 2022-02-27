@@ -1,5 +1,6 @@
 package com.idealIntent.managers.compositions
 
+import com.google.gson.Gson
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
@@ -12,7 +13,8 @@ import org.koin.core.component.inject
 abstract class CompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response>
     : ICompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response>,
     KoinComponent {
-    override val appEnv: AppEnv by inject()
+    val gson = Gson()
+    val appEnv: AppEnv by inject()
 }
 
 /**
@@ -27,8 +29,6 @@ abstract class CompositionTypeManagerStructure<Composition, CompositionMetadata,
  * @param ComposePrepared Ids of composition and collections created beforehand to compose into one composition.
  */
 private interface ICompositionTypeManagerStructure<Composition, CompositionMetadata, CreateRequest, ComposePrepared, Response> {
-    val appEnv: AppEnv
-
     /**
      * Get public composition. Only can get composition by its source id.
      *

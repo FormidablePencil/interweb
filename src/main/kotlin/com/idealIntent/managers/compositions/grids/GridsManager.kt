@@ -1,6 +1,8 @@
 package com.idealIntent.managers.compositions.grids
 
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.dtos.compositions.grids.GridOneOffCreateReq
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes
 import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import dtos.compositions.grids.CompositionGrid
@@ -16,12 +18,12 @@ data class CreateGridReq(val hello: Boolean)
 
 class GridsManager(
     private val oneOffGridManager: GridOneOffManager,
-) : CompositionCategoryManagerStructure<CompositionGrid, GridRes, CompositionResponse>() {
+) : CompositionCategoryManagerStructure<CompositionGrid, GridOneOffRes, CompositionResponse>() {
 
     override fun getPublicComposition(
         compositionType: CompositionGrid,
         compositionSourceId: Int
-    ): GridRes? {
+    ): GridOneOffRes? {
         TODO("Not yet implemented")
     }
 
@@ -29,7 +31,7 @@ class GridsManager(
         compositionType: CompositionGrid,
         compositionSourceId: Int,
         authorId: Int
-    ): GridRes? {
+    ): GridOneOffRes? {
         return when (compositionType) {
             Basic -> {
                 oneOffGridManager.getPrivateComposition(compositionSourceId, authorId)
@@ -46,7 +48,7 @@ class GridsManager(
         return when (compositionType) {
             Basic -> {
                 oneOffGridManager.createComposition(
-                    gson.fromJson(jsonData, CreateGridReq::class.java), layoutId,
+                    gson.fromJson(jsonData, GridOneOffCreateReq::class.java), layoutId,
                     userId
                 )
             }

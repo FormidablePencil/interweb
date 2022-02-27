@@ -27,8 +27,8 @@ open class CompositionSourcesModel(alias: String?) : Table<ICompositionSourceEnt
 
     override fun aliased(alias: String) = CompositionSourcesModel(alias)
 
-    val name = varchar("name").bindTo { it.name }
     val id = int("id").primaryKey().bindTo { it.id }
+    val name = varchar("name").bindTo { it.name }
     val privilegeLevel = int("privilege_level").bindTo { it.privilegeLevel }
     val compositionType = int("composition_type").bindTo { it.compositionType }
 }

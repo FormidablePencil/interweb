@@ -25,14 +25,9 @@ class HeaderCompositionsFlow : BehaviorSpecFlow() {
         private val gson = Gson()
         val layoutName = "That was legitness"
         val publicHeaderBasicReq = HeaderBasicCreateReq(
-            bgImg = "", profileImg = "", privilegeLevel = 0, name = "name", listOf()
+            bgImg = "bg img", profileImg = "profile img", privilegeLevel = 0, name = "name", listOf()
         )
         val privateHeaderBasicReq = publicHeaderBasicReq.let {
-            HeaderBasicCreateReq(
-                bgImg = it.bgImg, profileImg = it.profileImg, privilegeLevel = 1, name = it.name, listOf()
-            )
-        }
-        val privateHeaderBasicRes = publicHeaderBasicReq.let {
             HeaderBasicCreateReq(
                 bgImg = it.bgImg, profileImg = it.profileImg, privilegeLevel = 1, name = it.name, listOf()
             )

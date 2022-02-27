@@ -5,7 +5,7 @@ import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
+import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 
 class CarouselBlurredOverlayManager : CompositionTypeManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
         CreateCarouselBasicImagesReq, CarouselOfImagesComposePrepared, CompositionResponse>() {

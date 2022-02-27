@@ -1,6 +1,8 @@
 package com.idealIntent.repositories.collectionsGeneric
 
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
+import com.idealIntent.models.compositionLayout.CompositionSourceToLayoutsModel
+import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import com.idealIntent.repositories.RepositoryBase
@@ -24,6 +26,14 @@ class CompositionSourceRepository : RepositoryBase() {
     private val Database.compositionSource get() = this.sequenceOf(CompositionSourcesModel)
     private val Database.privilegedAuthorsToCompositions
         get() = this.sequenceOf(PrivilegedAuthorToCompositionSourcesModel)
+
+    companion object {
+        val compSource = CompositionSourcesModel.aliased("compSource")
+        val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
+        val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
+        val prvAth2CompSource = PrivilegedAuthorToCompositionSourcesModel.aliased("prvAth2CompSource")
+    }
+
 
     // region Privileges
 

@@ -196,7 +196,12 @@ class CompositionService(
                     Markdown -> TODO() // todo - part of text, remove
                     Divider -> TODO() // todo - style and text, move to text
                     LineDivider -> TODO() // todo - styles, remove
-                    Header -> TODO()
+                    Header -> headersManager.updateComposition(
+                        compositionType = CompositionHeader.fromInt(compositionType),
+                        compositionSourceId = compositionSourceId,
+                        compositionUpdateQue = compositionUpdateQue,
+                        authorId = authorId
+                    )
                 }
             }
             return CompositionResponse().succeeded(HttpStatusCode.OK)
@@ -257,7 +262,11 @@ class CompositionService(
                     Markdown -> TODO() // todo - part of text, remove
                     Divider -> TODO() // todo - style and text, move to text
                     LineDivider -> TODO() // todo - styles, remove
-                    Header -> TODO()
+                    Header -> headersManager.deleteComposition(
+                        compositionType = CompositionHeader.fromInt(compositionType),
+                        compositionSourceId = compositionSourceId,
+                        authorId = authorId
+                    )
                 }
             }
             return CompositionResponse().succeeded(HttpStatusCode.OK)

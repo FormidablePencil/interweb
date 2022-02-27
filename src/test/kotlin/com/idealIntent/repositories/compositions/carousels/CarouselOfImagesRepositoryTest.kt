@@ -3,6 +3,7 @@ package com.idealIntent.repositories.compositions.carousels
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.NewUserComposition
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException

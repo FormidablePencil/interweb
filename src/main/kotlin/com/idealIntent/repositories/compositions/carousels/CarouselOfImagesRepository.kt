@@ -4,12 +4,12 @@ import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.dtos.compositions.carousels.ImagesCarouselTopLvlIds
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositionLayout.CompositionLayoutsModel
-import com.idealIntent.models.compositionLayout.CompositionSourceToLayoutsModel
 import com.idealIntent.models.compositionLayout.LayoutToSpacesModel
 import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
@@ -20,13 +20,14 @@ import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
-import com.idealIntent.models.privileges.CompositionSourcesModel
 import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import com.idealIntent.models.space.SpacesModel
 import com.idealIntent.repositories.RepositoryBase
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
 import models.profile.AuthorsModel
@@ -35,13 +36,6 @@ import org.ktorm.dsl.*
 import org.ktorm.entity.sequenceOf
 import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
-
-data class CarouselOfImagesComposePrepared(
-    val imageCollectionId: Int,
-    val redirectTextCollectionId: Int,
-    val sourceId: Int,
-    val name: String, // todo remove, not being used
-)
 
 /**
  * Carousel of images repository - responsible for carousel_of_images CRUD actions.
@@ -56,16 +50,15 @@ class CarouselOfImagesRepository(
     private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
 
     // todo - move to a source file
-    private val space = SpacesModel.aliased("space")
-    private val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
-    private val layout = CompositionLayoutsModel.aliased("layout")
-    private val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
-    private val compSource = CompositionSourcesModel.aliased("compSource")
+    private val space = SpaceRepository.space
+    private val layout2Space = SpaceRepository.layout2Space
+    private val layout = SpaceRepository.layout
+    private val compSource = CompositionSourceRepository.compSource
+    private val compSource2Layout = CompositionSourceRepository.compSource2Layout
+    private val prvAth2CompSource = CompositionSourceRepository.prvAth2CompSource
 
-    private val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
+    private val compInstance2compSource = CompositionSourceRepository.compInstance2compSource
     private val compInstance = ImagesCarouselsModel.aliased("compInstance")
-
-    private val prvAth2CompSource = PrivilegedAuthorToCompositionSourcesModel.aliased("prvAth2CompSource")
 
 
     // region composition's collections
@@ -153,7 +146,7 @@ class CarouselOfImagesRepository(
             Pair(
                 row[compInstance.id]!!,
                 ImagePK(
-                    id = row[text.id]!!,
+                    id = row[img.id]!!,
                     orderRank = row[img2Col.orderRank]!!,
                     url = row[img.url]!!,
                     description = row[img.description]!!
@@ -254,7 +247,7 @@ class CarouselOfImagesRepository(
 
     override fun compose(composePrepared: CarouselOfImagesComposePrepared, sourceId: Int): Int {
         database.useTransaction {
-            val compositionId = database.insertAndGenerateKey(ImagesCarouselsModel) {
+            val compositionId = database.insertAndGenerateKey(compInstance) {
                 set(it.imageCollectionId, composePrepared.imageCollectionId)
                 set(it.redirectTextCollectionId, composePrepared.redirectTextCollectionId)
             } as Int? ?: throw CompositionExceptionReport(
@@ -281,12 +274,12 @@ class CarouselOfImagesRepository(
                 ) ?: throw CompositionException(CompositionCode.CompositionNotFound)
 
                 // region deletion
-                database.delete(ImagesCarouselsModel) { it.id eq id }
+                database.delete(compInstance) { it.id eq id }
                 imageRepository.deleteRecordsCollection(imageCollectionId)
                 textRepository.deleteRecordsCollection(redirectTextCollectionId)
-                database.delete(PrivilegedAuthorToCompositionSourcesModel) { it.sourceId eq compositionSourceId }
-                database.delete(CompositionInstanceToSourcesModel) { it.sourceId eq compositionSourceId }
-                database.delete(CompositionSourcesModel) { it.id eq id }
+                database.delete(prvAth2CompSource) { it.sourceId eq compositionSourceId }
+                database.delete(compInstance2compSource) { it.sourceId eq compositionSourceId }
+                database.delete(compSource) { it.id eq id }
                 // endregion
             }
         } catch (ex: CompositionException) {

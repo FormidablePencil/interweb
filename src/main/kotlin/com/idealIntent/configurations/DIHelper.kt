@@ -9,6 +9,8 @@ import com.idealIntent.managers.compositions.grids.GridOneOffManager
 import com.idealIntent.managers.compositions.grids.GridsManager
 import com.idealIntent.managers.compositions.headers.HeaderBasicManager
 import com.idealIntent.managers.compositions.headers.HeadersManager
+import com.idealIntent.managers.compositions.images.D2ImageRepository
+import com.idealIntent.managers.compositions.texts.D2TextRepository
 import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.PasswordRepository
 import com.idealIntent.repositories.RefreshTokenRepository
@@ -20,6 +22,7 @@ import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.CompositionQueryBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
+import com.idealIntent.repositories.compositions.grids.GridOneOffRepository
 import com.idealIntent.repositories.compositions.headers.HeaderBasicRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
@@ -57,7 +60,7 @@ object DIHelper {
         single { TextsManager() }
         single { BannersManager() }
         single { GridsManager(get()) }
-        single { GridOneOffManager(get()) }
+        single { GridOneOffManager(get(), get(), get(), get(), get(), get(), get(), get()) }
         single { HeaderBasicManager(get(), get(), get()) }
         single { HeadersManager(get()) }
 
@@ -73,8 +76,11 @@ object DIHelper {
         single { TextRepository() }
         single { ImageRepository() }
         single { CarouselOfImagesRepository(get(), get()) }
-        single { SpaceRepository(get(), get()) }
+        single { SpaceRepository() }
         single { HeaderBasicRepository() }
+        single { GridOneOffRepository(get(), get()) }
+        single { D2ImageRepository(get()) }
+        single { D2TextRepository(get()) }
         // env configurations
 
         single { CompositionQueryBuilder(get()) }

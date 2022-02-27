@@ -37,8 +37,10 @@ class TextRepository : RepositoryBase(),
     private val Database.textToCollections get() = this.sequenceOf(TextToCollectionsModel)
     private val Database.texts get() = this.sequenceOf(TextsModel)
 
-    val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
-    val text = TextsModel.aliased("textRedirect")
+    companion object {
+        val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
+        val text = TextsModel.aliased("textRedirect")
+    }
 
 
     // region Get records

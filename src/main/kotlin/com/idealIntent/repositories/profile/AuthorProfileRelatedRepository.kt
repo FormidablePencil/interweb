@@ -9,12 +9,15 @@ import models.profile.IAuthorEntity
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.add
-import org.ktorm.entity.removeIf
 import org.ktorm.entity.sequenceOf
 
 // todo - rename to ProfileRepository or something like that
 class AuthorProfileRelatedRepository() : RepositoryBase() {
     private val Database.authors get() = this.sequenceOf(AuthorsModel)
+
+    companion object {
+        val author = AuthorsModel.aliased("author")
+    }
 
     fun getAuthorWithDetail(authorId: Int): AuthorWithDetail =
         database.from(AuthorsModel)

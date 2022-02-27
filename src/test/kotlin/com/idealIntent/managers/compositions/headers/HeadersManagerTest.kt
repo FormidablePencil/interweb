@@ -21,7 +21,7 @@ class HeadersManagerTest : BehaviorSpec({
 
     val headersManager = HeadersManager(headerBasicManager)
 
-    val headerBasicRes = HeaderCompositionsFlow.privateHeaderBasicRes.let {
+    val headerBasicRes = HeaderCompositionsFlow.privateHeaderBasicReq.let {
         HeaderBasicRes(
             id = 0,
             sourceId = compositionSourceId,

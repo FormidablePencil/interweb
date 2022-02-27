@@ -7,17 +7,13 @@ import com.idealIntent.dtos.collectionsGeneric.images.ImageToCollection
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
-import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositions.basicCollections.images.IImageToCollectionEntity
 import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
 import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
-import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
-import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.repositories.RepositoryBase
 import com.idealIntent.repositories.collections.ICollectionStructure
 import dtos.collectionsGeneric.images.ImagesCOL
-import dtos.collectionsGeneric.texts.TextsCOL
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
@@ -41,9 +37,10 @@ class ImageRepository : RepositoryBase(),
     private val Database.imageToCollections get() = this.sequenceOf(ImageToCollectionsModel)
     private val Database.images get() = this.sequenceOf(ImagesModel)
 
-    val img2Col = ImageToCollectionsModel.aliased("img2Col")
-    val img = ImagesModel.aliased("img")
-
+    companion object {
+        val img2Col = ImageToCollectionsModel.aliased("img2Col")
+        val img = ImagesModel.aliased("img")
+    }
 
     // region Get records
     override fun getSingleRecordOfCollection(recordId: Int, collectionId: Int): ImagePK? =

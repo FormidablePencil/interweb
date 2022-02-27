@@ -27,7 +27,7 @@ class CarouselCompositionsFlow: BehaviorSpecFlow() {
         compositionCategory = CompositionCategory.Carousel,
         compositionType = CompositionCarouselType.BasicImages.value,
     )
-    val layoutName = "That was legitness"
+    val layoutName = "layout with carousel comp"
 
     fun createComposition(public: Boolean, layoutId: Int, authorId: Int): Int {
         val res = compositionService.createComposition(

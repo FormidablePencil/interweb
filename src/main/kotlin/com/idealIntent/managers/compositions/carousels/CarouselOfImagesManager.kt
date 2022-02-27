@@ -15,7 +15,7 @@ import com.idealIntent.repositories.collectionsGeneric.CompositionSourceReposito
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.SpaceRepository
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
+import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import dtos.compositions.carousels.CompositionCarouselType
 

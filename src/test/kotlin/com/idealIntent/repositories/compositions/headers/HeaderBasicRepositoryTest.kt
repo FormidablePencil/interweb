@@ -14,6 +14,7 @@ import dtos.compositions.headers.CompositionHeader
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.headers.HeaderCompositionsFlow
+import integrationTests.compositions.headers.HeaderCompositionsFlow.Companion.publicHeaderBasicReq
 import io.kotest.assertions.failure
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.IsolationMode
@@ -134,14 +135,7 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
 
             suspend fun prepareComposition(): Pair<HeaderBasicCreateReq, Int> {
                 val authorId = signupFlow.signupReturnId()
-                val createRequest = HeaderBasicCreateReq(
-                    bgImg = "bg img",
-                    profileImg = "profile img",
-                    privilegedAuthors = listOf(),
-                    name = "that was legitness",
-                    privilegeLevel = 0,
-                )
-                val layoutId = spaceRepository.insertNewLayout(createRequest.name, authorId)
+                val layoutId = spaceRepository.insertNewLayout(publicHeaderBasicReq.name, authorId)
 
                 val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
                     compositionType = 0,
@@ -156,14 +150,14 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
                     layoutId = layoutId
                 )
 
-                return Pair(createRequest, compositionSourceId)
+                return Pair(publicHeaderBasicReq, compositionSourceId)
             }
 
             then("successfully composed collections and compositions as one composition") {
                 rollback {
-                    val (createRequest, compositionSourceId) = prepareComposition()
+                    val (composePrepared, compositionSourceId) = prepareComposition()
 
-                    headerBasicRepository.compose(createRequest, compositionSourceId)
+                    headerBasicRepository.compose(composePrepared, compositionSourceId)
                 }
             }
         }

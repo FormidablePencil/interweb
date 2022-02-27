@@ -54,6 +54,13 @@ data class ImagesCarouselTopLvlIds(
     override val redirectTextCollectionId: Int,
 ) : IImagesCarousel
 
+data class CarouselOfImagesComposePrepared(
+    val imageCollectionId: Int,
+    val redirectTextCollectionId: Int,
+    val sourceId: Int,
+    val name: String, // todo remove, not being used
+)
+
 //data class CarouselItem( // todo - delete
 //    val name: String,
 //    val url: String,

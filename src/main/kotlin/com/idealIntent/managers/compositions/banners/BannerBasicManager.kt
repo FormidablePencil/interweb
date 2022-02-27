@@ -6,7 +6,7 @@ import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.managers.compositions.grids.CreateGridReq
 import com.idealIntent.managers.compositions.grids.GridRes
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
+import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 
 class BannerBasicManager : CompositionTypeManagerStructure<GridRes, IImagesCarouselEntity,
         CreateGridReq, CarouselOfImagesComposePrepared, CompositionResponse>() {

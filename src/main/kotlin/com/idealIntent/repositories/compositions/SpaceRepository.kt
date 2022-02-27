@@ -2,50 +2,49 @@ package com.idealIntent.repositories.compositions
 
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionExceptionReport
-import com.idealIntent.models.compositionLayout.*
+import com.idealIntent.models.compositionLayout.CompositionLayoutsModel
+import com.idealIntent.models.compositionLayout.LayoutToSpacesModel
+import com.idealIntent.models.compositionLayout.PrivilegedAuthorToLayoutsModel
+import com.idealIntent.models.compositionLayout.PrivilegedAuthorToSpacesModel
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
-import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.models.privileges.CompositionSourceToLayout
-import com.idealIntent.models.privileges.CompositionSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
 import com.idealIntent.models.space.SpacesModel
 import com.idealIntent.repositories.RepositoryBase
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import dtos.compositions.CompositionCategory
-import models.profile.AuthorsModel
 import org.ktorm.database.Database
 import org.ktorm.dsl.*
 import org.ktorm.entity.find
 import org.ktorm.entity.sequenceOf
 
 // todo - author space. Special kind of space...
-class SpaceRepository(
-    imageRepository: ImageRepository,
-    textRepository: TextRepository,
-) : RepositoryBase() {
+class SpaceRepository : RepositoryBase() {
     private val Database.spaces get() = this.sequenceOf(SpacesModel)
     private val Database.prvAuth2Layout get() = this.sequenceOf(PrivilegedAuthorToLayoutsModel)
 
-    val space = SpacesModel.aliased("space")
+    companion object {
+        val space = SpacesModel.aliased("space")
+        val prvAuth2Space = PrivilegedAuthorToSpacesModel.aliased("prvAuth2Space")
+        val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
+        val layout = CompositionLayoutsModel.aliased("layout")
+        val prvAuth2Layout = PrivilegedAuthorToLayoutsModel.aliased("prvAuth2Layout")
+    }
 
-    private val prvAuth2Space = PrivilegedAuthorToSpacesModel.aliased("prvAuth2Space")
-    private val layout2Space = LayoutToSpacesModel.aliased("layout2Space")
-    private val layout = CompositionLayoutsModel.aliased("layout")
-    private val prvAuth2Layout = PrivilegedAuthorToLayoutsModel.aliased("prvAuth2Layout")
-    val compSource2Layout = CompositionSourceToLayoutsModel.aliased("compSource2Layout")
-    val compSource = CompositionSourcesModel.aliased("compSource")
+    private val compSource2Layout = CompositionSourceRepository.compSource2Layout
+    private val compSource = CompositionSourceRepository.compSource
+    private val prvAth2CompSource = CompositionSourceRepository.prvAth2CompSource
 
-    val compInstance2compSource = CompositionInstanceToSourcesModel.aliased("compInstance2compSource")
-    val compInstance = ImagesCarouselsModel.aliased("compInstance")
+    private val compInstance2compSource = CompositionSourceRepository.compInstance2compSource
+    private val compInstance = ImagesCarouselsModel.aliased("compInstance")
 
-    val prvAth2CompSource = PrivilegedAuthorToCompositionSourcesModel.aliased("prvAth2CompSource")
-
-    val img2Col = imageRepository.img2Col
-    val img = imageRepository.img
-    val text2Col = textRepository.text2Col
-    val text = textRepository.text
-    val author = AuthorsModel.aliased("author")
+    private val img2Col = ImageRepository.img2Col
+    private val img = ImageRepository.img
+    private val text2Col = TextRepository.text2Col
+    private val text = TextRepository.text
+    private val author = AuthorProfileRelatedRepository.author
 
 
     // region Used to build queries with

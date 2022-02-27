@@ -8,7 +8,7 @@ import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.repositories.compositions.SpaceRepository
-import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesComposePrepared
+import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.repositories.compositions.headers.HeaderBasicRepository
 import dtos.compositions.carousels.CompositionCarouselType
 

@@ -2,6 +2,7 @@ package com.idealIntent.managers
 
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.models.privileges.CompositionSourceToLayout
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.compositions.CompositionDataBuilder
 import com.idealIntent.repositories.compositions.CompositionQueryBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
@@ -13,6 +14,8 @@ class SpaceManager(
     private val appEnv: AppEnv,
     private val spaceRepository: SpaceRepository,
 ) {
+
+    private val compSource = CompositionSourceRepository.compSource
 
     /**
      * Get space layout of compositions
@@ -77,13 +80,12 @@ class SpaceManager(
         val compositionBuilder = CompositionDataBuilder()
 
         val query = compositionQueryBuilder.compositionsLeftJoinBuilder(
-            appEnv.database.from(spaceRepository.compSource),
-            compCategoryAndType
+            appEnv.database.from(compSource), compCategoryAndType
         )
 
         query.select(select)
             .whereWithOrConditions {
-                compositionSourceToLayout.forEach { item -> it += spaceRepository.compSource.id eq item.sourceId }
+                compositionSourceToLayout.forEach { item -> it += compSource.id eq item.sourceId }
             }
             .whereWithConditions {
                 compositionQueryBuilder.compositionWhereClauseBuilder(it, compCategoryAndType)
