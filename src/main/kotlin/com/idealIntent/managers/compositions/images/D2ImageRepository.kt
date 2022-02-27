@@ -17,18 +17,18 @@ class D2ImageRepository(
         val imgCol2ImgD2Col = ImageCollectionToD2CollectionsModel.aliased("imgCol2ImgD2Col")
     }
 
-    override fun batchInsertRecordsToNewCollection(recordCollections: List<Pair<List<Image>, Int>>): Int {
+    override fun batchInsertRecordsToNewCollection(recordCollections: List<Pair<Int, List<Image>>>): Int {
         database.useTransaction {
-            val idsAndOrderRanksOfCollections = recordCollections.mapIndexed { idx, textCollection ->
-                Pair(imageRepository.batchInsertRecordsToNewCollection(textCollection.first), textCollection.second)
+            val listOfOrderRankAndIdOfCollection = recordCollections.mapIndexed { idx, textCollection ->
+                Pair(textCollection.first, imageRepository.batchInsertRecordsToNewCollection(textCollection.second))
             }
 
             val d2CollectionId = database.insertAndGenerateKey(d2ImgCol) {} as Int
 
-            idsAndOrderRanksOfCollections.forEach { (collectionId, orderRank) ->
+            listOfOrderRankAndIdOfCollection.forEach { (orderRank, collectionId) ->
                 database.insert(imgCol2ImgD2Col) {
-                    set(it.imageCollectionId, d2CollectionId)
-                    set(it.d2ImageCollectionId, collectionId)
+                    set(it.collectionId, collectionId)
+                    set(it.d2CollectionId, d2CollectionId)
                     set(it.orderRank, orderRank)
                 }
             }

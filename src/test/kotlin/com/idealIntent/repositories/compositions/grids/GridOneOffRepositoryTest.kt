@@ -2,7 +2,7 @@ package com.idealIntent.repositories.compositions.grids
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.grids.GridOneOffComposePrepared
-import com.idealIntent.dtos.compositions.grids.GridOneOffCreateReq
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.images.D2ImageRepository
 import com.idealIntent.managers.compositions.texts.D2TextRepository
@@ -71,6 +71,46 @@ class GridOneOffRepositoryTest : BehaviorSpecUtRepo() {
                     gridOneOffRepository.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
                         compositionSourceId = compositionSourceId, authorId = authorId
                     ) shouldNotBe null
+                }
+            }
+        }
+
+        given("getPublicComposition") {
+
+            then("failed to get because composition is private") {
+                rollback {
+                    val (compositionSourceId, layoutId, authorId) =
+                        signup_then_createComposition(false)
+
+                    gridOneOffRepository.getPublicComposition(compositionSourceId = compositionSourceId) shouldBe null
+                }
+            }
+
+            then("successfully got public composition") {
+                rollback {
+                    val (compositionSourceId, layoutId, authorId) =
+                        signup_then_createComposition(true)
+
+                    val res: GridOneOffRes = gridOneOffRepository.getPublicComposition(
+                        compositionSourceId = compositionSourceId
+                    ) ?: throw failure("failed to get composition")
+
+                    gridCompositionsFlow.validateGridOneOff(res, true)
+                }
+            }
+        }
+
+        given("getPrivateComposition") {
+
+            then("successfully got private composition") {
+                rollback {
+                    val (compositionSourceId, layoutId, authorId) =
+                        signup_then_createComposition(false)
+
+                    val res: GridOneOffRes = gridOneOffRepository.getPrivateComposition(compositionSourceId, authorId)
+                        ?: throw failure("failed to get composition")
+
+                    gridCompositionsFlow.validateGridOneOff(res, false)
                 }
             }
         }

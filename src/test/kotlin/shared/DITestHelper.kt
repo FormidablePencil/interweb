@@ -4,6 +4,7 @@ import integrationTests.auth.flows.LoginFlow
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.CompositionFlow
 import integrationTests.compositions.carousels.CarouselCompositionsFlow
+import integrationTests.compositions.grids.GridCompositionsFlow
 import integrationTests.compositions.headers.HeaderCompositionsFlow
 import io.mockk.mockk
 import org.apache.commons.mail.SimpleEmail
@@ -16,6 +17,7 @@ object DITestHelper {
         single { CompositionFlow() }
         single { CarouselCompositionsFlow() }
         single { HeaderCompositionsFlow() }
+        single { GridCompositionsFlow() }
         // mocks email manager so that sending emails did happen on tests
         val eMailer: SimpleEmail = mockk(relaxed = true)
         single { eMailer }

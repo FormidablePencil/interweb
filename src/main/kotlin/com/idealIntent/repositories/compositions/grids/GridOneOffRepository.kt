@@ -134,7 +134,7 @@ class GridOneOffRepository(
 //                id = it[compInstance2compSource.compositionId]!!,
 //                sourceId = it[compInstance2compSource.sourceId]!!,
 //                name = it[compSource.name]!!,
-////                imageCollectionId = it[imgCol.id]!!,
+////                collectionId = it[imgCol.id]!!,
 ////                redirectTextCollectionId = it[textCol.id]!!
 //            )
         }.ifEmpty { null }?.first()
@@ -184,8 +184,8 @@ class GridOneOffRepository(
             val compositionId = database.insertAndGenerateKey(compInstance) {
                 set(it.titlesOfImageCategoriesCollectionId, composePrepared.collectionOf_titles_of_image_categories_id)
                 set(it.d2ImageCollectionId, composePrepared.collectionOf_images_2d_id)
-                set(it.navToOnClickCollectionId, composePrepared.collectionOf_onclick_redirects_id)
-                set(it.imgDescriptionsCollectionId, composePrepared.collectionOf_img_descriptions_id)
+                set(it.d2RedirectOnClickCollectionId, composePrepared.collectionOf_onclick_redirects_id)
+                set(it.d2ImgDescriptionsCollectionId, composePrepared.collectionOf_img_descriptions_id)
             } as Int? ?: throw CompositionExceptionReport(
                 CompositionCode.FailedToComposeInternalError, this::class.java
             )

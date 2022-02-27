@@ -9,12 +9,12 @@ private interface ID2RepoStructure<Record> {
     /**
      * Compose collection of images.
      *
-     * Save collection of images and take the ids of the collections and associate them to the 2 dimensional compositions.
+     * Save collection of images, get the ids of the collections saved and associate them to the 2 dimensional compositions.
      *
      * @param recordCollections Collections of records and orderRank of collections.
-     * @return Id of 2 dimensional composition which consists of record collections.
+     * @return Id of the 2 dimensional composition which consists of record collections.
      */
-    fun batchInsertRecordsToNewCollection(recordCollections: List<Pair<List<Record>, Int>>): Int
+    fun batchInsertRecordsToNewCollection(recordCollections: List<Pair<Int, List<Record>>>): Int
 
     /**
      * Delete records of collections of 2 dimensional composition of provided [d2RecordCollectionId].

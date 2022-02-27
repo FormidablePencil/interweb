@@ -41,7 +41,7 @@ class HeaderBasicRepository(
     override val compositionSelect = mutableListOf<Column<out Any>>(
         compSource.name, compSource.id, compSource.privilegeLevel,
         compSource2Layout.orderRank,
-        compInstance.id, compInstance.bgImg,
+        compInstance.id, compInstance.bgImg, compInstance.profileImg,
         compInstance2compSource.sourceId,
         prvAth2CompSource.authorId, prvAth2CompSource.modify,
         prvAth2CompSource.deletion, prvAth2CompSource.modifyUserPrivileges,
@@ -78,13 +78,13 @@ class HeaderBasicRepository(
     }
 
     override fun compositionQueryMap(row: QueryRowSet, dto: HeaderBasicDataMapped) {
-        if (dto.data.isNotEmpty())
+        if (dto.data.isEmpty())
             dto.data += HeaderBasicRes(
                 id = row[compInstance.id]!!,
                 sourceId = row[compSource.id]!!,
                 name = row[compSource.name]!!,
                 bgImg = row[compInstance.bgImg]!!,
-                profileImg = row[compInstance.bgImg]!!,
+                profileImg = row[compInstance.profileImg]!!,
                 privilegeLevel = row[compSource.privilegeLevel]!!,
                 privilegedAuthors = listOf()
             )

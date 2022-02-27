@@ -5,13 +5,8 @@ import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.grids.GridOneOffComposePrepared
 import com.idealIntent.dtos.compositions.grids.GridOneOffCreateReq
 import com.idealIntent.dtos.compositions.grids.GridOneOffRes
-import com.idealIntent.dtos.compositions.grids.GridOneOffTopLvlIds
-import com.idealIntent.dtos.compositions.headers.HeaderBasicRes
-import com.idealIntent.exceptions.CompositionCode
-import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
-import com.idealIntent.managers.compositions.carousels.UpdateDataOfCarouselOfImages
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import com.idealIntent.managers.compositions.images.D2ImageRepository
 import com.idealIntent.managers.compositions.texts.D2TextRepository
@@ -100,7 +95,7 @@ class GridOneOffManager(
 //
 //            when (UpdateDataOfCarouselOfImages.fromInt(it.updateDataOf)) {
 //                UpdateDataOfCarouselOfImages.Image -> {
-//                    if (!imageRepository.validateRecordToCollectionRelationship(record.recordId, imageCollectionId))
+//                    if (!imageRepository.validateRecordToCollectionRelationship(record.recordId, collectionId))
 //                        throw CompositionException(
 //                            CompositionCode.IdOfRecordProvidedNotOfComposition,
 //                            gson.toJson("Image id ${record.recordId}")

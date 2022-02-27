@@ -5,7 +5,6 @@ import models.IWithName
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
 import org.ktorm.schema.int
-import org.ktorm.schema.varchar
 
 /**
  * SpaceResponseFailed Grid composition. Composes of 2 dimensional array of images [(collection of image collections)][models.generic.ID2ImageCollectionEntity].
@@ -18,8 +17,8 @@ interface IOneOffGridEntity : Entity<IOneOffGridEntity>, IWithName {
     val id: Int
     val titlesOfImageCategoriesCollectionId: Int
     val d2ImageCollectionId: Int
-    val navToOnClickCollectionId: Int
-    val imgDescriptionsCollectionId: Int
+    val d2RedirectOnClickCollectionId: Int
+    val d2ImgDescriptionsCollectionId: Int
 }
 
 // todo - give one_off_grids collection ids foreign keys to their respective tables and do the same for the d2 tables
@@ -32,6 +31,6 @@ open class GridOneOffModel(alias: String?) : Table<IOneOffGridEntity>("one_off_g
     val titlesOfImageCategoriesCollectionId =
         int("titles_of_image_categories_collection_id").bindTo { it.titlesOfImageCategoriesCollectionId }
     val d2ImageCollectionId = int("d2_image_collection_id").bindTo { it.d2ImageCollectionId }
-    val navToOnClickCollectionId = int("nav_to_onclick_collection_id").bindTo { it.navToOnClickCollectionId }
-    val imgDescriptionsCollectionId = int("img_description_collection_id").bindTo { it.imgDescriptionsCollectionId }
+    val d2RedirectOnClickCollectionId = int("d2_redirect_onclick_collection_id").bindTo { it.d2RedirectOnClickCollectionId }
+    val d2ImgDescriptionsCollectionId = int("d2_img_description_collection_id").bindTo { it.d2ImgDescriptionsCollectionId }
 }

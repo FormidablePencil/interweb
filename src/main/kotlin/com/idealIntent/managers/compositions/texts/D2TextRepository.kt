@@ -2,7 +2,7 @@ package com.idealIntent.managers.compositions.texts
 
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.managers.compositions.D2RepoStructure
-import com.idealIntent.models.compositions.basicCollections.images.D2ImageCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.texts.D2TextCollectionModel
 import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionToD2CollectionsModel
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import org.ktorm.dsl.insert
@@ -13,22 +13,22 @@ class D2TextRepository(
 ) : D2RepoStructure<Text>() {
 
     companion object {
-        val d2TextCol = D2ImageCollectionsModel.aliased("d2TextCol")
+        val d2TextCol = D2TextCollectionModel.aliased("d2TextCol")
         val textCol2TextD2Col = TextCollectionToD2CollectionsModel.aliased("textCol2TextD2Col")
     }
 
-    override fun batchInsertRecordsToNewCollection(recordCollections: List<Pair<List<Text>, Int>>): Int {
+    override fun batchInsertRecordsToNewCollection(recordCollections: List<Pair<Int, List<Text>>>): Int {
         database.useTransaction {
-            val idsAndOrderRanksOfCollections = recordCollections.mapIndexed { idx, textCollection ->
-                Pair(textRepository.batchInsertRecordsToNewCollection(textCollection.first), textCollection.second)
+            val listOfOrderRankAndIdOfCollection = recordCollections.mapIndexed { idx, textCollection ->
+                Pair(textCollection.first, textRepository.batchInsertRecordsToNewCollection(textCollection.second))
             }
 
             val d2CollectionId = database.insertAndGenerateKey(d2TextCol) {} as Int
 
-            idsAndOrderRanksOfCollections.forEach { (collectionId, orderRank) ->
+            listOfOrderRankAndIdOfCollection.forEach { (orderRank, collectionId) ->
                 database.insert(textCol2TextD2Col) {
-                    set(it.imageCollectionId, d2CollectionId)
-                    set(it.d2ImageCollectionId, collectionId)
+                    set(it.collectionId, collectionId)
+                    set(it.d2CollectionId, d2CollectionId)
                     set(it.orderRank, orderRank)
                 }
             }
@@ -38,6 +38,9 @@ class D2TextRepository(
     }
 
     override fun deleteRecordsCollection(d2RecordCollectionId: Int) {
-
+        database.useTransaction {
+            // get all collection ids then recordRepository.delete
+            // then delete 2dcollection
+        }
     }
 }

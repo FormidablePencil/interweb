@@ -10,6 +10,10 @@ interface ID2ImageCollectionEntity : Entity<ID2ImageCollectionEntity> {
     val id: Int
 }
 
-object D2ImageCollectionsModel : Table<ID2ImageCollectionEntity>("d2_image_collections") {
+open class D2ImageCollectionsModel(alias: String?) : Table<ID2ImageCollectionEntity>("d2_image_collections", alias) {
+    companion object : D2ImageCollectionsModel(null)
+
+    override fun aliased(alias: String) = D2ImageCollectionsModel(alias)
+
     val id = int("id").primaryKey().bindTo { it.id }
 }
