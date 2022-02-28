@@ -23,7 +23,7 @@ class HeaderCompositionsFlow : BehaviorSpecFlow() {
 
     companion object {
         private val gson = Gson()
-        val layoutName = "That was legitness"
+        const val layoutName = "layout with header composition"
         val publicHeaderBasicReq = HeaderBasicCreateReq(
             bgImg = "bg img", profileImg = "profile img", privilegeLevel = 0, name = "name", listOf()
         )
@@ -32,8 +32,8 @@ class HeaderCompositionsFlow : BehaviorSpecFlow() {
                 bgImg = it.bgImg, profileImg = it.profileImg, privilegeLevel = 1, name = it.name, listOf()
             )
         }
-        val headerPublicBasicImagesReqSerialized = gson.toJson(publicHeaderBasicReq)
-        val headerPrivateBasicImagesReqSerialized = gson.toJson(privateHeaderBasicReq)
+        val headerPublicBasicImagesReqSerialized: String = gson.toJson(publicHeaderBasicReq)
+        val headerPrivateBasicImagesReqSerialized: String = gson.toJson(privateHeaderBasicReq)
     }
 
 

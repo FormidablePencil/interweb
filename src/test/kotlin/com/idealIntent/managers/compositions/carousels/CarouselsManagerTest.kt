@@ -1,6 +1,5 @@
 package com.idealIntent.managers.compositions.carousels
 
-import com.google.gson.Gson
 import dtos.compositions.carousels.CompositionCarouselType.BasicImages
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -19,7 +18,6 @@ class CarouselsManagerTest : BehaviorSpec({
     val layoutId = 543
     val compositionSourceId = 1
     val authorId = 1
-    val gson = Gson()
 
     val carouselsManager = CarouselsManager(carouselOfImagesManager, carouselBlurredOverlayManager)
 
@@ -28,15 +26,12 @@ class CarouselsManagerTest : BehaviorSpec({
     given("getPublicComposition") {
         // region setup
         every {
-            carouselOfImagesManager.getPublicComposition(
-                compositionSourceId = compositionSourceId,
-            )
+            carouselOfImagesManager.getPublicComposition(compositionSourceId = compositionSourceId)
         } returns carouselBasicImagesRes
         // endregion
 
         carouselsManager.getPublicComposition(
-            compositionType = BasicImages,
-            compositionSourceId = compositionSourceId,
+            compositionType = BasicImages, compositionSourceId = compositionSourceId,
         ) shouldBe carouselBasicImagesRes
     }
 
@@ -44,16 +39,13 @@ class CarouselsManagerTest : BehaviorSpec({
         // region setup
         every {
             carouselOfImagesManager.getPrivateComposition(
-                compositionSourceId = compositionSourceId,
-                authorId = authorId
+                compositionSourceId = compositionSourceId, authorId = authorId
             )
         } returns carouselBasicImagesRes
         // endregion
 
         carouselsManager.getPrivateComposition(
-            compositionType = BasicImages,
-            compositionSourceId = compositionSourceId,
-            authorId = authorId
+            compositionType = BasicImages, compositionSourceId = compositionSourceId, authorId = authorId
         ) shouldBe carouselBasicImagesRes
     }
 

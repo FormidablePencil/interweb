@@ -5,16 +5,20 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TextLonelyCreateReq(
-    val name: String,
-    val text: String,
     val privilegeLevel: Int,
     val privilegedAuthors: List<PrivilegedAuthor>,
+
+    val name: String,
+    val text: String,
 )
 
 @Serializable
 data class TextLonelyRes(
+    val sourceId: Int,
     val compositionId: Int,
+    val privilegeLevel: Int,
+    val privilegedAuthors: List<PrivilegedAuthor>,
+
     val name: String,
     val text: String,
-    val privilegedAuthors: List<PrivilegedAuthor>,
 )

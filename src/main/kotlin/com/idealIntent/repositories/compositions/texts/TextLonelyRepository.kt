@@ -11,7 +11,6 @@ import com.idealIntent.repositories.compositions.SimpleCompositionRepositoryStru
 import dtos.compositions.CompositionCategory
 import dtos.compositions.texts.CompositionTextType
 import org.ktorm.dsl.*
-import org.ktorm.schema.Column
 
 class TextLonelyRepository : SimpleCompositionRepositoryStructure<TextLonelyRes, IImagesCarouselEntity,
         TextLonelyCreateReq, TextLonelyRes, TextLonelyDataMapped, TextLonelyModel>(
@@ -28,10 +27,12 @@ class TextLonelyRepository : SimpleCompositionRepositoryStructure<TextLonelyRes,
         dto.data += Pair(
             row[compInstance.id]!!,
             TextLonelyRes(
+                sourceId = row[compSource.id]!!,
                 compositionId = row[compInstance.id]!!,
+                privilegeLevel = row[compSource.privilegeLevel]!!,
+                privilegedAuthors = listOf(),
                 name = row[compSource.name]!!,
                 text = row[compInstance.text]!!,
-                privilegedAuthors = listOf(),
             )
         )
 

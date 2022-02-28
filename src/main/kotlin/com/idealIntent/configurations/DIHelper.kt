@@ -90,11 +90,9 @@ object DIHelper {
         single { AccountRepository() }
         single { AuthorProfileRelatedRepository() }
         single { CompositionSourceRepository() }
-
         single { TextRepository() }
         single { ImageRepository() }
         single { SpaceRepository() }
-
         single { D2ImageRepository(get()) }
         single { D2TextRepository(get()) }
 

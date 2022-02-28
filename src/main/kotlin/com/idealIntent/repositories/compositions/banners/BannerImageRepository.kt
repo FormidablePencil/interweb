@@ -1,8 +1,8 @@
 package com.idealIntent.repositories.compositions.banners
 
 import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
-import com.idealIntent.dtos.compositions.banners.BannerBasicCreateReq
-import com.idealIntent.dtos.compositions.banners.BannerBasicRes
+import com.idealIntent.dtos.compositions.banners.BannerImageCreateReq
+import com.idealIntent.dtos.compositions.banners.BannerImageRes
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositions.banners.BannerImageModel
@@ -12,27 +12,28 @@ import dtos.compositions.CompositionCategory
 import dtos.compositions.texts.CompositionTextType
 import org.ktorm.dsl.*
 
-class BannerImageRepository : SimpleCompositionRepositoryStructure<BannerBasicRes, IImagesCarouselEntity,
-        BannerBasicCreateReq, BannerBasicRes, BannerImageDataMapped, BannerImageModel>(
+class BannerImageRepository : SimpleCompositionRepositoryStructure<BannerImageRes, IImagesCarouselEntity,
+        BannerImageCreateReq, BannerImageRes, BannerImageDataMapped, BannerImageModel>(
     compInstance = BannerImageModel,
     compInstanceId = BannerImageModel.id
 ) {
 
     init {
-       super.compositionSelect += mutableListOf(compInstance.id, compInstance.imageUrl, compInstance.imageAlt)
+        super.compositionSelect += mutableListOf(compInstance.id, compInstance.imageUrl, compInstance.imageAlt)
     }
 
     // region Reusable query instructions
     override fun compositionQueryMap(row: QueryRowSet, dto: BannerImageDataMapped) {
         dto.data += Pair(
             row[compInstance.id]!!,
-            BannerBasicRes(
+            BannerImageRes(
                 compositionId = row[compInstance.id]!!,
                 sourceId = row[compSource.id]!!,
+                privilegedAuthors = listOf(),
+                privilegeLevel = row[compSource.privilegeLevel]!!,
                 imageUrl = row[compInstance.imageUrl]!!,
                 imageAlt = row[compInstance.imageAlt]!!,
                 name = row[compSource.name]!!,
-                privilegedAuthors = listOf(),
             )
         )
 
@@ -50,14 +51,14 @@ class BannerImageRepository : SimpleCompositionRepositoryStructure<BannerBasicRe
 
 
     // region Get composition
-    override fun getPublicComposition(compositionSourceId: Int): BannerBasicRes? =
+    override fun getPublicComposition(compositionSourceId: Int): BannerImageRes? =
         getCompositionsQuery(
             restricted = false,
             authorId = null,
             compositionSourceId = compositionSourceId
         )?.first()
 
-    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): BannerBasicRes? =
+    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): BannerImageRes? =
         getCompositionsQuery(
             restricted = true,
             authorId = authorId,
@@ -66,7 +67,7 @@ class BannerImageRepository : SimpleCompositionRepositoryStructure<BannerBasicRe
 
     private fun getCompositionsQuery(
         restricted: Boolean, authorId: Int?, compositionSourceId: Int,
-    ): List<BannerBasicRes>? {
+    ): List<BannerImageRes>? {
         val dto = BannerImageDataMapped()
 
         compositionLeftJoin(database.from(compSource))
@@ -83,7 +84,7 @@ class BannerImageRepository : SimpleCompositionRepositoryStructure<BannerBasicRe
         return dto.get().ifEmpty { null }
     }
 
-    override fun compose(composePrepared: BannerBasicCreateReq, sourceId: Int): Int {
+    override fun compose(composePrepared: BannerImageCreateReq, sourceId: Int): Int {
         database.useTransaction {
             val compositionId = database.insertAndGenerateKey(compInstance) {
                 set(it.imageUrl, composePrepared.imageUrl)

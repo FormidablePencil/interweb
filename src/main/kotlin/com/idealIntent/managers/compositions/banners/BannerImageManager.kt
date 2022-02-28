@@ -1,7 +1,7 @@
 package com.idealIntent.managers.compositions.banners
 
-import com.idealIntent.dtos.compositions.banners.BannerBasicCreateReq
-import com.idealIntent.dtos.compositions.banners.BannerBasicRes
+import com.idealIntent.dtos.compositions.banners.BannerImageCreateReq
+import com.idealIntent.dtos.compositions.banners.BannerImageRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
@@ -15,15 +15,15 @@ class BannerImageManager(
     private val bannerImageRepository: BannerImageRepository,
     private val spaceRepository: SpaceRepository,
     private val compositionPrivilegesManager: CompositionPrivilegesManager,
-) : CompositionTypeManagerStructure<BannerBasicRes, IImagesCarouselEntity,
-        BannerBasicCreateReq, BannerBasicRes, CompositionResponse>() {
-    override fun getPublicComposition(compositionSourceId: Int): BannerBasicRes? =
+) : CompositionTypeManagerStructure<BannerImageRes, IImagesCarouselEntity,
+        BannerImageCreateReq, BannerImageRes, CompositionResponse>() {
+    override fun getPublicComposition(compositionSourceId: Int): BannerImageRes? =
         bannerImageRepository.getPublicComposition(compositionSourceId)
 
-    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): BannerBasicRes? =
+    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): BannerImageRes? =
         bannerImageRepository.getPrivateComposition(compositionSourceId, authorId)
 
-    override fun createComposition(createRequest: BannerBasicCreateReq, layoutId: Int, authorId: Int): Int {
+    override fun createComposition(createRequest: BannerImageCreateReq, layoutId: Int, authorId: Int): Int {
         appEnv.database.useTransaction {
             val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
                 compositionType = CompositionBanner.Basic.value,

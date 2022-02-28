@@ -20,7 +20,6 @@ import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.IsolationMode
 import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.clearAllMocks
 import org.koin.core.component.inject
 import shared.DITestHelper
@@ -43,12 +42,12 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
         compositionType = CompositionHeader.Basic.value,
     )
 
-    private suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
-        val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
+    private suspend fun signup_then_createComposition(isPublic: Boolean): Triple<Int, Int, Int> {
+        val authorId = signupFlow.signupReturnId()
         val layoutId = compositionService.createNewLayout(
             name = HeaderCompositionsFlow.layoutName, authorId = authorId
         ).data ?: throw failure("Failed to get id of newly created layout.")
-        val compositionSourceId = headerCompositionsFlow.createComposition(publicView, layoutId, authorId)
+        val compositionSourceId = headerCompositionsFlow.createComposition(isPublic, layoutId, authorId)
         return Triple(compositionSourceId, layoutId, authorId)
     }
 
@@ -56,7 +55,7 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
         beforeEach { clearAllMocks() }
 
         // todo - not a complex composition
-//        given("getOnlyTopLvlIdsOfCompositionOnlyModifiable") {
+        xgiven("getOnlyTopLvlIdsOfCompositionOnlyModifiable") {
 //
 //            then("Author id not privileged to view nor modify. Failed to retrieve private composition") {
 //                rollback {
@@ -77,7 +76,7 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
 //                    ) shouldNotBe null
 //                }
 //            }
-//        }
+        }
 
         given("getPublicComposition") {
 

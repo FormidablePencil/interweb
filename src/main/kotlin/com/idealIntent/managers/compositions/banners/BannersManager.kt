@@ -1,7 +1,7 @@
 package com.idealIntent.managers.compositions.banners
 
-import com.idealIntent.dtos.compositions.banners.BannerBasicCreateReq
-import com.idealIntent.dtos.compositions.banners.BannerBasicRes
+import com.idealIntent.dtos.compositions.banners.BannerImageCreateReq
+import com.idealIntent.dtos.compositions.banners.BannerImageRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
@@ -10,12 +10,12 @@ import dtos.compositions.banners.CompositionBanner.Basic
 
 class BannersManager(
     private val bannerImageManager: BannerImageManager,
-) : CompositionCategoryManagerStructure<CompositionBanner, BannerBasicRes, CompositionResponse>() {
+) : CompositionCategoryManagerStructure<CompositionBanner, BannerImageRes, CompositionResponse>() {
 
     override fun getPublicComposition(
         compositionType: CompositionBanner,
         compositionSourceId: Int
-    ): BannerBasicRes? = when (compositionType) {
+    ): BannerImageRes? = when (compositionType) {
         Basic -> bannerImageManager.getPublicComposition(compositionSourceId)
     }
 
@@ -34,7 +34,7 @@ class BannersManager(
         authorId: Int
     ) = when (compositionType) {
         Basic -> bannerImageManager.createComposition(
-            gson.fromJson(jsonData, BannerBasicCreateReq::class.java), layoutId, authorId
+            gson.fromJson(jsonData, BannerImageCreateReq::class.java), layoutId, authorId
         )
     }
 

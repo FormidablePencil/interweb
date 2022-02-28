@@ -4,21 +4,23 @@ import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class BannerBasicCreateReq(
+data class BannerImageCreateReq(
+    val name: String,
+    val privilegeLevel: Int,
+    val privilegedAuthors: List<PrivilegedAuthor>,
+
     val imageUrl: String,
     val imageAlt: String,
-    val privilegeLevel: Int,
-    val name: String,
-    val privilegedAuthors: List<PrivilegedAuthor>,
 )
 
 @Serializable
-data class BannerBasicRes(
+data class BannerImageRes(
     val compositionId: Int,
     val sourceId: Int,
+    val name: String,
+    val privilegeLevel: Int,
+    val privilegedAuthors: List<PrivilegedAuthor>,
+
     val imageUrl: String,
     val imageAlt: String,
-//    val privilegeLevel: Int,
-    val name: String,
-    val privilegedAuthors: List<PrivilegedAuthor>,
 )

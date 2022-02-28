@@ -21,5 +21,5 @@ open class BannerImageModel(alias: String?) : Table<IBannerImageEntity>("banner_
 
     val id = int("id").primaryKey().bindTo { it.id }
     val imageUrl = varchar("image_url").bindTo { it.imageUrl }
-    val imageAlt = varchar("imageAlt").bindTo { it.imageAlt }
+    val imageAlt = varchar("image_alt").bindTo { it.imageAlt }
 }
