@@ -9,32 +9,14 @@ import com.idealIntent.dtos.compositions.carousels.ImagesCarouselTopLvlIds
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
-import com.idealIntent.models.compositionLayout.CompositionLayoutsModel
-import com.idealIntent.models.compositionLayout.LayoutToSpacesModel
-import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
-import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
-import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
-import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
-import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
-import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
-import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
-import com.idealIntent.models.privileges.PrivilegedAuthorToCompositionSourcesModel
-import com.idealIntent.models.space.SpacesModel
-import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
-import com.idealIntent.repositories.compositions.SpaceRepository
+import com.idealIntent.repositories.compositions.ComplexCompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
-import models.profile.AuthorsModel
-import org.ktorm.database.Database
 import org.ktorm.dsl.*
-import org.ktorm.entity.sequenceOf
-import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 
 /**
@@ -45,64 +27,37 @@ import org.ktorm.schema.ColumnDeclaring
 class CarouselOfImagesRepository(
     private val textRepository: TextRepository,
     private val imageRepository: ImageRepository,
-) : RepositoryBase(), ICompositionRepositoryStructure<CarouselBasicImagesRes, IImagesCarouselEntity,
-        CarouselOfImagesComposePrepared, CarouselBasicImagesRes, CarouselOfImagesDataMapped, ImagesCarouselTopLvlIds> {
-    private val Database.imagesCarousels get() = this.sequenceOf(ImagesCarouselsModel)
-
-    // todo - move to a source file
-    private val space = SpaceRepository.space
-    private val layout2Space = SpaceRepository.layout2Space
-    private val layout = SpaceRepository.layout
-    private val compSource = CompositionSourceRepository.compSource
-    private val compSource2Layout = CompositionSourceRepository.compSource2Layout
-    private val prvAth2CompSource = CompositionSourceRepository.prvAth2CompSource
-
-    private val compInstance2compSource = CompositionSourceRepository.compInstance2compSource
-    private val compInstance = ImagesCarouselsModel.aliased("compInstance")
-
+) : ComplexCompositionRepositoryStructure<CarouselBasicImagesRes, IImagesCarouselEntity, CarouselOfImagesComposePrepared,
+        CarouselBasicImagesRes, CarouselOfImagesDataMapped, ImagesCarouselTopLvlIds, ImagesCarouselsModel>(
+    compInstance = ImagesCarouselsModel,
+    compInstanceId = ImagesCarouselsModel.id
+) {
 
     // region composition's collections
-    val imgCol = ImageCollectionsModel.aliased("imgCol")
-    val img2Col = ImageToCollectionsModel.aliased("img2Col")
-    val img = ImagesModel.aliased("img")
-    val textCol = TextCollectionsModel.aliased("textCol")
-    val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
-    val text = TextsModel.aliased("textRedirect")
-    val author = AuthorsModel.aliased("author")
+    private val imgCol = ImageRepository.imgCol
+    private val img2Col = ImageRepository.img2Col
+    private val img = ImageRepository.img
+    private val textCol = TextRepository.textCol
+    private val text2Col = TextRepository.text2Col
+    private val text = TextRepository.text
     // endregion
 
 
     // region Reusable query instructions
-    override val compositionSelect = mutableListOf<Column<out Any>>(
-        compSource.name, compSource.id, compSource.privilegeLevel,
-        compSource2Layout.orderRank,
-        compInstance.id,
-        compInstance2compSource.sourceId,
-        img2Col.orderRank, img.id, img.url, img.description,
-        text2Col.orderRank, text.id, text.text,
-        prvAth2CompSource.authorId, prvAth2CompSource.modify,
-        prvAth2CompSource.deletion, prvAth2CompSource.modifyUserPrivileges,
-        author.username
-    )
-
-    override val compositionOnlyIdsSelect = mutableListOf<Column<out Any>>(
-        compSource.name, compSource.privilegeLevel,
-        compInstance.redirectTextCollectionId, compInstance.imageCollectionId,
-        compInstance2compSource.compositionId, compInstance2compSource.sourceId,
-        prvAth2CompSource.sourceId, prvAth2CompSource.authorId,
-        imgCol.id, textCol.id,
-    )
+    init {
+        super.compositionSelect += mutableListOf(
+            compInstance.id,
+            img2Col.orderRank, img.id, img.url, img.description,
+            text2Col.orderRank, text.id, text.text,
+        )
+        super.compositionOnlyIdsSelect += mutableListOf(
+            compInstance.redirectTextCollectionId, compInstance.imageCollectionId,
+            imgCol.id, textCol.id,
+        )
+    }
 
     override fun compositionLeftJoin(querySource: QuerySource): QuerySource {
-        return querySource
-            .leftJoin(compSource2Layout, compSource2Layout.sourceId eq compSource.id)
-
-            .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
-            .leftJoin(compInstance, compInstance.id eq compInstance2compSource.compositionId)
-
-            .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
-            .leftJoin(author, author.id eq prvAth2CompSource.authorId)
-
+        return super.compositionLeftJoin(querySource)
             .leftJoin(img2Col, img2Col.collectionId eq compInstance.imageCollectionId)
             .leftJoin(img, img.id eq img2Col.imageId)
 
@@ -111,12 +66,7 @@ class CarouselOfImagesRepository(
     }
 
     override fun compositionOnlyIdsLeftJoin(querySource: QuerySource): QuerySource {
-        return querySource
-            .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
-            .leftJoin(compInstance, compInstance.id eq compInstance2compSource.compositionId)
-
-            .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
-
+        return super.compositionOnlyIdsLeftJoin(querySource)
             .leftJoin(imgCol, imgCol.id eq compInstance.imageCollectionId)
             .leftJoin(textCol, textCol.id eq compInstance.redirectTextCollectionId)
     }
@@ -250,16 +200,13 @@ class CarouselOfImagesRepository(
             val compositionId = database.insertAndGenerateKey(compInstance) {
                 set(it.imageCollectionId, composePrepared.imageCollectionId)
                 set(it.redirectTextCollectionId, composePrepared.redirectTextCollectionId)
-            } as Int? ?: throw CompositionExceptionReport(
-                CompositionCode.FailedToComposeInternalError, this::class.java
-            )
+            } as Int? ?: throw CompositionExceptionReport(CompositionCode.FailedToCompose, this::class.java)
 
-            if (database.insert(CompositionInstanceToSourcesModel) {
-                    set(it.compositionCategory, CompositionCategory.Carousel.value)
-                    set(it.compositionType, CompositionCarouselType.BasicImages.value)
-                    set(it.sourceId, sourceId)
-                    set(it.compositionId, compositionId)
-                } == 0) throw CompositionExceptionReport(CompositionCode.FailedToComposeInternalError, this::class.java)
+            associateCompToSource(
+                compositionCategory = CompositionCategory.Carousel.value,
+                compositionType = CompositionCarouselType.BasicImages.value,
+                compositionId = compositionId, sourceId = sourceId
+            )
 
             return compositionId
         }

@@ -6,7 +6,7 @@ import org.ktorm.schema.Table
 import org.ktorm.schema.int
 
 /**
- * Image and collection records queried by ids of [image to collection][IImageToCollection].
+ * Image and collection records queried by ids of [imageUrl to collection][IImageToCollection].
  */
 interface IImageToCollectionEntity : Entity<IImageToCollectionEntity>, IWithOrder {
     companion object : Entity.Factory<IImageToCollectionEntity>()

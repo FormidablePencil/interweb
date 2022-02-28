@@ -1,39 +1,41 @@
 package com.idealIntent.managers.compositions.texts
 
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
+import com.idealIntent.dtos.compositions.texts.TextLonelyCreateReq
+import com.idealIntent.dtos.compositions.texts.TextLonelyRes
 import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import dtos.compositions.texts.CompositionTextType
+import dtos.compositions.texts.CompositionTextType.Basic
 
-class TextsManager :
-    CompositionCategoryManagerStructure<CompositionTextType, CompositionResponse, CompositionResponse>() {
+class TextsManager(
+    private val textLonelyManager: TextLonelyManager,
+) : CompositionCategoryManagerStructure<CompositionTextType, TextLonelyRes, CompositionResponse>() {
+
     override fun getPublicComposition(
         compositionType: CompositionTextType,
         compositionSourceId: Int
-    ): CompositionResponse? {
-        TODO("Not yet implemented")
+    ): TextLonelyRes? = when (compositionType) {
+        Basic -> textLonelyManager.getPublicComposition(compositionSourceId)
     }
 
     override fun getPrivateComposition(
         compositionType: CompositionTextType,
         compositionSourceId: Int,
         authorId: Int
-    ): CompositionResponse? {
-        TODO("Not yet implemented")
+    ): TextLonelyRes? = when (compositionType) {
+        Basic -> textLonelyManager.getPrivateComposition(compositionSourceId, authorId)
     }
 
     override fun createComposition(
         compositionType: CompositionTextType,
         jsonData: String,
         layoutId: Int,
-        userId: Int
-    ): Int {
-        TODO("Organized the file structure first.")
-//        val gson = Gson()
-//        return lonelyTextManager.createComposition(
-//            gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java),
-//            layoutId
-//        )
+        authorId: Int
+    ): Int = when (compositionType) {
+        Basic -> textLonelyManager.createComposition(
+            gson.fromJson(jsonData, TextLonelyCreateReq::class.java), layoutId, authorId
+        )
     }
 
     override fun updateComposition(
@@ -41,15 +43,15 @@ class TextsManager :
         compositionSourceId: Int,
         compositionUpdateQue: List<UpdateDataOfComposition>,
         authorId: Int
-    ) {
-        TODO("Not yet implemented")
+    ) = when (compositionType) {
+        Basic -> textLonelyManager.updateComposition(compositionUpdateQue, compositionSourceId, authorId)
     }
 
     override fun deleteComposition(
         compositionType: CompositionTextType,
         compositionSourceId: Int,
         authorId: Int
-    ) {
-        TODO("Not yet implemented")
+    ) = when (compositionType) {
+        Basic -> textLonelyManager.deleteComposition(compositionSourceId, authorId)
     }
 }

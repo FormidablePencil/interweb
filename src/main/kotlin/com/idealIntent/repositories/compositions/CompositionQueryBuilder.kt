@@ -22,7 +22,7 @@ class CompositionQueryBuilder(
     /**
      * Left joins compositions of category and type.
      *
-     * Left joins all tables that compose a composition of category and type. For instance, if a composition is a basic image carousel,
+     * Left joins all tables that compose a composition of category and type. For instance, if a composition is a basic imageUrl carousel,
      * it will all join text, text to collection relationship and text collection so all the records of a composition
      * were gotten of a layout.
      *
@@ -62,8 +62,8 @@ class CompositionQueryBuilder(
      *
      * Build the where clause of the get composition query. Given all the types of composition types, this function will
      * return all logic of the where clause for the given compositions. For example, the carousel of images composition
-     * with image and texts representing clickable images to redirect the user to a different page need to be queried
-     * together so a where clause of image order rank is equal to text order rank.
+     * with imageUrl and texts representing clickable images to redirect the user to a different page need to be queried
+     * together so a where clause of imageUrl order rank is equal to text order rank.
      *
      * @param mutableList The list of where statements which will be processed to sql queries by ktorm.
      * @param compCategoryAndType

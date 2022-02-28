@@ -17,7 +17,6 @@ import com.idealIntent.managers.compositions.grids.GridsManager
 import com.idealIntent.managers.compositions.headers.HeadersManager
 import com.idealIntent.managers.compositions.texts.TextsManager
 import com.idealIntent.repositories.compositions.CompositionDataBuilder
-import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
 import com.idealIntent.repositories.compositions.SpaceRepository
 import dtos.compositions.CompositionCategory
 import dtos.compositions.CompositionCategory.*
@@ -38,7 +37,7 @@ import io.ktor.http.*
  * directs CRUD operations of the category of compositions.
  * 3. [composition of type of category manager][com.idealIntent.managers.compositions.ICompositionTypeManagerStructure],
  * directs CRUD operations of the type of category of compositions.
- * 4. [composition of type of category repositories][com.idealIntent.repositories.compositions.ICompositionRepositoryStructure],
+ * 4. [composition of type of category repositories][com.idealIntent.repositories.compositions.SimpleCompositionRepositoryStructure],
  * does CRUD operations of the type of category of compositions.
  * 5. [collection repositories][com.idealIntent.repositories.collections.ICollectionStructure].
  * does CRUD operations of compositions and collections composed of composition request to do on.

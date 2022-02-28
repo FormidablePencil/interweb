@@ -12,7 +12,6 @@ import io.ktor.http.*
  */
 enum class CompositionCode {
     ServerError,
-    FailedToCompose,
     FailedToGivePrivilege,
     UserNotPrivileged,
     FailedToFindAuthorByUsername,
@@ -25,27 +24,28 @@ enum class CompositionCode {
     FailedToConvertToIntOrderRank,
     CompositionNotFound,
     FailedToAssociateAuthorToLayout,
-    FailedToComposeInternalError,
+    FailedToCompose,
     ColumnDoesNotExist,
     ProvidedStringInPlaceOfInt,
     CollectionOfRecordsNotFound,
     CompositionRecordIsCorrupt,
     CompositionRecordIsCorrupt2,
     NotPrivilegedToLayout,
+    ShouldNotBeCalledForSimpleComposition, // todo - remove
     ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
         override fun getLogMsg(code: CompositionCode): String {
             return when (code) {
                 FailedToGivePrivilege -> "Failed give user privileges."
-                FailedToCompose -> "Failed to compose."
                 NoAuthorIdProvidedToRestrictedResource -> "No id of author provided to restricted resource for validation of privileges."
                 FailedToAddRecordToCompositionValidator -> "No records updates which only means that developer failed to add a record to composition validator."
                 FailedToAssociateAuthorToLayout -> "Failed to associate author to layout. Author id does not exist perhaps."
-                FailedToComposeInternalError -> "Failed to compose. Internal cms error."
+                FailedToCompose -> "Failed to compose. Internal cms error."
                 ColumnDoesNotExist -> "Failed to handle a column of a record."
                 CompositionRecordIsCorrupt -> "Composition is corrupt. Could not find id of collection composition composes."
                 CompositionRecordIsCorrupt2 -> "Composition is corrupt. No order rank for composition. Perhaps not associated to any layout."
+                ShouldNotBeCalledForSimpleComposition -> "Attempted to call a method designated for only more complicated compositions on a simple composition."
 
                 ServerError -> genericServerError
 
@@ -81,10 +81,10 @@ enum class CompositionCode {
                 CollectionOfRecordsNotFound -> "Collection of records not found by provided collection id."
                 NotPrivilegedToLayout -> "Not privileged to modify composition."
 
+                ShouldNotBeCalledForSimpleComposition,
                 CompositionRecordIsCorrupt2,
                 CompositionRecordIsCorrupt,
                 ColumnDoesNotExist,
-                FailedToComposeInternalError,
                 FailedToAddRecordToCompositionValidator,
                 NoAuthorIdProvidedToRestrictedResource,
                 FailedToGivePrivilege,
@@ -111,7 +111,6 @@ enum class CompositionCode {
                 NotPrivilegedToLayout,
                 -> HttpStatusCode.BadRequest
 
-                FailedToComposeInternalError,
                 ServerError,
                 FailedToCompose,
                 FailedToGivePrivilege,
@@ -120,6 +119,7 @@ enum class CompositionCode {
                 FailedToAssociateAuthorToLayout,
                 ColumnDoesNotExist,
                 CompositionRecordIsCorrupt2,
+                ShouldNotBeCalledForSimpleComposition,
                 -> HttpStatusCode.InternalServerError
             }
         }

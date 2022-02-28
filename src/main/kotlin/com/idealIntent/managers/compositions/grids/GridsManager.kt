@@ -43,13 +43,13 @@ class GridsManager(
         compositionType: CompositionGrid,
         jsonData: String,
         layoutId: Int,
-        userId: Int
+        authorId: Int
     ): Int {
         return when (compositionType) {
             Basic -> {
                 oneOffGridManager.createComposition(
                     gson.fromJson(jsonData, GridOneOffCreateReq::class.java), layoutId,
-                    userId
+                    authorId
                 )
             }
         }

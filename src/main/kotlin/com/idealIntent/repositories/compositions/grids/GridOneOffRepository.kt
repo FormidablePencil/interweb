@@ -12,12 +12,9 @@ import com.idealIntent.managers.compositions.texts.D2TextRepository
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.grids.GridOneOffModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
-import com.idealIntent.repositories.RepositoryBase
-import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
-import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
+import com.idealIntent.repositories.compositions.ComplexCompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
 import org.ktorm.dsl.*
@@ -25,17 +22,13 @@ import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 
 class GridOneOffRepository(
-    val d2ImageRepository: D2ImageRepository,
-    val d2TextRepository: D2TextRepository,
-) : RepositoryBase(), ICompositionRepositoryStructure<GridOneOffRes, IImagesCarouselEntity,
-        GridOneOffComposePrepared, HeaderBasicRes, GridOneOffDataMapped, GridOneOffTopLvlIds> {
-
-    private val author = AuthorProfileRelatedRepository.author
-    private val compSource = CompositionSourceRepository.compSource
-    private val compSource2Layout = CompositionSourceRepository.compSource2Layout
-    private val compInstance2compSource = CompositionSourceRepository.compInstance2compSource
-    private val prvAth2CompSource = CompositionSourceRepository.prvAth2CompSource
-    private val compInstance = GridOneOffModel.aliased("compInstance")
+    private val d2ImageRepository: D2ImageRepository,
+    private val d2TextRepository: D2TextRepository,
+) : ComplexCompositionRepositoryStructure<GridOneOffRes, IImagesCarouselEntity,
+        GridOneOffComposePrepared, HeaderBasicRes, GridOneOffDataMapped, GridOneOffTopLvlIds, GridOneOffModel>(
+    compInstance = GridOneOffModel,
+    compInstanceId = GridOneOffModel.id,
+) {
 
     private val text = TextRepository.text
     private val text2Col = TextRepository.text2Col
@@ -187,7 +180,7 @@ class GridOneOffRepository(
                 set(it.d2RedirectOnClickCollectionId, composePrepared.collectionOf_onclick_redirects_id)
                 set(it.d2ImgDescriptionsCollectionId, composePrepared.collectionOf_img_descriptions_id)
             } as Int? ?: throw CompositionExceptionReport(
-                CompositionCode.FailedToComposeInternalError, this::class.java
+                CompositionCode.FailedToCompose, this::class.java
             )
 
             if (database.insert(CompositionInstanceToSourcesModel) {
@@ -195,7 +188,7 @@ class GridOneOffRepository(
                     set(it.compositionType, CompositionCarouselType.BasicImages.value)
                     set(it.sourceId, sourceId)
                     set(it.compositionId, compositionId)
-                } == 0) throw CompositionExceptionReport(CompositionCode.FailedToComposeInternalError, this::class.java)
+                } == 0) throw CompositionExceptionReport(CompositionCode.FailedToCompose, this::class.java)
 
             return compositionId
         }

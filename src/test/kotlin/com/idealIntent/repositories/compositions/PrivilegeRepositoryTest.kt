@@ -62,7 +62,7 @@ class PrivilegeRepositoryTest : BehaviorSpecUtRepo() {
 //                    res.privilegedAuthors.map {
 //                        val privilegedAuthor = privilegedAuthors.find { privilegedAuthor ->
 //                            privilegedAuthor.authorId == it.authorId
-//                        } ?: throw Exception("failed to find returned image")
+//                        } ?: throw Exception("failed to find returned imageUrl")
 //                        privilegedAuthor.modLvl shouldBe it.modLvl
 //                    }
 //                }

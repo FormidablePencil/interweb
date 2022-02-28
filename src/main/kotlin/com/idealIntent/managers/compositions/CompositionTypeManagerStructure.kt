@@ -5,7 +5,7 @@ import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
-import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.ComplexCompositionRepositoryStructure
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -56,10 +56,10 @@ private interface ICompositionTypeManagerStructure<Composition, CompositionMetad
      * well the user will get the id of the newly composed composition.
      *
      * todo - delete
-     * Insert images and redirection texts, create a collection for each, create an association between image and
+     * Insert images and redirection texts, create a collection for each, create an association between imageUrl and
      * assign privileges compositions to specified authors. If either looking up author by id or assigning privileges to
      * authors fails then return a response a fail response to client with the author's username that failed.
-     * Otherwise, if all went well, pass ids of image's and redirection text's collections to
+     * Otherwise, if all went well, pass ids of imageUrl's and redirection text's collections to
      * [compose][CarouselOfImagesRepository.compose]. Then return id of the newly created composition.
      *
      * @param createRequest Composition of records.
@@ -94,7 +94,7 @@ private interface ICompositionTypeManagerStructure<Composition, CompositionMetad
     /**
      * Delete composition and records it is composed of.
      * @throws CompositionException [CompositionNotFound]
-     * @see ICompositionRepositoryStructure.deleteComposition
+     * @see ComplexCompositionRepositoryStructure.deleteComposition
      */
     fun deleteComposition(compositionSourceId: Int, authorId: Int)
 }

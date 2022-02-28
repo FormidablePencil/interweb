@@ -16,7 +16,7 @@ import kotlinx.serialization.Serializable
 //
 //data class GridOffItem(
 //    val title: String,
-//    val image: String,
+//    val imageUrl: String,
 //    val navTo: String,
 //)
 

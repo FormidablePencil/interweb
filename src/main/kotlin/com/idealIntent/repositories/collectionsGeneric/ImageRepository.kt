@@ -27,9 +27,9 @@ import org.ktorm.entity.sequenceOf
  * Having them in this way makes for easier unit testing.
  *
  * Responsible for -
- * [image][models.compositions.basicsCollections.images.IImage],
- * [image to collections][models.compositions.basicsCollections.images.IImageToCollection],
- * [image collection][models.compositions.basicsCollections.images.IImageCollection].
+ * [imageUrl][models.compositions.basicsCollections.images.IImage],
+ * [imageUrl to collections][models.compositions.basicsCollections.images.IImageToCollection],
+ * [imageUrl collection][models.compositions.basicsCollections.images.IImageCollection].
  */
 class ImageRepository : RepositoryBase(),
     ICollectionStructure<Image, ImagePK, IImageToCollectionEntity, ImageToCollection, ImageCollection> {
@@ -38,6 +38,7 @@ class ImageRepository : RepositoryBase(),
     private val Database.images get() = this.sequenceOf(ImagesModel)
 
     companion object {
+        val imgCol = ImageCollectionsModel.aliased("imgCol")
         val img2Col = ImageToCollectionsModel.aliased("img2Col")
         val img = ImagesModel.aliased("img")
     }

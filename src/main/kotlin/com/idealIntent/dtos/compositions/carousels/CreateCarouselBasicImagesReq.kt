@@ -17,7 +17,7 @@ import models.IWithPrivilegeSourcePK
  *
  * @property name User provided name.
  * @property images collection of images.
- * @property imgOnclickRedirects collection of redirect text links for when user clicks on image.
+ * @property imgOnclickRedirects collection of redirect text links for when user clicks on imageUrl.
  * @property privilegedAuthors privileges.
  */
 @Serializable

@@ -13,7 +13,7 @@ interface IImagesCarousel {
 
 /**
  * SpaceResponseFailed carousel composition. Composes of a collection of images and a collection of redirect links which is
- * mapped over images. When an image of carousel is click the user will be redirected to another site.
+ * mapped over images. When an imageUrl of carousel is click the user will be redirected to another site.
  */
 interface IImagesCarouselEntity : Entity<IImagesCarouselEntity>, IImagesCarousel {
     companion object : Entity.Factory<IImagesCarouselEntity>()

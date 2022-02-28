@@ -55,28 +55,29 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
     init {
         beforeEach { clearAllMocks() }
 
-        given("getOnlyTopLvlIdsOfCompositionOnlyModifiable") {
-
-            then("Author id not privileged to view nor modify. Failed to retrieve private composition") {
-                rollback {
-                    val (compositionSourceId, _, authorId) = signup_then_createComposition(true)
-
-                    headerBasicRepository.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
-                        compositionSourceId = compositionSourceId, authorId = 1
-                    ) shouldBe null
-                }
-            }
-
-            then("successfully retrieved private composition") {
-                rollback {
-                    val (compositionSourceId, _, authorId) = signup_then_createComposition(true)
-
-                    headerBasicRepository.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
-                        compositionSourceId = compositionSourceId, authorId = authorId
-                    ) shouldNotBe null
-                }
-            }
-        }
+        // todo - not a complex composition
+//        given("getOnlyTopLvlIdsOfCompositionOnlyModifiable") {
+//
+//            then("Author id not privileged to view nor modify. Failed to retrieve private composition") {
+//                rollback {
+//                    val (compositionSourceId, _, authorId) = signup_then_createComposition(true)
+//
+//                    headerBasicRepository.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
+//                        compositionSourceId = compositionSourceId, authorId = 1
+//                    ) shouldBe null
+//                }
+//            }
+//
+//            then("successfully retrieved private composition") {
+//                rollback {
+//                    val (compositionSourceId, _, authorId) = signup_then_createComposition(true)
+//
+//                    headerBasicRepository.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
+//                        compositionSourceId = compositionSourceId, authorId = authorId
+//                    ) shouldNotBe null
+//                }
+//            }
+//        }
 
         given("getPublicComposition") {
 

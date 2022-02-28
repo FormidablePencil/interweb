@@ -38,6 +38,7 @@ class TextRepository : RepositoryBase(),
     private val Database.texts get() = this.sequenceOf(TextsModel)
 
     companion object {
+        val textCol = TextCollectionsModel.aliased("textCol")
         val text2Col = TextToCollectionsModel.aliased("textRedirect2Col")
         val text = TextsModel.aliased("textRedirect")
     }

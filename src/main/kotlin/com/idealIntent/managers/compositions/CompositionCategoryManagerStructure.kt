@@ -4,8 +4,8 @@ import com.google.gson.Gson
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
-import com.idealIntent.repositories.compositions.ICompositionRepositoryStructure
 
+// todo CompositionResponse not being used
 abstract class CompositionCategoryManagerStructure<CompositionType, Composition, Response> :
     ICompositionCategoryManagerStructure<CompositionType, Composition, Response> {
     val gson = Gson()
@@ -65,7 +65,7 @@ private interface ICompositionCategoryManagerStructure<CompositionType, Composit
     fun createComposition(
         compositionType: CompositionType, jsonData: String,
         layoutId: Int,
-        userId: Int
+        authorId: Int
     ): Int
 
     /**

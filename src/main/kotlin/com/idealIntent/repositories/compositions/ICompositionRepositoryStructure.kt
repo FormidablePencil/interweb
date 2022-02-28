@@ -4,34 +4,54 @@ import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionCode.CollectionOfRecordsNotFound
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
-import org.ktorm.dsl.QueryRowSet
-import org.ktorm.dsl.QuerySource
+import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
+import com.idealIntent.repositories.RepositoryBase
+import com.idealIntent.repositories.collectionsGeneric.CompositionSourceRepository
+import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
+import org.ktorm.database.Database
+import org.ktorm.dsl.*
+import org.ktorm.schema.BaseTable
 import org.ktorm.schema.Column
 import org.ktorm.schema.ColumnDeclaring
 
-interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, ComposedPrepared,
-        CreateComposition, DtoMapper, TopLvlIds> {
+abstract class ComplexCompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, ComposedPrepared,
+        CreateComposition, DtoMapper, TopLvlIds, Model>(
+    override val compInstance: Model,
+    private val compInstanceId: Column<Int>
+) : SimpleCompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, ComposedPrepared, CreateComposition,
+        DtoMapper, Model>(compInstance, compInstanceId), IComplexCompositionRepositoryStructure<TopLvlIds> {
 
-    // region Composition query instructions
-    /**
-     * Composition select statement for query.
-     *
-     * Used in [SpaceRepository][com.idealIntent.repositories.compositions.SpaceRepository]
-     * to query layouts of compositions.
-     */
-    val compositionSelect: List<Column<out Any>>
+    override val compositionOnlyIdsSelect = mutableListOf<Column<out Any>>(
+        compSource.name, compSource.privilegeLevel,
+        compInstance2compSource.compositionId, compInstance2compSource.sourceId,
+        prvAth2CompSource.sourceId, prvAth2CompSource.authorId,
+    )
 
-    /**
-     * Composition select statement of only ids.
-     *
-     * @see compositionSelect
-     */
-    val compositionOnlyIdsSelect: MutableList<Column<out Any>>
+    override fun compositionOnlyIdsLeftJoin(querySource: QuerySource): QuerySource {
+        return querySource
+            .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
+            .leftJoin(compInstance as BaseTable<*>, compInstanceId eq compInstance2compSource.compositionId)
+
+            .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
+    }
+}
+
+abstract class SimpleCompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, ComposedPrepared,
+        CreateComposition, DtoMapper, Model>(open val compInstance: Model, private val compInstanceId: Column<Int>) :
+    RepositoryBase(), ICompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, ComposedPrepared,
+        CreateComposition, DtoMapper> {
+
+    val compSource = CompositionSourceRepository.compSource
+    val compSource2Layout = CompositionSourceRepository.compSource2Layout
+    val prvAth2CompSource = CompositionSourceRepository.prvAth2CompSource
+    val compInstance2compSource = CompositionSourceRepository.compInstance2compSource
+    val author = AuthorProfileRelatedRepository.author
+
 
     /**
      * Left join all related records of composition.
      *
-     * Left joins all tables that compose a composition of category and type. For instance, if a composition is a basic image carousel,
+     * Left joins all tables that compose a composition of category and type. For instance, if a composition is a basic imageUrl carousel,
      * it will all join text, text to collection relationship and text collection so all the records of a composition
      * were gotten of a layout.
      *
@@ -44,20 +64,54 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      * @param querySource The query to append left join statements to.
      * @return The appended left join statements for querying records of composition.
      */
-    fun compositionLeftJoin(querySource: QuerySource): QuerySource
+    open fun compositionLeftJoin(querySource: QuerySource): QuerySource {
+        return querySource
+            .leftJoin(compSource2Layout, compSource2Layout.sourceId eq compSource.id)
+
+            .leftJoin(compInstance2compSource, compInstance2compSource.sourceId eq compSource.id)
+            .leftJoin(compInstance as BaseTable<*>, compInstanceId eq compInstance2compSource.compositionId)
+
+            .leftJoin(prvAth2CompSource, prvAth2CompSource.sourceId eq compSource.id)
+            .leftJoin(author, author.id eq prvAth2CompSource.authorId)
+    }
+
+    /**
+     * Composition select statement for query.
+     *
+     * Used in [SpaceRepository][com.idealIntent.repositories.compositions.SpaceRepository]
+     * to query layouts of compositions.
+     */
+    open val compositionSelect = mutableListOf<Column<out Any>>(
+        compSource.name, compSource.id, compSource.privilegeLevel,
+        compSource2Layout.orderRank,
+        compInstance2compSource.sourceId,
+        prvAth2CompSource.authorId, prvAth2CompSource.modify,
+        prvAth2CompSource.deletion, prvAth2CompSource.modifyUserPrivileges,
+        author.username
+    )
+}
+
+private interface IComplexCompositionRepositoryStructure<TopLvlIds> {
+    // region Composition query instructions
+    /**
+     * Composition select statement of only ids.
+     *
+     * @see SimpleCompositionRepositoryStructure.compositionSelect
+     */
+    val compositionOnlyIdsSelect: MutableList<Column<out Any>>
 
     /**
      * Left join all related ids of records composed of composition.
      *
-     * @see compositionLeftJoin
+     * @see SimpleCompositionRepositoryStructure.compositionLeftJoin
      */
     fun compositionOnlyIdsLeftJoin(querySource: QuerySource): QuerySource
 
     /**
      * Composition's where clause for to query its records properly.
      *
-     * E.g. The carousel of images composition with image and texts representing clickable images to redirect the user
-     * to a different page need to be queried together so a where clause of image order rank is equal to text order rank.
+     * E.g. The carousel of images composition with imageUrl and texts representing clickable images to redirect the user
+     * to a different page need to be queried together so a where clause of imageUrl order rank is equal to text order rank.
      *
      * Used in [SpaceRepository][com.idealIntent.repositories.compositions.SpaceRepository] to query layouts of compositions.
      *
@@ -65,6 +119,27 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      */
     fun compositionWhereClause(mutableList: MutableList<ColumnDeclaring<Boolean>>)
 
+
+    /**
+     * Get only top lvl ids of composition that are privileged to [authorId] to modify.
+     *
+     * Method [ICompositionRepositoryStructure.deleteComposition] uses it.
+     *
+     * @param compositionSourceId Id of composition source.
+     * @param authorId Criteria query composition of only privileged author.
+     * @return Only top level ids of composition.
+     */
+    fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
+        compositionSourceId: Int,
+        authorId: Int
+    ): TopLvlIds?
+}
+
+private interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMetadata, ComposedPrepared,
+        CreateComposition, DtoMapper> {
+    val database: Database
+
+    // region Composition query instructions
     /**
      * Map clause builder carousel of images.
      *
@@ -75,21 +150,6 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      */
     fun compositionQueryMap(row: QueryRowSet, dto: DtoMapper)
     // endregion
-
-
-    /**
-     * Get only top lvl ids of composition that are privileged to [authorId] to modify.
-     *
-     * Method [deleteComposition] uses it.
-     *
-     * @param compositionSourceId Id of composition source.
-     * @param authorId Criteria query composition of only privileged author.
-     * @return Only top level ids of composition.
-     */
-    fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(
-        compositionSourceId: Int,
-        authorId: Int
-    ): TopLvlIds?
 
 
     // region Get compositions
@@ -124,10 +184,24 @@ interface ICompositionRepositoryStructure<ResponseOfComposition, CompositionMeta
      */
     fun compose(composePrepared: ComposedPrepared, sourceId: Int): Int
 
+
+    /**
+     * Associate composition to source. Used only by [compose].
+     */
+    fun associateCompToSource(compositionCategory: Int, compositionType: Int, compositionId: Int, sourceId: Int) {
+        if (database.insert(CompositionInstanceToSourcesModel) {
+                set(it.compositionCategory, compositionCategory)
+                set(it.compositionType, compositionType)
+                set(it.sourceId, sourceId)
+                set(it.compositionId, compositionId)
+            } == 0) throw CompositionExceptionReport(CompositionCode.FailedToCompose, this::class.java)
+    }
+
     /**
      * Delete composition.
      *
-     * Invokes [getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify] to query all the ids of collection and compositions
+     * Invokes [getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify][IComplexCompositionRepositoryStructure.getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify]
+     * to query all the ids of collection and compositions
      * composed of composition requested to delete then calls delete methods of its respective repositories to
      * delete each collection and composition composed of composition requested to delete.
      *

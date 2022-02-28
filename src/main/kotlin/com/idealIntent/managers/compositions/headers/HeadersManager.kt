@@ -6,6 +6,7 @@ import com.idealIntent.dtos.compositions.headers.HeaderBasicRes
 import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import dtos.compositions.headers.CompositionHeader
+import dtos.compositions.headers.CompositionHeader.*
 
 class HeadersManager(
     private val headerBasicManager: HeaderBasicManager,
@@ -14,7 +15,7 @@ class HeadersManager(
         compositionType: CompositionHeader,
         compositionSourceId: Int
     ): HeaderBasicRes? = when (compositionType) {
-        CompositionHeader.Basic ->
+        Basic ->
             headerBasicManager.getPublicComposition(compositionSourceId)
     }
 
@@ -23,7 +24,7 @@ class HeadersManager(
         compositionSourceId: Int,
         authorId: Int
     ): HeaderBasicRes? = when (compositionType) {
-        CompositionHeader.Basic ->
+        Basic ->
             headerBasicManager.getPrivateComposition(compositionSourceId, authorId)
     }
 
@@ -33,7 +34,7 @@ class HeadersManager(
         layoutId: Int,
         authorId: Int
     ): Int = when (compositionType) {
-        CompositionHeader.Basic ->
+        Basic ->
             headerBasicManager.createComposition(
                 gson.fromJson(jsonData, HeaderBasicCreateReq::class.java), layoutId, authorId
             )
@@ -45,7 +46,7 @@ class HeadersManager(
         compositionUpdateQue: List<UpdateDataOfComposition>,
         authorId: Int
     ) = when (compositionType) {
-        CompositionHeader.Basic ->
+        Basic ->
             headerBasicManager.updateComposition(compositionUpdateQue, compositionSourceId, authorId)
     }
 
@@ -54,7 +55,7 @@ class HeadersManager(
         compositionSourceId: Int,
         authorId: Int
     ) = when (compositionType) {
-        CompositionHeader.Basic ->
+        Basic ->
             headerBasicManager.deleteComposition(compositionSourceId, authorId)
     }
 }

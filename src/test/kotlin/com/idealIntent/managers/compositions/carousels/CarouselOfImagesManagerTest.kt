@@ -198,7 +198,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
                 }.code shouldBe CompositionCode.IdOfRecordProvidedNotOfComposition
             }
 
-            then("successfully updated image") {
+            then("successfully updated imageUrl") {
                 // region Setup
                 val updateTextDataOfComposition = UpdateDataOfComposition(
                     updateDataOf = UpdateDataOfCarouselOfImages.Image.value,

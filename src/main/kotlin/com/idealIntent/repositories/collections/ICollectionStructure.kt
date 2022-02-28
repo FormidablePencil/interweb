@@ -48,7 +48,7 @@ interface ICollectionStructure<Record, RecordPK, RecordToCollectionEntity, Recor
 
 
     /**
-     * validate image to collection relationship.
+     * validate imageUrl to collection relationship.
      */
     fun validateRecordToCollectionRelationship(recordId: Int, collectionId: Int): Boolean
 
