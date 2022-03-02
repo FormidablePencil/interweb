@@ -3,7 +3,7 @@ package com.idealIntent.managers.compositions.carousels
 import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 import com.idealIntent.exceptions.CompositionCode.IdOfRecordProvidedNotOfComposition
 import com.idealIntent.exceptions.CompositionCode.ModifyPermittedToAuthorOfCompositionNotFound
 import com.idealIntent.exceptions.CompositionException
@@ -26,7 +26,7 @@ class CarouselOfImagesManager(
     private val compositionSourceRepository: CompositionSourceRepository,
     private val carouselOfImagesRepository: CarouselOfImagesRepository,
     private val spaceRepository: SpaceRepository,
-) : CompositionTypeManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity, CreateCarouselBasicImagesReq,
+) : CompositionTypeManagerStructure<CarouselBasicImagesRes, IImagesCarouselEntity, CarouselBasicImagesCreateReq,
         CarouselOfImagesComposePrepared, CompositionResponse>() {
 
     override fun getPublicComposition(compositionSourceId: Int): CarouselBasicImagesRes? =
@@ -36,7 +36,7 @@ class CarouselOfImagesManager(
         carouselOfImagesRepository.getPrivateComposition(compositionSourceId, authorId)
 
     override fun createComposition(
-        createRequest: CreateCarouselBasicImagesReq,
+        createRequest: CarouselBasicImagesCreateReq,
         layoutId: Int,
         authorId: Int
     ): Int {

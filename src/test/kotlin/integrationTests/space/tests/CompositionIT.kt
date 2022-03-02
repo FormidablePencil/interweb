@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.ExistingUserComposition
 import com.idealIntent.dtos.compositions.NewUserComposition
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
@@ -25,7 +25,7 @@ class CompositionIT : BehaviorSpecIT({
     val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
     val gson = Gson()
 
-    val createCarouselBasicImagesReq = CreateCarouselBasicImagesReq(
+    val createCarouselBasicImagesReq = CarouselBasicImagesCreateReq(
         "Projects", images, texts, listOf(), privilegeLevel = 0
     )
 

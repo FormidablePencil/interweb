@@ -1,6 +1,7 @@
 package integrationTests.compositions.carousels
 
 import com.idealIntent.dtos.compositions.NewUserComposition
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 import com.idealIntent.exceptions.logInfo
 import com.idealIntent.managers.compositions.carousels.CarouselOfImagesManager
 import com.idealIntent.services.CompositionService
@@ -10,24 +11,27 @@ import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import org.koin.core.component.inject
-import shared.testUtils.BehaviorSpecFlow
-import shared.testUtils.carouselPrivateBasicImagesReqSerialized
-import shared.testUtils.carouselPublicBasicImagesReqSerialized
-import shared.testUtils.createPrivateCarouselBasicImagesReq
+import shared.testUtils.*
 
 /**
  * Carousel composition flow. Used for code shortcuts.
  *
  * Instead of needing to repeat code this class was created to hold code that is or like to be used in multiple places.
  */
-class CarouselCompositionsFlow: BehaviorSpecFlow() {
+class CarouselCompositionsFlow : BehaviorSpecFlow() {
     private val compositionService: CompositionService by inject()
     private val carouselOfImagesManager: CarouselOfImagesManager by inject()
     private val userComposition = NewUserComposition(
         compositionCategory = CompositionCategory.Carousel,
         compositionType = CompositionCarouselType.BasicImages.value,
     )
-    val layoutName = "layout with carousel comp"
+
+    companion object {
+        const val layoutName = "layout with carousel comp"
+        val carouselBasicImagesCreateReq = CarouselBasicImagesCreateReq(
+            "Projects", images, texts, listOf(), privilegeLevel = 0
+        )
+    }
 
     fun createComposition(public: Boolean, layoutId: Int, authorId: Int): Int {
         val res = compositionService.createComposition(

@@ -3,7 +3,7 @@ package com.idealIntent.managers.compositions.carousels
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CarouselBlurredOverlayCreateReq
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import dtos.compositions.carousels.CompositionCarouselType
 import dtos.compositions.carousels.CompositionCarouselType.*
@@ -64,7 +64,7 @@ class CarouselsManager(
             CarouselMagnifying -> TODO() // todo - this is a style variant of BasicImages
             BasicImages ->
                 carouselOfImagesManager.createComposition(
-                    gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java),
+                    gson.fromJson(jsonData, CarouselBasicImagesCreateReq::class.java),
                     layoutId, authorId
                 )
         }

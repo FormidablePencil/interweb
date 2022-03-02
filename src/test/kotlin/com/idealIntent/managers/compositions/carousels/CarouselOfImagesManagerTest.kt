@@ -3,7 +3,7 @@ package com.idealIntent.managers.compositions.carousels
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.dtos.compositionCRUD.RecordUpdate
 import com.idealIntent.dtos.compositionCRUD.UpdateColumn
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 import com.idealIntent.dtos.compositions.carousels.ImagesCarouselTopLvlIds
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionCode.FailedToFindAuthorByUsername
@@ -40,7 +40,7 @@ class CarouselOfImagesManagerTest : BehaviorSpec({
     val idOfNewlyCreatedTextCollection = 43
     val compositionSourceId = 89
     val layoutId = 54
-    val createPublicCarouselBasicImagesRequest = CreateCarouselBasicImagesReq(
+    val createPublicCarouselBasicImagesRequest = CarouselBasicImagesCreateReq(
         name = createPublicCarouselBasicImagesReq.name,
         images = createPublicCarouselBasicImagesReq.images,
         imgOnclickRedirects = createPublicCarouselBasicImagesReq.imgOnclickRedirects,

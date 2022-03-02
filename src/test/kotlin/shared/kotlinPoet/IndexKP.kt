@@ -6,6 +6,6 @@ import java.io.File
 fun main() {
     val (writeTo, func) = carouselOfImagesRepositoryKP()
     func
-//        .writeTo(File(writeTo))
-        .writeTo(System.out)
+        .writeTo(File(writeTo))
+//        .writeTo(System.out)
 }

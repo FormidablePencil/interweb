@@ -7,7 +7,7 @@ import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 
 // region compositions and collections
 // todo - put in an companion object
@@ -50,10 +50,10 @@ val privilegedAuthors = listOf(
 // endregion compositions and collections
 
 // region categories of compositions
-val createPublicCarouselBasicImagesReq = CreateCarouselBasicImagesReq(
+val createPublicCarouselBasicImagesReq = CarouselBasicImagesCreateReq(
     "Projects", images, texts, listOf(), privilegeLevel = 0
 )
-val createPrivateCarouselBasicImagesReq = CreateCarouselBasicImagesReq(
+val createPrivateCarouselBasicImagesReq = CarouselBasicImagesCreateReq(
     "Projects", images, texts, listOf(), privilegeLevel = 1
 )
 

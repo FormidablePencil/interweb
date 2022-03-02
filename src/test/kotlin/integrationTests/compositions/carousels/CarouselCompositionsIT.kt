@@ -1,7 +1,7 @@
 package integrationTests.compositions.carousels
 
 import com.google.gson.Gson
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 import com.idealIntent.managers.SpaceManager
 import com.idealIntent.services.CompositionService
 import integrationTests.auth.flows.AuthUtilities
@@ -31,7 +31,7 @@ class CarouselCompositionsIT : BehaviorSpecIT({
         suspend fun setupCreateComposition(): Triple<Int, Int, Int> {
             val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
             val layoutId = compositionService.createNewLayout(
-                name = carouselCompositionFlow.layoutName, authorId = authorId
+                name = CarouselCompositionsFlow.layoutName, authorId = authorId
             ).data ?: throw failure("Failed to get id of newly created layout.")
 
             // todo there will be many components so we can't rely on returning ids of compositions
@@ -52,7 +52,7 @@ class CarouselCompositionsIT : BehaviorSpecIT({
                     println(wrappedPresent)
 
                     val unwrapPresent =
-                        gson.fromJson(wrappedPresent[0].serializedComposition, CreateCarouselBasicImagesReq::class.java)
+                        gson.fromJson(wrappedPresent[0].serializedComposition, CarouselBasicImagesCreateReq::class.java)
                     unwrapPresent.images.size shouldBe createPrivateCarouselBasicImagesReq.images.size
                     unwrapPresent.imgOnclickRedirects.size shouldBe createPrivateCarouselBasicImagesReq.imgOnclickRedirects.size
                     unwrapPresent.name shouldBe createPrivateCarouselBasicImagesReq.name

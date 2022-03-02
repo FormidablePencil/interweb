@@ -1,12 +1,16 @@
-package shared.kotlinPoet
+package shared.kotlinPoet.compositionRepositoryKP
 
 import com.squareup.kotlinpoet.*
-import shared.kotlinPoet.compositionRepositoryKP.RepositoryTestBuilderDTO
-import shared.kotlinPoet.compositionRepositoryKP.compComplexRepoTestBuilder
-import shared.kotlinPoet.compositionRepositoryKP.signupThenCreateComposition
 import shared.testUtils.BehaviorSpecUtRepo
 
-val koinInject = MemberName("org.koin.core.component", "inject")
+data class RepositoryTestBuilderDTO(
+    val compositionFlow: Class<*>,
+    val compositionRepo: Class<*>,
+    val responseData: Class<*>,
+    val createRequestData: Pair<String, String>, // import statement and name of data
+    val createRequest: Class<*>,
+    val composePrepared: Class<*>,
+)
 
 fun repositoryTestBuilder(dependencies: List<Class<*>>, dto: RepositoryTestBuilderDTO): FileSpec {
     val testClass = TypeSpec
@@ -35,6 +39,8 @@ fun repositoryTestBuilder(dependencies: List<Class<*>>, dto: RepositoryTestBuild
 }
 
 fun FunSpec.Builder.setupDependencies(dependencies: List<Class<*>>): FunSpec.Builder {
+    val koinInject = MemberName("org.koin.core.component", "inject")
+
     dependencies.forEach { dependency ->
         this.addStatement(
             "val %N: %T by %M()",

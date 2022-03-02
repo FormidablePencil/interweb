@@ -21,7 +21,7 @@ import models.IWithPrivilegeSourcePK
  * @property privilegedAuthors privileges.
  */
 @Serializable
-data class CreateCarouselBasicImagesReq(
+data class CarouselBasicImagesCreateReq(
     override val name: String,
     override val images: List<Image>,
     override val imgOnclickRedirects: List<Text>,

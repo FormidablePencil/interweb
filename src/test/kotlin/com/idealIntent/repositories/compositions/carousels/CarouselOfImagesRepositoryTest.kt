@@ -1,8 +1,8 @@
 package com.idealIntent.repositories.compositions.carousels
 
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
-import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.CompositionPrivilegesManager
@@ -13,6 +13,7 @@ import com.idealIntent.services.CompositionService
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.carousels.CarouselCompositionsFlow
+import integrationTests.compositions.carousels.CarouselCompositionsFlow.Companion.carouselBasicImagesCreateReq
 import io.kotest.assertions.failure
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
@@ -20,9 +21,7 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.clearAllMocks
 import org.koin.core.component.inject
 import shared.testUtils.BehaviorSpecUtRepo2
-import shared.testUtils.images
 import shared.testUtils.rollback
-import shared.testUtils.texts
 
 /**
  * Carousel of images repository integration/unit testing
@@ -44,13 +43,11 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
 //            compositionCategory = CompositionCategory.Carousel,
 //            compositionType = CompositionCarouselType.BasicImages.value,
 //        )
-        val createCarouselBasicImagesReq =
-            CreateCarouselBasicImagesReq("Projects", images, texts, listOf(), privilegeLevel = 0)
 
         suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
             val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
             val layoutId = compositionService.createNewLayout(
-                name = carouselCompositionFlow.layoutName,
+                name = CarouselCompositionsFlow.layoutName,
                 authorId = authorId
             ).data ?: throw failure("Failed to get id of newly created layout.")
             val compositionSourceId = carouselCompositionFlow.createComposition(publicView, layoutId, authorId)
@@ -103,22 +100,22 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
                     ) ?: throw failure("failed to get composition")
 
                     // region verify
-                    comp.images.size shouldBe createCarouselBasicImagesReq.images.size
-                    comp.imgOnclickRedirects.size shouldBe createCarouselBasicImagesReq.imgOnclickRedirects.size
+                    comp.images.size shouldBe carouselBasicImagesCreateReq.images.size
+                    comp.imgOnclickRedirects.size shouldBe carouselBasicImagesCreateReq.imgOnclickRedirects.size
                     comp.images.forEach { resItem ->
-                        createCarouselBasicImagesReq.images.find {
+                        carouselBasicImagesCreateReq.images.find {
                             it.orderRank == resItem.orderRank
                                     && it.description == resItem.description
                                     && it.url == resItem.url
                         } shouldNotBe null
                     }
                     comp.imgOnclickRedirects.forEach { item ->
-                        createCarouselBasicImagesReq.imgOnclickRedirects.find {
+                        carouselBasicImagesCreateReq.imgOnclickRedirects.find {
                             it.text == item.text
                                     && it.orderRank == item.orderRank
                         } shouldNotBe null
                     }
-                    comp.name shouldBe createCarouselBasicImagesReq.name
+                    comp.name shouldBe carouselBasicImagesCreateReq.name
                     // endregion
                 }
             }
@@ -136,22 +133,22 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
                             ?: throw failure("failed to get composition")
 
                     // region verify
-                    comp.images.size shouldBe createCarouselBasicImagesReq.images.size
-                    comp.imgOnclickRedirects.size shouldBe createCarouselBasicImagesReq.imgOnclickRedirects.size
+                    comp.images.size shouldBe carouselBasicImagesCreateReq.images.size
+                    comp.imgOnclickRedirects.size shouldBe carouselBasicImagesCreateReq.imgOnclickRedirects.size
                     comp.images.forEach { resItem ->
-                        createCarouselBasicImagesReq.images.find {
+                        carouselBasicImagesCreateReq.images.find {
                             it.orderRank == resItem.orderRank
                                     && it.description == resItem.description
                                     && it.url == resItem.url
                         } shouldNotBe null
                     }
                     comp.imgOnclickRedirects.forEach { item ->
-                        createCarouselBasicImagesReq.imgOnclickRedirects.find {
+                        carouselBasicImagesCreateReq.imgOnclickRedirects.find {
                             it.text == item.text
                                     && it.orderRank == item.orderRank
                         } shouldNotBe null
                     }
-                    comp.name shouldBe createCarouselBasicImagesReq.name
+                    comp.name shouldBe carouselBasicImagesCreateReq.name
                     // endregion
                 }
             }
@@ -160,7 +157,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
         given("compose") {
             suspend fun prepareComposition(): CarouselOfImagesComposePrepared {
                 val authorId = signupFlow.signupReturnId()
-                val createRequest = CreateCarouselBasicImagesReq(
+                val createRequest = CarouselBasicImagesCreateReq(
                     name = "that was legitness",
                     images = listOf(),
                     imgOnclickRedirects = listOf(),
@@ -200,12 +197,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
                     val preparedComposition = prepareComposition()
 
                     carouselOfImagesRepository.compose(
-                        CarouselOfImagesComposePrepared(
-                            name = preparedComposition.name,
-                            imageCollectionId = preparedComposition.imageCollectionId,
-                            redirectTextCollectionId = preparedComposition.redirectTextCollectionId,
-                            sourceId = preparedComposition.sourceId,
-                        ),
+                        preparedComposition,
                         preparedComposition.sourceId
                     )
                 }
@@ -243,22 +235,22 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
-                    resBeforeDeletion.images.size shouldBe createCarouselBasicImagesReq.images.size
-                    resBeforeDeletion.imgOnclickRedirects.size shouldBe createCarouselBasicImagesReq.imgOnclickRedirects.size
+                    resBeforeDeletion.images.size shouldBe carouselBasicImagesCreateReq.images.size
+                    resBeforeDeletion.imgOnclickRedirects.size shouldBe carouselBasicImagesCreateReq.imgOnclickRedirects.size
                     resBeforeDeletion.images.forEach { resItem ->
-                        createCarouselBasicImagesReq.images.find {
+                        carouselBasicImagesCreateReq.images.find {
                             it.orderRank == resItem.orderRank
                                     && it.url == resItem.url
                                     && it.description == resItem.description
                         } shouldNotBe null
                     }
                     resBeforeDeletion.imgOnclickRedirects.forEach { item ->
-                        createCarouselBasicImagesReq.imgOnclickRedirects.find {
+                        carouselBasicImagesCreateReq.imgOnclickRedirects.find {
                             item.orderRank == it.orderRank
                                     && item.text == it.text
                         } shouldNotBe null
                     }
-                    resBeforeDeletion.name shouldBe createCarouselBasicImagesReq.name
+                    resBeforeDeletion.name shouldBe carouselBasicImagesCreateReq.name
                     // endregion
 
                     carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)
