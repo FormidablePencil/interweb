@@ -23,7 +23,7 @@ class GridsManager(
     override fun getPublicComposition(
         compositionType: CompositionGrid,
         compositionSourceId: Int
-    ): GridOneOffRes? {
+    ): Pair<CompositionGrid, String> {
         TODO("Not yet implemented")
     }
 
@@ -31,11 +31,13 @@ class GridsManager(
         compositionType: CompositionGrid,
         compositionSourceId: Int,
         authorId: Int
-    ): GridOneOffRes? {
+    ): Pair<CompositionGrid, String> {
         return when (compositionType) {
-            Basic -> {
-                oneOffGridManager.getPrivateComposition(compositionSourceId, authorId)
-            }
+            Basic ->
+                Pair(
+                    Basic,
+                    gson.toJson(oneOffGridManager.getPrivateComposition(compositionSourceId, authorId))
+                )
         }
     }
 
@@ -46,12 +48,11 @@ class GridsManager(
         authorId: Int
     ): Int {
         return when (compositionType) {
-            Basic -> {
+            Basic ->
                 oneOffGridManager.createComposition(
                     gson.fromJson(jsonData, GridOneOffCreateReq::class.java), layoutId,
                     authorId
                 )
-            }
         }
     }
 
@@ -75,9 +76,9 @@ class GridsManager(
         authorId: Int
     ) {
         return when (compositionType) {
-            Basic -> {
+            Basic ->
                 oneOffGridManager.deleteComposition(compositionSourceId, authorId)
-            }
+
         }
     }
 }

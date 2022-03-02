@@ -6,7 +6,7 @@ import com.idealIntent.dtos.compositions.headers.HeaderBasicRes
 import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
 import dtos.compositions.headers.CompositionHeader
-import dtos.compositions.headers.CompositionHeader.*
+import dtos.compositions.headers.CompositionHeader.Basic
 
 class HeadersManager(
     private val headerBasicManager: HeaderBasicManager,
@@ -14,18 +14,24 @@ class HeadersManager(
     override fun getPublicComposition(
         compositionType: CompositionHeader,
         compositionSourceId: Int
-    ): HeaderBasicRes? = when (compositionType) {
+    ): Pair<CompositionHeader, String> = when (compositionType) {
         Basic ->
-            headerBasicManager.getPublicComposition(compositionSourceId)
+            Pair(
+                Basic,
+                gson.toJson(headerBasicManager.getPublicComposition(compositionSourceId))
+            )
     }
 
     override fun getPrivateComposition(
         compositionType: CompositionHeader,
         compositionSourceId: Int,
         authorId: Int
-    ): HeaderBasicRes? = when (compositionType) {
+    ): Pair<CompositionHeader, String> = when (compositionType) {
         Basic ->
-            headerBasicManager.getPrivateComposition(compositionSourceId, authorId)
+            Pair(
+                Basic,
+                gson.toJson(headerBasicManager.getPrivateComposition(compositionSourceId, authorId))
+            )
     }
 
     override fun createComposition(

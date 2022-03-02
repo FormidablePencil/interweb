@@ -14,7 +14,7 @@ import com.idealIntent.models.compositions.grids.GridOneOffModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.ComplexCompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.protocolStructures.repo.ComplexCompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
 import org.ktorm.dsl.*
@@ -99,7 +99,7 @@ class GridOneOffRepository(
 
 
     // region Get top lvl only of composition
-    override fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(compositionSourceId: Int, authorId: Int) =
+    public override fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(compositionSourceId: Int, authorId: Int) =
         getOnlyTopLvlIdsOfCompositionQuery(onlyModifiable = true, compositionSourceId, authorId)
 
     private fun getOnlyTopLvlIdsOfCompositionQuery(

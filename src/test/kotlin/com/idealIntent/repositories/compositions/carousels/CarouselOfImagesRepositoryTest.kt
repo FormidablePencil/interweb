@@ -1,7 +1,5 @@
 package com.idealIntent.repositories.compositions.carousels
 
-import com.idealIntent.configurations.DIHelper
-import com.idealIntent.dtos.compositions.NewUserComposition
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
 import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
@@ -12,21 +10,16 @@ import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.services.CompositionService
-import dtos.compositions.CompositionCategory
-import dtos.compositions.carousels.CompositionCarouselType
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.carousels.CarouselCompositionsFlow
 import io.kotest.assertions.failure
 import io.kotest.assertions.throwables.shouldThrowExactly
-import io.kotest.core.spec.IsolationMode
-import io.kotest.koin.KoinListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.clearAllMocks
 import org.koin.core.component.inject
-import shared.DITestHelper
-import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.BehaviorSpecUtRepo2
 import shared.testUtils.images
 import shared.testUtils.rollback
 import shared.testUtils.texts
@@ -36,36 +29,34 @@ import shared.testUtils.texts
  *
  * NOTE: Everything in reusable query instructions region is tested in composition integration tests
  */
-class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo() {
-    override fun listeners() = listOf(KoinListener(listOf(DIHelper.CoreModule, DITestHelper.FlowModule)))
-    override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
-
-    private val imageRepository: ImageRepository by inject()
-    private val textRepository: TextRepository by inject()
-    private val spaceRepository: SpaceRepository by inject()
-    private val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
-    private val compositionPrivilegesManager: CompositionPrivilegesManager by inject()
-    private val compositionService: CompositionService by inject()
-    private val signupFlow: SignupFlow by inject()
-    private val carouselCompositionFlow: CarouselCompositionsFlow by inject()
-
-    private val userComposition = NewUserComposition(
-        compositionCategory = CompositionCategory.Carousel,
-        compositionType = CompositionCarouselType.BasicImages.value,
-    )
-    private val createCarouselBasicImagesReq =
-        CreateCarouselBasicImagesReq("Projects", images, texts, listOf(), privilegeLevel = 0)
-
-    private suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
-        val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
-        val layoutId =
-            compositionService.createNewLayout(name = carouselCompositionFlow.layoutName, authorId = authorId).data
-                ?: throw failure("Failed to get id of newly created layout.")
-        val compositionSourceId = carouselCompositionFlow.createComposition(publicView, layoutId, authorId)
-        return Triple(compositionSourceId, layoutId, authorId)
-    }
-
+class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
     init {
+        val imageRepository: ImageRepository by inject()
+        val textRepository: TextRepository by inject()
+        val spaceRepository: SpaceRepository by inject()
+        val carouselOfImagesRepository: CarouselOfImagesRepository by inject()
+        val compositionPrivilegesManager: CompositionPrivilegesManager by inject()
+        val compositionService: CompositionService by inject()
+        val signupFlow: SignupFlow by inject()
+        val carouselCompositionFlow: CarouselCompositionsFlow by inject()
+//
+//        val userComposition = NewUserComposition(
+//            compositionCategory = CompositionCategory.Carousel,
+//            compositionType = CompositionCarouselType.BasicImages.value,
+//        )
+        val createCarouselBasicImagesReq =
+            CreateCarouselBasicImagesReq("Projects", images, texts, listOf(), privilegeLevel = 0)
+
+        suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
+            val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
+            val layoutId = compositionService.createNewLayout(
+                name = carouselCompositionFlow.layoutName,
+                authorId = authorId
+            ).data ?: throw failure("Failed to get id of newly created layout.")
+            val compositionSourceId = carouselCompositionFlow.createComposition(publicView, layoutId, authorId)
+            return Triple(compositionSourceId, layoutId, authorId)
+        }
+
         beforeEach { clearAllMocks() }
 
         given("getOnlyTopLvlIdsOfCompositionOnlyModifiable") {

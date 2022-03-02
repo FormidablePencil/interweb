@@ -2,6 +2,7 @@ package shared.testUtils
 
 import com.idealIntent.configurations.AppEnv
 import com.idealIntent.configurations.DIHelper
+import com.squareup.kotlinpoet.FunSpec
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.koin.KoinListener
 import io.mockk.mockk

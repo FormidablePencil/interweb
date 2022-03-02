@@ -8,7 +8,7 @@ import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.headers.HeaderBasicModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
-import com.idealIntent.repositories.compositions.SimpleCompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.protocolStructures.repo.SimpleCompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
 import dtos.compositions.headers.CompositionHeader
 import org.ktorm.dsl.*

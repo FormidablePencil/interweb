@@ -7,7 +7,7 @@ import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.texts.TextLonelyModel
-import com.idealIntent.repositories.compositions.SimpleCompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.protocolStructures.repo.SimpleCompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
 import dtos.compositions.texts.CompositionTextType
 import org.ktorm.dsl.*

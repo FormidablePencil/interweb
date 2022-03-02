@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
+import dtos.compositions.carousels.CompositionCarouselType
 
 // todo CompositionResponse not being used
 abstract class CompositionCategoryManagerStructure<CompositionType, Composition, Response> :
@@ -37,7 +38,7 @@ private interface ICompositionCategoryManagerStructure<CompositionType, Composit
     fun getPublicComposition(
         compositionType: CompositionType,
         compositionSourceId: Int,
-    ): Composition?
+    ): Pair<CompositionType, String>
 
     /**
      * Get private composition.
@@ -53,7 +54,7 @@ private interface ICompositionCategoryManagerStructure<CompositionType, Composit
         compositionType: CompositionType,
         compositionSourceId: Int,
         authorId: Int
-    ): Composition?
+    ): Pair<CompositionType, String>
 
     /**
      * Find the composition to of compositionType and sends the json data off to the composition's manager to create composition.

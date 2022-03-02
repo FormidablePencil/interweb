@@ -15,16 +15,24 @@ class TextsManager(
     override fun getPublicComposition(
         compositionType: CompositionTextType,
         compositionSourceId: Int
-    ): TextLonelyRes? = when (compositionType) {
-        Basic -> textLonelyManager.getPublicComposition(compositionSourceId)
+    ): Pair<CompositionTextType, String> = when (compositionType) {
+        Basic ->
+            Pair(
+                Basic,
+                gson.toJson(textLonelyManager.getPublicComposition(compositionSourceId))
+            )
     }
 
     override fun getPrivateComposition(
         compositionType: CompositionTextType,
         compositionSourceId: Int,
         authorId: Int
-    ): TextLonelyRes? = when (compositionType) {
-        Basic -> textLonelyManager.getPrivateComposition(compositionSourceId, authorId)
+    ): Pair<CompositionTextType, String> = when (compositionType) {
+        Basic ->
+            Pair(
+                Basic,
+                gson.toJson(textLonelyManager.getPrivateComposition(compositionSourceId, authorId))
+            )
     }
 
     override fun createComposition(
@@ -33,7 +41,8 @@ class TextsManager(
         layoutId: Int,
         authorId: Int
     ): Int = when (compositionType) {
-        Basic -> textLonelyManager.createComposition(
+        Basic ->
+            textLonelyManager.createComposition(
             gson.fromJson(jsonData, TextLonelyCreateReq::class.java), layoutId, authorId
         )
     }

@@ -31,7 +31,7 @@ enum class CompositionCode {
     CompositionRecordIsCorrupt,
     CompositionRecordIsCorrupt2,
     NotPrivilegedToLayout,
-    ShouldNotBeCalledForSimpleComposition, // todo - remove
+    MethodNotNeededThusShouldNotBeCalled,
     ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
@@ -45,7 +45,7 @@ enum class CompositionCode {
                 ColumnDoesNotExist -> "Failed to handle a column of a record."
                 CompositionRecordIsCorrupt -> "Composition is corrupt. Could not find id of collection composition composes."
                 CompositionRecordIsCorrupt2 -> "Composition is corrupt. No order rank for composition. Perhaps not associated to any layout."
-                ShouldNotBeCalledForSimpleComposition -> "Attempted to call a method designated for only more complicated compositions on a simple composition."
+                MethodNotNeededThusShouldNotBeCalled -> "Attempted to use a method that is not implemented. Method is implemented because it is not needed."
 
                 ServerError -> genericServerError
 
@@ -81,7 +81,7 @@ enum class CompositionCode {
                 CollectionOfRecordsNotFound -> "Collection of records not found by provided collection id."
                 NotPrivilegedToLayout -> "Not privileged to modify composition."
 
-                ShouldNotBeCalledForSimpleComposition,
+                MethodNotNeededThusShouldNotBeCalled,
                 CompositionRecordIsCorrupt2,
                 CompositionRecordIsCorrupt,
                 ColumnDoesNotExist,
@@ -119,7 +119,7 @@ enum class CompositionCode {
                 FailedToAssociateAuthorToLayout,
                 ColumnDoesNotExist,
                 CompositionRecordIsCorrupt2,
-                ShouldNotBeCalledForSimpleComposition,
+                MethodNotNeededThusShouldNotBeCalled,
                 -> HttpStatusCode.InternalServerError
             }
         }

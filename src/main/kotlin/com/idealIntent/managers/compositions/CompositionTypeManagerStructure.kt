@@ -5,7 +5,7 @@ import com.idealIntent.configurations.AppEnv
 import com.idealIntent.exceptions.CompositionCode.*
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
-import com.idealIntent.repositories.compositions.ComplexCompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.protocolStructures.repo.ComplexCompositionRepositoryStructure
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

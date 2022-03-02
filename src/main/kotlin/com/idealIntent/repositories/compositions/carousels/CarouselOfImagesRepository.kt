@@ -13,7 +13,7 @@ import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.carousels.ImagesCarouselsModel
 import com.idealIntent.repositories.collectionsGeneric.ImageRepository
 import com.idealIntent.repositories.collectionsGeneric.TextRepository
-import com.idealIntent.repositories.compositions.ComplexCompositionRepositoryStructure
+import com.idealIntent.repositories.compositions.protocolStructures.repo.ComplexCompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
 import org.ktorm.dsl.*
@@ -71,7 +71,7 @@ class CarouselOfImagesRepository(
             .leftJoin(textCol, textCol.id eq compInstance.redirectTextCollectionId)
     }
 
-    override fun compositionWhereClause(mutableList: MutableList<ColumnDeclaring<Boolean>>) {
+    public override fun compositionWhereClause(mutableList: MutableList<ColumnDeclaring<Boolean>>) {
         mutableList += (img2Col.orderRank eq text2Col.orderRank)
     }
 
@@ -129,7 +129,7 @@ class CarouselOfImagesRepository(
 
 
     // region Get top lvl only of composition
-    override fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(compositionSourceId: Int, authorId: Int) =
+    public override fun getOnlyTopLvlIdsOfCompositionByOnlyPrivilegedToModify(compositionSourceId: Int, authorId: Int) =
         getOnlyTopLvlIdsOfCompositionQuery(onlyModifiable = true, compositionSourceId, authorId)
 
     private fun getOnlyTopLvlIdsOfCompositionQuery(

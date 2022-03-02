@@ -1,6 +1,7 @@
 package com.idealIntent.managers.compositions.carousels
 
 import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+import com.idealIntent.dtos.compositions.carousels.CarouselBlurredOverlayCreateReq
 import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.carousels.CreateCarouselBasicImagesReq
 import com.idealIntent.managers.compositions.CompositionCategoryManagerStructure
@@ -15,24 +16,37 @@ class CarouselsManager(
     override fun getPublicComposition(
         compositionType: CompositionCarouselType,
         compositionSourceId: Int,
-    ): CarouselBasicImagesRes? = when (compositionType) {
+    ): Pair<CompositionCarouselType, String> = when (compositionType) {
         CarouselBlurredOverlay ->
-            carouselBlurredOverlayManager.getPublicComposition(compositionSourceId)
+            Pair(
+                CarouselBlurredOverlay,
+                gson.toJson(carouselBlurredOverlayManager.getPublicComposition(compositionSourceId))
+            )
         CarouselMagnifying -> TODO() // todo - this is a style variant of BasicImages
         BasicImages ->
-            carouselOfImagesManager.getPublicComposition(compositionSourceId)
+            Pair(
+                CarouselBlurredOverlay,
+                gson.toJson(carouselOfImagesManager.getPublicComposition(compositionSourceId))
+            )
     }
 
     override fun getPrivateComposition(
         compositionType: CompositionCarouselType,
         compositionSourceId: Int,
         authorId: Int
-    ): CarouselBasicImagesRes? = when (compositionType) {
+    ): Pair<CompositionCarouselType, String> = when (compositionType) {
         CarouselBlurredOverlay ->
-            carouselBlurredOverlayManager.getPrivateComposition(compositionSourceId, authorId)
+            Pair(
+                CarouselBlurredOverlay,
+                gson.toJson(carouselBlurredOverlayManager.getPrivateComposition(compositionSourceId, authorId))
+            )
+
         CarouselMagnifying -> TODO() // todo - this is a style variant of BasicImages
         BasicImages ->
-            carouselOfImagesManager.getPrivateComposition(compositionSourceId, authorId)
+            Pair(
+                CarouselBlurredOverlay,
+                gson.toJson(carouselOfImagesManager.getPrivateComposition(compositionSourceId, authorId))
+            )
     }
 
     override fun createComposition(
@@ -44,7 +58,7 @@ class CarouselsManager(
         return when (compositionType) {
             CarouselBlurredOverlay ->
                 carouselBlurredOverlayManager.createComposition(
-                    gson.fromJson(jsonData, CreateCarouselBasicImagesReq::class.java),
+                    gson.fromJson(jsonData, CarouselBlurredOverlayCreateReq::class.java),
                     layoutId, authorId
                 )
             CarouselMagnifying -> TODO() // todo - this is a style variant of BasicImages

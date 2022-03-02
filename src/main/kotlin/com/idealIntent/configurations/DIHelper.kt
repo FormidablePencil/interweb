@@ -24,6 +24,7 @@ import com.idealIntent.repositories.collectionsGeneric.TextRepository
 import com.idealIntent.repositories.compositions.CompositionQueryBuilder
 import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.repositories.compositions.banners.BannerImageRepository
+import com.idealIntent.repositories.compositions.carousels.CarouselBlurredOverlayRepository
 import com.idealIntent.repositories.compositions.carousels.CarouselOfImagesRepository
 import com.idealIntent.repositories.compositions.grids.GridOneOffRepository
 import com.idealIntent.repositories.compositions.headers.HeaderBasicRepository
@@ -62,8 +63,9 @@ object DIHelper {
         // compositions
         single { CarouselsManager(get(), get()) }
         single { CarouselOfImagesManager(get(), get(), get(), get(), get(), get()) }
-        single { CarouselBlurredOverlayManager() }
+        single { CarouselBlurredOverlayManager(get(), get(), get(), get(), get(), get()) } // variant of carousel of images
         single { CarouselOfImagesRepository(get(), get()) }
+        single { CarouselBlurredOverlayRepository() } // made up of CarouselOfImagesRepository
 
         single { TextsManager(get()) }
         single { TextLonelyManager(get(), get(), get()) }

@@ -15,8 +15,12 @@ class BannersManager(
     override fun getPublicComposition(
         compositionType: CompositionBanner,
         compositionSourceId: Int
-    ): BannerImageRes? = when (compositionType) {
-        Basic -> bannerImageManager.getPublicComposition(compositionSourceId)
+    ): Pair<CompositionBanner, String> = when (compositionType) {
+        Basic ->
+            Pair(
+                Basic,
+                gson.toJson(bannerImageManager.getPublicComposition(compositionSourceId))
+            )
     }
 
     override fun getPrivateComposition(
@@ -24,7 +28,11 @@ class BannersManager(
         compositionSourceId: Int,
         authorId: Int
     ) = when (compositionType) {
-        Basic -> bannerImageManager.getPrivateComposition(compositionSourceId, authorId)
+        Basic ->
+            Pair(
+                Basic,
+                gson.toJson(bannerImageManager.getPrivateComposition(compositionSourceId, authorId))
+            )
     }
 
     override fun createComposition(
