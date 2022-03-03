@@ -2,7 +2,6 @@ package com.idealIntent.repositories.compositions.headers
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.NewUserComposition
-import com.idealIntent.dtos.compositions.headers.HeaderBasicCreateReq
 import com.idealIntent.dtos.compositions.headers.HeaderBasicRes
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
@@ -11,10 +10,8 @@ import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.headers.CompositionHeader
-import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.headers.HeaderCompositionsFlow
-import integrationTests.compositions.headers.HeaderCompositionsFlow.Companion.publicHeaderBasicReq
 import io.kotest.assertions.failure
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.IsolationMode
@@ -116,46 +113,20 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
                     val (compositionSourceId, layoutId, authorId) =
                         signup_then_createComposition(false)
 
-                    val comp: HeaderBasicRes =
-                        headerBasicRepository.getPrivateComposition(compositionSourceId, authorId)
-                            ?: throw failure("failed to get composition")
+                    val comp: HeaderBasicRes = headerBasicRepository.getPrivateComposition(
+                        compositionSourceId, authorId
+                    ) ?: throw failure("failed to get composition")
 
-                    // region verify
-                    HeaderCompositionsFlow.publicHeaderBasicReq.let {
-                        comp.bgImg shouldBe it.bgImg
-                        comp.profileImg shouldBe it.profileImg
-                        comp.name shouldBe it.name
-                    }
-                    // endregion
+                    HeaderCompositionsFlow.validateDataResponse(comp)
                 }
             }
         }
 
         given("compose") {
 
-            suspend fun prepareComposition(): Pair<HeaderBasicCreateReq, Int> {
-                val authorId = signupFlow.signupReturnId()
-                val layoutId = spaceRepository.insertNewLayout(publicHeaderBasicReq.name, authorId)
-
-                val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
-                    compositionType = 0,
-                    authorId = authorId,
-                    name = "legit",
-                    privilegeLevel = 0,
-                )
-
-                spaceRepository.associateCompositionToLayout(
-                    orderRank = 0,
-                    compositionSourceId = compositionSourceId,
-                    layoutId = layoutId
-                )
-
-                return Pair(publicHeaderBasicReq, compositionSourceId)
-            }
-
             then("successfully composed collections and compositions as one composition") {
                 rollback {
-                    val (composePrepared, compositionSourceId) = prepareComposition()
+                    val (composePrepared, compositionSourceId) = headerCompositionsFlow.prepareComposition()
 
                     headerBasicRepository.compose(composePrepared, compositionSourceId)
                 }
@@ -193,11 +164,7 @@ class HeaderBasicRepositoryTest : BehaviorSpecUtRepo() {
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
-                    HeaderCompositionsFlow.publicHeaderBasicReq.let {
-                        resBeforeDeletion.bgImg shouldBe it.bgImg
-                        resBeforeDeletion.profileImg shouldBe it.profileImg
-                        resBeforeDeletion.name shouldBe it.name
-                    }
+                    HeaderCompositionsFlow.validateDataResponse(resBeforeDeletion)
                     // endregion
 
                     headerBasicRepository.deleteComposition(compositionSourceId, authorId)

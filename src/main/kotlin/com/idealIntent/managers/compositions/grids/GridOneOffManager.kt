@@ -65,6 +65,7 @@ class GridOneOffManager(
 
         gridOneOffRepository.compose(
             composePrepared = GridOneOffComposePrepared(
+                sourceId = compositionSourceId,
                 collectionOf_titles_of_image_categories_id = titlesOfImagesId,
                 collectionOf_images_2d_id = image2dCollectionId,
                 collectionOf_onclick_redirects_id = redirects2dCollectionId,

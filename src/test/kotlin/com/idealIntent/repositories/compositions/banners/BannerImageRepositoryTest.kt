@@ -14,6 +14,7 @@ import dtos.compositions.headers.CompositionHeader
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.banners.BannerCompositionsFlow
 import integrationTests.compositions.banners.BannerCompositionsFlow.Companion.publicBannerImageCreateReq
+import integrationTests.compositions.carousels.CarouselCompositionsFlow
 import integrationTests.compositions.texts.TextCompositionsFlow
 import io.kotest.assertions.failure
 import io.kotest.core.spec.IsolationMode
@@ -30,9 +31,7 @@ class BannerImageRepositoryTest : BehaviorSpecUtRepo() {
     override fun listeners() = listOf(KoinListener(listOf(DIHelper.CoreModule, DITestHelper.FlowModule)))
     override fun isolationMode(): IsolationMode = IsolationMode.InstancePerTest
 
-    private val spaceRepository: SpaceRepository by inject()
     private val bannerImageRepository: BannerImageRepository by inject()
-    private val compositionPrivilegesManager: CompositionPrivilegesManager by inject()
     private val compositionService: CompositionService by inject()
     private val signupFlow: SignupFlow by inject()
     private val bannerCompositionsFlow: BannerCompositionsFlow by inject()
@@ -69,16 +68,11 @@ class BannerImageRepositoryTest : BehaviorSpecUtRepo() {
                 rollback {
                     val (compositionSourceId, layoutId, authorId) = signup_then_createComposition(true)
 
-                    val comp: BannerImageRes = bannerImageRepository.getPublicComposition(
+                    val res: BannerImageRes = bannerImageRepository.getPublicComposition(
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
-                    // region verify
-                    publicBannerImageCreateReq.let {
-                        comp.name shouldBe it.name
-                        comp.privilegeLevel shouldBe it.privilegeLevel
-                    }
-                    // endregion
+                    BannerCompositionsFlow.validateDataResponse(res)
                 }
             }
         }
@@ -89,51 +83,19 @@ class BannerImageRepositoryTest : BehaviorSpecUtRepo() {
                 rollback {
                     val (compositionSourceId, layoutId, authorId) = signup_then_createComposition(false)
 
-                    val comp: BannerImageRes = bannerImageRepository.getPrivateComposition(compositionSourceId, authorId)
+                    val res: BannerImageRes = bannerImageRepository.getPrivateComposition(compositionSourceId, authorId)
                         ?: throw failure("failed to get composition")
 
-                    // region verify
-                    publicBannerImageCreateReq.let {
-                        comp.name shouldBe it.name
-                        comp.privilegeLevel shouldBe it.privilegeLevel
-//                        it.privilegedAuthors.forEach { item ->
-//                            publicTextLonelyCreateReq.privilegedAuthors.findLast {
-//                                item.username shouldBe
-//                            }
-//                        }
-                    }
-
-
-                    // endregion
+                    BannerCompositionsFlow.validateDataResponse(res)
                 }
             }
         }
 
         given("compose") {
 
-            suspend fun prepareComposition(): Pair<BannerImageCreateReq, Int> {
-                val authorId = signupFlow.signupReturnId()
-                val layoutId = spaceRepository.insertNewLayout(publicBannerImageCreateReq.name, authorId)
-
-                val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
-                    compositionType = 0,
-                    authorId = authorId,
-                    name = "legit",
-                    privilegeLevel = 0,
-                )
-
-                spaceRepository.associateCompositionToLayout(
-                    orderRank = 0,
-                    compositionSourceId = compositionSourceId,
-                    layoutId = layoutId
-                )
-
-                return Pair(publicBannerImageCreateReq, compositionSourceId)
-            }
-
             then("successfully composed collections and compositions as one composition") {
                 rollback {
-                    val (composePrepared, compositionSourceId) = prepareComposition()
+                    val (composePrepared, compositionSourceId) = bannerCompositionsFlow.prepareComposition()
 
                     bannerImageRepository.compose(composePrepared, compositionSourceId)
                 }

@@ -44,6 +44,25 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
 //            compositionType = CompositionCarouselType.BasicImages.value,
 //        )
 
+        fun validateDataResponse(res: CarouselBasicImagesRes) {
+            res.images.size shouldBe carouselBasicImagesCreateReq.images.size
+            res.imgOnclickRedirects.size shouldBe carouselBasicImagesCreateReq.imgOnclickRedirects.size
+            res.images.forEach { resItem ->
+                carouselBasicImagesCreateReq.images.find {
+                    it.orderRank == resItem.orderRank
+                            && it.url == resItem.url
+                            && it.description == resItem.description
+                } shouldNotBe null
+            }
+            res.imgOnclickRedirects.forEach { item ->
+                carouselBasicImagesCreateReq.imgOnclickRedirects.find {
+                    item.orderRank == it.orderRank
+                            && item.text == it.text
+                } shouldNotBe null
+            }
+            res.name shouldBe carouselBasicImagesCreateReq.name
+        }
+
         suspend fun signup_then_createComposition(publicView: Boolean): Triple<Int, Int, Int> {
             val authorId = signupFlow.signupReturnId(AuthUtilities.createAuthorRequest)
             val layoutId = compositionService.createNewLayout(
@@ -95,28 +114,11 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
                     val (compositionSourceId, layoutId, authorId) =
                         signup_then_createComposition(true)
 
-                    val comp: CarouselBasicImagesRes = carouselOfImagesRepository.getPublicComposition(
+                    val res: CarouselBasicImagesRes = carouselOfImagesRepository.getPublicComposition(
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
-                    // region verify
-                    comp.images.size shouldBe carouselBasicImagesCreateReq.images.size
-                    comp.imgOnclickRedirects.size shouldBe carouselBasicImagesCreateReq.imgOnclickRedirects.size
-                    comp.images.forEach { resItem ->
-                        carouselBasicImagesCreateReq.images.find {
-                            it.orderRank == resItem.orderRank
-                                    && it.description == resItem.description
-                                    && it.url == resItem.url
-                        } shouldNotBe null
-                    }
-                    comp.imgOnclickRedirects.forEach { item ->
-                        carouselBasicImagesCreateReq.imgOnclickRedirects.find {
-                            it.text == item.text
-                                    && it.orderRank == item.orderRank
-                        } shouldNotBe null
-                    }
-                    comp.name shouldBe carouselBasicImagesCreateReq.name
-                    // endregion
+                    validateDataResponse(res)
                 }
             }
         }
@@ -128,28 +130,11 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
                     val (compositionSourceId, layoutId, authorId) =
                         signup_then_createComposition(false)
 
-                    val comp: CarouselBasicImagesRes =
-                        carouselOfImagesRepository.getPrivateComposition(compositionSourceId, authorId)
-                            ?: throw failure("failed to get composition")
+                    val res: CarouselBasicImagesRes = carouselOfImagesRepository.getPrivateComposition(
+                        compositionSourceId, authorId
+                    ) ?: throw failure("failed to get composition")
 
-                    // region verify
-                    comp.images.size shouldBe carouselBasicImagesCreateReq.images.size
-                    comp.imgOnclickRedirects.size shouldBe carouselBasicImagesCreateReq.imgOnclickRedirects.size
-                    comp.images.forEach { resItem ->
-                        carouselBasicImagesCreateReq.images.find {
-                            it.orderRank == resItem.orderRank
-                                    && it.description == resItem.description
-                                    && it.url == resItem.url
-                        } shouldNotBe null
-                    }
-                    comp.imgOnclickRedirects.forEach { item ->
-                        carouselBasicImagesCreateReq.imgOnclickRedirects.find {
-                            it.text == item.text
-                                    && it.orderRank == item.orderRank
-                        } shouldNotBe null
-                    }
-                    comp.name shouldBe carouselBasicImagesCreateReq.name
-                    // endregion
+                    validateDataResponse(res)
                 }
             }
         }
@@ -235,22 +220,7 @@ class CarouselOfImagesRepositoryTest : BehaviorSpecUtRepo2() {
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
-                    resBeforeDeletion.images.size shouldBe carouselBasicImagesCreateReq.images.size
-                    resBeforeDeletion.imgOnclickRedirects.size shouldBe carouselBasicImagesCreateReq.imgOnclickRedirects.size
-                    resBeforeDeletion.images.forEach { resItem ->
-                        carouselBasicImagesCreateReq.images.find {
-                            it.orderRank == resItem.orderRank
-                                    && it.url == resItem.url
-                                    && it.description == resItem.description
-                        } shouldNotBe null
-                    }
-                    resBeforeDeletion.imgOnclickRedirects.forEach { item ->
-                        carouselBasicImagesCreateReq.imgOnclickRedirects.find {
-                            item.orderRank == it.orderRank
-                                    && item.text == it.text
-                        } shouldNotBe null
-                    }
-                    resBeforeDeletion.name shouldBe carouselBasicImagesCreateReq.name
+                    validateDataResponse(resBeforeDeletion)
                     // endregion
 
                     carouselOfImagesRepository.deleteComposition(compositionSourceId, authorId)

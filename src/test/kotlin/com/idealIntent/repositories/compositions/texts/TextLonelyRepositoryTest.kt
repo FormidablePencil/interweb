@@ -2,7 +2,6 @@ package com.idealIntent.repositories.compositions.texts
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.NewUserComposition
-import com.idealIntent.dtos.compositions.texts.TextLonelyCreateReq
 import com.idealIntent.dtos.compositions.texts.TextLonelyRes
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.repositories.compositions.SpaceRepository
@@ -10,8 +9,8 @@ import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.headers.CompositionHeader
 import integrationTests.auth.flows.SignupFlow
-import integrationTests.compositions.headers.HeaderCompositionsFlow
 import integrationTests.compositions.texts.TextCompositionsFlow
+import integrationTests.compositions.texts.TextCompositionsFlow.Companion.privateTextLonelyCreateReq
 import integrationTests.compositions.texts.TextCompositionsFlow.Companion.publicTextLonelyCreateReq
 import io.kotest.assertions.failure
 import io.kotest.core.spec.IsolationMode
@@ -87,52 +86,22 @@ class TextLonelyRepositoryTest : BehaviorSpecUtRepo() {
                 rollback {
                     val (compositionSourceId, layoutId, authorId) = signup_then_createComposition(false)
 
-                    val comp: TextLonelyRes = textLonelyRepository.getPrivateComposition(compositionSourceId, authorId)
-                        ?: throw failure("failed to get composition")
+                    val res: TextLonelyRes = textLonelyRepository.getPrivateComposition(
+                        compositionSourceId, authorId
+                    ) ?: throw failure("failed to get composition")
 
-                    // region verify
-                    publicTextLonelyCreateReq.let {
-                        comp.name shouldBe it.name
-                        comp.text shouldBe it.text
-                        comp.privilegeLevel shouldBe it.privilegeLevel
-//                        it.privilegedAuthors.forEach { item ->
-//                            publicTextLonelyCreateReq.privilegedAuthors.findLast {
-//                                item.username shouldBe
-//                            }
-//                        }
-                    }
-
-
-                    // endregion
+                    TextCompositionsFlow.validateDataResponse(res)
                 }
             }
         }
 
         given("compose") {
 
-            suspend fun prepareComposition(): Pair<TextLonelyCreateReq, Int> {
-                val authorId = signupFlow.signupReturnId()
-                val layoutId = spaceRepository.insertNewLayout(publicTextLonelyCreateReq.name, authorId)
-
-                val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
-                    compositionType = 0,
-                    authorId = authorId,
-                    name = "legit",
-                    privilegeLevel = 0,
-                )
-
-                spaceRepository.associateCompositionToLayout(
-                    orderRank = 0,
-                    compositionSourceId = compositionSourceId,
-                    layoutId = layoutId
-                )
-
-                return Pair(publicTextLonelyCreateReq, compositionSourceId)
-            }
-
             then("successfully composed collections and compositions as one composition") {
                 rollback {
-                    val (composePrepared, compositionSourceId) = prepareComposition()
+                    val (composePrepared, compositionSourceId) = textCompositionsFlow.prepareComposition(
+                        privateTextLonelyCreateReq
+                    )
 
                     textLonelyRepository.compose(composePrepared, compositionSourceId)
                 }

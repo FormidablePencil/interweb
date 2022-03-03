@@ -2,22 +2,28 @@ package shared.kotlinPoet.compositionRepositoryKP
 
 import com.squareup.kotlinpoet.*
 import shared.testUtils.BehaviorSpecUtRepo
+import shared.testUtils.BehaviorSpecUtRepo2
 
 data class RepositoryTestBuilderDTO(
     val compositionFlow: Class<*>,
     val compositionRepo: Class<*>,
-    val responseData: Class<*>,
-    val createRequestData: Pair<String, String>, // import statement and name of data
+    val responseDataType: Class<*>,
+    val responseData: MemberName,
     val createRequest: Class<*>,
     val composePrepared: Class<*>,
 )
 
-fun repositoryTestBuilder(dependencies: List<Class<*>>, dto: RepositoryTestBuilderDTO): FileSpec {
+fun repositoryTestBuilder(
+    dependencies: List<Class<*>>,
+    dto: RepositoryTestBuilderDTO,
+    packageName: String,
+    isCompComplex: Boolean
+): FileSpec {
     val testClass = TypeSpec
-        .classBuilder("CarouselOfImagesRepositoryTest")
+        .classBuilder(dto.compositionRepo.simpleName + "TestGen")
         .superclass(
             ClassName(
-                BehaviorSpecUtRepo::class.java.packageName, BehaviorSpecUtRepo::class.java.simpleName
+                BehaviorSpecUtRepo::class.java.packageName, BehaviorSpecUtRepo2::class.java.simpleName
             )
         )
         .primaryConstructor(
@@ -28,12 +34,21 @@ fun repositoryTestBuilder(dependencies: List<Class<*>>, dto: RepositoryTestBuild
                 .addStatement("beforeEach { %M() }", MemberName("io.mockk", "clearAllMocks"))
                 .addComment("endregion Setup\n")
 
-                .compComplexRepoTestBuilder(dto)
+                .compRepoTestBuilder(dto, isCompComplex)
                 .build()
         )
         .build()
 
-    return FileSpec.builder("", "HelloWorld")
+    return FileSpec.builder(packageName, dto.compositionRepo.simpleName + "TestGen")
+        .addComment(
+            """
+            =========
+            Please do not make changes to this file directly. This is a generated file.
+            
+            This is a test of composition repository - ${dto.compositionRepo.simpleName}.
+            =========
+        """.trimIndent()
+        )
         .addType(testClass)
         .build()
 }

@@ -4,13 +4,21 @@ import com.google.gson.Gson
 import com.idealIntent.dtos.collectionsGeneric.images.Image
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
 import com.idealIntent.dtos.compositions.NewUserComposition
+import com.idealIntent.dtos.compositions.grids.GridOneOffComposePrepared
 import com.idealIntent.dtos.compositions.grids.GridOneOffCreateReq
 import com.idealIntent.dtos.compositions.grids.GridOneOffRes
 import com.idealIntent.exceptions.logInfo
+import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.grids.GridOneOffManager
+import com.idealIntent.managers.compositions.images.D2ImageRepository
+import com.idealIntent.managers.compositions.texts.D2TextRepository
+import com.idealIntent.repositories.collectionsGeneric.ImageRepository
+import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.grids.CompositionGrid
+import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -20,6 +28,13 @@ import shared.testUtils.BehaviorSpecFlow
 class GridCompositionsFlow : BehaviorSpecFlow() {
     private val compositionService: CompositionService by inject()
     private val gridOneOffManager: GridOneOffManager by inject()
+    private val imageRepository: ImageRepository by inject()
+    private val textRepository: TextRepository by inject()
+    private val d2ImageRepository: D2ImageRepository by inject()
+    private val d2TextRepository: D2TextRepository by inject()
+    private val spaceRepository: SpaceRepository by inject()
+    private val compositionPrivilegesManager: CompositionPrivilegesManager by inject()
+    private val signupFlow: SignupFlow by inject()
     private val userComposition = NewUserComposition(
         compositionCategory = CompositionCategory.Grid,
         compositionType = CompositionGrid.Basic.value, // todo rename to OneOff
@@ -141,73 +156,73 @@ class GridCompositionsFlow : BehaviorSpecFlow() {
         }
         val publicGridOneOffReqSerialized = gson.toJson(publicGridOneOffReq)
         val privateGridOneOffReqSerialized = gson.toJson(privateGridOneOffReq)
-    }
 
-    fun validateGridOneOff(response: GridOneOffRes, isPublic: Boolean) {
-        with(privateGridOneOffReq) {
-            response.privilegeLevel shouldBe if (isPublic) 1 else 0
-            response.collectionOf_titles_of_image_categories.size shouldBe collectionOf_titles_of_image_categories.size
-            response.collectionOf_images_2d.size shouldBe collectionOf_images_2d.size
-            response.collectionOf_img_descriptions.size shouldBe collectionOf_img_descriptions.size
-            response.collectionOf_onclick_redirects.size shouldBe collectionOf_onclick_redirects.size
-            response.name shouldBe name
-            response.privilegedAuthors shouldBe privilegedAuthors
+        fun validateDataResponse(response: GridOneOffRes, isPublic: Boolean = true) {
+            with(privateGridOneOffReq) {
+                response.privilegeLevel shouldBe if (isPublic) 1 else 0
+                response.collectionOf_titles_of_image_categories.size shouldBe collectionOf_titles_of_image_categories.size
+                response.collectionOf_images_2d.size shouldBe collectionOf_images_2d.size
+                response.collectionOf_img_descriptions.size shouldBe collectionOf_img_descriptions.size
+                response.collectionOf_onclick_redirects.size shouldBe collectionOf_onclick_redirects.size
+                response.name shouldBe name
+                response.privilegedAuthors shouldBe privilegedAuthors
 
 
-            collectionOf_titles_of_image_categories.forEach {
-                response.collectionOf_titles_of_image_categories.find { item ->
-                    it.orderRank == item.orderRank
-                            && it.text == item.text
-                } shouldNotBe null
-            }
-
-            collectionOf_images_2d.forEach {
-                val found = response.collectionOf_images_2d.find { item ->
-                    it.first == item.first
-                } ?: throw failure("did not find item by order rank")
-
-                it.second.forEach {
-                    found.second.find { item ->
-                        item.orderRank == it.orderRank
-                                && item.url == it.url
-                                && item.description == it.description
+                collectionOf_titles_of_image_categories.forEach {
+                    response.collectionOf_titles_of_image_categories.find { item ->
+                        it.orderRank == item.orderRank
+                                && it.text == item.text
                     } shouldNotBe null
                 }
-            }
 
-            collectionOf_img_descriptions.forEach {
-                val found = response.collectionOf_img_descriptions.find { item ->
-                    it.first == item.first
-                } ?: throw failure("did not find item by order rank")
+                collectionOf_images_2d.forEach {
+                    val found = response.collectionOf_images_2d.find { item ->
+                        it.first == item.first
+                    } ?: throw failure("did not find item by order rank")
 
-                it.second.forEach {
-                    found.second.find { item ->
-                        item.orderRank == it.orderRank
-                                && item.text == it.text
+                    it.second.forEach {
+                        found.second.find { item ->
+                            item.orderRank == it.orderRank
+                                    && item.url == it.url
+                                    && item.description == it.description
+                        } shouldNotBe null
+                    }
+                }
+
+                collectionOf_img_descriptions.forEach {
+                    val found = response.collectionOf_img_descriptions.find { item ->
+                        it.first == item.first
+                    } ?: throw failure("did not find item by order rank")
+
+                    it.second.forEach {
+                        found.second.find { item ->
+                            item.orderRank == it.orderRank
+                                    && item.text == it.text
+                        } shouldNotBe null
+                    }
+                }
+
+                collectionOf_onclick_redirects.forEach {
+                    val found = response.collectionOf_onclick_redirects.find { item ->
+                        it.first == item.first
+                    } ?: throw failure("did not find item by order rank")
+
+                    it.second.forEach {
+                        found.second.find { item ->
+                            item.orderRank == it.orderRank
+                                    && item.text == it.text
+                        } shouldNotBe null
+                    }
+                }
+
+                privilegedAuthors.forEach {
+                    response.privilegedAuthors.find { item ->
+                        it.username == item.username
+                                && it.modify == item.modify
+                                && it.deletion == item.deletion
+                                && it.modifyUserPrivileges == item.modifyUserPrivileges
                     } shouldNotBe null
                 }
-            }
-
-            collectionOf_onclick_redirects.forEach {
-                val found = response.collectionOf_onclick_redirects.find { item ->
-                    it.first == item.first
-                } ?: throw failure("did not find item by order rank")
-
-                it.second.forEach {
-                    found.second.find { item ->
-                        item.orderRank == it.orderRank
-                                && item.text == it.text
-                    } shouldNotBe null
-                }
-            }
-
-            privilegedAuthors.forEach {
-                response.privilegedAuthors.find { item ->
-                    it.username == item.username
-                            && it.modify == item.modify
-                            && it.deletion == item.deletion
-                            && it.modifyUserPrivileges == item.modifyUserPrivileges
-                } shouldNotBe null
             }
         }
     }
@@ -227,10 +242,48 @@ class GridCompositionsFlow : BehaviorSpecFlow() {
 
         resGetComp ?: throw failure("failed to get created composition")
 
-        validateGridOneOff(resGetComp, isPublic)
+        validateDataResponse(resGetComp, isPublic)
 
         logInfo("Created composition: ${resGetComp.toString()}", this::class.java)
 
         return res.data!!
+    }
+
+    suspend fun prepareComposition(): Pair<GridOneOffComposePrepared, Int> {
+        val authorId = signupFlow.signupReturnId()
+        val layoutId = spaceRepository.insertNewLayout(publicGridOneOffReq.name, authorId)
+
+        val titlesOfImagesId =
+            textRepository.batchInsertRecordsToNewCollection(publicGridOneOffReq.collectionOf_titles_of_image_categories)
+        val image2dCollectionId =
+            d2ImageRepository.batchInsertRecordsToNewCollection(publicGridOneOffReq.collectionOf_images_2d)
+        val redirects2dCollectionId =
+            d2TextRepository.batchInsertRecordsToNewCollection(publicGridOneOffReq.collectionOf_onclick_redirects)
+        val imgDescriptions2dId =
+            d2TextRepository.batchInsertRecordsToNewCollection(publicGridOneOffReq.collectionOf_img_descriptions)
+
+        val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
+            compositionType = 0,
+            authorId = authorId,
+            name = "legit",
+            privilegeLevel = 0,
+        )
+
+        spaceRepository.associateCompositionToLayout(
+            orderRank = 0,
+            compositionSourceId = compositionSourceId,
+            layoutId = layoutId
+        )
+
+        return Pair(
+            GridOneOffComposePrepared(
+                sourceId = compositionSourceId,
+                collectionOf_titles_of_image_categories_id = titlesOfImagesId,
+                collectionOf_images_2d_id = image2dCollectionId,
+                collectionOf_img_descriptions_id = imgDescriptions2dId,
+                collectionOf_onclick_redirects_id = redirects2dCollectionId,
+            ),
+            compositionSourceId
+        )
     }
 }

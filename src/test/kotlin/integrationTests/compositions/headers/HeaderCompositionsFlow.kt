@@ -2,20 +2,33 @@ package integrationTests.compositions.headers
 
 import com.google.gson.Gson
 import com.idealIntent.dtos.compositions.NewUserComposition
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesCreateReq
+import com.idealIntent.dtos.compositions.carousels.CarouselBasicImagesRes
+import com.idealIntent.dtos.compositions.carousels.CarouselOfImagesComposePrepared
 import com.idealIntent.dtos.compositions.headers.HeaderBasicCreateReq
+import com.idealIntent.dtos.compositions.headers.HeaderBasicRes
 import com.idealIntent.exceptions.logInfo
+import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.headers.HeaderBasicManager
+import com.idealIntent.repositories.compositions.SpaceRepository
+import com.idealIntent.repositories.compositions.headers.HeaderBasicRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.headers.CompositionHeader
+import integrationTests.auth.flows.SignupFlow
+import integrationTests.compositions.carousels.CarouselCompositionsFlow
 import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import org.koin.core.component.inject
 import shared.testUtils.BehaviorSpecFlow
 
 class HeaderCompositionsFlow : BehaviorSpecFlow() {
     private val compositionService: CompositionService by inject()
     private val headerBasicManager: HeaderBasicManager by inject()
+    private val spaceRepository: SpaceRepository by inject()
+    private val compositionPrivilegesManager: CompositionPrivilegesManager by inject()
+    private val signupFlow: SignupFlow by inject()
     private val userComposition = NewUserComposition(
         compositionCategory = CompositionCategory.Header,
         compositionType = CompositionHeader.Basic.value,
@@ -34,8 +47,15 @@ class HeaderCompositionsFlow : BehaviorSpecFlow() {
         }
         val headerPublicBasicImagesReqSerialized: String = gson.toJson(publicHeaderBasicReq)
         val headerPrivateBasicImagesReqSerialized: String = gson.toJson(privateHeaderBasicReq)
-    }
 
+        fun validateDataResponse(res: HeaderBasicRes, isPublic: Boolean = true) {
+            publicHeaderBasicReq.let {
+                res.bgImg shouldBe it.bgImg
+                res.profileImg shouldBe it.profileImg
+                res.name shouldBe it.name
+            }
+        }
+    }
 
     // todo - creates only one variant. Implement more variants
     fun createComposition(public: Boolean, layoutId: Int, authorId: Int): Int {
@@ -59,5 +79,25 @@ class HeaderCompositionsFlow : BehaviorSpecFlow() {
         logInfo("Created composition: ${resGetComp.toString()}", this::class.java)
 
         return res.data!!
+    }
+
+    suspend fun prepareComposition(): Pair<HeaderBasicCreateReq, Int> {
+        val authorId = signupFlow.signupReturnId()
+        val layoutId = spaceRepository.insertNewLayout(publicHeaderBasicReq.name, authorId)
+
+        val compositionSourceId = compositionPrivilegesManager.createCompositionSource(
+            compositionType = 0,
+            authorId = authorId,
+            name = "legit",
+            privilegeLevel = 0,
+        )
+
+        spaceRepository.associateCompositionToLayout(
+            orderRank = 0,
+            compositionSourceId = compositionSourceId,
+            layoutId = layoutId
+        )
+
+        return Pair(publicHeaderBasicReq, compositionSourceId)
     }
 }
