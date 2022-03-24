@@ -5,7 +5,7 @@
 // =========
 package com.idealIntent.repositories.compositions.grids
 
-import com.idealIntent.dtos.compositions.grids.GridOneOffRes
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes3
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.services.CompositionService
@@ -84,7 +84,7 @@ public final class GridOneOffRepositoryTestGen() : BehaviorSpecUtRepo2() {
         rollback {
           val (compositionSourceId, _, _) = signup_then_createComposition(true)
 
-          val res: GridOneOffRes = gridOneOffRepository.getPublicComposition(
+          val res: GridOneOffRes3 = gridOneOffRepository.getPublicComposition(
               compositionSourceId = compositionSourceId
           ) ?: throw failure("failed to get composition")
 
@@ -99,7 +99,7 @@ public final class GridOneOffRepositoryTestGen() : BehaviorSpecUtRepo2() {
         rollback {
           val (compositionSourceId, _, authorId) = signup_then_createComposition(false)
 
-          val res: GridOneOffRes =gridOneOffRepository.getPrivateComposition(
+          val res: GridOneOffRes3 =gridOneOffRepository.getPrivateComposition(
               compositionSourceId, authorId
           ) ?: throw failure("failed to get composition")
 
@@ -146,7 +146,7 @@ public final class GridOneOffRepositoryTestGen() : BehaviorSpecUtRepo2() {
           val (compositionSourceId, _, authorId) = signup_then_createComposition(true)
 
           // region before deletion assertions
-          val res: GridOneOffRes = gridOneOffRepository.getPublicComposition(
+          val res: GridOneOffRes3 = gridOneOffRepository.getPublicComposition(
               compositionSourceId = compositionSourceId
           ) ?: throw failure("failed to get composition")
 

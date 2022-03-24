@@ -23,6 +23,10 @@ class BannerImageRepository : SimpleCompositionRepositoryStructure<BannerImageRe
     }
 
     // region Reusable query instructions
+    /**
+     * If there is a privileged authors list under a composition id that already exists
+     * then push the list of privileges to that list.
+     */
     override fun compositionQueryMap(row: QueryRowSet, dto: BannerImageDataMapped) {
         dto.data += Pair(
             row[compInstance.id]!!,
@@ -37,13 +41,24 @@ class BannerImageRepository : SimpleCompositionRepositoryStructure<BannerImageRe
             )
         )
 
-        dto.privilegedAuthors += Pair(
-            row[compInstance.id]!!,
-            PrivilegedAuthor(
+        val compExists = dto.privilegedAuthorsOfComps.find { it.first == row[compInstance.id]!! }
+
+        if (compExists != null)
+            compExists.second += PrivilegedAuthor(
                 username = row[author.username]!!,
                 modify = row[prvAth2CompSource.modify]!!,
                 deletion = row[prvAth2CompSource.deletion]!!,
                 modifyUserPrivileges = row[prvAth2CompSource.modifyUserPrivileges]!!,
+            )
+        else dto.privilegedAuthorsOfComps += Pair(
+            row[compInstance.id]!!,
+            mutableListOf(
+                PrivilegedAuthor(
+                    username = row[author.username]!!,
+                    modify = row[prvAth2CompSource.modify]!!,
+                    deletion = row[prvAth2CompSource.deletion]!!,
+                    modifyUserPrivileges = row[prvAth2CompSource.modifyUserPrivileges]!!,
+                )
             )
         )
     }

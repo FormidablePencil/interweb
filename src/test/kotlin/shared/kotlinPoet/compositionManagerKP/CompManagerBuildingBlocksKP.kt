@@ -1,4 +1,4 @@
-package shared.kotlinPoet.compositionRepositoryKP
+package shared.kotlinPoet.compositionManagerKP
 
 import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
@@ -58,7 +58,7 @@ fun FunSpec.Builder.compComplexRepoTestBuilder(
 }
 
 fun FunSpec.Builder.compRepoTestBuilder(
-    data: RepositoryTestBuilderDTO,
+    data: ManagerTestBuilderDTO,
     isCompComplex: Boolean
 ): FunSpec.Builder {
     val rollback = MemberName("shared.testUtils", "rollback")

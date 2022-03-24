@@ -64,7 +64,7 @@ public class BannerImageRepositoryTestGen() : BehaviorSpecUtRepo2() {
               compositionSourceId = compositionSourceId
           ) ?: throw failure("failed to get composition")
 
-          BannerCompositionsFlow.validateDataResponse(res)
+          BannerCompositionsFlow.validateDataResponse(res, true)
         }
       }
     }
@@ -79,7 +79,7 @@ public class BannerImageRepositoryTestGen() : BehaviorSpecUtRepo2() {
               compositionSourceId, authorId
           ) ?: throw failure("failed to get composition")
 
-          BannerCompositionsFlow.validateDataResponse(res)
+          BannerCompositionsFlow.validateDataResponse(res, false)
         }
       }
     }
@@ -126,7 +126,7 @@ public class BannerImageRepositoryTestGen() : BehaviorSpecUtRepo2() {
               compositionSourceId = compositionSourceId
           ) ?: throw failure("failed to get composition")
 
-          BannerCompositionsFlow.validateDataResponse(res)
+          BannerCompositionsFlow.validateDataResponse(res, true)
           // endregion
 
           bannerImageRepository.deleteComposition(compositionSourceId, authorId)

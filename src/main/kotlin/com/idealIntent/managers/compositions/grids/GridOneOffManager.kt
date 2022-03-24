@@ -5,6 +5,7 @@ import com.idealIntent.dtos.compositions.carousels.CompositionResponse
 import com.idealIntent.dtos.compositions.grids.GridOneOffComposePrepared
 import com.idealIntent.dtos.compositions.grids.GridOneOffCreateReq
 import com.idealIntent.dtos.compositions.grids.GridOneOffRes
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes3
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.CompositionTypeManagerStructure
 import com.idealIntent.managers.compositions.carousels.UpdateDataOfComposition
@@ -27,13 +28,13 @@ class GridOneOffManager(
     private val imageRepository: ImageRepository,
     private val image2dManager: D2ImageRepository,
     private val text2dManager: D2TextRepository,
-) : CompositionTypeManagerStructure<GridOneOffRes, IImagesCarouselEntity, GridOneOffCreateReq, CarouselOfImagesComposePrepared,
+) : CompositionTypeManagerStructure<GridOneOffRes3, IImagesCarouselEntity, GridOneOffCreateReq, CarouselOfImagesComposePrepared,
         CompositionResponse>() {
 
-    override fun getPublicComposition(compositionSourceId: Int): GridOneOffRes? =
+    override fun getPublicComposition(compositionSourceId: Int): GridOneOffRes3? =
         gridOneOffRepository.getPublicComposition(compositionSourceId)
 
-    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): GridOneOffRes? =
+    override fun getPrivateComposition(compositionSourceId: Int, authorId: Int): GridOneOffRes3? =
         gridOneOffRepository.getPrivateComposition(compositionSourceId, authorId)
 
     override fun createComposition(

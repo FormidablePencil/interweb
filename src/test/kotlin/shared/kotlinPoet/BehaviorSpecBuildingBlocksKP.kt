@@ -2,8 +2,7 @@ package shared.kotlinPoet
 
 import com.squareup.kotlinpoet.FunSpec
 
-//    val f = TypeSpec.Builder().signupThenCreateComposition
-object BehaviorSpecBuilderKP {
+object BehaviorSpecBuildingBlocksKP {
     fun FunSpec.Builder.given(name: String, map: Map<String, Any?>, code: () -> String): FunSpec.Builder {
         return this
             .addCode("\ngiven(\"$name\") {⇥")
@@ -18,7 +17,4 @@ object BehaviorSpecBuilderKP {
     fun then(name: String, code: () -> String): String {
         return "\n\nthen(\"$name\") {⇥\n%rollback:M {⇥\n${code()}\n⇤}\n⇤}"
     }
-}
-
-fun main() {
 }

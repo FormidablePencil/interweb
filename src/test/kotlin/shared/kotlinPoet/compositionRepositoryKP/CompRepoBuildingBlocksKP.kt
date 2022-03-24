@@ -4,8 +4,8 @@ import com.idealIntent.exceptions.CompositionCode
 import com.idealIntent.exceptions.CompositionException
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.MemberName
-import shared.kotlinPoet.TestBuilderKP.given
-import shared.kotlinPoet.TestBuilderKP.then
+import shared.kotlinPoet.BehaviorSpecBuildingBlocksKP.given
+import shared.kotlinPoet.BehaviorSpecBuildingBlocksKP.then
 import kotlin.reflect.full.memberProperties
 
 inline fun <reified T : Any> T.asMap(): Map<String, Any?> {

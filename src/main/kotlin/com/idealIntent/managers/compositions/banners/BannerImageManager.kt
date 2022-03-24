@@ -17,6 +17,7 @@ class BannerImageManager(
     private val compositionPrivilegesManager: CompositionPrivilegesManager,
 ) : CompositionTypeManagerStructure<BannerImageRes, IImagesCarouselEntity,
         BannerImageCreateReq, BannerImageRes, CompositionResponse>() {
+
     override fun getPublicComposition(compositionSourceId: Int): BannerImageRes? =
         bannerImageRepository.getPublicComposition(compositionSourceId)
 

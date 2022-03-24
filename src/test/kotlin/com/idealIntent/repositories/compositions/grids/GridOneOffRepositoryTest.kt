@@ -2,6 +2,7 @@ package com.idealIntent.repositories.compositions.grids
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.grids.GridOneOffRes
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes3
 import com.idealIntent.services.CompositionService
 import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
@@ -77,7 +78,7 @@ class GridOneOffRepositoryTest : BehaviorSpecUtRepo() {
                     val (compositionSourceId, layoutId, authorId) =
                         signup_then_createComposition(true)
 
-                    val res: GridOneOffRes = gridOneOffRepository.getPublicComposition(
+                    val res: GridOneOffRes3 = gridOneOffRepository.getPublicComposition(
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
@@ -93,7 +94,7 @@ class GridOneOffRepositoryTest : BehaviorSpecUtRepo() {
                     val (compositionSourceId, layoutId, authorId) =
                         signup_then_createComposition(false)
 
-                    val res: GridOneOffRes = gridOneOffRepository.getPrivateComposition(compositionSourceId, authorId)
+                    val res: GridOneOffRes3 = gridOneOffRepository.getPrivateComposition(compositionSourceId, authorId)
                         ?: throw failure("failed to get composition")
 
                     GridCompositionsFlow.validateDataResponse(res, false)

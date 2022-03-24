@@ -2,11 +2,14 @@ package integrationTests.compositions.grids
 
 import com.google.gson.Gson
 import com.idealIntent.dtos.collectionsGeneric.images.Image
+import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
 import com.idealIntent.dtos.collectionsGeneric.texts.Text
+import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
 import com.idealIntent.dtos.compositions.NewUserComposition
+import com.idealIntent.dtos.compositions.grids.GridItem
 import com.idealIntent.dtos.compositions.grids.GridOneOffComposePrepared
 import com.idealIntent.dtos.compositions.grids.GridOneOffCreateReq
-import com.idealIntent.dtos.compositions.grids.GridOneOffRes
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes3
 import com.idealIntent.exceptions.logInfo
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.grids.GridOneOffManager
@@ -43,7 +46,7 @@ class GridCompositionsFlow : BehaviorSpecFlow() {
 
     companion object {
         private val gson = Gson()
-        val layoutName = "That was legitness"
+        const val layoutName = "That was legitness"
         val publicGridOneOffReq = GridOneOffCreateReq(
             collectionOf_titles_of_image_categories = listOf(
                 Text(10000, "Backend"),
@@ -154,74 +157,111 @@ class GridCompositionsFlow : BehaviorSpecFlow() {
                 privilegedAuthors = it.privilegedAuthors,
             )
         }
-        val publicGridOneOffReqSerialized = gson.toJson(publicGridOneOffReq)
-        val privateGridOneOffReqSerialized = gson.toJson(privateGridOneOffReq)
+        val publicGridOneOffReqSerialized: String = gson.toJson(publicGridOneOffReq)
+        val privateGridOneOffReqSerialized: String = gson.toJson(privateGridOneOffReq)
 
-        fun validateDataResponse(response: GridOneOffRes, isPublic: Boolean = true) {
-            with(privateGridOneOffReq) {
-                response.privilegeLevel shouldBe if (isPublic) 1 else 0
-                response.collectionOf_titles_of_image_categories.size shouldBe collectionOf_titles_of_image_categories.size
-                response.collectionOf_images_2d.size shouldBe collectionOf_images_2d.size
-                response.collectionOf_img_descriptions.size shouldBe collectionOf_img_descriptions.size
-                response.collectionOf_onclick_redirects.size shouldBe collectionOf_onclick_redirects.size
-                response.name shouldBe name
-                response.privilegedAuthors shouldBe privilegedAuthors
+        fun convertToGrid3(): GridOneOffRes3 {
+            val gridItems = mutableListOf<GridItem>()
 
+            privateGridOneOffReq.collectionOf_titles_of_image_categories.forEach { item ->
+                // collection of images
+                val colOf_images_2d = privateGridOneOffReq.collectionOf_images_2d.find { it.first == item.orderRank }
+                    ?: throw Exception("")
 
-                collectionOf_titles_of_image_categories.forEach {
-                    response.collectionOf_titles_of_image_categories.find { item ->
-                        it.orderRank == item.orderRank
-                                && it.text == item.text
-                    } shouldNotBe null
+                val images_2d = colOf_images_2d.second.map {
+                    return@map ImagePK(
+                        id = 0,
+                        orderRank = it.orderRank,
+                        url = it.url,
+                        description = it.description,
+                    )
                 }
 
-                collectionOf_images_2d.forEach {
-                    val found = response.collectionOf_images_2d.find { item ->
-                        it.first == item.first
-                    } ?: throw failure("did not find item by order rank")
+                // collection of image descriptions
+                val colOf_img_descriptions = privateGridOneOffReq.collectionOf_img_descriptions.find {
+                    it.first == item.orderRank
+                } ?: throw Exception("")
 
-                    it.second.forEach {
-                        found.second.find { item ->
-                            item.orderRank == it.orderRank
-                                    && item.url == it.url
-                                    && item.description == it.description
-                        } shouldNotBe null
+                val img_descriptions = colOf_img_descriptions.second.map {
+                    return@map TextPK(
+                        id = 0,
+                        orderRank = it.orderRank,
+                        text = it.text,
+                    )
+                }
+
+                // collection of onclick redirection links
+                val colOf_onclick_redirects = privateGridOneOffReq.collectionOf_onclick_redirects.find {
+                    it.first == item.orderRank
+                } ?: throw Exception("")
+
+                val onclick_redirects = colOf_onclick_redirects.second.map {
+                    return@map TextPK(
+                        id = 0,
+                        orderRank = it.orderRank,
+                        text = it.text,
+                    )
+                }
+
+                gridItems += GridItem(
+                    title = item.text,
+                    images_2d = images_2d.toMutableList(),
+                    img_descriptions = img_descriptions.toMutableList(),
+                    onclick_redirects = onclick_redirects.toMutableList(),
+                )
+            }
+
+            return GridOneOffRes3(
+                id = 0,
+                sourceId = 0,
+                gridItems = gridItems,
+                privilegeLevel = privateGridOneOffReq.privilegeLevel,
+                name = privateGridOneOffReq.name,
+                privilegedAuthors = privateGridOneOffReq.privilegedAuthors,
+            )
+        }
+
+        fun validateDataResponse(response: GridOneOffRes3, isPublic: Boolean = true) {
+            val gridItemOriginal = convertToGrid3()
+            response.gridItems.size shouldBe gridItemOriginal.gridItems.size
+            response.name shouldBe gridItemOriginal.name
+            response.privilegeLevel shouldBe if (isPublic) 1 else 0
+            response.privilegedAuthors shouldBe gridItemOriginal.privilegedAuthors
+
+            response.privilegedAuthors.forEach { item ->
+                gridItemOriginal.privilegedAuthors.find {
+                    it.username == item.username
+                            && it.modify == item.modify
+                            && it.deletion == item.deletion
+                            && it.modifyUserPrivileges == item.modifyUserPrivileges
+                } shouldNotBe null
+            }
+
+            gridItemOriginal.gridItems.forEach { originalItem ->
+                response.gridItems.forEach { resItem ->
+
+                    originalItem.title shouldBe resItem.title
+                    originalItem.images_2d.size shouldBe resItem.images_2d.size
+                    originalItem.img_descriptions.size shouldBe resItem.img_descriptions.size
+                    originalItem.onclick_redirects.size shouldBe resItem.onclick_redirects.size
+
+                    originalItem.images_2d.forEach { orig ->
+                        resItem.images_2d.find {
+                            orig.url == it.url && orig.description == it.description && orig.orderRank == it.orderRank
+                        } ?: throw failure("items not the same")
                     }
-                }
 
-                collectionOf_img_descriptions.forEach {
-                    val found = response.collectionOf_img_descriptions.find { item ->
-                        it.first == item.first
-                    } ?: throw failure("did not find item by order rank")
-
-                    it.second.forEach {
-                        found.second.find { item ->
-                            item.orderRank == it.orderRank
-                                    && item.text == it.text
-                        } shouldNotBe null
+                    originalItem.img_descriptions.forEach { orig ->
+                        resItem.img_descriptions.find {
+                            orig.text == it.text && orig.orderRank == it.orderRank
+                        } ?: throw failure("items not the same")
                     }
-                }
 
-                collectionOf_onclick_redirects.forEach {
-                    val found = response.collectionOf_onclick_redirects.find { item ->
-                        it.first == item.first
-                    } ?: throw failure("did not find item by order rank")
-
-                    it.second.forEach {
-                        found.second.find { item ->
-                            item.orderRank == it.orderRank
-                                    && item.text == it.text
-                        } shouldNotBe null
+                    originalItem.onclick_redirects.forEach { orig ->
+                        resItem.onclick_redirects.find {
+                            orig.text == it.text && orig.orderRank == it.orderRank
+                        } ?: throw failure("items not the same")
                     }
-                }
-
-                privilegedAuthors.forEach {
-                    response.privilegedAuthors.find { item ->
-                        it.username == item.username
-                                && it.modify == item.modify
-                                && it.deletion == item.deletion
-                                && it.modifyUserPrivileges == item.modifyUserPrivileges
-                    } shouldNotBe null
                 }
             }
         }

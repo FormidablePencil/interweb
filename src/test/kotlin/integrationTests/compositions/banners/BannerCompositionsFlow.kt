@@ -1,6 +1,7 @@
 package integrationTests.compositions.banners
 
 import com.google.gson.Gson
+import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
 import com.idealIntent.dtos.compositions.NewUserComposition
 import com.idealIntent.dtos.compositions.banners.BannerImageCreateReq
 import com.idealIntent.dtos.compositions.banners.BannerImageRes
@@ -8,10 +9,10 @@ import com.idealIntent.exceptions.logInfo
 import com.idealIntent.managers.CompositionPrivilegesManager
 import com.idealIntent.managers.compositions.banners.BannerImageManager
 import com.idealIntent.repositories.compositions.SpaceRepository
-import com.idealIntent.repositories.compositions.banners.BannerImageRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.banners.CompositionBanner
+import integrationTests.auth.flows.AuthUtilities
 import integrationTests.auth.flows.SignupFlow
 import io.kotest.assertions.failure
 import io.kotest.matchers.shouldBe
@@ -30,12 +31,12 @@ class BannerCompositionsFlow : BehaviorSpecFlow() {
     )
 
     companion object {
-        fun validateDataResponse(res: BannerImageRes) {
+        fun validateDataResponse(res: BannerImageRes, public: Boolean = true) {
             publicBannerImageCreateReq.let {
                 res.name shouldBe it.name
-                res.privilegeLevel shouldBe it.privilegeLevel
+                if (public) res.privilegeLevel shouldBe it.privilegeLevel
+                else res.privilegeLevel shouldBe privateBannerImageCreateReq.privilegeLevel
             }
-
 //                        it.privilegedAuthors.forEach { item ->
 //                            publicTextLonelyCreateReq.privilegedAuthors.findLast {
 //                                item.username shouldBe
@@ -48,21 +49,21 @@ class BannerCompositionsFlow : BehaviorSpecFlow() {
         val publicBannerImageCreateReq = BannerImageCreateReq(
             imageUrl = "image url",
             imageAlt = "image alt",
-            privilegeLevel = 1,
+            privilegeLevel = 0,
             name = "banner image",
             privilegedAuthors = listOf(),
         )
-        val privateHeaderImageCreateReq = publicBannerImageCreateReq.let {
+        val privateBannerImageCreateReq = publicBannerImageCreateReq.let {
             BannerImageCreateReq(
                 imageUrl = it.imageUrl,
                 imageAlt = it.imageAlt,
-                privilegeLevel = it.privilegeLevel,
+                privilegeLevel = 1,
                 name = it.name,
                 privilegedAuthors = it.privilegedAuthors,
             )
         }
         val publicBannerImagesReqCreateSerialized: String = gson.toJson(publicBannerImageCreateReq)
-        val privateBannerImagesReqCreateSerialized: String = gson.toJson(privateHeaderImageCreateReq)
+        val privateBannerImagesReqCreateSerialized: String = gson.toJson(privateBannerImageCreateReq)
     }
 
 
@@ -82,11 +83,24 @@ class BannerCompositionsFlow : BehaviorSpecFlow() {
 
         resGetComp ?: throw failure("failed to get created composition")
 
-        resGetComp.imageUrl shouldBe privateHeaderImageCreateReq.imageUrl
-        resGetComp.imageAlt shouldBe privateHeaderImageCreateReq.imageAlt
-        resGetComp.privilegeLevel shouldBe privateHeaderImageCreateReq.privilegeLevel
-        resGetComp.privilegedAuthors shouldBe privateHeaderImageCreateReq.privilegedAuthors
+        resGetComp.imageUrl shouldBe privateBannerImageCreateReq.imageUrl
+        resGetComp.imageAlt shouldBe privateBannerImageCreateReq.imageAlt
 
+        if (public) resGetComp.privilegeLevel shouldBe publicBannerImageCreateReq.privilegeLevel
+        else resGetComp.privilegeLevel shouldBe privateBannerImageCreateReq.privilegeLevel
+
+        val privilegedAuthors = mutableListOf<PrivilegedAuthor>()
+        privilegedAuthors += privateBannerImageCreateReq.privilegedAuthors
+        privilegedAuthors += listOf(
+            PrivilegedAuthor(
+                username = AuthUtilities.createAuthorRequest.username,
+                modify = 1,
+                deletion = 1,
+                modifyUserPrivileges = 1,
+            )
+        )
+
+        resGetComp.privilegedAuthors shouldBe privilegedAuthors
         logInfo("Created composition: $resGetComp", this::class.java)
 
         return res.data!!

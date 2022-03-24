@@ -2,19 +2,12 @@ package com.idealIntent.repositories.compositions.banners
 
 import com.idealIntent.configurations.DIHelper
 import com.idealIntent.dtos.compositions.NewUserComposition
-import com.idealIntent.dtos.compositions.banners.BannerImageCreateReq
 import com.idealIntent.dtos.compositions.banners.BannerImageRes
-import com.idealIntent.dtos.compositions.texts.TextLonelyCreateReq
-import com.idealIntent.dtos.compositions.texts.TextLonelyRes
-import com.idealIntent.managers.CompositionPrivilegesManager
-import com.idealIntent.repositories.compositions.SpaceRepository
 import com.idealIntent.services.CompositionService
 import dtos.compositions.CompositionCategory
 import dtos.compositions.headers.CompositionHeader
 import integrationTests.auth.flows.SignupFlow
 import integrationTests.compositions.banners.BannerCompositionsFlow
-import integrationTests.compositions.banners.BannerCompositionsFlow.Companion.publicBannerImageCreateReq
-import integrationTests.compositions.carousels.CarouselCompositionsFlow
 import integrationTests.compositions.texts.TextCompositionsFlow
 import io.kotest.assertions.failure
 import io.kotest.core.spec.IsolationMode
@@ -57,8 +50,7 @@ class BannerImageRepositoryTest : BehaviorSpecUtRepo() {
 
             then("failed to get because composition is private") {
                 rollback {
-                    val (compositionSourceId, layoutId, authorId) =
-                        signup_then_createComposition(false)
+                    val (compositionSourceId, layoutId, authorId) = signup_then_createComposition(false)
 
                     bannerImageRepository.getPublicComposition(compositionSourceId = compositionSourceId) shouldBe null
                 }
@@ -72,7 +64,7 @@ class BannerImageRepositoryTest : BehaviorSpecUtRepo() {
                         compositionSourceId = compositionSourceId
                     ) ?: throw failure("failed to get composition")
 
-                    BannerCompositionsFlow.validateDataResponse(res)
+                    BannerCompositionsFlow.validateDataResponse(res, true)
                 }
             }
         }
@@ -86,7 +78,7 @@ class BannerImageRepositoryTest : BehaviorSpecUtRepo() {
                     val res: BannerImageRes = bannerImageRepository.getPrivateComposition(compositionSourceId, authorId)
                         ?: throw failure("failed to get composition")
 
-                    BannerCompositionsFlow.validateDataResponse(res)
+                    BannerCompositionsFlow.validateDataResponse(res, false)
                 }
             }
         }

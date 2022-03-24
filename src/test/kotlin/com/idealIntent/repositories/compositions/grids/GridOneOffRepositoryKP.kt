@@ -2,7 +2,7 @@ package com.idealIntent.repositories.compositions.grids
 
 import com.idealIntent.dtos.compositions.grids.GridOneOffComposePrepared
 import com.idealIntent.dtos.compositions.grids.GridOneOffCreateReq
-import com.idealIntent.dtos.compositions.grids.GridOneOffRes
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes3
 import com.idealIntent.services.CompositionService
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.MemberName
@@ -30,7 +30,7 @@ fun gridOneOffRepositoryKP(): FileSpec {
         dto = RepositoryTestBuilderDTO(
             compositionFlow = GridCompositionsFlow::class.java,
             compositionRepo = GridOneOffRepository::class.java,
-            responseDataType = GridOneOffRes::class.java,
+            responseDataType = GridOneOffRes3::class.java,
             responseData = MemberName(
                 "integrationTests.compositions.grids.GridCompositionsFlow.Companion",
                 "privateGridOneOffReq"

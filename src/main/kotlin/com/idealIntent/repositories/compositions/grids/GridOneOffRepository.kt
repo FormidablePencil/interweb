@@ -1,7 +1,11 @@
 package com.idealIntent.repositories.compositions.grids
 
+import com.idealIntent.dtos.collectionsGeneric.images.ImagePK
+import com.idealIntent.dtos.collectionsGeneric.privileges.PrivilegedAuthor
+import com.idealIntent.dtos.collectionsGeneric.texts.TextPK
+import com.idealIntent.dtos.compositions.grids.GridItem
 import com.idealIntent.dtos.compositions.grids.GridOneOffComposePrepared
-import com.idealIntent.dtos.compositions.grids.GridOneOffRes
+import com.idealIntent.dtos.compositions.grids.GridOneOffRes3
 import com.idealIntent.dtos.compositions.grids.GridOneOffTopLvlIds
 import com.idealIntent.dtos.compositions.headers.HeaderBasicRes
 import com.idealIntent.exceptions.CompositionCode
@@ -9,11 +13,16 @@ import com.idealIntent.exceptions.CompositionException
 import com.idealIntent.exceptions.CompositionExceptionReport
 import com.idealIntent.managers.compositions.images.D2ImageRepository
 import com.idealIntent.managers.compositions.texts.D2TextRepository
+import com.idealIntent.models.compositions.basicCollections.images.ImageCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.images.ImageToCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.images.ImagesModel
+import com.idealIntent.models.compositions.basicCollections.texts.TextCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.texts.TextToCollectionsModel
+import com.idealIntent.models.compositions.basicCollections.texts.TextsModel
 import com.idealIntent.models.compositions.carousels.IImagesCarouselEntity
 import com.idealIntent.models.compositions.grids.GridOneOffModel
 import com.idealIntent.models.privileges.CompositionInstanceToSourcesModel
-import com.idealIntent.repositories.collectionsGeneric.ImageRepository
-import com.idealIntent.repositories.collectionsGeneric.TextRepository
+import com.idealIntent.repositories.compositions.carousels.CompositionMetadata
 import com.idealIntent.repositories.compositions.protocolStructures.repo.ComplexCompositionRepositoryStructure
 import dtos.compositions.CompositionCategory
 import dtos.compositions.carousels.CompositionCarouselType
@@ -24,50 +33,156 @@ import org.ktorm.schema.ColumnDeclaring
 class GridOneOffRepository(
     private val d2ImageRepository: D2ImageRepository,
     private val d2TextRepository: D2TextRepository,
-) : ComplexCompositionRepositoryStructure<GridOneOffRes, IImagesCarouselEntity,
+) : ComplexCompositionRepositoryStructure<GridOneOffRes3, IImagesCarouselEntity,
         GridOneOffComposePrepared, HeaderBasicRes, GridOneOffDataMapped, GridOneOffTopLvlIds, GridOneOffModel>(
     compInstance = GridOneOffModel,
     compInstanceId = GridOneOffModel.id,
 ) {
+    private val textCol_onclickRedirects = TextCollectionsModel.aliased("textCol_onclickRedirects")
+    private val text2Col_onclickRedirects = TextToCollectionsModel.aliased("text2Col_onclickRedirects")
+    private val text_onclickRedirects = TextsModel.aliased("text_onclickRedirects")
 
-    private val text = TextRepository.text
-    private val text2Col = TextRepository.text2Col
-    private val img = ImageRepository.img
-    private val img2Col = ImageRepository.img2Col
+    private val textCol_imgDescription = TextCollectionsModel.aliased("textCol_imgDescription")
+    private val text2Col_imgDescription = TextToCollectionsModel.aliased("text2Col_imgDescription")
+    private val text_imgDescription = TextsModel.aliased("text_imgDescription")
 
+    private val textCol_title = TextCollectionsModel.aliased("textCol_title")
+    private val text2Col_title = TextToCollectionsModel.aliased("text2Col_title")
+    private val text_title = TextsModel.aliased("text_title")
+
+    private val imgCol = ImageCollectionsModel.aliased("imgCol")
+    private val img2Col = ImageToCollectionsModel.aliased("img2Col")
+    private val img = ImagesModel.aliased("img")
+
+    private val d2ImgCol = D2ImageRepository.d2ImgCol
+    private val imgCol2ImgD2Col = D2ImageRepository.imgCol2ImgD2Col
+    private val d2TextCol = D2TextRepository.d2TextCol
+    private val textCol2TextD2Col = D2TextRepository.textCol2TextD2Col
 
     // region Reusable query instructions
     override val compositionSelect = mutableListOf<Column<out Any>>(
         compSource.name, compSource.id, compSource.privilegeLevel,
         compSource2Layout.orderRank,
-        compInstance.id,
+        compInstance.id, compInstance.d2ImageCollectionId,
         compInstance2compSource.sourceId,
+
         prvAth2CompSource.authorId, prvAth2CompSource.modify,
         prvAth2CompSource.deletion, prvAth2CompSource.modifyUserPrivileges,
-        author.username
+        author.username,
+
+        d2TextCol.id,
+        textCol2TextD2Col.d2CollectionId, textCol2TextD2Col.collectionId,
+        textCol_title.id,
+        text2Col_title.collectionId, text2Col_title.textId, text2Col_title.orderRank,
+        text_title.id, text_title.text,
+//
+//        textCol_onclickRedirects.id,
+//        text2Col_onclickRedirects.collectionId, text2Col_onclickRedirects.textId, text2Col_onclickRedirects.orderRank,
+//        text_onclickRedirects.id, text_onclickRedirects.text,
+//
+//        textCol_imgDescription.id,
+//        text2Col_imgDescription.collectionId, text2Col_imgDescription.textId, text2Col_imgDescription.orderRank,
+//        text_imgDescription.id, text_imgDescription.text,
+//
+//        d2ImgCol.id,
+//        imgCol2ImgD2Col.d2CollectionId, imgCol2ImgD2Col.collectionId,
+//        imgCol.id,
+//        img2Col.collectionId, img2Col.imageId, img2Col.orderRank,
+//        img.id, img.url, img.description,
     )
 
     override val compositionOnlyIdsSelect = mutableListOf<Column<out Any>>(
+        d2ImgCol.id, d2TextCol.id,
+        imgCol2ImgD2Col.d2CollectionId, imgCol2ImgD2Col.collectionId,
+        textCol2TextD2Col.d2CollectionId, textCol2TextD2Col.collectionId,
         compSource.name, compSource.privilegeLevel,
         compInstance2compSource.compositionId, compInstance2compSource.sourceId,
         prvAth2CompSource.sourceId, prvAth2CompSource.authorId,
     )
 
     override fun compositionLeftJoin(querySource: QuerySource): QuerySource {
-        TODO("Not yet implemented")
+        return super.compositionLeftJoin(querySource)
+            .leftJoin(
+                d2TextCol, d2TextCol.id eq compInstance.d2ImgDescriptionsCollectionId
+                        or (d2TextCol.id eq compInstance.d2RedirectOnClickCollectionId)
+                        or (d2TextCol.id eq compInstance.titlesOfImageCategoriesCollectionId)
+            )
+            .leftJoin(textCol2TextD2Col, textCol2TextD2Col.d2CollectionId eq d2TextCol.id)
+
+
+            // Titles of each d2 collection
+            .leftJoin(textCol_title, textCol_title.id eq compInstance.titlesOfImageCategoriesCollectionId)
+            .leftJoin(text2Col_title, text2Col_title.collectionId eq textCol_title.id)
+            .leftJoin(text_title, text_title.id eq text2Col_title.collectionId)
+
+//            // Redirections
+//            .leftJoin(
+//                textCol_onclickRedirects,
+//                textCol_onclickRedirects.id eq textCol2TextD2Col.d2CollectionId
+//                        and (textCol2TextD2Col.collectionId eq compInstance.d2RedirectOnClickCollectionId)
+//            )
+//            .leftJoin(text2Col_onclickRedirects, text2Col_onclickRedirects.collectionId eq textCol_onclickRedirects.id)
+//            .leftJoin(text_onclickRedirects, text_onclickRedirects.id eq text2Col_onclickRedirects.textId)
+//
+//            // Image descriptions
+//            .leftJoin(
+//                textCol_imgDescription,
+//                textCol_imgDescription.id eq textCol2TextD2Col.d2CollectionId
+//                        and (textCol2TextD2Col.collectionId eq compInstance.d2ImgDescriptionsCollectionId)
+//            )
+//            .leftJoin(text2Col_imgDescription, text2Col_imgDescription.collectionId eq textCol_imgDescription.id)
+//            .leftJoin(text_imgDescription, text_imgDescription.id eq text2Col_imgDescription.textId)
+//
+//            // Image
+//            .leftJoin(d2ImgCol, d2ImgCol.id eq compInstance.d2ImageCollectionId)
+//            .leftJoin(imgCol2ImgD2Col, imgCol2ImgD2Col.d2CollectionId eq d2ImgCol.id)
+//            .leftJoin(imgCol, imgCol.id eq imgCol2ImgD2Col.collectionId)
+//            .leftJoin(img2Col, img2Col.collectionId eq imgCol.id)
+//            .leftJoin(img, img.id eq img2Col.imageId)
     }
 
     override fun compositionOnlyIdsLeftJoin(querySource: QuerySource): QuerySource {
-        TODO("Not yet implemented")
+        return super.compositionOnlyIdsLeftJoin(querySource)
+            .leftJoin(d2ImgCol, d2ImgCol.id eq compInstance.d2ImageCollectionId)
+            .leftJoin(imgCol2ImgD2Col, imgCol2ImgD2Col.d2CollectionId eq d2ImgCol.id)
+            .leftJoin(img2Col, img2Col.collectionId eq imgCol2ImgD2Col.collectionId)
+
+            .leftJoin(d2TextCol)
+            .leftJoin(
+                d2TextCol,
+                d2TextCol.id eq compInstance.d2ImgDescriptionsCollectionId
+                        and (d2TextCol.id eq compInstance.d2RedirectOnClickCollectionId)
+                        and (d2TextCol.id eq compInstance.titlesOfImageCategoriesCollectionId)
+            )
+            .leftJoin(textCol2TextD2Col, textCol2TextD2Col.d2CollectionId eq d2TextCol.id)
+            .leftJoin(
+                text2Col_onclickRedirects,
+                text2Col_onclickRedirects.collectionId eq textCol2TextD2Col.collectionId
+            )
     }
 
     override fun compositionWhereClause(mutableList: MutableList<ColumnDeclaring<Boolean>>) {
-        TODO("Not yet implemented")
+        mutableList += (img2Col.orderRank eq text2Col_onclickRedirects.orderRank)
     }
 
-    // TODO
+    /**
+     * Create a grid item for each title of collection. Then by title of collection push content to grid item.
+     * Also pushes privileged authors of composition.
+     *
+     * @see com.idealIntent.repositories.compositions.protocolStructures.repo.ICompositionRepositoryStructure
+     */
     override fun compositionQueryMap(row: QueryRowSet, dto: GridOneOffDataMapped) {
-        TODO()
+////        d2TextCol.id,
+////        textCol2TextD2Col.d2CollectionId, textCol2TextD2Col.collectionId,
+////        textCol_title.id,
+////        text2Col_title.collectionId, text2Col_title.textId, text2Col_title.orderRank,
+////        text_title.id, text_title.text,
+//
+//
+        println(row[d2TextCol.id])
+        println(row[textCol2TextD2Col.d2CollectionId])
+//        println(row[textCol_onclickRedirects.id])
+//
 //        dto.compositionsMetadata += CompositionMetadata(
 //            name = row[compSource.name]!!,
 //            orderRank = row[compSource2Layout.orderRank]!!,
@@ -75,27 +190,57 @@ class GridOneOffRepository(
 //            sourceId = row[compSource.id]!!,
 //        )
 //
-////        dto.images += Pair(
-////            row[compInstance.id]!!,
-////            ImagePK(
-////                id = row[img.id]!!,
-////                orderRank = row[img2Col.orderRank]!!,
-////                url = row[img.url]!!,
-////                description = row[img.description]!!
-////            )
-////        )
+//        // region If a grid item was not created, create it
+//        if (row[text2Col_onclickRedirects.collectionId] == row[compInstance.titlesOfImageCategoriesCollectionId]
+//            && row[text_onclickRedirects.id] == row[text2Col_onclickRedirects.textId]
+//        ) {
+//            if (dto.gridItems.find { it.title == row[text_onclickRedirects.text]!! } == null) // check if already created
+//                dto.gridItems += GridItem(
+////                    title = row[text_title.text]!!,
+//                    title = "",
+//                    images_2d = mutableListOf(),
+//                    img_descriptions = mutableListOf(),
+//                    onclick_redirects = mutableListOf(),
+//                )
+//        }
+//        // endregion
 //
-//        dto.privilegedAuthors += Pair(
-//            row[compInstance.id]!!,
-//            PrivilegedAuthor(
-//                username = row[author.username]!!,
-//                modify = row[prvAth2CompSource.modify]!!,
-//                deletion = row[prvAth2CompSource.deletion]!!,
-//                modifyUserPrivileges = row[prvAth2CompSource.modifyUserPrivileges]!!,
-//            )
+//        // region push items to gridItems
+//        val gridItem = dto.gridItems.find {
+//            it.title == row[text_onclickRedirects.text]!!
+//        }
+//        if (gridItem != null) {
+//            dto.gridItems.forEach { item ->
+//
+//                item.images_2d += ImagePK(
+//                    id = row[img.id]!!,
+//                    orderRank = row[img2Col.orderRank]!!,
+//                    url = row[img.url]!!,
+//                    description = row[img.description]!!,
+//                )
+//
+//                item.img_descriptions += TextPK(
+//                    id = row[text_imgDescription.id]!!,
+//                    orderRank = row[text2Col_imgDescription.orderRank]!!,
+//                    text = row[text_imgDescription.text]!!,
+//                )
+//
+//                item.onclick_redirects += TextPK(
+//                    id = row[text_onclickRedirects.id]!!,
+//                    orderRank = row[text2Col_onclickRedirects.orderRank]!!,
+//                    text = row[text_onclickRedirects.text]!!,
+//                )
+//            }
+//        }
+//        // endregion
+//
+//        dto.privilegedAuthor += PrivilegedAuthor(
+//            username = row[author.username]!!,
+//            modify = row[prvAth2CompSource.modify]!!,
+//            deletion = row[prvAth2CompSource.deletion]!!,
+//            modifyUserPrivileges = row[prvAth2CompSource.modifyUserPrivileges]!!,
 //        )
     }
-    // endregion
 
 
     // region Get top lvl only of composition
@@ -151,21 +296,22 @@ class GridOneOffRepository(
 
     private fun getCompositionsQuery(
         restricted: Boolean, authorId: Int?, compositionSourceId: Int,
-    ): List<GridOneOffRes>? {
+    ): List<GridOneOffRes3>? {
         val dto = GridOneOffDataMapped()
 
         compositionLeftJoin(database.from(compSource))
             .select(compositionSelect)
             .whereWithConditions {
-                // todo - connect all by order rank of items
-                it += (img2Col.orderRank eq text2Col.orderRank)
+//                it += (img2Col.orderRank eq text2Col_onclickRedirects.orderRank)
                 it += (compSource.id eq compositionSourceId)
-                it += (compSource.privilegeLevel eq if (restricted) 1 else 0)
-                if (restricted) {
-                    val authorIdRes = throwIfNull(authorId)
-                    it += (prvAth2CompSource.authorId eq authorIdRes)
-                }
-            }.map { compositionQueryMap(it, dto) }
+//                it += (compSource.privilegeLevel eq if (restricted) 1 else 0)
+//                if (restricted) {
+//                    val authorIdRes = throwIfNull(authorId)
+//                    it += (prvAth2CompSource.authorId eq authorIdRes)
+//                }
+            }.map {
+                compositionQueryMap(it, dto)
+            }
 
         return dto.get().ifEmpty { null }
     }

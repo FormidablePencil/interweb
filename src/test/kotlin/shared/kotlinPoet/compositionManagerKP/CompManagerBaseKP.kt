@@ -1,10 +1,10 @@
-package shared.kotlinPoet.compositionRepositoryKP
+package shared.kotlinPoet.compositionManagerKP
 
 import com.squareup.kotlinpoet.*
 import shared.testUtils.BehaviorSpecUtRepo
 import shared.testUtils.BehaviorSpecUtRepo2
 
-data class RepositoryTestBuilderDTO(
+data class ManagerTestBuilderDTO(
     val compositionFlow: Class<*>,
     val compositionRepo: Class<*>,
     val responseDataType: Class<*>,
@@ -13,9 +13,9 @@ data class RepositoryTestBuilderDTO(
     val composePrepared: Class<*>,
 )
 
-fun repositoryTestBuilder(
+fun managerTestBuilder(
     dependencies: List<Class<*>>,
-    dto: RepositoryTestBuilderDTO,
+    dto: ManagerTestBuilderDTO,
     packageName: String,
     isCompComplex: Boolean
 ): FileSpec {

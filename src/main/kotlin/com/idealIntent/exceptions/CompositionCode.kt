@@ -32,6 +32,7 @@ enum class CompositionCode {
     CompositionRecordIsCorrupt2,
     NotPrivilegedToLayout,
     MethodNotNeededThusShouldNotBeCalled,
+    PrivilegeForCompNotFound,
     ;
 
     companion object : IServerExceptionCode<CompositionCode>, IApiResponseEnum<CompositionCode> {
@@ -46,6 +47,7 @@ enum class CompositionCode {
                 CompositionRecordIsCorrupt -> "Composition is corrupt. Could not find id of collection composition composes."
                 CompositionRecordIsCorrupt2 -> "Composition is corrupt. No order rank for composition. Perhaps not associated to any layout."
                 MethodNotNeededThusShouldNotBeCalled -> "Attempted to use a method that is not implemented. Method is implemented because it is not needed."
+                PrivilegeForCompNotFound -> "Privilege for composition not found."
 
                 ServerError -> genericServerError
 
@@ -81,6 +83,7 @@ enum class CompositionCode {
                 CollectionOfRecordsNotFound -> "Collection of records not found by provided collection id."
                 NotPrivilegedToLayout -> "Not privileged to modify composition."
 
+                PrivilegeForCompNotFound,
                 MethodNotNeededThusShouldNotBeCalled,
                 CompositionRecordIsCorrupt2,
                 CompositionRecordIsCorrupt,
@@ -111,6 +114,7 @@ enum class CompositionCode {
                 NotPrivilegedToLayout,
                 -> HttpStatusCode.BadRequest
 
+                PrivilegeForCompNotFound,
                 ServerError,
                 FailedToCompose,
                 FailedToGivePrivilege,
