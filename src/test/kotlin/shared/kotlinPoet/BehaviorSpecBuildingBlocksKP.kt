@@ -3,7 +3,7 @@ package shared.kotlinPoet
 import com.squareup.kotlinpoet.FunSpec
 
 //    val f = TypeSpec.Builder().signupThenCreateComposition
-object TestBuilderKP {
+object BehaviorSpecBuilderKP {
     fun FunSpec.Builder.given(name: String, map: Map<String, Any?>, code: () -> String): FunSpec.Builder {
         return this
             .addCode("\ngiven(\"$name\") {⇥")
