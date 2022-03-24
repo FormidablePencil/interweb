@@ -1,7 +1,7 @@
-* [Why decentralized approach](main/whyDecentralizedApproach.md)
-* [Ukraine-Russia war](main/ukraineRussiaWar.md)
-* [Julia Whitepaper](main/juliaWhitepaper.md)
-* [DataWallet Whitepaper](main/dataWalletWhitepaper.md)
+* [Why decentralized approach](/whyDecentralizedApproach.md)
+* [Ukraine-Russia war](/ukraineRussiaWar.md)
+* [Julia Whitepaper](/juliaWhitepaper.md)
+* [DataWallet Whitepaper](/dataWalletWhitepaper.md)
 * [The Vision](vision.md)
 
 Implementation details
