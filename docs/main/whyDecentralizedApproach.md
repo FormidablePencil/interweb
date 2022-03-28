@@ -1,64 +1,102 @@
+------ Bits and pieces not part of anything... yet perhaps ------
+
 [comment]: <> (this is part of the decentralized approach)
 We live predominantly in a society of centralized control which if you know the structure, it looks like a pyrimid where
 it's possible to real the whole world by a handful of people.
 
-creating other alternatives
-for the body of society to depend on to stay informed on what's happening globally.
+creating other alternatives for the body of society to depend on to stay informed on what's happening globally.
 
-In a world all the abuse of centralized power is pervasive, Putin forcing 18 year old kids to war on a brotherly country and Ukraine
-restricting all men from the age of 18-60 from leaving the country, the sensorship of large tech platforms behind the
-mask of cancel culture, an infringment of bodily autonomy through vaccine mandates, centralized money and attempting to
-ban it under the name of "regulation", the control of narratives through mainstream media, legal tax evasion by the powerful
-and threats of imprisionment if you choose to evade, a system made to keep the rich rich and the poor poor. The
-government was made to serve the people and not vise-versa which we see through various means of exploitation of power.
 [comment]: <> (this is part of the decentralized approach)
 
 Decentralized approach - just a necessary benefit
 
 
 [comment]: <> (More of the decentralized approach section)
-A college degree only signifies that you are submissible/submitable/controllable to top to bottom hierarchy approach, that's it
-other than that, all that's needed is that you can do the job. The chain of command, top management, middle management
-and the people that actually do the job - people don't need to be managed, they are capable of and deserve individual sovereignty.
-The many have to vote a few to "lead" a country but to where, why lead, I ain't no sheep!
-The point is that this mentality to impose and adhere to a top to bottom hierarchical structure of control pervades our society.
+
 [comment]: <> (More of the decentralized approach section)
-
-
-
-
-### An abstract point of view of what’s happening with our times
 
 We are moving into an era of truth and those who have been untruthful to one another fear, for they will be exposed.
 
-### A quick recap of what the blockchain aims to solve
+------ Bits and pieces not part of anything... yet perhaps ------
 
-The blockchain won’t bring new features and shiny new things for people to indulge in link NFTs and crypto trading fads
-have taken blockchain to be. The blockchain simply is a technology to replace the underlying foundation upon which the
-current services of today are built on. So, our lifestyles won’t change with it we gain so much in the security of our
-privacy.
+### Preface
 
-The paradigm the blockchain aims to support is the removing all hopeful trust to the powers that be and back to the
-hands of the individual.
+We now live in a world where the abuse of power is pervasive. Putin forcing 18-year-age children to war against a
+brotherly country and Ukraine restricting all men from the age of 18-60 from leaving the country, the censoring free
+speech of large tech corporations behind the mask of cancel culture, an infringement of bodily autonomy through vaccine
+mandates, centralized money and attempts to ban decentralized currencies under the name of "regulation", the control of
+narratives through mainstream media, legal tax evasion by the powerful left unpunished and posing threats of
+imprisonment if one chooses to evade taxes. Ultimately it's a governmental system made to keep the rich rich and the
+poor poor of which was initially created to serve the people and not vise-versa.
 
-The governments and large corporations of today are centralized powers of authority. You have to trust that whatever
-they are responsible for they will do right by you. With the instance of the government, you have to trust that your tax
-dollars are utilized properly, you have to trust that the dollar isn’t intentionally devalued by the deliberate printing
-of money. You have to trust that the information gathered by corporates and governments isn’t leaked, sold or used
-against you. That’s a lot of trust with little to no accountability. It baffles me that people think that username and
-password prevents others from accessing their personal information when the database where which all your data is stored
-is accessible to the higher ups in the companies. How could these people that hold that master keys to our data be held
-accountable when selling this data for personal profit only needs to be copied and pasted unlike tangible goods if it’s
-been stolen you would know. You can’t know who has what kind of data about you and thus is so dangerous to entrust the
-collection of your data to other people. After all, if they didn’t profit for it, they wouldn’t collect it. That’s why
-Facebook, instagram and YouTube is free to use. You are the product. The most troubling thing about giving your data to
-something is how they’ll use it. Look at Uber’s ‘god mode’ for example, with it it shows the location of all uber riders
-and customers. It sounds like it could be useful for good but with all power, it’s a double edged sword. It’s not the
+The governments and large corporations of today are mostly centralized. You have to blindly trust that whatever they are
+responsible for they will do right by you. With the instance of the government, you just have to simply trust that your
+tax dollars are utilized properly, you have to trust that the dollar isn’t intentionally devalued by the deliberate
+printing of money and you have to trust that the information gathered by corporates and governments isn’t leaked or sold
+or used against you. It's false to think that a password prevent others from accessing personal accounts and information
+when the database where which all your data is stored is accessible to the higher ups in those companies. How could
+these people that hold that master keys to our data be held accountable when selling this data is so easy. It's
+completely untraceable if all that's needed is to be copied and pasted unlike tangible goods where if it has been stolen
+you would know it's gone. You can’t know who has what kind of data about you and thus is so dangerous to entrust the
+collection of your data to other people. After all, if they didn’t profit for it, they wouldn’t collect it and if your data wasn't profitable
+apps like facebook wouldn't be free. Where it's free you are the product. The most troubling thing about giving your data to
+something is how they’ll use it. Uber’s ‘god mode’ for example, is a feature that shows the location of all uber riders
+and drivers. It sounds like it could be useful for good but with all power, it’s a double edged sword. It’s not the
 sword that inflicts evil until others, it’s the welder that swings it at those for his own personal good. Why would
 Facebook, YouTube, or the government care if they aren’t held accountable. It’s been said that data is power in the form
 of the phrase ‘knowledge is power’, in other words if you know, you have the power to change and control whatever you
 know. That explains why we are so addicted to the products produced by the system. It pulls the strings behind the
 curtain.
+
+A college degree only signifies that you are submissible/submitable/controllable to top to bottom hierarchy approach,
+that's it other than that, all that's needed is that you can do the job. The chain of command, top management, middle
+management and the people that actually do the job - people don't need to be managed, they are capable of and deserve
+individual sovereignty. The many have to vote a few to "lead" a country but to where, why lead, I ain't no sheep!
+The point is that this mentality to impose and adhere to a top to bottom hierarchical structure of control is deeply
+ingrained in society, and the result of careless submission of control to authority is tyranny and tyranny war and
+conflict from the "need to breath"; the human right to freedom.
+
+### The decentralized approach
+
+Centralization of power has prevailed in all aspects of life but now alternative systems are emerging.
+
+An anonymous organization or person that went by the name Satoshi Nakamoto created Bitcoin, an alternative currency to
+the centralized controlled fiat currency. He knew there were inherent flaws to centralized systems. The following he
+wrote in a forum while developing Bitcoin.
+*"The root problem with conventional currency is all the trust that's required to make it work. The central bank must be
+trusted not to debase the currency, but the history of fiat currencies is full of breaches of that trust."*
+After the creation of Bitcoin, Vitalik Buterin extrapolated on the underlying technology of Bitcoin of which was called
+the blockchain to create a decentralized and trustless virtual machine. The idea was make a platform to host code that
+would be public and immutable so that the code also known as smart contracts were to be available to view on a public
+ledger of which all peers of the network had a copy of and thus making the smart contract code transparent. Layer 2
+solutions to better its usability and other implementation of the so-called virtual machines came after. This innovation
+of a virtual machine serves as a base for DAO (decentralized autonomous organizations) and dapps (decentralized
+applications with the business logic hosted in the virtual machine). DAOs and dapps is web3 of which the hype should be
+all about but instead we have NFTs and crypto-trading fads. What's better, a shiny new toy or potentially not needing to
+pay taxes in the future. ... There are already protocols like Tornado Cash and private blockchains like the Secret
+Network through which the transactions could be done. No governmental attempt to enforce taxes would be impossible as it
+was with marajhuana when it was illegal.
+
+The underlying technology of web3 is the blockchain. The blockchain came about through the creation of Bitcoin of which
+was an alternative currency to fiat currencies.
+
+The ability to create a facebook, youtube that's decetralized will make it so much better. Also, DAOs are essentially
+governments and of which governments could be made. Code would be law.
+
+It's important to make a note that the blockchain hadn't promised to bring new features and shiny new things for people
+to indulge in such as NFTs and crypto trading fads. The web3 is a change from a centralized approach of which such
+entities must be trusted to a decentralized approach where important business logic is immutable and publicly viewable.
+
+The underlying idea of the web3 technology aimed to achieve to solve that to remove the necessity to simply trust
+centralized monopolies that they would act in accordance with the best interests of others at heart.
+
+[comment]: <> (comment)
+"Governments are good at cutting off the heads of a centrally controlled networks..., but pure P2P networks... seem to
+be holding their own." - Satoshi Nakamoto - If built publicly then there's no chance of shutting it down. I have a
+feeling governments wouldn't like people communing with one another without let allow people who from other nations.
+It's hard to keep a nation independent if the people in it move between each periodically. It's like, what are you
+independent to?
+[comment]: <> (comment)
 
 ### The blockchain solves two dilemmas
 
@@ -127,5 +165,5 @@ people want it the stronger you have to build that damn. If you can’t beat the
 
 ### Why go through all the trouble of building this?
 
-Why not, it’s fun, it’s right, it’s a loving thing to do. Unless you deem this world to be meaningless then get
-ready to be enlightened!😁
+Why not, it’s fun, it’s right, it’s a loving thing to do. Unless you deem this world to be meaningless then get ready to
+be enlightened!😁

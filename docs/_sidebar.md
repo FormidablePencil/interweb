@@ -1,12 +1,16 @@
-* [Why decentralized approach](main/whyDecentralizedApproach.md)
+**Deeper understanding**
+
+* [The decentralized approach](main/whyDecentralizedApproach.md)
 * [Ukraine-Russia war](main/ukraineRussiaWar.md)
-* [Julia Whitepaper](main/juliaWhitepaper.md)
+* [Julia](main/juliaWhitepaper.md)
 * [DataWallet Whitepaper](main/dataWalletWhitepaper.md)
 * [The Vision](vision.md)
 
-Implementation details
+**Implementation details**
 
-* [DataWallet]()
+* [DataWallet implementation](main/DataWalletImpl.md)
+* [Julia implementation](main/JuliaImpl.md)
 * [Testing](testing.md)
 
-[Intricate matters](intricateMatters/readme.md)
+**Miscellaneous**
+- [Intricate matters](intricateMatters/readme.md)

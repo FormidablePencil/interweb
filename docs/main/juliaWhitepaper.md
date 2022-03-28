@@ -1,8 +1,5 @@
 # Julia
 
-<img src="https://i.ibb.co/rpYRRrT/julia-enter.jpg" width="200" title="Julia - enter screen">
-<img src="https://i.ibb.co/YjnRVDW/julia-flowergirl.jpg" width="200" title="Julia - profile screen">
-
 Index:
 My dream
 The logistical implications; how could it be possible from an abstract point of view
@@ -53,7 +50,7 @@ It's fear-mongering by which these jokes work by which induces us to turn on one
 Inevitably they make laws to their liking and get us to impose and 
 uphold them!
 
-## I have a dreams
+## I have a dream
 "No one puts new wine into old wineskin". So, I ask to suspend your current understanding of the world, that way I could present
 an alternative view and deductively reason from it; bringing heaven to earth so to speak.
 
