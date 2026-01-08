@@ -63,10 +63,15 @@ class AuthorProfileRelatedRepositoryTest : BehaviorSpecUtRepo() {
         given("getAuthorWithDetail") {
             then("should have joined table authors with author_details") {
                 rollback {
-                    // todo
-                    //  author and author_detail must be created first
-                    val response = authorProfileRelatedRepository.getAuthorWithDetail(394)
+                    // Create test author and author_details first
+                    val authorId = authorProfileRelatedRepository.createNewAuthor(genReq())
+                    authorId shouldNotBe null
+                    val response = authorProfileRelatedRepository.getAuthorWithDetail(authorId!!)
                     response shouldNotBe null
+                    response.authorId shouldBe authorId
+                    response.username shouldBe "username123"
+                    response.firstname shouldBe "firstname"
+                    response.lastname shouldBe "lastname"
                 }
             }
         }
@@ -74,10 +79,15 @@ class AuthorProfileRelatedRepositoryTest : BehaviorSpecUtRepo() {
         given("getAuthorWithDetailAndAccount") {
             then("should have joined table authors and accounts with author_details") {
                 rollback {
-                    // todo
-                    //  author and author_detail and account must be created first
-                    val response = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(394)
+                    // Create test author, author_details, and account first
+                    val authorId = authorProfileRelatedRepository.createNewAuthor(genReq())
+                    authorId shouldNotBe null
+                    val response = authorProfileRelatedRepository.getAuthorWithDetailAndAccount(authorId!!)
                     response shouldNotBe null
+                    response!!.authorId shouldBe authorId
+                    response.username shouldBe "username123"
+                    response.firstname shouldBe "firstname"
+                    response.email shouldBe "email"
                 }
             }
         }

@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compile "com.idealIntent:IW-data:1.0-SNAPSHOT"
+    implementation "com.idealIntent:IW-data:1.0-SNAPSHOT"
 
     // Ktor - api
     implementation "io.ktor:ktor-server-core:$ktor_version"
@@ -48,7 +48,7 @@ dependencies {
     testImplementation "io.kotest.extensions:kotest-extensions-koin:1.0.0"
 
     // Other
-    compile group: 'org.mindrot', name: 'jbcrypt', version: jbcrypt_version // password encryption
+    implementation group: 'org.mindrot', name: 'jbcrypt', version: jbcrypt_version // password encryption
     implementation "org.valiktor:valiktor-core:$valiktor_version" // validator
     implementation "io.github.microutils:kotlin-logging-jvm:$microutils_version" // Logging
     implementation("org.apache.commons:commons-email:1.5")

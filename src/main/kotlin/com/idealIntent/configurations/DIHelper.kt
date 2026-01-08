@@ -32,8 +32,11 @@ import com.idealIntent.repositories.compositions.texts.TextLonelyRepository
 import com.idealIntent.repositories.profile.AccountRepository
 import com.idealIntent.repositories.profile.AuthorProfileRelatedRepository
 import com.idealIntent.repositories.profile.AuthorRepository
+import com.idealIntent.repositories.awareness.AwarenessTaskRepository
 import com.idealIntent.services.AuthorizationService
+import com.idealIntent.configurations.SchemaCreator
 import com.idealIntent.services.AuthorsPortfolioService
+import com.idealIntent.services.AwarenessTaskService
 import com.idealIntent.services.CompositionService
 import com.typesafe.config.ConfigFactory
 import io.ktor.config.*
@@ -50,6 +53,7 @@ object DIHelper {
         // services
         single { AuthorsPortfolioService(get(), get()) }
         single { AuthorizationService(get(), get(), get(), get(), get(), get(), get()) }
+        single { AwarenessTaskService() }
         single { CompositionService(get(), get(), get(), get(), get(), get(), get()) }
 
         // managers
@@ -91,6 +95,7 @@ object DIHelper {
         single { ResetPasswordCodeRepository() }
         single { AccountRepository() }
         single { AuthorProfileRelatedRepository() }
+        single { AwarenessTaskRepository() }
         single { CompositionSourceRepository() }
         single { TextRepository() }
         single { ImageRepository() }
@@ -106,8 +111,13 @@ object DIHelper {
 
         val appConfig: ApplicationConfig = HoconApplicationConfig(ConfigFactory.load("application.conf"))
 
-        single { AppEnv(appConfig, dbConnection) }
-//        single<IConnectionToDb> { ConnectionToDb() } // database access
+        // Initialize database schema automatically
+        single {
+            val appEnv = AppEnv(appConfig, dbConnection)
+            SchemaCreator.createTablesIfNotExist(appEnv.database)
+            SchemaCreator.initializeAwarenessStatuses(appEnv.database)
+            appEnv
+        }
 
         // third parties
         single { SimpleEmail() } // e-mailer
